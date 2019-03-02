@@ -1,0 +1,5797 @@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+TABLES FOR WAVELET FILTERS ADAPTED TO LIFE ON AN INTERVAL.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This file contains two sets of tables, both for wavelets adapted
+to the interval. The resulting wavelet bases on say [0,1] have
+the same number of vanishing moments (even as the edges) as the
+unperturbed interior wavelets.
+
+The first set of tables corresponds to a construction which was
+discovered independently by Albert Cohen, Ingrid Daubechies &
+Pierre Vial, by Bjorn Jawerth, and by Pierre-Gilles Lemarie .
+A first announcement of the construction appeared in
+A. Cohen, I. Daubechies, B. Jawerth and P. Vial, "Multiresolution
+analysis, wavelets and fast algorithms on the interval", 
+Comptes Rendus, Acad. Sc. Paris 316 (serie 1) (1992) pp. 417-421.
+The full details of the construction will appear in "Wavelets on the
+interval and fast wavelet transforms", by Albert Cohen, Ingrid Daubechies
+and Pierre Vial, Journal for Applied and Computational
+Harmonic Analysis, 1 (1993) 54-81.
+
+The second set of tables corresponds to an older construction of
+wavelet bases adapted to the interval, due to Yves Meyer, 
+"Ondelettes sur l'intervalle", Revista Matematica Iberoamericana,
+7 (1992) p. 115-133. The original paper of Y. Meyer did not give any
+tables corresponding to his construction; they are provided here.
+For a discussion of some advantages of the new construction over
+this first construction by Y. Mayer, see the J. ACHA paper mentioned above.
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+TABLES FOR WAVELETS ON THE INTERVAL AS IN THE JOINT WORK
+
+OF ALBERT COHEN, INGRID DAUBECHIES AND PIERRE VIAL.
+
+
+(Tables computed by Albert Cohen in Spring 1993)
+
+Note: it was pointed out to us by G. Beylkin in 1995 that some of 
+the entries are not accurate to all the decimals shown. 
+
+***************************************************************
+
+
+What follows are tables for a special construction of wavelets
+on the interval.
+The number of scaling functions and the number of wavelets
+at a resolution level j are equal in this construction 
+(and both equal to 2^j). 
+The tables are carried out for different values of N (N = 2 to 8),
+which is the number of vanishing moments of the wavelets.
+For given N, we need to adapt the N outermost wavelets and
+scaling functions, both on the right and the left side of the
+interval; the 2^j-2N "interior" functions are untouched and 
+are therefore the same as for the construction on the whole line.
+These are therefore associated with a pair of exact reconstruction
+filters. We have chosen the pair with length 2N (shortest length
+for which N vanishing moments are possible), and with phase closest
+to linear phase (exact linear phase is excluded, because these
+filters are orthonormal).
+At each edge we have computed the adapted filters corresponding to
+the adapted functions. Their lengths go from N+1 (for the one closest
+to the edge) to 3N-1 (closest to the interior), with increments
+of 2. The adapted filters are different for the left and right edges.
+
+The following illustrates how these adapted filters should be used.
+Suppose the data are represented by the following sequence of stars:
+
+	*  *  *  *  *  *  *  *  *  * ....
+
+We only consider the left edge here. The approximations at the
+next coarser scale will be obtained by applying low pass filters, and
+decimating, as usual. We represent the result as a sparser sequence
+of stars:
+
+original seq. : *   *   *   *   *   *   *   *   * ...
+
+coarser seq. :    *       *       *       *     .....
+
+In the case N=2, the interior filters have 4 taps, and we have 2 
+adapted filters for the edge, one with 3 and one with 5 taps. 
+What this means is that the leftmost of the coarser sequence points is
+obtained by weighting the leftmost 3 points of the finer sequence with
+the 3-tap adapted filter (the first coefficient weighs the leftmost fine
+scale point, the 2nd coefficient the 2nd point, etc.); the second leftmost
+of the coarser sequence is similarly obtained by applying the 5 tap adapted
+filter to the 5 leftmost fine scale points. From then on, i.e.
+for the third leftmost coarse seq. point on (and until we get near the
+right edge, where the right coefficients take over) we use the "interior
+filters". The third coarse point e.g. is obtained by acting with the standard
+4 tap filter on the fine scale points directly above it ( 2 to the right
+and 2 to the left).
+For larger N, one has to use the adapted tables for the N leftmost
+coarse points; from the (N+1)th, the interior filters take over.
+
+For any N, these tables can only be used if the data have at least
+2N points; for less points the 2 edges interfere and these adapted 
+tables are not sufficient. The whole procedure can of course be 
+repeated, to lead to a decomposition in many scales, but it has to
+be stopped when the coarsest scale has strictly less than 2N points.
+(At this point, other adapted filters should take over; in any case,
+if we want the scaling functions at every level to generate all
+polynomials of degree less than or equal to N-1, then we can at most
+go one step further ...)
+
+The high pass filters work of course in exactly the same way.
+
+
+
+On the infinite line, the fact that the wavelets have N vanishing
+moments is expressed by the fact that
+	 ...  1 1 1 1 1 1 1 1  ...
+is invariant under the lowpass filtering + decimation operation,
+while    ... 1 2 3 4 5 6 .... gets mapped into 1/2 times itself +
+multiple of  .. 1 1 1 1 1 1 .. , etc. (similar statements for 
+higher order polynomials). On the interval, it is not true,
+even though the wavelets have vanishing moments, that the
+sequence  1 1 1 ... 1 1 1 gets mapped, by the lowpass+decimation
+operations to a sequence  1 1 1 .. 1 1 1 of half the original
+length. (This is because the "adapted" low pass functions
+don't have integral 1.) Instead, there exist a1, a2, .. aN
+so that    a1 a2 .. aN 1 1 1 1 1 ... gets mapped to a similar
+sequence (at the other end, we need to end with properly chosen
+bN, .. b2, b1 of course). This sequence  a1 a2 .. aN 1 1 1 1 ...
+is therefore the sequence which maps to an all-zero sequence
+under the high-pass+decimation operation. In some applications
+(image analysis?) one would like the sequence  1 1 1 1 ...
+to have this property, however. To achieve this, one has to
+precondition the data. Before starting the decomposition,
+the N extreme values at the left have to be multiplied
+by a lower triangular matrix (the upper left corner triangle is zero), which 
+will map the column vector   1 1  .. 1  to   a1 a2 .. aN   (and which will
+also do the appropriate thing with the higher order polynomials).
+See below for the detailed preconditioning scheme.
+This matrix is also given in the tables, as well as its inverse 
+(needed after reconstruction), which is also a lower triangular matrix.
+
+Organization of the tables:
+
+For every N we have
+	
+	list of the lowpass filter coefficients used on the
+	interior.
+	(BEWARE: these should be normalized so that their sum
+	equals sqrt(2). In some cases - which will be indicated -
+	it isn't, and the normalization should be adapted to be
+	in accordance with the "edge" coefficients; the "edge"
+	coefficients are always normalized in L^2-sense, i.e.
+	the sum of the squares of every group is 1).
+
+	two columns with the lowpass adapted coefficients at
+	the left, highpass coefficients at the right. there
+	are N different filters; the shortest corresponds
+	with the outermost point, the longest with the innermost
+	of the adapted edge filters.
+
+	two columns with N blocks, with N entries in the every
+	block. These give the entries of
+	the preconditioning matrix described above: left column
+	for the matrix to apply to the data, right column for
+	the inverse, to use at the end of the reconstruction
+        (each block represents a column of the matrix in question).
+
+
+
+
+
+THE WHOLE THING IS GIVEN FOR THE LEFT EDGE AND THEN REPEATED
+FOR THE RIGHT EDGE.
+
+AT THE RIGHT EDGE :
+
+-The adapted filter coefficients have been obtained from the same program as 
+the results at the left edge, except that the "interior" filter
+coefficients were listed in the opposite order. The filtering operation should
+thus be done symmetrically : in the case N=2, for example, the rightmost of the
+coarser sequence points is obtained by weighting the rightmost 3 points of 
+the finer sequence with the 3-tap adapted filter (the first coeff. weighs the 
+rightmost fine scale point, the 2nd coeff. the 2nd point, etc.); the second 
+rightmost of the coarser sequence is similarly obtained by applying the 5 tap
+adapted filter to the 5 rightmost fine scale points. From then on, i.e.
+for the third rightmost coarse seq. point on (and until we get near the
+left edge, where the left coeff. take over) we use the "interior
+filters".
+
+-The preconditioning matrices are now upper triangular and their application
+does not require to "symmetrize" the data, i.e. to consider the rightmost point
+as the first point. The following scheme (corresponding to N=2) shows that
+the extreme points should be consider as standard column vectors on which
+the matrices are applied :
+
+           Prec. Matrix    Original Data             Preconditioned Data
+
+Left          | A 0 |            a                         Aa
+              | B C |            b                         Ba+Cb
+                                 c                         c
+                                 d                         d
+                                 e                         e
+                                 f                         f
+              | D E |            g                         Dg+Ef
+right         | 0 F |            h                         Fh
+
+The inverse operation (after reconstruction) works in the same way.
+
+************************************************************************
+
+
+The interior coefficients in these tables were computed with Macsyma.
+The edge coefficients were then computed, using these interior filter
+coefficients, with a Fortran program using double precision.
+
+
+
+************************************************************************
+
+
+
+
+
+
+
+
+
+
+TABLES AT LEFT EDGE.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+N=2
+
+
+lowpass coefficients in the interior
+
+	0.482962913145
+	0.836516303738
+	0.224143868042
+	-0.129409522551
+
+coefficients for the edge filters:
+
+    0.6033325119E+00       -0.7965435169E+00
+
+    0.6908955318E+00        0.5463927140E+00
+
+   -0.3983129977E+00       -0.2587922483E+00
+
+
+
+    0.3751746045E-01        0.1003722456E-01
+
+    0.4573276599E+00        0.1223510431E+00
+
+    0.8500881025E+00        0.2274281117E+00
+
+    0.2238203570E+00       -0.8366029212E+00
+
+   -0.1292227434E+00        0.4830129218E+00
+
+entries for the triangular preconditioning matrix and its inverse:
+
+
+    0.3248940489E+00        0.3077926491E+01
+
+    0.3715801512E-01       -0.1142045672E+00
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1001445405E+01        0.9985566812E+00
+
+
+
+
+N=3
+
+lowpass coefficients for the interior:
+
+	.332670552950
+	.806891509311
+	.459877502118
+	-.135011020010
+	-.085441273882
+	.035226291882
+
+
+coefficients for the edge filters:
+
+    0.3888997639E+00        0.5837809695E+00
+
+   -0.8820782813E-01        0.7936188402E+00
+
+   -0.8478413085E+00        0.1609551773E+00
+
+    0.3494874367E+00       -0.5884171124E-01
+
+
+
+   -0.6211483178E+00       -0.3493401824E+00
+
+    0.5225273932E+00        0.2989205572E+00
+
+   -0.2000080031E+00       -0.3283013439E+00
+
+    0.3378673486E+00       -0.3322637132E+00
+
+   -0.3997707705E+00        0.6982497200E+00
+
+    0.1648201297E+00       -0.2878789995E+00
+
+
+
+   -0.9587863831E-02        0.1015059001E-02
+
+    0.3712255319E-03       -0.3930133175E-04
+
+    0.3260097101E+00       -0.3451437111E-01
+
+    0.8016481645E+00       -0.8486981030E-01
+
+    0.4720552620E+00        0.1337307023E+00
+
+   -0.1400420809E+00        0.4604064538E+00
+
+   -0.8542510010E-01       -0.8068932216E+00
+
+    0.3521962365E-01        0.3326712589E+00
+
+
+entries for the triangular preconditioning matrix described above,
+and its inverse:
+
+
+    0.1007941579E+00        0.9921209927E+01
+
+   -0.5929310244E+00        0.2752403722E+02
+
+   -0.1509649764E-01       -0.6946796955E+00
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.2137256653E+00        0.4678895250E+01
+
+    0.3068542369E-01       -0.1435467050E+00
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1000189333E+01        0.9998107029E+00
+
+
+
+
+N=4
+
+coefficients for the interior lowpass filter:
+(beware: these coefficients are normalized so that their sum is 2)
+
+       0.045570345896 
+       - 0.0178247014417
+       - 0.140317624179
+       0.421234534204 
+       1.13665824341
+       0.703739068656
+       - 0.0419109651251
+      - 0.107148901418
+
+coefficients for the edge filters:
+
+    0.9097539258E+00       -0.7573970762E-01
+
+    0.4041658894E+00        0.3254391718E+00
+
+    0.8904031866E-01       -0.6843490805E+00
+
+   -0.1198419201E-01        0.6200442107E+00
+
+   -0.3042908414E-01       -0.1885851398E+00
+
+
+
+   -0.2728514077E+00        0.1665959592E+00
+
+    0.5090815232E+00       -0.4847843089E+00
+
+    0.6236424434E+00        0.3564635425E+00
+
+    0.4628400863E+00        0.4839896156E+00
+
+    0.2467476417E+00       -0.6057543651E+00
+
+   -0.1766953329E-01        0.3451833289E-01
+
+   -0.4517364549E-01        0.8824901639E-01
+
+
+
+    0.1261179286E+00        0.2082535326E+00
+
+   -0.2308557268E+00       -0.4018227932E+00
+
+   -0.5279923525E-01       -0.6872148762E-01
+
+    0.2192651713E+00        0.3302135113E+00
+
+    0.4634807211E+00        0.5580212962E+00
+
+    0.7001197140E+00       -0.5994974134E+00
+
+    0.4120325790E+00       -0.6909199198E-01
+
+   -0.2622276250E-01        0.2785356997E-01
+
+   -0.6704069413E-01        0.7120999037E-01
+
+
+
+   -0.2907980427E-01        0.6548500701E-01
+
+    0.5992807229E-01       -0.1349524295E+00
+
+    0.6176427778E-02       -0.1390873929E-01
+
+   -0.4021099904E-01        0.9055141946E-01
+
+   -0.3952587013E-01        0.8900857304E-01
+
+   -0.5259906257E-01        0.3733444476E+00
+
+    0.3289494480E+00       -0.8404653708E+00
+
+    0.7966378967E+00        0.3156849362E+00
+
+    0.4901130336E+00        0.1202976509E+00
+
+   -0.2943287768E-01       -0.1307020280E-01
+
+   -0.7524762313E-01       -0.3341507090E-01
+
+
+entries for the triangular preconditioning matrix and its inverse:
+
+    0.2489911114E+01        0.4016207624E+00
+
+   -0.2752988536E+01        0.6592239446E+00
+
+    0.1687841447E+01       -0.1870967456E+00
+
+   -0.4022221173E+00        0.3352374610E-01
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1677210550E+01        0.5962280646E+00
+
+   -0.7075375437E+00        0.3732739492E+00
+
+    0.1763544288E+00       -0.8158414568E-01
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1130145142E+01        0.8848420994E+00
+
+   -0.6162121550E-01        0.5415219932E-01
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1006885156E+01        0.9931619247E+00
+
+
+
+N=5
+
+coefficients for the interior lowpass filter:
+(beware: these are normalized so that their sum is 2)
+
+      0.0276321529578
+      - 0.0298424998687
+       - 0.247951362613
+      0.0234789231361
+      0.89658164838
+      1.02305296689 
+      0.281990696854
+       - 0.0553441861166
+       0.0417468644215 
+       0.0386547959548 
+
+coefficients for the edge filters:
+
+
+    0.9302490657E+00        0.2803062751E-01
+
+    0.3488878121E+00       -0.1899596351E+00
+
+    0.1098578445E+00        0.5126446690E+00
+
+    0.2701025958E-01       -0.6992703507E+00
+
+    0.7897329608E-02        0.4475860840E+00
+
+    0.7300852033E-02       -0.1049415950E+00
+
+
+
+   -0.3099501188E+00       -0.6736388320E-01
+
+    0.5987214008E+00        0.3342473230E+00
+
+    0.6208411495E+00       -0.5086311754E+00
+
+    0.3720164550E+00        0.1104945888E-01
+
+    0.1451060379E+00        0.6367318477E+00
+
+    0.6263262144E-02       -0.4656214411E+00
+
+    0.1687072021E-01        0.3800200446E-01
+
+    0.1562115518E-01        0.3518730685E-01
+
+
+
+    0.1138401479E+00        0.1327317986E+00
+
+   -0.3641831811E+00       -0.4544562923E+00
+
+    0.1228916167E-01        0.2604140629E+00
+
+    0.4117590210E+00        0.4050120843E+00
+
+    0.5954973448E+00       -0.8108043041E-02
+
+    0.5457944280E+00       -0.6031278756E+00
+
+    0.1756416185E+00       -0.3803908839E-01
+
+   -0.1751671276E-01        0.4149398330E+00
+
+    0.2376581050E-01       -0.5938666471E-01
+
+    0.2200554624E-01       -0.5498806769E-01
+
+
+
+   -0.4098816981E-01       -0.2828796750E-01
+
+    0.1431055982E+00        0.1003358539E+00
+
+   -0.6777711666E-01       -0.8695683128E-01
+
+   -0.1740980466E+00       -0.7322615732E-01
+
+   -0.9559132536E-01        0.9631505948E-01
+
+    0.1512981220E+00        0.2847632852E+00
+
+    0.6357421629E+00       -0.7284839004E+00
+
+    0.6823643465E+00        0.5708436334E+00
+
+    0.1963091141E+00       -0.5757775517E-02
+
+   -0.3301996982E-01       -0.1685142803E+00
+
+    0.2833562039E-01        0.2152759089E-01
+
+    0.2623688365E-01        0.1993310503E-01
+
+
+
+    0.7965029532E-02        0.1109055091E-01
+
+   -0.2796122002E-01       -0.3893335648E-01
+
+    0.1706238600E-01        0.2375776006E-01
+
+    0.2928655475E-01        0.4077875984E-01
+
+    0.2857806991E-02        0.3979226173E-02
+
+   -0.4686793277E-01       -0.6525916723E-01
+
+   -0.1702677471E+00       -0.3158187796E-01
+
+    0.3028147873E-01       -0.1797740855E+00
+
+    0.6351733467E+00        0.7214516731E+00
+
+    0.7207789094E+00       -0.6372838903E+00
+
+    0.1995469939E+00        0.1632013715E-01
+
+   -0.3864256419E-01        0.1755600827E+00
+
+    0.2947288315E-01       -0.2116688221E-01
+
+    0.2728991267E-01       -0.1959911299E-01
+
+
+entries for the triangular preconditioning matrix and its inverse:
+
+    0.3743818971E+01        0.2671069322E+00
+
+   -0.6861305063E+01        0.1047409836E+01
+
+    0.7183286173E+01       -0.6066998614E+00
+
+   -0.3711751230E+01        0.2622361574E+00
+
+    0.7595392314E+00       -0.5336282441E-01
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1749746932E+01        0.5715112179E+00
+
+   -0.1112386159E+01        0.5118280722E+00
+
+    0.5611031648E+00       -0.2021081048E+00
+
+   -0.1136294342E+00        0.3953339052E-01
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1242099062E+01        0.8050887651E+00
+
+   -0.2151591879E+00        0.1662752175E+00
+
+    0.4303743724E-01       -0.3186979674E-01
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1041780293E+01        0.9598952930E+00
+
+   -0.1641111826E-01        0.1572808312E-01
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1001581378E+01        0.9984211186E+00
+
+
+
+
+N=6
+
+coefficients for the interior lowpass filter
+(Beware: they are normalized so that their sum is 2)
+
+       - 0.0110318675094
+       0.00249992209279
+       0.06325056266
+       - 0.0297837512985 
+       - 0.102724969862
+       0.477904371333
+       1.11389278393
+       0.694457972958
+       - 0.0683231215866 
+      - 0.166863215412
+       0.00493661237185
+       0.0217847003266
+
+
+coefficients for the edge filters:
+
+
+    0.9231184460E+00       -0.2321705918E-01
+
+    0.3781064509E+00        0.1171366871E+00
+
+    0.6815972396E-01       -0.3314072447E+00
+
+   -0.1063392935E-01        0.6083387113E+00
+
+   -0.9724819798E-02       -0.6313905276E+00
+
+    0.1297887318E-02        0.3213644020E+00
+
+    0.5723757426E-02       -0.6248310180E-01
+
+
+
+   -0.2868924125E+00        0.6092307458E-01
+
+    0.5940469387E+00       -0.2496185025E+00
+
+    0.6609604336E+00        0.4764189916E+00
+
+    0.3412988002E+00       -0.3565792957E+00
+
+    0.9716877076E-01       -0.2893047969E+00
+
+   -0.1860855577E-01        0.6336061692E+00
+
+   -0.4013700006E-01       -0.3069767199E+00
+
+    0.1537307481E-02        0.4772815467E-02
+
+    0.6783960390E-02        0.2106188350E-01
+
+
+
+    0.1472870932E+00       -0.1146309215E+00
+
+   -0.3468945123E+00        0.3715476805E+00
+
+    0.6221043773E-01       -0.4207564723E+00
+
+    0.4938022108E+00       -0.1034481165E+00
+
+    0.5849105895E+00        0.4067108104E+00
+
+    0.4598788833E+00        0.2977351919E+00
+
+    0.2274224529E+00       -0.6148599157E+00
+
+   -0.2788953680E-01        0.6853115007E-01
+
+   -0.6367943024E-01        0.1538100267E+00
+
+    0.2177711568E-02       -0.5448874481E-02
+
+    0.9609989671E-02       -0.2404525386E-01
+
+
+
+   -0.8324138021E-01        0.1150865862E+00
+
+    0.2035630921E+00       -0.2924528794E+00
+
+   -0.8289131955E-01        0.1456717540E+00
+
+   -0.1939904105E+00        0.2552553980E+00
+
+   -0.1908457968E-01       -0.1279750816E-02
+
+    0.2636403540E+00       -0.3051944288E+00
+
+    0.5123094150E+00       -0.4352292068E+00
+
+    0.6538041187E+00        0.7155631228E+00
+
+    0.3695601186E+00       -0.1145542755E+00
+
+   -0.3993953251E-01       -0.4300360725E-01
+
+   -0.9479455728E-01       -0.6987749084E-01
+
+    0.2986558645E-02        0.4395928052E-02
+
+    0.1317933842E-01        0.1939872286E-01
+
+
+
+    0.3164853364E-01        0.7165752442E-01
+
+   -0.8214471961E-01       -0.1869771835E+00
+
+    0.4327551059E-01        0.1021125523E+00
+
+    0.6830653932E-01        0.1533850430E+00
+
+   -0.4840048148E-02       -0.1330465569E-01
+
+   -0.7320834090E-01       -0.1616269775E+00
+
+   -0.5786918156E-01       -0.1222261416E+00
+
+    0.2055855208E-01       -0.2142989488E+00
+
+    0.4001944206E+00        0.8103733356E+00
+
+    0.7644983569E+00       -0.4058841524E+00
+
+    0.4653802512E+00       -0.1135045856E+00
+
+   -0.4686421163E-01        0.2621633969E-01
+
+   -0.1137136979E+00        0.6071714788E-01
+
+    0.3413297317E-02       -0.2015600401E-02
+
+    0.1506248690E-01       -0.8894611814E-02
+
+
+
+   -0.5550804971E-02        0.1092693197E-01
+
+    0.1471087926E-01       -0.2895882270E-01
+
+   -0.8859117912E-02        0.1743944876E-01
+
+   -0.1158923365E-01        0.2281376635E-01
+
+    0.1569832259E-02       -0.3090263591E-02
+
+    0.1157111171E-01       -0.2277809280E-01
+
+    0.7445526684E-02       -0.1465675051E-01
+
+    0.2902493903E-01       -0.8673422325E-01
+
+   -0.2999940975E-01        0.6576188609E-01
+
+   -0.6576340468E-01        0.4762105224E+00
+
+    0.3438258786E+00       -0.7968622388E+00
+
+    0.7867130346E+00        0.3399096026E+00
+
+    0.4895844920E+00        0.7597309556E-01
+
+   -0.4825468670E-01       -0.2118117647E-01
+
+   -0.1177993251E+00       -0.4513809001E-01
+
+    0.3488475665E-02        0.1772121221E-02
+
+    0.1539424027E-01        0.7820166308E-02
+
+
+entries for the triangular preconditioning matrix and its inverse:
+
+
+    0.2691258238E+01        0.3715734097E+00
+
+   -0.4691390835E+01        0.7677024985E+00
+
+    0.5650878809E+01       -0.1862336274E+00
+
+   -0.4003610222E+01        0.4546833284E-01
+
+    0.1548107666E+01       -0.9293368857E-02
+
+   -0.2523403787E+00        0.1131936169E-02
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.2270666166E+01        0.4403993925E+00
+
+   -0.2346218035E+01        0.6446164864E+00
+
+    0.1686964492E+01       -0.2228021018E+00
+
+   -0.6557730032E+00        0.6332382245E-01
+
+    0.1069443363E+00       -0.8983535001E-02
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1602926731E+01        0.6238588332E+00
+
+   -0.7485464376E+00        0.3995416825E+00
+
+    0.3030447729E+00       -0.1345491657E+00
+
+   -0.5083020320E-01        0.2195487513E-01
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1168807480E+01        0.8555728955E+00
+
+   -0.1287884925E+00        0.1077442661E+00
+
+    0.2180567976E-01       -0.1782040660E-01
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1022680347E+01        0.9778226434E+00
+
+   -0.7652542041E-02        0.7478034810E-02
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1000641088E+01        0.9993593230E+00
+
+
+
+N=7
+
+coefficients for the interior lowpass filter:
+(Beware: they are normalized so that their sum is 2)
+
+
+       0.014521394762
+       0.00567134268574
+       - 0.152463871896 
+       - 0.198056706807 
+       0.408183939725
+       1.08578270981
+      0.758162601964 
+      0.0246656594886 
+       - 0.070078291222
+       0.0960147679355 
+      0.043155452582 
+       - 0.0178704316511
+      - 0.0014812259146 
+      0.0037926585342 
+
+
+coefficients for the edge filters:
+
+
+    0.9426568713E+00        0.2111640418E-01
+
+    0.2691475418E+00       -0.3198838656E+00
+
+    0.1685897688E+00        0.5837712653E+00
+
+    0.9379442214E-01       -0.5101698301E+00
+
+    0.4001600171E-01        0.4662343677E+00
+
+    0.1057520816E-01       -0.2666472827E+00
+
+   -0.1804517915E-02        0.8683768041E-01
+
+    0.4620417362E-02       -0.1225652919E-01
+
+
+
+   -0.3237338194E+00       -0.3337831390E-01
+
+    0.6746802222E+00        0.3515528841E+00
+
+    0.5985769136E+00       -0.4361153142E+00
+
+    0.2331427899E+00        0.2303567833E-01
+
+    0.7615188825E-02        0.3942229572E+00
+
+    0.8787238208E-01       -0.5996924995E+00
+
+    0.1327822780E+00        0.3966958788E+00
+
+   -0.4208296665E-01       -0.1101295389E+00
+
+   -0.4763766998E-02       -0.2001792798E-02
+
+    0.1219755973E-01        0.5125562862E-02
+
+
+
+   -0.2713311808E-01       -0.6003418428E-01
+
+   -0.2899110477E+00        0.4010347311E+00
+
+    0.6661404639E-01       -0.2255897141E+00
+
+    0.7251175151E+00       -0.3612133157E+00
+
+    0.5750729858E+00        0.4028777516E+00
+
+    0.4362186445E-01        0.2083956160E+00
+
+   -0.1857980605E+00       -0.6015619432E+00
+
+    0.1201045634E+00        0.2500040680E+00
+
+    0.5011061230E-01        0.1224078560E+00
+
+   -0.2991531277E-01       -0.9490678016E-01
+
+   -0.1573393605E-02       -0.3494310966E-02
+
+    0.4028652635E-02        0.8947135057E-02
+
+
+
+    0.2428297386E-01       -0.9808774833E-02
+
+   -0.1012534619E-01        0.2839107988E-01
+
+   -0.1589124403E+00        0.2026374721E-02
+
+   -0.1400872185E+00        0.3959072389E-02
+
+    0.3332116140E+00       -0.1570876545E-01
+
+    0.7053065273E+00       -0.9207675872E-01
+
+    0.5793528972E+00       -0.5918868498E-02
+
+    0.3896614469E-02        0.5375286822E+00
+
+   -0.5955471765E-01       -0.7665446854E+00
+
+    0.7479188863E-01        0.2868941871E+00
+
+    0.3081374376E-01        0.1404254891E+00
+
+   -0.1340206604E-01       -0.1078898335E+00
+
+   -0.1047350551E-02       -0.4024427396E-02
+
+    0.2681726647E-02        0.1030449087E-01
+
+
+
+    0.2396415492E-02        0.1254105463E-02
+
+   -0.2199441967E-01       -0.1041703156E-01
+
+    0.3831273498E-01        0.1308623534E-01
+
+    0.8416826933E-02        0.7187262673E-02
+
+   -0.1404553727E+00       -0.3166691268E-01
+
+   -0.9975512873E-01       -0.1089545516E-01
+
+    0.2671255526E+00        0.5917635073E-01
+
+    0.7725679637E+00        0.4986270055E-01
+
+    0.5400947777E+00        0.1873760767E-01
+
+    0.1395136806E-01       -0.5366643035E+00
+
+   -0.4947167749E-01        0.7678225002E+00
+
+    0.6809969285E-01       -0.2885552645E+00
+
+    0.3044230228E-01       -0.1401119926E+00
+
+   -0.1259630803E-01        0.1078385285E+00
+
+   -0.1045026849E-02        0.4012411756E-02
+
+    0.2675776840E-02       -0.1027372499E-01
+
+
+
+   -0.9493922980E-03       -0.4169893239E-04
+
+    0.8445740060E-02        0.4623987716E-03
+
+   -0.8462283108E-02       -0.6221335658E-03
+
+   -0.3100522289E-02        0.1572706697E-03
+
+    0.2269052507E-01        0.2991444009E-02
+
+   -0.9675176425E-02        0.4406571767E-03
+
+   -0.1013545517E+00       -0.1220793447E-01
+
+   -0.1405275956E+00       -0.3060471910E-01
+
+    0.2877816730E+00        0.6783517122E-01
+
+    0.7686169120E+00        0.4959733828E-01
+
+    0.5358841401E+00        0.1742614880E-01
+
+    0.1743190445E-01       -0.5361004996E+00
+
+   -0.4949055461E-01        0.7677690648E+00
+
+    0.6785067390E-01       -0.2886325963E+00
+
+    0.3050565786E-01       -0.1400474616E+00
+
+   -0.1262873733E-01        0.1078086397E+00
+
+   -0.1047102354E-02        0.4010247499E-02
+
+    0.2681091142E-02       -0.1026818344E-01
+
+
+
+    0.1364120169E-03        0.3562754358E-04
+
+   -0.1153014522E-02       -0.3011395265E-03
+
+    0.1050196147E-02        0.2742856482E-03
+
+    0.6396328807E-03        0.1670567176E-03
+
+   -0.1940525665E-02       -0.5068179562E-03
+
+    0.1962825019E-02        0.5126423314E-03
+
+    0.9431646581E-02        0.2463316874E-02
+
+    0.4027633417E-02        0.1051919469E-02
+
+   -0.1076854888E+00       -0.1260408191E-01
+
+   -0.1401281648E+00       -0.3053643220E-01
+
+    0.2886799721E+00        0.6790539526E-01
+
+    0.7677614604E+00        0.4955094521E-01
+
+    0.5360881498E+00        0.1743687297E-01
+
+    0.1744975917E-01       -0.5360995353E+00
+
+   -0.4954996630E-01        0.7677648691E+00
+
+    0.6789074612E-01       -0.2886301380E+00
+
+    0.3051526119E-01       -0.1400473018E+00
+
+   -0.1263602514E-01        0.1078082911E+00
+
+   -0.1047379021E-02        0.4010246532E-02
+
+    0.2681799545E-02       -0.1026818096E-01
+
+
+
+entries for the triangular preconditioning matrix and its inverse:
+
+    0.5804269091E+00        0.1722869812E+01
+
+   -0.7323447716E+00        0.5738683253E+01
+
+    0.2824499599E+01       -0.1245382394E+02
+
+   -0.2917456460E+01        0.7964976943E+01
+
+    0.1789930270E+01       -0.4649550414E+01
+
+   -0.6097284388E+00        0.1520565899E+01
+
+    0.8862324360E-01       -0.2151255312E+00
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.2198648442E+00        0.4548248738E+01
+
+    0.5966667693E+00       -0.4076684813E+01
+
+   -0.9937306950E-01        0.1227270380E+01
+
+    0.5522044783E-01       -0.6678395557E+00
+
+   -0.1473788829E-01        0.1967618134E+00
+
+    0.1693029724E-02       -0.2546662797E-01
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.6656852331E+00        0.1502211481E+01
+
+    0.1901881588E+00       -0.2856934692E+00
+
+   -0.1038800577E+00        0.1544684019E+00
+
+    0.3255433820E-01       -0.4820986746E-01
+
+   -0.4462431097E-02        0.6604466353E-02
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1000032785E+01        0.9999672157E+00
+
+   -0.4315341245E-02        0.4305484704E-02
+
+    0.1542073127E-02       -0.1534917109E-02
+
+   -0.2143390832E-03        0.2132631237E-03
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1002256439E+01        0.9977486406E+00
+
+   -0.1554134553E-02        0.1550217349E-02
+
+    0.2204062611E-03       -0.2197888501E-03
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1000269825E+01        0.9997302475E+00
+
+   -0.7738658261E-04        0.7736527399E-04
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1000005602E+01        0.9999943980E+00
+
+
+
+
+N=8
+
+coefficients for the interior lowpass filter:
+(beware: they are normalized so that their sum is 2)
+
+      0.00267279339281 
+       - 0.000428394300246 
+       - 0.0211456865284
+       0.00538638875377
+       0.0694904659113 
+       - 0.0384935212634
+       - 0.0734625087609 
+       0.515398670374
+       1.09910663054
+       0.68074534719
+       - 0.0866536154058
+       - 0.202648655286 
+       0.0107586117505
+       0.0448236230437
+       - 0.000766690896228
+       - 0.0047834585115
+
+
+
+coefficients for the edge filters:
+
+
+    0.9281136260E+00       -0.7274859222E-02
+
+    0.3668618286E+00        0.4042756257E-01
+
+    0.6266997447E-01       -0.1352706631E+00
+
+   -0.7647264163E-02        0.3196302046E+00
+
+   -0.5088004810E-02       -0.5501818613E+00
+
+    0.1171898539E-02        0.6205221664E+00
+
+    0.1656055473E-02       -0.4113728030E+00
+
+   -0.1929333000E-03        0.1430304841E+00
+
+   -0.1203653707E-02       -0.2044325554E-01
+
+
+
+   -0.2926634432E+00        0.2188690374E-01
+
+    0.6373078980E+00       -0.1065695633E+00
+
+    0.6452435440E+00        0.2843724182E+00
+
+    0.2965161471E+00       -0.4589840425E+00
+
+    0.5906254343E-01        0.3646732234E+00
+
+   -0.1366965641E-01        0.1447078292E+00
+
+   -0.1323318522E-01       -0.5672211027E+00
+
+    0.2213708145E-02        0.4500458402E+00
+
+    0.8306912600E-02       -0.1356216791E+00
+
+   -0.1892199826E-03        0.8474645355E-03
+
+   -0.1180561737E-02        0.5287413026E-02
+
+
+
+    0.1537394280E+00        0.4622773093E-01
+
+   -0.3933877381E+00       -0.1945832994E+00
+
+    0.1368645026E+00        0.3992968143E+00
+
+    0.6064470308E+00       -0.3762144385E+00
+
+    0.5685338138E+00       -0.7211460588E-01
+
+    0.3166230149E+00        0.4092764167E+00
+
+    0.9637901837E-01        0.5023569070E-01
+
+   -0.2215743488E-01       -0.5779911399E+00
+
+   -0.4105959919E-01        0.3834915553E+00
+
+    0.3062891878E-02       -0.1151747954E-01
+
+    0.1191510029E-01       -0.4999008246E-01
+
+   -0.2473506634E-03        0.7518452020E-03
+
+   -0.1543244666E-02        0.4690834793E-02
+
+
+
+   -0.9143117079E-01       -0.7950461567E-01
+
+    0.2571933236E+00        0.2823466127E+00
+
+   -0.1858137201E+00       -0.4114017970E+00
+
+   -0.2318000501E+00        0.1023384550E+00
+
+    0.1598859051E+00        0.3519831583E+00
+
+    0.4871009258E+00       -0.6162537699E-01
+
+    0.5734443542E+00       -0.4034315192E+00
+
+    0.4450618899E+00       -0.1544031905E+00
+
+    0.2033090498E+00        0.6034144392E+00
+
+   -0.3331081673E-01       -0.1069950598E+00
+
+   -0.6859620275E-01       -0.2019995950E+00
+
+    0.4406096842E-02        0.1468973030E-01
+
+    0.1763488599E-01        0.5758759998E-01
+
+   -0.3388224811E-03       -0.1171092606E-02
+
+   -0.2113946167E-02       -0.7306559816E-02
+
+
+
+    0.5709470789E-01        0.6367040385E-01
+
+   -0.1665850443E+00       -0.1917735089E+00
+
+    0.1454047216E+00        0.1859227361E+00
+
+    0.1015538648E+00        0.8760929009E-01
+
+   -0.1362852159E+00       -0.1698024241E+00
+
+   -0.1769345243E+00       -0.1650717698E+00
+
+    0.8596479652E-02        0.4044496899E-01
+
+    0.3062987789E+00        0.2651503207E+00
+
+    0.5431752460E+00        0.3382384364E+00
+
+    0.6140955155E+00       -0.7711604374E+00
+
+    0.3284966144E+00        0.2754111726E+00
+
+   -0.4723534035E-01        0.4710140765E-01
+
+   -0.1039762360E+00        0.2958356475E-01
+
+    0.6053819361E-02       -0.8186932177E-02
+
+    0.2473853830E-01       -0.2780308340E-01
+
+   -0.4480360998E-03        0.8002315701E-03
+
+   -0.2795340476E-02        0.4992722014E-02
+
+
+
+   -0.2771885178E-01        0.5905246892E-01
+
+    0.8389262409E-01       -0.1800708576E+00
+
+   -0.8147463473E-01        0.1795432638E+00
+
+   -0.3866640174E-01        0.7542773595E-01
+
+    0.7464550842E-01       -0.1632828547E+00
+
+    0.6920099668E-01       -0.1404076028E+00
+
+   -0.2231653624E-01        0.5304071283E-01
+
+   -0.1020129060E+00        0.2049015597E+00
+
+   -0.6275852804E-01        0.1129722066E+00
+
+    0.8683887629E-01        0.6297984646E-01
+
+    0.4540741128E+00       -0.7409643915E+00
+
+    0.7328223558E+00        0.5042713730E+00
+
+    0.4319437621E+00        0.7588728111E-01
+
+   -0.5734179466E-01       -0.4120932567E-01
+
+   -0.1314896433E+00       -0.8313424682E-01
+
+    0.7195965493E-02        0.5540498594E-02
+
+    0.2979946085E-01        0.2315912504E-01
+
+   -0.5190323961E-03       -0.3922287088E-03
+
+   -0.3238293222E-02       -0.2447152777E-02
+
+
+
+    0.8529185218E-02        0.1789547417E-01
+
+   -0.2624362023E-01       -0.5515123460E-01
+
+    0.2697489980E-01        0.5699017157E-01
+
+    0.9748173003E-02        0.1992423503E-01
+
+   -0.2431726904E-01       -0.5131208900E-01
+
+   -0.1901319060E-01       -0.3947317762E-01
+
+    0.8695522469E-02        0.1852759787E-01
+
+    0.2729552258E-01        0.5658785929E-01
+
+    0.1231155208E-01        0.2487421369E-01
+
+    0.9187597846E-02        0.5732429572E-01
+
+   -0.4745631970E-01       -0.1020173091E+00
+
+   -0.2924026466E-01       -0.4251128534E+00
+
+    0.3831732042E+00        0.8001954561E+00
+
+    0.7723764353E+00       -0.3763869007E+00
+
+    0.4743837775E+00       -0.6582574501E-01
+
+   -0.6082976218E-01        0.2842730285E-01
+
+   -0.1418145038E+00        0.5331847291E-01
+
+    0.7565491348E-02       -0.3918460367E-02
+
+    0.3149214931E-01       -0.1548884491E-01
+
+   -0.5401012058E-03        0.3080051475E-03
+
+   -0.3369743560E-02        0.1921673848E-02
+
+
+
+   -0.1148179452E-02        0.2054346689E-02
+
+    0.3567347972E-02       -0.6382774933E-02
+
+   -0.3784785333E-02        0.6771819551E-02
+
+   -0.1105680377E-02        0.1978304192E-02
+
+    0.3387180654E-02       -0.6060419089E-02
+
+    0.2395725348E-02       -0.4286482122E-02
+
+   -0.1281174092E-02        0.2292309675E-02
+
+   -0.3407989030E-02        0.6097652254E-02
+
+   -0.1283416571E-02        0.2296316381E-02
+
+   -0.9841020551E-02        0.2254192382E-01
+
+    0.6341196709E-02       -0.1213654065E-01
+
+    0.4619539219E-01       -0.1379967819E+00
+
+   -0.2943416082E-01        0.6522286075E-01
+
+   -0.5094613096E-01        0.4794644197E+00
+
+    0.3655480429E+00       -0.7789628537E+00
+
+    0.7770499808E+00        0.3646968778E+00
+
+    0.4810695095E+00        0.5250853492E-01
+
+   -0.6126039684E-01       -0.2724349082E-01
+
+   -0.1432436897E+00       -0.4923361338E-01
+
+    0.7606483137E-02        0.3810616823E-02
+
+    0.3168981524E-01        0.1496216731E-01
+
+   -0.5420982042E-03       -0.3029798461E-03
+
+   -0.3382203026E-02       -0.1890320507E-02
+
+
+entries for the triangular preconditioning matrix and its inverse:
+
+    0.2810123818E+01        0.3558562059E+00
+
+   -0.6559223197E+01        0.8146829794E+00
+
+    0.1166265739E+02       -0.1366545660E+00
+
+   -0.1370803617E+02       -0.2512978838E-01
+
+    0.1057161896E+02        0.3435512306E-01
+
+   -0.5161014832E+01       -0.1989050428E-01
+
+    0.1450032681E+01        0.6413814665E-02
+
+   -0.1790147104E+00       -0.8795283072E-03
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.2865090274E+01        0.3490291420E+00
+
+   -0.4726642907E+01        0.7527005851E+00
+
+    0.5658991531E+01       -0.1741151174E+00
+
+   -0.4391120800E+01        0.2189754588E-01
+
+    0.2150489727E+01        0.7628539402E-02
+
+   -0.6053327281E+00       -0.4888651292E-02
+
+    0.7483245389E-01        0.8230905056E-03
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.2191756126E+01        0.4562551409E+00
+
+   -0.2253964453E+01        0.6427198947E+00
+
+    0.1808275069E+01       -0.2393601344E+00
+
+   -0.9018774144E+00        0.8134531543E-01
+
+    0.2565106244E+00       -0.1922603801E-01
+
+   -0.3190347407E-01        0.2116725807E-02
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1600048291E+01        0.6249811369E+00
+
+   -0.8330291569E+00        0.4302638030E+00
+
+    0.4321721196E+00       -0.1746850867E+00
+
+   -0.1262794856E+00        0.4820621391E-01
+
+    0.1601926411E-01       -0.6049455037E-02
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1210019309E+01        0.8264330929E+00
+
+   -0.2036886238E+00        0.1611623644E+00
+
+    0.6037258981E-01       -0.4551697161E-01
+
+   -0.7732501809E-02        0.5803277507E-02
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1044505769E+01        0.9573905957E+00
+
+   -0.2609642521E-01        0.2489086650E-01
+
+    0.3366051566E-02       -0.3198214876E-02
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1003760640E+01        0.9962534497E+00
+
+   -0.9726417449E-03        0.9689366947E-03
+
+
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.1000062955E+01        0.9999370493E+00
+
+
+
+
+
+*****************************************************************
+
+
+TABLES FOR THE RIGHT EDGE.
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
+The coefficients for the interior filters are exactly the same as
+above for every value of N, so that we do not repeat them here.
+
+
+
+N=2
+
+
+coefficients for the edge filters:
+
+
+
+    0.8705087534E+00       -0.2575129195E+00
+
+    0.4348969980E+00        0.8014229620E+00
+
+    0.2303890438E+00       -0.5398225007E+00
+
+
+
+   -0.1942334074E+00        0.3717189665E+00
+
+    0.1901514184E+00       -0.3639069596E+00
+
+    0.3749553316E+00       -0.7175799994E+00
+
+    0.7675566693E+00        0.4010695194E+00
+
+    0.4431490496E+00        0.2315575950E+00
+
+
+
+entries for the triangular preconditioning matrix and its inverse:
+
+    0.1089843053E+01        0.9175633109E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.8008132342E+00        0.3505220326E+00
+
+    0.2096292884E+01        0.4770325785E+00
+
+
+N=3
+
+coefficients for the edge filters:
+
+
+    0.9096849943E+00        0.7221948764E-01
+
+    0.3823606559E+00       -0.4265622188E+00
+
+    0.1509872153E+00        0.8042331410E+00
+
+    0.5896101069E-01       -0.4074776976E+00
+
+
+
+   -0.2904078511E+00       -0.1535052307E+00
+
+    0.4189992290E+00        0.5223942379E+00
+
+    0.4969643721E+00       -0.9819800088E-01
+
+    0.4907578307E+00       -0.7678795743E+00
+
+    0.4643627674E+00        0.2985152397E+00
+
+    0.1914505442E+00        0.1230738317E+00
+
+
+
+    0.8183541840E-01        0.2294775484E+00
+
+   -0.1587582156E+00       -0.4451794444E+00
+
+   -0.9124735623E-01       -0.2558698912E+00
+
+    0.6042558204E-03        0.1694414802E-02
+
+    0.7702933610E-01        0.7598761510E+00
+
+    0.5200601778E+00        0.1391503267E+00
+
+    0.7642591993E+00       -0.2725472352E+00
+
+    0.3150938230E+00       -0.1123675716E+00
+
+
+entries of the triangular preconditioning matrix and its inverse:
+
+    0.1055782528E+01        0.9471647557E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.4658798302E+00        0.2539461793E+00
+
+    0.1737631796E+01        0.5754959149E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+    0.2417783151E+01       -0.1059694498E+00
+
+   -0.6663367942E+01        0.6796520006E+00
+
+    0.5642212524E+01        0.1772354366E+00
+
+
+
+N=4
+
+coefficients for the edge filters:
+
+
+    0.9154705188E+00       -0.1982779906E+00
+
+    0.3919142810E+00        0.6040677868E+00
+
+    0.5947771124E-01       -0.6495297603E+00
+
+   -0.2519180851E-01        0.4050309541E+00
+
+    0.6437934569E-01       -0.9924194741E-01
+
+
+
+   -0.2191626469E+00       -0.2726273506E+00
+
+    0.4488001781E+00        0.5092867484E+00
+
+    0.7540005084E+00        0.6811856626E-01
+
+    0.3937758157E+00       -0.6735345752E+00
+
+   -0.1581338944E+00        0.4499340827E+00
+
+   -0.1614201190E-01        0.2719065540E-01
+
+    0.4126840881E-01       -0.6951519362E-01
+
+
+
+    0.1290078289E-01        0.4581959340E-02
+
+   -0.1390716006E+00        0.3062032365E-01
+
+    0.2921367950E-01        0.1388737145E-01
+
+    0.4606168537E+00       -0.9504834999E-01
+
+    0.8164119742E+00       -0.3015815012E+00
+
+    0.2986473346E+00        0.8033636317E+00
+
+   -0.1027663536E+00       -0.4968427065E+00
+
+   -0.1257488211E-01       -0.2963204370E-01
+
+    0.3214874197E-01        0.7575680778E-01
+
+
+
+   -0.6775603652E-02        0.2880305124E-02
+
+    0.1913244129E-01       -0.8133189531E-02
+
+   -0.1770918425E-01        0.7528163799E-02
+
+   -0.6765916174E-01        0.2876186983E-01
+
+   -0.3023588481E-01        0.1285325684E-01
+
+    0.4977920821E+00       -0.9920191439E-01
+
+    0.8039495996E+00       -0.2977899841E+00
+
+    0.2977111011E+00        0.8037936841E+00
+
+   -0.9910804055E-01       -0.4976470524E+00
+
+   -0.1259895190E-01       -0.2963766018E-01
+
+    0.3221027840E-01        0.7577116678E-01
+
+
+
+entries of the triangular preconditioning matrix and its inverse:
+
+    0.1000398078E+01        0.9996020804E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.2241154296E-02        0.2235092825E-02
+
+    0.1002312956E+01        0.9976923812E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.1844504727E-01        0.2335082980E-01
+
+    0.9170462790E-01       -0.1171759021E+00
+
+    0.7808176166E+00        0.1280708809E+01
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.7373304912E-02       -0.2846460011E-02
+
+   -0.9310068502E-03        0.9005357890E-01
+
+    0.3767386370E+00       -0.9639839213E+00
+
+    0.5005192311E+00        0.1997925230E+01
+
+
+N=5
+
+coefficients of the edge filters:
+
+
+
+    0.6629994791E+00        0.2704377396E+00
+
+    0.5590853114E+00       -0.2099389697E+00
+
+   -0.3638895712E+00        0.6232723378E+00
+
+   -0.3190292420E+00       -0.6204577645E+00
+
+   -0.8577516141E-01        0.3239177989E+00
+
+    0.7938922949E-01       -0.6655879286E-01
+
+
+
+   -0.1615976602E+00       -0.4460509080E+00
+
+    0.7429922432E+00        0.2531551137E+00
+
+    0.5771521705E+00       -0.3811235714E+00
+
+    0.2773360273E+00       -0.2939476383E+00
+
+    0.1530007177E-01        0.6480763210E+00
+
+   -0.1063942878E+00       -0.2856775435E+00
+
+   -0.1216769629E-01       -0.4448843004E-01
+
+    0.1126647052E-01        0.4119330180E-01
+
+
+
+    0.2576681838E+00       -0.4091805529E+00
+
+   -0.3995181391E-01        0.1427046841E+00
+
+    0.1290658921E-01        0.2088087907E-01
+
+    0.4163708782E+00       -0.3899540483E+00
+
+    0.6469374504E+00       -0.2052536834E+00
+
+    0.5608421202E+00        0.7190940497E+00
+
+    0.4995700940E-02       -0.3116714966E+00
+
+   -0.1569482750E+00       -0.1763286609E-01
+
+   -0.2009485730E-01       -0.4039743821E-01
+
+    0.1860648984E-01        0.3740531781E-01
+
+
+
+   -0.8955158953E-01       -0.1414833249E+00
+
+    0.3895616532E-01        0.6067058589E-01
+
+    0.4751157158E-02       -0.1094361815E-01
+
+   -0.6596188737E-01       -0.1401642518E+00
+
+    0.1520881337E-01       -0.7844525367E-01
+
+    0.2466644601E+00        0.5612750679E-01
+
+    0.7199998123E+00        0.5913073605E+00
+
+    0.6131240289E+00       -0.7443064557E+00
+
+    0.1537319456E-01        0.1990571237E+00
+
+   -0.1721947543E+00        0.4730213481E-01
+
+   -0.2083858871E-01        0.3055544136E-01
+
+    0.1929513523E-01       -0.2829228895E-01
+
+
+
+    0.1546583496E-01        0.1104876084E-01
+
+   -0.6559247482E-02       -0.4685912973E-02
+
+    0.2728093541E-02        0.1948944437E-02
+
+    0.1830645747E-01        0.1307809574E-01
+
+    0.1708296448E-01        0.1220403484E-01
+
+    0.2156026058E-01        0.1540260595E-01
+
+   -0.3692524465E-01       -0.1737014260E+00
+
+    0.2045334663E+00       -0.1298838460E-01
+
+    0.7233635779E+00        0.6336000391E+00
+
+    0.6327590443E+00       -0.7243137518E+00
+
+    0.1649999072E-01        0.1992776018E+00
+
+   -0.1751674471E+00        0.3929252813E-01
+
+   -0.2109311508E-01        0.2952572161E-01
+
+    0.1953080958E-01       -0.2733883754E-01
+
+
+entries of the triangular preconditioning matrix and its inverse:
+
+    0.1000413355E+01        0.9995868157E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.4572991430E-02        0.4514077458E-02
+
+    0.1012632589E+01        0.9875250029E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+    0.9186034191E-02       -0.8522720044E-02
+
+   -0.5149118250E-01        0.4842233071E-01
+
+    0.1050111166E+01        0.9522801325E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.8653411835E-01        0.4412830877E-01
+
+    0.4462922645E+00       -0.2280710782E+00
+
+   -0.9332961770E+00        0.5124746278E+00
+
+    0.1734250554E+01        0.5766179504E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.6651201997E-01        0.2197171709E+00
+
+    0.3272287057E+00       -0.1071279051E+01
+
+   -0.6835308959E+00        0.2403809220E+01
+
+    0.1157116986E+00       -0.2710986078E+00
+
+    0.2461150317E+00        0.4063140690E+01
+
+
+
+N=6
+
+
+coefficients of the edge filters:
+
+
+    0.9236675275E+00       -0.5565971353E-01
+
+    0.3793343885E+00        0.2242498085E+00
+
+    0.4986459778E-01       -0.5135424238E+00
+
+   -0.1688947163E-01        0.6321916480E+00
+
+   -0.3311806998E-02       -0.4901838615E+00
+
+    0.2804629640E-02        0.2042322283E+00
+
+   -0.1237553624E-01       -0.3508415169E-01
+
+
+
+   -0.2831955072E+00        0.1057159278E+00
+
+    0.6209232596E+00       -0.3394364574E+00
+
+    0.6494435367E+00        0.4787854504E+00
+
+    0.3279016732E+00       -0.7187645472E-01
+
+ 
+   0.4613465423E-01       -0.5042780615E+00
+
+   -0.2201105042E-01        0.5796966704E+00
+
+    0.4772996268E-01       -0.2205355783E+00
+
+    0.1811083865E-02       -0.3313371482E-02
+
+   -0.7992103956E-02        0.1462152573E-01
+
+
+
+    0.1415889950E+00        0.1743290418E+00
+
+   -0.3264117354E+00       -0.4255531446E+00
+
+    0.5898718517E-01        0.2638047100E+00
+
+    0.5662575494E+00        0.3616438204E+00
+
+    0.6511436245E+00       -0.2644671055E+00
+
+    0.3434709841E+00       -0.4908547063E+00
+
+   -0.6897565912E-01        0.4962107578E+00
+
+   -0.2139852264E-01        0.6828427694E-01
+
+    0.4514540543E-01       -0.1606899475E+00
+
+    0.1807019829E-02       -0.5156673789E-02
+
+   -0.7974169836E-02        0.2275580595E-01
+
+
+
+   -0.4080929146E-01        0.3244709516E-02
+
+    0.1251977353E+00        0.5111253513E-03
+
+   -0.9208945297E-01        0.4381492218E-02
+
+   -0.1815441604E+00       -0.3035847066E-01
+
+    0.7492893632E-01       -0.3796933443E-01
+
+    0.4921890166E+00        0.7322186910E-01
+
+    0.7598885402E+00        0.3436818708E+00
+
+    0.3298535864E+00       -0.7867428461E+00
+
+   -0.6885203537E-01        0.4886190401E+00
+
+   -0.2056224689E-01        0.4823811158E-01
+
+    0.4357038095E-01       -0.1176377166E+00
+
+    0.1729458762E-02       -0.3491719268E-02
+
+   -0.7631901801E-02        0.1540855391E-01
+
+
+
+    0.1473338385E-01       -0.5211034254E-02
+
+   -0.3879928306E-01        0.1379054345E-01
+
+    0.3222685441E-01       -0.1172287487E-01
+
+    0.4181351746E-01       -0.1651839644E-01
+
+   -0.4470160402E-01        0.1484603300E-01
+
+   -0.1143592801E+00        0.4328769202E-01
+
+   -0.3079264597E-01        0.1491923547E-01
+
+    0.4953303341E+00       -0.7352728683E-01
+
+    0.7831063037E+00       -0.3353441076E+00
+
+    0.3365261769E+00        0.7880177709E+00
+
+   -0.7161554542E-01       -0.4916362852E+00
+
+   -0.2096645980E-01       -0.4832809329E-01
+
+    0.4445995152E-01        0.1180259590E+00
+
+    0.1762244193E-02        0.3492043263E-02
+
+   -0.7776580122E-02       -0.1540998367E-01
+
+
+
+   -0.2279778462E-02        0.1154376053E-02
+
+    0.5934267127E-02       -0.3004842779E-02
+
+   -0.4653920620E-02        0.2356533579E-02
+
+   -0.4697326198E-02        0.2378512204E-02
+
+    0.7905498252E-02       -0.4002984474E-02
+
+    0.1478426761E-01       -0.7486080223E-02
+
+    0.6356609850E-03       -0.3218698441E-03
+
+   -0.1184137622E+00        0.4493383491E-01
+
+   -0.4719524338E-01        0.2049260653E-01
+
+    0.4914056494E+00       -0.7279363945E-01
+
+    0.7873827096E+00       -0.3377604925E+00
+
+    0.3378777169E+00        0.7876649023E+00
+
+   -0.7256793624E-01       -0.4910841873E+00
+
+   -0.2105690525E-01       -0.4831332253E-01
+
+    0.4471373463E-01        0.1179951690E+00
+
+    0.1767573251E-02        0.3490782271E-02
+
+   -0.7800096641E-02       -0.1540441905E-01
+
+
+entries of the triangular preconditioning matrix and its inverse:
+
+    0.1000078420E+01        0.9999215862E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.9850976530E-03        0.9819736622E-03
+
+    0.1003102675E+01        0.9969069215E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+    0.2633468462E-02       -0.2560290665E-02
+
+   -0.1664138984E-01        0.1623091263E-01
+
+    0.1022118540E+01        0.9783601031E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.1429038400E-02        0.1388671224E-02
+
+    0.9368484963E-02       -0.9150173851E-02
+
+   -0.2392821028E-01        0.2393097496E-01
+
+    0.9782470759E+00        0.1022236636E+01
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+    0.1195277199E-01       -0.1168953970E-01
+
+   -0.6711312742E-01        0.6542835502E-01
+
+    0.1479375368E+00       -0.1465646909E+00
+
+   -0.7026196422E-01        0.7358661282E-01
+
+    0.9760519092E+00        0.1024535673E+01
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.1248032832E-01        0.2141640226E-01
+
+    0.7502310126E-01       -0.1275021840E+00
+
+   -0.1804736950E+00        0.3095551764E+00
+
+    0.1461500318E+00       -0.2545824950E+00
+
+    0.1504596966E+00       -0.2445553979E+00
+
+    0.6303329548E+00        0.1586463142E+01
+
+
+
+
+N=7
+
+coefficients for the edge filters:
+
+
+
+    0.9091449027E+00        0.1058599696E-01
+
+    0.4122956702E+00       -0.4261024318E-01
+
+    0.8463996964E-02        0.1626466305E+00
+
+   -0.4985469571E-01       -0.3983434261E+00
+
+   -0.2885243693E-01        0.6359366721E+00
+
+   -0.8468475604E-02       -0.5811383289E+00
+
+    0.9290995299E-03        0.2621339682E+00
+
+    0.2377975298E-02       -0.4571068446E-01
+
+
+
+   -0.2699308042E+00       -0.3369311938E-01
+
+    0.6287804833E+00        0.1173158297E+00
+
+    0.6425124921E+00       -0.3345684650E+00
+
+    0.3295936378E+00        0.4993594177E+00
+
+    0.9680040842E-01       -0.2270999192E+00
+
+   -0.1505090528E-02       -0.4092454872E+00
+
+   -0.2576996713E-01        0.5883989035E+00
+
+   -0.1663793375E-01       -0.2415648560E+00
+
+    0.7886583178E-03        0.4918478872E-02
+
+    0.2019348750E-02        0.1259369707E-01
+
+
+
+    0.2157402688E+00       -0.6868038150E-01
+
+   -0.3660961628E+00        0.2059784468E+00
+
+    0.9979560410E-01       -0.4260199250E+00
+
+    0.5343306371E+00        0.3030769028E+00
+
+    0.5651956498E+00        0.2528028219E+00
+
+    0.3984651316E+00       -0.2995453713E+00
+
+    0.2006608171E+00       -0.4153788373E+00
+
+    0.3790996947E-01        0.5783273640E+00
+
+   -0.5279896883E-01       -0.1200871578E+00
+
+   -0.3509616877E-01       -0.6583871196E-01
+
+    0.1600620645E-02        0.3864118919E-02
+
+    0.4098367097E-02        0.9894023233E-02
+
+
+
+   -0.1219999250E+00        0.1199301213E+00
+
+    0.2497494925E+00       -0.3021493088E+00
+
+   -0.1489636838E+00        0.4092549285E+00
+
+   -0.2314941689E+00        0.2642183651E-01
+
+    0.4306729538E-01       -0.3532455770E+00
+
+    0.3349988297E+00       -0.2065478346E+00
+
+    0.5170449138E+00        0.2227171845E+00
+
+    0.5314908191E+00        0.5240786066E+00
+
+    0.3984867666E+00       -0.2234158448E+00
+
+    0.1134176909E+00       -0.3876543947E+00
+
+   -0.8664578083E-01        0.1720771534E+00
+
+   -0.6206801690E-01        0.6600629896E-01
+
+    0.2555164772E-02       -0.5990160538E-02
+
+    0.6542464174E-02       -0.1533772348E-01
+
+
+
+    0.6643773700E-01        0.4081778499E-01
+
+   -0.1425076588E+00       -0.7665915987E-01
+
+    0.1150002072E+00        0.2089854289E-01
+
+    0.1110261320E+00        0.1140640809E+00
+
+   -0.5456405522E-01        0.1937409327E-01
+
+   -0.1403852745E+00       -0.1187989690E+00
+
+   -0.9002913124E-01       -0.1838791619E+00
+
+    0.9927107272E-01       -0.1133363121E+00
+
+    0.3252695570E+00        0.7805202816E+00
+
+    0.5955739150E+00       -0.5430653297E+00
+
+    0.6177120462E+00        0.6990288263E-01
+
+    0.2102093627E+00       -0.6927193818E-01
+
+   -0.1207077310E+00        0.6202160209E-01
+
+   -0.9029360085E-01        0.1264388999E-01
+
+    0.3498469159E-02       -0.2337275009E-02
+
+    0.8957782052E-02       -0.5984560439E-02
+
+
+
+   -0.2472698999E-01        0.1089534551E+00
+
+    0.5451727819E-01       -0.2418936349E+00
+
+   -0.4913268141E-01        0.2243741754E+00
+
+   -0.3543504434E-01        0.1488992192E+00
+
+    0.2981657384E-01       -0.1382661605E+00
+
+    0.5443081267E-01       -0.2312770306E+00
+
+    0.3080352023E-01       -0.1080114084E+00
+
+   -0.2311127518E-01        0.1488311123E+00
+
+   -0.2663146891E-01        0.2352279421E+00
+
+   -0.3986350788E-01        0.4020354092E+00
+
+    0.1012109980E+00       -0.7029809958E+00
+
+    0.5654368499E+00       -0.6175503239E-02
+
+    0.7419995864E+00        0.1485821868E+00
+
+    0.2730680885E+00        0.1174257523E+00
+
+   -0.1373359727E+00       -0.5325615968E-01
+
+   -0.1050857718E+00       -0.2772249506E-01
+
+    0.3942767529E-02        0.1737252935E-02
+
+    0.1009540190E-01        0.4448212190E-02
+
+
+
+    0.4060965940E-02        0.1545016950E-01
+
+   -0.9082349871E-02       -0.3455430249E-01
+
+    0.8675066430E-02        0.3300477019E-01
+
+    0.5263347825E-02        0.2002469773E-01
+
+   -0.5426164014E-02       -0.2064414148E-01
+
+   -0.8281419894E-02       -0.3150712024E-01
+
+   -0.2928559727E-02       -0.1114186730E-01
+
+    0.7407888982E-02        0.2818372382E-01
+
+    0.1392100926E-02       -0.5377738331E-01
+
+    0.2865053765E-01        0.1320738411E+00
+
+    0.5527738563E-01        0.2388167237E+00
+
+   -0.5250033174E-01       -0.7743478585E+00
+
+    0.2337385282E-01        0.5554662583E+00
+
+    0.5390029057E+00       -0.7133893666E-02
+
+    0.7666684946E+00       -0.5462109919E-01
+
+    0.2878132266E+00       -0.7104460368E-01
+
+   -0.1399692009E+00        0.3084906050E-01
+
+   -0.1077108034E+00        0.1309957900E-01
+
+    0.4008607630E-02       -0.1053633670E-02
+
+    0.1026398458E-01       -0.2697814488E-02
+
+
+
+entries of the triangular preconditioning matrix and its inverse:
+
+    0.1000408431E+01        0.9995917354E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.5293682422E-02        0.5202484794E-02
+
+    0.1017114208E+01        0.9831737600E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+    0.1591493727E-01       -0.1341009335E-01
+
+   -0.1031512206E+00        0.8847321480E-01
+
+    0.1146285615E+01        0.8723829270E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.3646661500E-01        0.1680436654E-01
+
+    0.2406286152E+00       -0.1136375469E+00
+
+   -0.6581590373E+00        0.3658356512E+00
+
+    0.1569466249E+01        0.6371592893E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+    0.8620589496E-01       -0.7264200771E-02
+
+   -0.5839504132E+00        0.5536106388E-01
+
+    0.1663842388E+01       -0.2090053065E+00
+
+   -0.2536273536E+01        0.6450028470E+00
+
+    0.2505431179E+01        0.3991328951E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.3341753604E+00       -0.3790478410E-02
+
+    0.2298323873E+01        0.1873956341E-01
+
+   -0.6712323867E+01       -0.2295905912E-01
+
+    0.1070192046E+02       -0.9239613787E-01
+
+   -0.9843372614E+01        0.7726440127E+00
+
+    0.5084895171E+01        0.1966608881E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+    0.1653022182E+00        0.3026314320E-01
+
+   -0.1367863363E+01       -0.1720350030E+00
+
+    0.4921932660E+01        0.4114532707E+00
+
+   -0.1002831667E+02       -0.6057060145E+00
+
+    0.1256338987E+02        0.5848923814E+00
+
+   -0.9758759367E+01        0.4444537862E+00
+
+    0.4318033378E+01        0.2315869083E+00
+
+
+
+N=8
+
+coefficients for the edge filters:
+
+
+
+    0.9280961080E+00       -0.1623137602E-01
+
+    0.3685482772E+00        0.7700181909E-01
+
+    0.5169019500E-01       -0.2216538064E+00
+
+   -0.1072856966E-01        0.4518914876E+00
+
+   -0.3547264354E-02       -0.5968036841E+00
+
+    0.1881724221E-02        0.5361053678E+00
+
+    0.2253426546E-03       -0.2972611580E+00
+
+   -0.4074549423E-03        0.9152878068E-01
+
+    0.2542121693E-02       -0.1206728019E-01
+
+
+
+   -0.2880715337E+00        0.3847998474E-01
+
+    0.6422316271E+00       -0.1590369267E+00
+
+    0.6540393284E+00        0.3562112107E+00
+
+    0.2730170577E+00       -0.4595861878E+00
+
+    0.4300012686E-01        0.1637283171E+00
+
+   -0.1532507378E-01        0.3534175472E+00
+
+   -0.3095082211E-02       -0.5814453781E+00
+
+    0.3081063250E-02        0.3686477291E+00
+
+   -0.1192117285E-01       -0.9703824753E-01
+
+   -0.2510321213E-03       -0.5800646631E-03
+
+    0.1566213637E-02        0.3619079426E-02
+
+
+
+    0.1554699662E+00       -0.7121179707E-01
+
+   -0.3928508188E+00        0.2523023478E+00
+
+    0.1655006354E+00       -0.4171714520E+00
+
+    0.6186900270E+00        0.2451267006E+00
+
+    0.5757733437E+00        0.2725111911E+00
+
+    0.2765573214E+00       -0.3518314346E+00
+
+    0.4215137090E-01       -0.2344734683E+00
+
+   -0.2022141803E-01        0.5903810045E+00
+
+    0.3170527734E-01       -0.3062645760E+00
+
+    0.2969565406E-02       -0.9326190637E-02
+
+   -0.1133537854E-01        0.4097674398E-01
+
+   -0.2472629557E-03        0.5916913076E-03
+
+    0.1542697449E-02       -0.3691619185E-02
+
+
+
+   -0.9273812077E-01        0.1179909741E+00
+
+    0.2525480154E+00       -0.3454318691E+00
+
+   -0.1903081753E+00        0.3669763444E+00
+
+   -0.2325263183E+00        0.8571956937E-01
+
+    0.1951123754E+00       -0.3733637204E+00
+
+    0.5747752998E+00       -0.1532441521E+00
+
+    0.6031889613E+00        0.3576146478E+00
+
+    0.3197987067E+00        0.3379298220E+00
+
+   -0.2318110629E-01       -0.4826776512E+00
+
+   -0.2335276594E-01       -0.1247229279E+00
+
+    0.3904642048E-01        0.2577717071E+00
+
+    0.3358324305E-02        0.1649336963E-01
+
+   -0.1296942483E-01       -0.6672983676E-01
+
+   -0.2744734004E-03       -0.1243663709E-02
+
+    0.1712466040E-02        0.7759337931E-02
+
+
+
+    0.4096472123E-01        0.9544232866E-02
+
+   -0.1240767851E+00       -0.2688549916E-01
+
+    0.1278114403E+00        0.3303656538E-01
+
+    0.7138489316E-01       -0.1099762148E-01
+
+   -0.1584871307E+00       -0.3331736763E-01
+
+   -0.1727866355E+00        0.3186523735E-01
+
+    0.1143640280E+00        0.7533252701E-01
+
+    0.5129116028E+00       -0.5202591621E-01
+
+    0.7137757767E+00       -0.3899644872E+00
+
+    0.3414317954E+00        0.7710342652E+00
+
+   -0.3881329228E-01       -0.4656907083E+00
+
+   -0.2526829049E-01       -0.6031146457E-01
+
+    0.4424255303E-01        0.1391049995E+00
+
+    0.3575822034E-02        0.7543265904E-02
+
+   -0.1394488775E-01       -0.3124469163E-01
+
+   -0.2875903358E-03       -0.5438414561E-03
+
+    0.1794303867E-02        0.3393079342E-02
+
+
+
+   -0.1790191282E-01       -0.5044968595E-02
+
+    0.5295161530E-01        0.1488052556E-01
+
+   -0.5704547538E-01       -0.1581581210E-01
+
+   -0.1894676577E-01       -0.6949272400E-02
+
+    0.6968256270E-01        0.2057861785E-01
+
+    0.4547075753E-01        0.1765306809E-01
+
+   -0.7337937479E-01       -0.1862118927E-01
+
+   -0.1444748191E+00       -0.4891212508E-01
+
+   -0.1409191494E-01       -0.1375364073E-01
+
+    0.4948704363E+00        0.5400109528E-01
+
+    0.7618895951E+00        0.3573536308E+00
+
+    0.3591100053E+00       -0.7782672053E+00
+
+   -0.4810103061E-01        0.4837479787E+00
+
+   -0.2674149513E-01        0.6134832074E-01
+
+    0.4783092078E-01       -0.1436058269E+00
+
+    0.3754819526E-02       -0.7612327455E-02
+
+   -0.1470868404E-01        0.3171165160E-01
+
+   -0.2997260590E-03        0.5426010792E-03
+
+    0.1870019815E-02       -0.3385340511E-02
+
+
+
+    0.4842573875E-02        0.2223331313E-02
+
+   -0.1435818114E-01       -0.6588142232E-02
+
+    0.1564773617E-01        0.7160556501E-02
+
+    0.3635704163E-02        0.1734300817E-02
+
+   -0.1807616145E-01       -0.8390109930E-02
+
+   -0.7951972463E-02       -0.3916508325E-02
+
+    0.2177252927E-01        0.9923280681E-02
+
+    0.3159516732E-01        0.1489081491E-01
+
+   -0.5393073080E-02       -0.2164190023E-02
+
+   -0.1454356948E+00       -0.5005924913E-01
+
+   -0.5484912621E-01       -0.2423995567E-01
+
+    0.4834662634E+00        0.5271872910E-01
+
+    0.7753953496E+00        0.3632737173E+00
+
+    0.3639514649E+00       -0.7773694792E+00
+
+   -0.5141318290E-01        0.4816288882E+00
+
+   -0.2717238099E-01        0.6128840935E-01
+
+    0.4899043649E-01       -0.1433368916E+00
+
+    0.3804055936E-02       -0.7609148826E-02
+
+   -0.1492982098E-01        0.3170285605E-01
+
+   -0.3026846009E-03        0.5422216523E-03
+
+    0.1888478444E-02       -0.3382973230E-02
+
+
+
+   -0.5886912723E-03        0.3289309542E-03
+
+    0.1750384584E-02       -0.9780261437E-03
+
+   -0.1931250902E-02        0.1079085355E-02
+
+   -0.3621632497E-03        0.2023585594E-03
+
+    0.2085884179E-02       -0.1165486300E-02
+
+    0.6409242844E-03       -0.3581158117E-03
+
+   -0.2736289413E-02        0.1528899888E-02
+
+   -0.3368917714E-02        0.1882379797E-02
+
+    0.1038171472E-02       -0.5800785496E-03
+
+    0.3193936333E-01       -0.1508848895E-01
+
+    0.6823471193E-02       -0.3370611049E-02
+
+   -0.1435014917E+00        0.4925184726E-01
+
+   -0.6098305316E-01        0.2705640950E-01
+
+    0.4814477634E+00       -0.5199195925E-01
+
+    0.7771077176E+00       -0.3643916717E+00
+
+    0.3644295324E+00        0.7771916813E+00
+
+   -0.5192289139E-01       -0.4813707824E+00
+
+   -0.2721779258E-01       -0.6127396434E-01
+
+    0.4913249792E-01        0.1432965635E+00
+
+    0.3808651449E-02        0.7607535473E-02
+
+   -0.1495173150E-01       -0.3169534309E-01
+
+   -0.3029170562E-03       -0.5421338829E-03
+
+    0.1889928755E-02        0.3382425628E-02
+
+
+
+
+entries of the triangular preconditioning matrix and its inverse:
+
+    0.1000011417E+01        0.9999885829E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.1885821248E-03        0.1884331061E-03
+
+    0.1000779405E+01        0.9992212023E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+    0.6980138374E-03       -0.6895681425E-03
+
+   -0.5775869059E-02        0.5710508693E-02
+
+    0.1010657918E+01        0.9894544755E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.1587420489E-02        0.1473040141E-02
+
+    0.1315517251E-01       -0.1221739122E-01
+
+   -0.4838107469E-01        0.4544822540E-01
+
+    0.1053305612E+01        0.9493920742E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+    0.2302522936E-02       -0.1832761923E-02
+
+   -0.1919511889E-01        0.1530411869E-01
+
+    0.7113262876E-01       -0.5742370539E-01
+
+   -0.1541810491E+00        0.1326319561E+00
+
+    0.1103642518E+01        0.9060904992E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.6297296878E-02        0.3996745292E-02
+
+    0.5008238228E-01       -0.3139508197E-01
+
+   -0.1744341513E+00        0.1085741195E+00
+
+    0.3478392588E+00       -0.2247406296E+00
+
+   -0.4139824420E+00        0.3061849704E+00
+
+    0.1225094612E+01        0.8162634872E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+    0.1205751485E-01       -0.5357488581E-02
+
+   -0.9775783312E-01        0.4355462708E-01
+
+    0.3469638042E+00       -0.1557775571E+00
+
+   -0.7026319735E+00        0.3312968007E+00
+
+    0.8627444834E+00       -0.4752264599E+00
+
+   -0.6802055242E+00        0.4601200251E+00
+
+    0.1206700215E+01        0.8287062417E+00
+
+    0.0000000000E+00        0.0000000000E+00
+
+
+
+   -0.1638857751E-01        0.1062802918E-01
+
+    0.1318974327E+00       -0.8500762499E-01
+
+   -0.4651165383E+00        0.2996885100E+00
+
+    0.9374435384E+00       -0.6305890566E+00
+
+   -0.1161167601E+01        0.9184100559E+00
+
+    0.8600562361E+00       -0.8062512474E+00
+
+   -0.2230327919E+00        0.2486081011E+00
+
+    0.7434539179E+00        0.1345073280E+01
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+***************************************************************************
+
+	TABLES FOR WAVELETS ON THE INTERVAL IN THE CONSTRUCTION
+
+		OF YVES MEYER (COMPUTED BY PIERRE VIAL)
+
+***************************************************************************
+
+
+
+
+
+These tables correspond to a different construction for wavelets on
+the interval, due to Yves Meyer (Revista Matematica Iberoamericana,
+7 (1992) p. 115-133). The details of how these tables were obtained,
+as well as graphs corresponding to the cases N=2 and N=4, can be found
+in "Wavelets on the interval and fast algorithms", by Albert Cohen,
+Ingrid Daubechies and Pierre Vial, to appear in Journal for Applied
+and Computational Harmonic Analysis (1993).
+
+
+
+The organization of these tables is as follows:
+
+- table of the interior filter coefficients for the different values
+  of N. We have again chosen the filters with closest to linear
+  phase, leading to "near-symmetric" scaling functions and wavelets.
+  Note: the interior coefficients given are not always normalized so that
+	their sum is sqrt(2). They should be renormalized before
+	they are used.
+	These interior filters are the same as in the first set of
+	tables given above, but for some values of N their order has
+	been inverted. This will mean that the graphs are mirror images.
+	If you would like the same graphs (without mirroring), then
+	you should invert the order of the interior coefficients, 
+	exchange the right edge table with the left edge table (for
+	this value of N), and invert the order of all the edge coefficients
+	in each subgroup as well.
+
+- table of edge coefficients for the scaling functions ("low pass" filters)
+  at the left side, for N=2 to 8
+
+- table of edge coefficients for the wavelet ("high pass" filters) at the 
+  left side, for N=2 to 8
+
+- table of edge coefficients for the scaling functions ("low pass" filters)
+  at the right side, for N=2 to 8
+
+- table of edge coefficients for the wavelet ("high pass" filters) at the 
+  right side, for N=2 to 8
+
+Note: the tables of the right side have been obtained by doing exactly 
+the same computations, and listing the results in the same order, as for
+the left side tables, but with the order of the interior coefficients 
+inverted.
+
+
+**************************************************************************
+
+
+The interior coefficients in these tables were computed with Macsyma.
+The edge coefficients were then computed, using the interior filter
+coefficients, by means of a Fortran program using double precision
+for N=2,3,4,5 and quadruple precision for N=6,7,8 .
+
+
+***************************************************************************
+
+
+
+INTERIOR COEFFICIENTS
+*********************
+
+N=2
+
+	0.482962913145
+	0.836516303738
+	0.224143868042
+	-0.129409522551
+
+N=3
+
+	.332670552950
+	.806891509311
+	.459877502118
+	-.135011020010
+	-.085441273882
+	.035226291882
+
+N=4   (coefficients normalized so that their sum equals 2)
+
+      - 0.107148901418
+       - 0.0419109651251
+       0.703739068656
+       1.13665824341
+       0.421234534204 
+       - 0.140317624179
+       - 0.0178247014417
+       0.045570345896 
+
+
+N=5   (coefficients normalized so that their sum equals 2)
+
+       0.0386547959548 
+       0.0417468644215 
+       - 0.0553441861166
+      0.281990696854
+      1.02305296689 
+      0.89658164838
+      0.0234789231361
+       - 0.247951362613
+      - 0.0298424998687
+      0.0276321529578
+
+
+N=6   (coefficients normalized so that their sum equals 2)
+
+       0.0217847003266
+       0.00493661237185
+      - 0.166863215412
+       - 0.0683231215866 
+       0.694457972958
+       1.11389278393
+       0.477904371333
+       - 0.102724969862
+       - 0.0297837512985 
+       0.06325056266
+       0.00249992209279
+       - 0.0110318675094
+
+
+N=7   (coefficients normalized so that their sum equals 2)
+
+      0.0037926585342 
+      - 0.0014812259146 
+       - 0.0178704316511
+      0.043155452582 
+       0.0960147679355 
+       - 0.070078291222
+      0.0246656594886 
+      0.758162601964 
+       1.08578270981
+       0.408183939725
+       - 0.198056706807 
+       - 0.152463871896 
+       0.00567134268574
+       0.014521394762
+
+
+N=8   (coefficients normalized so that their sum equals 2)
+
+      0.00267279339281 
+       - 0.000428394300246 
+       - 0.0211456865284
+       0.00538638875377
+       0.0694904659113 
+       - 0.0384935212634
+       - 0.0734625087609 
+       0.515398670374
+       1.09910663054
+       0.68074534719
+       - 0.0866536154058
+       - 0.202648655286 
+       0.0107586117505
+       0.0448236230437
+       - 0.000766690896228
+       - 0.0047834585115
+
+
+
+****************************************
+
+LEFT EDGE SCALING FUNCTION COEFFICIENTS
+***************************************
+
+
+N=2
+
+
+
+  0.848528137424
+- 0.529150262213
+
+  0.132287565553
+  0.212132034356
+  0.838525491562
+- 0.484122918276
+
+
+
+
+N=3
+
+  0.689047760315
+  0.724715933318
+
+  0.0306457241755
+- 0.0291374408035
+- 0.986047279405
+  0.161005005859
+ 
+  0.0172802631418
+- 0.0164297845102
+  0.00443452721664
+  0.0208960300827
+- 0.924034270866
+  0.380966943247
+
+  0.027026368393
+- 0.0256962180001
+  0.0639688879804
+  0.381971870809
+  0.176750229211
+  0.404677356783
+- 0.747429432607
+  0.308155135811
+
+
+
+
+N=4
+
+    0.7983434920E+00
+    0.6022023488E+00
+
+   -0.3918024327E-01
+    0.5194149822E-01
+   -0.4817281609E+00
+    0.8739021503E+00
+
+    0.1774707150E-01
+   -0.2352740580E-01
+   -0.1232594861E+00
+   -0.6575127688E-01
+   -0.9620570014E-01
+    0.9850684416E+00
+
+   -0.2636405192E-01
+    0.3495099166E-01
+    0.8114147375E+00
+    0.4440233637E+00
+    0.3192581817E+00
+    0.1636579832E+00
+   -0.4282797155E-01
+    0.1094933054E+00
+
+   -0.1670338745E-01
+    0.2214378721E-01
+   -0.1643714751E-01
+   -0.1112580065E-01
+    0.2995602574E+00
+    0.2728668922E-01
+    0.8472064764E+00
+   -0.4270166998E+00
+   -0.3309408518E-01
+    0.8460780753E-01
+
+    0.2727915769E-02
+   -0.3616415322E-02
+   -0.5206157868E-01
+   -0.2836107693E-01
+   -0.4413123462E-01
+   -0.1285294872E-01
+    0.4543141690E+00
+    0.8282235028E+00
+    0.3000539798E+00
+   -0.1037443976E+00
+   -0.1262470890E-01
+    0.3227612835E-01
+
+
+
+N=5
+
+    0.5149588736E+00
+    0.8572148847E+00
+
+   -0.7062608421E-01
+    0.4242755162E-01
+   -0.9680855135E+00
+    0.2366902992E+00
+
+    0.1166375834E+00
+   -0.7006826369E-01
+    0.2569251462E-01
+    0.1524482921E+00
+   -0.8988377800E+00
+    0.3868800469E+00
+
+    0.4678469852E+00
+   -0.2810519985E+00
+    0.8265463674E-01
+    0.5280457443E+00
+    0.8615307089E-01
+   -0.2053530811E+00
+   -0.4422572318E+00
+    0.4138613016E+00
+
+   -0.1341363044E+00
+    0.8058035557E-01
+   -0.3810281736E-01
+   -0.2103133707E+00
+    0.3026059798E-01
+    0.2107415482E+00
+   -0.8553851730E+00
+   -0.3335028061E+00
+   -0.1496490635E+00
+    0.1385649939E+00
+
+   -0.2809362553E+00
+    0.1687682052E+00
+   -0.4001455131E-01
+   -0.2777441959E+00
+    0.9006724682E-02
+    0.2482896416E+00
+   -0.9917949547E-01
+    0.8098971461E+00
+   -0.2582323890E+00
+   -0.1241046836E+00
+   -0.4791583558E-01
+    0.4436684941E-01
+
+   -0.8360649632E-01
+    0.5022533782E-01
+   -0.1533783538E-01
+   -0.9668361515E-01
+   -0.4952912706E-02
+    0.6191148032E-01
+   -0.5197035907E-01
+    0.2312568194E+00
+    0.6976664051E+00
+    0.6350643725E+00
+    0.1189068293E-01
+   -0.1727260340E+00
+   -0.2133407205E-01
+    0.1975391957E-01
+
+   -0.1591308791E-02
+    0.9559546817E-03
+    0.3515007474E-03
+    0.7914817671E-03
+   -0.1039035431E-02
+   -0.2096326217E-02
+    0.2722494187E-01
+    0.2963704669E-01
+   -0.3930998378E-01
+    0.1995579157E+00
+    0.7233513164E+00
+    0.6339755574E+00
+    0.1659420760E-01
+   -0.1753213559E+00
+   -0.2110191042E-01
+    0.1953895348E-01
+
+
+
+N=6
+
+    0.8035811728E+00
+   -0.5951951771E+00
+
+    0.2409444375E+00
+    0.3253023901E+00
+    0.8139624945E+00
+   -0.4166403612E+00
+
+   -0.1713726513E+00
+   -0.2313725672E+00
+    0.2850349985E+00
+    0.2770986033E+00
+    0.5575844464E+00
+   -0.6694543662E+00
+
+   -0.2876454491E-02
+   -0.3883540664E-02
+   -0.5655242446E-01
+   -0.1151783354E+00
+    0.5730520088E+00
+    0.4076173301E+00
+   -0.4430745754E+00
+   -0.5409776766E+00
+
+    0.9214100804E-01
+    0.1244008388E+00
+    0.7306532844E-01
+    0.2931573652E+00
+   -0.1321263657E+00
+   -0.2417688989E-01
+   -0.3632781234E+00
+    0.6792063579E-01
+    0.1887648043E+00
+   -0.8333645213E+00
+
+   -0.1061491551E+00
+   -0.1433134304E+00
+   -0.2622879500E+00
+   -0.6856964195E+00
+    0.2766563635E+00
+   -0.8836692218E-01
+    0.3328884755E+00
+    0.1288342707E+00
+    0.5008585553E-01
+   -0.4619028205E+00
+    0.8828610310E-02
+   -0.3895963779E-01
+
+   -0.2023876977E-01
+   -0.2732464068E-01
+    0.4220601869E-01
+    0.4941654301E-01
+    0.3803171587E-01
+    0.8472554296E-01
+    0.1946516826E+00
+   -0.6992838718E-01
+    0.9438761468E+00
+    0.1295249721E+00
+   -0.7015973081E-01
+    0.1735085659E+00
+    0.4990121912E-02
+   -0.2202083175E-01
+
+    0.5456011297E-01
+    0.7366235691E-01
+   -0.1344279366E+00
+   -0.1735568822E+00
+    0.3102530241E-02
+   -0.1659152277E+00
+   -0.3869255752E+00
+    0.2453596290E+00
+    0.2217987487E+00
+    0.1874151629E+00
+    0.7052410111E+00
+   -0.3333463173E+00
+   -0.4413043778E-01
+    0.1047852370E+00
+    0.3298337216E-02
+   -0.1455518125E-01
+
+   -0.4678407876E-02
+   -0.6316382647E-02
+    0.3592640703E-03
+   -0.6935341643E-02
+    0.4493043023E-02
+    0.4405183141E-02
+    0.2315284183E-01
+   -0.9374856771E-02
+   -0.1151952189E+00
+   -0.4165806865E-01
+    0.4741171777E+00
+    0.7976083337E+00
+    0.3391664841E+00
+   -0.7534748748E-01
+   -0.2114679112E-01
+    0.4508434214E-01
+    0.1768528334E-02
+   -0.7804311311E-02
+
+    0.4182788817E-04
+    0.5647240556E-04
+   -0.3442465609E-04
+    0.1028288644E-05
+    0.1389588842E-03
+    0.7128147780E-04
+   -0.1053053091E-03
+    0.2899067329E-03
+    0.1541349274E-01
+    0.3547130473E-02
+   -0.1181216165E+00
+   -0.4823069885E-01
+    0.4910659254E+00
+    0.7876202163E+00
+    0.3379287356E+00
+   -0.7263467678E-01
+   -0.2106028481E-01
+    0.4472486618E-01
+    0.1767711923E-02
+   -0.7800708584E-02
+
+
+
+N=7
+
+    0.7766665156E+00
+    0.6299119967E+00
+
+   -0.1148964921E+00
+    0.1416646431E+00
+   -0.9671641580E+00
+    0.1769842267E+00
+
+   -0.3218471381E-01
+    0.3968298692E-01
+    0.1563278738E+00
+    0.8016258409E+00
+   -0.5564532662E+00
+    0.1438984865E+00
+
+    0.2211311440E-01
+   -0.2726494430E-01
+    0.4246022560E-01
+    0.2682115073E+00
+    0.2563887092E+00
+   -0.5363572642E+00
+   -0.6324950327E+00
+    0.4142017603E+00
+
+    0.1199996300E-01
+   -0.1479566908E-01
+   -0.5636972038E-01
+   -0.2884098615E+00
+   -0.2710188640E+00
+    0.6266429769E+00
+   -0.5971809113E+00
+    0.2582226700E+00
+    0.5436350287E-01
+    0.1445242950E+00
+
+    0.4175845107E-02
+   -0.5148717734E-02
+   -0.7440855354E-02
+   -0.3382983614E-01
+   -0.3079310698E-01
+    0.7981928189E-01
+    0.5722707580E-01
+    0.2319141981E+00
+   -0.9107619432E+00
+   -0.3104299380E+00
+    0.3358655707E-01
+    0.8599791766E-01
+
+   -0.1031229858E+00
+    0.1271481897E+00
+    0.1056363589E-01
+   -0.1109935195E+00
+   -0.1694835353E+00
+   -0.1066751168E+00
+    0.3522103457E-01
+    0.1052218705E+00
+   -0.2477521992E-02
+   -0.9262193855E-01
+   -0.8918295201E+00
+   -0.3112729161E+00
+    0.3153823148E-01
+    0.8075320692E-01
+
+   -0.1636840253E+00
+    0.2018185116E+00
+    0.2397992313E-01
+   -0.1367621625E+00
+   -0.2287872293E+00
+   -0.2411625975E+00
+    0.1547745353E+00
+    0.1738003308E+00
+   -0.2203021645E+00
+    0.7991821052E+00
+    0.4097263186E-01
+    0.7425536593E-01
+   -0.2186097493E+00
+   -0.7664414437E-01
+    0.7725319564E-02
+    0.1978057424E-01
+
+   -0.5079391756E-01
+    0.6262769271E-01
+    0.6693967094E-02
+   -0.4652396311E-01
+   -0.7498687931E-01
+   -0.6670242581E-01
+    0.2830429724E-01
+    0.3953767158E-01
+    0.1915788427E-01
+    0.1080996941E+00
+   -0.9385371148E-01
+    0.5278533401E+00
+    0.7495761660E+00
+    0.2923381676E+00
+   -0.1429933474E+00
+   -0.1070457309E+00
+    0.4143065991E-02
+    0.1060826335E-01
+
+   -0.1495677487E-02
+    0.1844134781E-02
+    0.3796088187E-03
+   -0.3726476076E-03
+   -0.1313050363E-02
+   -0.4257093968E-02
+    0.4767087176E-02
+    0.2983259636E-02
+   -0.1353810327E-01
+    0.3517346347E-01
+    0.6457953904E-01
+   -0.4929701131E-01
+    0.1763779822E-01
+    0.5365060286E+00
+    0.7675636132E+00
+    0.2885569171E+00
+   -0.1400433929E+00
+   -0.1077912821E+00
+    0.4010358474E-02
+    0.1026846759E-01
+
+   -0.3038841290E-04
+    0.3746819061E-04
+    0.1201067262E-04
+    0.1591583744E-04
+    0.1765202958E-04
+   -0.5058087991E-04
+   -0.2976878538E-03
+   -0.5384490113E-03
+    0.2571676204E-02
+   -0.9401364213E-03
+   -0.1271271848E-01
+    0.3052112329E-01
+    0.6789733930E-01
+   -0.4954313507E-01
+    0.1743713195E-01
+    0.5361004301E+00
+    0.7677643255E+00
+    0.2886299560E+00
+   -0.1400472373E+00
+   -0.1078082259E+00
+    0.4010244932E-02
+    0.1026817686E-01
+
+   -0.4587815337E-07
+    0.5656667234E-07
+    0.1705493214E-07
+    0.1813824211E-07
+    0.3222871934E-07
+   -0.2080479474E-07
+   -0.2019192222E-06
+   -0.3625456178E-06
+   -0.1335197462E-06
+    0.6674082282E-07
+    0.2681764400E-02
+   -0.1047381271E-02
+   -0.1263630033E-01
+    0.3051551953E-01
+    0.6789269080E-01
+   -0.4955283591E-01
+    0.1744125510E-01
+    0.5361019173E+00
+    0.7677643170E+00
+    0.2886296318E+00
+   -0.1400472404E+00
+   -0.1078082377E+00
+    0.4010244872E-02
+    0.1026817671E-01
+
+
+
+N=8
+
+    0.8145313640E+00
+   -0.5801195196E+00
+
+    0.2546778816E+00
+    0.3575868684E+00
+    0.3176080089E+00
+   -0.8404736527E+00
+
+   -0.2118740650E+00
+   -0.2974870959E+00
+   -0.5809146479E+00
+   -0.4102927684E+00
+    0.5953490052E+00
+   -0.7980217044E-01
+
+    0.7371113089E-01
+    0.1034959624E+00
+    0.3790561153E+00
+    0.2096111511E+00
+    0.5261835609E+00
+   -0.4930256875E+00
+    0.6765214691E-01
+   -0.5212625063E+00
+
+   -0.1657029358E-01
+   -0.2326593637E-01
+    0.2835607555E-01
+   -0.4204253027E-02
+    0.5232892196E-01
+    0.3363143855E+00
+    0.2707791658E+00
+   -0.2181631699E+00
+    0.1282592034E+00
+   -0.8632205676E+00
+
+    0.4725307654E-01
+    0.6634686747E-01
+   -0.1768605708E+00
+   -0.2428779496E-01
+   -0.1728053705E+00
+   -0.2496491113E+00
+   -0.1026485332E+00
+   -0.7015597057E-01
+    0.4504320556E+00
+   -0.6366908518E-01
+   -0.1272105456E+00
+   -0.7941822291E+00
+
+   -0.3150600071E+00
+   -0.4423679063E+00
+    0.4664265832E+00
+   -0.1074191330E+00
+    0.4591536250E-01
+   -0.1495306795E-01
+    0.3948485068E+00
+    0.2753380149E+00
+   -0.2521499192E+00
+    0.4757966099E-01
+    0.4479299855E-01
+   -0.3909345922E+00
+   -0.2305781603E-01
+   -0.1438599401E+00
+
+   -0.1628374040E+00
+   -0.2286359419E+00
+    0.1439556412E+00
+   -0.9221803771E-01
+   -0.1559638710E+00
+   -0.4526846422E+00
+    0.7680278703E-01
+    0.2798722613E+00
+    0.6073428962E+00
+   -0.1277567678E+00
+    0.7075076739E-02
+    0.4371314130E+00
+    0.1227511608E-01
+    0.4457322339E-01
+   -0.1100591484E-02
+   -0.6866696512E-02
+
+    0.1422343910E-01
+    0.1997077647E-01
+   -0.5755686815E-01
+   -0.8943575462E-02
+   -0.5113148256E-01
+   -0.2870337098E-01
+   -0.5044680204E-01
+   -0.7048754871E-01
+    0.7802410165E-01
+   -0.3357971353E-02
+    0.9574788820E+00
+   -0.6034410649E-01
+   -0.8780892537E-01
+   -0.2208827842E+00
+    0.1042138073E-01
+    0.4380269399E-01
+   -0.7294541741E-03
+   -0.4551135007E-02
+
+   -0.2847286228E-01
+   -0.3997803654E-01
+    0.1712399543E-01
+   -0.1916575373E-01
+   -0.2592997362E-01
+    0.5065243826E-02
+    0.4279291071E-01
+   -0.3263024185E-01
+   -0.3163483356E-01
+    0.1965128227E-01
+    0.1870478101E+00
+   -0.5633846528E-01
+    0.8568892098E+00
+    0.4372612498E+00
+   -0.6703059990E-01
+   -0.1500716835E+00
+    0.8519695716E-02
+    0.3506433161E-01
+   -0.6219669046E-03
+   -0.3880511557E-02
+
+   -0.1332967539E-01
+   -0.1871586512E-01
+    0.2153245326E-01
+   -0.3865012867E-02
+    0.4740812821E-02
+    0.3654642397E-02
+    0.1552794626E-01
+    0.1184719866E-01
+   -0.1683351520E-01
+    0.2573274217E-02
+    0.5123819976E-01
+   -0.3022844964E-01
+   -0.4903142965E-01
+    0.3621831839E+00
+    0.7774835776E+00
+    0.4809708581E+00
+   -0.6128478594E-01
+   -0.1432550194E+00
+    0.7610815937E-02
+    0.3170366925E-01
+   -0.5425512917E-03
+   -0.3385029882E-02
+
+    0.1198029623E-03
+    0.1682123545E-03
+   -0.4574159978E-03
+   -0.6498394141E-04
+   -0.5037600110E-03
+   -0.1039508974E-02
+    0.1793350305E-03
+    0.1895383041E-03
+    0.1581295871E-02
+   -0.2137732665E-03
+   -0.1495199763E-01
+    0.3830464294E-02
+    0.4910595228E-01
+   -0.2718959315E-01
+   -0.5195946631E-01
+    0.3644408152E+00
+    0.7771868548E+00
+    0.4813611500E+00
+   -0.6127351228E-01
+   -0.1432947954E+00
+    0.7607500914E-02
+    0.3169516934E-01
+   -0.5421324438E-03
+   -0.3382416650E-02
+
+   -0.1467161418E-04
+   -0.2060004793E-04
+    0.1949164967E-04
+   -0.5844488030E-05
+    0.7485554110E-06
+    0.9490983180E-05
+   -0.5287598342E-04
+   -0.9424653819E-05
+    0.1650150426E-06
+   -0.8931253371E-05
+    0.1889628005E-02
+   -0.3041026881E-03
+   -0.1495041138E-01
+    0.3806880495E-02
+    0.4913803765E-01
+   -0.2721895815E-01
+   -0.5194591141E-01
+    0.3644417925E+00
+    0.7771857621E+00
+    0.4813596873E+00
+   -0.6127335999E-01
+   -0.1432942437E+00
+    0.7607487339E-02
+    0.3169508789E-01
+   -0.5421323322E-03
+   -0.3382415953E-02
+
+   -0.1287522004E-07
+   -0.1807777568E-07
+    0.1467373756E-07
+   -0.6047676057E-08
+   -0.2557954799E-08
+    0.6767773484E-08
+   -0.4138623196E-07
+   -0.1152590396E-07
+   -0.7816962231E-09
+   -0.6457861266E-08
+   -0.1973430468E-08
+   -0.1721336728E-09
+    0.1889952080E-02
+   -0.3029230007E-03
+   -0.1495225720E-01
+    0.3808752194E-02
+    0.4913717957E-01
+   -0.2721903007E-01
+   -0.5194583809E-01
+    0.3644418949E+00
+    0.7771857517E+00
+    0.4813596513E+00
+   -0.6127335907E-01
+   -0.1432942384E+00
+    0.7607487325E-02
+    0.3169508781E-01
+   -0.5421323318E-03
+   -0.3382415951E-02
+
+
+
+
+*********************************************************************
+
+
+LEFT EDGE WAVELET COEFFICIENTS.
+*******************************
+
+
+N=2
+
+ - 0.512347538298
+ - 0.821583836258
+   0.216506350947
+ - 0.125
+
+
+N=3
+
+  0.720522830617
+- 0.685061028561
+  0.0259917491699
+- 0.101939535681, 
+  0.0200641216304
+- 0.00827216838973
+
+  0.0639675079235
+- 0.0608192341872
+  0.151405112504
+  0.904072212264
+- 0.0510574707719
+- 0.18071490589
+  0.315790060572
+- 0.130196008824
+
+
+
+N=4
+
+    0.5979027428E+00
+   -0.7926434769E+00
+   -0.1659403671E-01
+    0.6477069526E-01
+    0.9713044594E-01
+   -0.1797030610E-01
+   -0.3192898087E-03
+    0.8162911886E-03
+
+    0.4823971249E-01
+   -0.6395169431E-01
+    0.3010034664E+00
+    0.1718883936E+00
+   -0.8873256413E+00
+   -0.3991915695E-01
+    0.2462565991E+00
+   -0.1524149055E+00
+   -0.9080945357E-02
+    0.2321619929E-01
+
+   -0.1162436086E-02
+    0.1541048928E-02
+    0.2218479707E-01
+    0.1208539488E-01
+    0.1880547055E-01
+    0.5476976811E-02
+   -0.8114432093E-01
+   -0.3089428579E+00
+    0.8028339176E+00
+   -0.4957693566E+00
+   -0.2962669767E-01
+    0.7574314021E-01
+
+
+
+N=5
+
+    0.6182708675E+00
+   -0.3714168701E+00
+   -0.1886088129E+00
+   -0.5203639573E+00
+    0.1728721711E+00
+    0.3655404713E+00
+    0.9964278013E-01
+    0.2321755628E-02
+    0.8297752060E-04
+   -0.7683163866E-04
+
+   -0.9199155757E-01
+    0.5526253651E-01
+    0.1276201402E+00
+    0.4846229512E+00
+    0.3921178348E+00
+    0.7493106089E+00
+    0.1219411317E+00
+   -0.8181830470E-01
+    0.2258502019E-01
+    0.4446446219E-02
+    0.3345391169E-02
+   -0.3097607805E-02
+
+   -0.5206990422E-01
+    0.3128020722E-01
+   -0.1303591078E-01
+   -0.7446233534E-01
+    0.2030318262E-02
+    0.5628764191E-01
+   -0.1851188211E+00
+    0.7400777444E-02
+    0.6246714288E+00
+   -0.7215672985E+00
+    0.1975651316E+00
+    0.3986516515E-01
+    0.2939208418E-01
+   -0.2721509824E-01
+
+   -0.1137543931E-02
+    0.6833623070E-03
+    0.2512696118E-03
+    0.5657891708E-03
+   -0.7427524153E-03
+   -0.1498554635E-02
+    0.1946169563E-01
+    0.2118598397E-01
+   -0.1754541390E+00
+   -0.1648697186E-01
+    0.6339417098E+00
+   -0.7234098228E+00
+    0.1993922999E+00
+    0.3913868175E-01
+    0.2951943631E-01
+   -0.2733301778E-01
+
+
+
+N=6
+
+
+   -0.4056098474E+00
+   -0.5476194186E+00
+    0.3345888248E+00
+   -0.8469145514E-02
+    0.2860429450E-02
+    0.4344317225E+00
+   -0.1793040681E+00
+    0.4501354334E+00
+   -0.7823562605E-02
+   -0.2169451337E-03
+    0.3443284776E-06
+   -0.1518815163E-05
+
+   -0.2714331420E+00
+   -0.3664656082E+00
+    0.8617650411E-01
+   -0.2747405494E+00
+   -0.5148935461E+00
+   -0.3097406490E+00
+   -0.2206953036E+00
+   -0.5444907507E+00
+    0.4953215623E-01
+   -0.2013924147E-01
+   -0.1989883688E-02
+    0.4859370755E-02
+    0.1437935110E-03
+   -0.6345441585E-03
+
+   -0.7388896229E-01
+   -0.9975850151E-01
+    0.1991481291E+00
+    0.2684432545E+00
+   -0.1045213665E-01
+    0.2405920775E+00
+    0.5401581689E+00
+   -0.3490563093E+00
+   -0.6165711214E-01
+   -0.1943705670E+00
+    0.5024780923E+00
+   -0.3169028187E+00
+   -0.3084242027E-01
+    0.7560970841E-01
+    0.2218060423E-02
+   -0.9788044508E-02
+
+    0.2329741271E-02
+    0.3145415646E-02
+   -0.1484555312E-03
+    0.3513131058E-02
+   -0.2412185766E-02
+   -0.2301643677E-02
+   -0.1162880173E-01
+    0.4467413223E-02
+    0.4333253688E-01
+    0.1764767584E-01
+   -0.6404967457E-01
+   -0.3432838094E+00
+    0.7870194497E+00
+   -0.4897071000E+00
+   -0.4826799594E-01
+    0.1178085687E+00
+    0.3490290194E-02
+   -0.1540224757E-01
+
+   -0.2118182730E-04
+   -0.2859787559E-04
+    0.1743279790E-04
+   -0.5207298811E-06
+   -0.7036938958E-04
+   -0.3609725256E-04
+    0.5332707089E-04
+   -0.1468100425E-03
+   -0.7805460453E-02
+   -0.1796282458E-02
+    0.4479149901E-01
+    0.2101925260E-01
+   -0.7264258737E-01
+   -0.3379188415E+00
+    0.7876414895E+00
+   -0.4910573861E+00
+   -0.4831174654E-01
+    0.1179901294E+00
+    0.3490712054E-02
+   -0.1540410920E-01
+
+
+
+N=7
+
+    0.3969456608E+00
+   -0.4894245622E+00
+   -0.1235692328E+00
+   -0.2582101893E-01
+   -0.1328855813E+00
+   -0.1202996209E-01
+    0.3801419403E+00
+    0.6231415519E+00
+    0.1905526450E+00
+    0.5893964132E-02
+    0.1561741876E-03
+    0.6031669262E-05
+   -0.4927938364E-06
+   -0.1261756223E-05
+
+   -0.3233700290E+00
+    0.3987075576E+00
+    0.1351807407E+00
+    0.2096521373E+00
+    0.4833387568E+00
+    0.3720043480E+00
+    0.2556921125E+00
+    0.4668718999E+00
+    0.1373682453E+00
+    0.2872512719E-02
+   -0.1360874965E-02
+   -0.1949202336E-02
+    0.8743490990E-03
+    0.3629247193E-03
+   -0.2999653169E-04
+   -0.7680570657E-04
+
+   -0.2823703425E+00
+    0.3481559189E+00
+    0.2903665693E-01
+   -0.3033125208E+00
+   -0.4606818655E+00
+   -0.2824761359E+00
+    0.5936310480E-01
+    0.2414473445E+00
+    0.2265766807E+00
+   -0.4453082198E+00
+    0.3158425440E+00
+   -0.6883194783E-02
+   -0.3045582749E-01
+   -0.4030240270E-01
+    0.1788874193E-01
+    0.7517433396E-02
+   -0.6122399330E-03
+   -0.1567631908E-02
+
+   -0.5050738626E-02
+    0.6227440642E-02
+    0.1186122150E-02
+   -0.1781771641E-02
+   -0.5423430571E-02
+   -0.1518205990E-01
+    0.2487591795E-01
+    0.2339536126E-01
+   -0.1088432050E+00
+    0.1555511237E+00
+    0.2777338303E+00
+   -0.7671513525E+00
+    0.5369254850E+00
+   -0.1606926084E-01
+   -0.5015309817E-01
+   -0.6812578033E-01
+    0.3052715070E-01
+    0.1268650625E-01
+   -0.1047058590E-02
+   -0.2680979085E-02
+
+   -0.1153350842E-03
+    0.1422054166E-03
+    0.4560875753E-04
+    0.6053691674E-04
+    0.6687225073E-04
+   -0.1932039563E-03
+   -0.1135318214E-02
+   -0.2053589490E-02
+    0.9849438060E-02
+   -0.3601089889E-02
+   -0.1080997299E+00
+    0.1400686730E+00
+    0.2886474191E+00
+   -0.7677274911E+00
+    0.5360863094E+00
+   -0.1744690015E-01
+   -0.4955276912E-01
+   -0.6789145494E-01
+    0.3051552376E-01
+    0.1263634496E-01
+   -0.1047384658E-02
+   -0.2681813977E-02
+
+   -0.1756594007E-06
+    0.2165838647E-06
+    0.6530033661E-07
+    0.6944811113E-07
+    0.1233981379E-06
+   -0.7965760361E-07
+   -0.7731119139E-06
+   -0.1388121081E-05
+   -0.5112227575E-06
+    0.2555383959E-06
+    0.1026798462E-01
+   -0.4010231020E-02
+   -0.1078082259E+00
+    0.1400472648E+00
+    0.2886296214E+00
+   -0.7677643207E+00
+    0.5361019171E+00
+   -0.1744125426E-01
+   -0.4955283493E-01
+   -0.6789269348E-01
+    0.3051551317E-01
+    0.1263630340E-01
+   -0.1047384889E-02
+   -0.2681814568E-02
+
+
+
+N=8
+
+   -0.2620979145E+00
+   -0.3680051517E+00
+    0.3007938848E+00
+   -0.1223236495E+00
+   -0.3815411480E-01
+    0.2223806092E+00
+   -0.7414398574E+00
+   -0.2856615192E+00
+    0.7435240137E-01
+   -0.3958129970E-01
+   -0.3312367172E-01
+    0.5296663936E-03
+   -0.2698631364E-04
+    0.4827845400E-07
+   -0.2405836391E-08
+   -0.1119370789E-07
+
+   -0.1530044792E-01
+   -0.2148297772E-01
+   -0.1411089928E+00
+   -0.6710033379E-01
+   -0.2754652268E+00
+   -0.5621677849E+00
+   -0.2521929541E+00
+    0.8489402134E-01
+   -0.5756119710E+00
+   -0.4252477763E+00
+   -0.1717046011E-02
+    0.4224061134E-03
+   -0.2349772977E-03
+   -0.4160927634E-03
+    0.3225252044E-04
+    0.1266155053E-03
+   -0.2565139468E-05
+   -0.1600415263E-04
+
+    0.1495099502E+00
+    0.2099231961E+00
+    0.1776433332E+00
+    0.2017476699E+00
+    0.4784490465E+00
+    0.5947478107E-01
+   -0.3620530588E+00
+    0.6528531425E+00
+    0.5286410695E-01
+   -0.2222121460E+00
+    0.5727745934E-01
+   -0.1143513897E+00
+    0.5375754041E-01
+    0.8506084034E-02
+   -0.4048226504E-02
+   -0.7458590086E-02
+    0.5621800279E-03
+    0.2220046324E-02
+   -0.4426269435E-04
+   -0.2761592227E-03
+
+    0.2437646831E-01
+    0.3422639182E-01
+   -0.4003214950E-01
+    0.6820587728E-02
+   -0.9838965803E-02
+   -0.9366231848E-02
+   -0.2696011202E-01
+   -0.2069757161E-01
+    0.3436761211E-01
+   -0.5103853901E-02
+   -0.1475095258E+00
+    0.6694319985E-01
+    0.4773719174E+00
+   -0.7755787502E+00
+    0.3636972524E+00
+    0.5218600648E-01
+   -0.2717665152E-01
+   -0.4912168611E-01
+    0.3801081650E-02
+    0.1492736485E-01
+   -0.3021310554E-03
+   -0.1885024820E-02
+
+   -0.2526109188E-03
+   -0.3546846973E-03
+    0.8694036319E-03
+    0.1010912744E-03
+    0.9035494282E-03
+    0.1885121065E-02
+   -0.4586723661E-03
+   -0.3637255134E-03
+   -0.2829586692E-02
+    0.3593205922E-03
+    0.3169382593E-01
+   -0.7649438160E-02
+   -0.1432336703E+00
+    0.6121586703E-01
+    0.4813866596E+00
+   -0.7771843511E+00
+    0.3644396836E+00
+    0.5194280857E-01
+   -0.2721872350E-01
+   -0.4913606047E-01
+    0.3808725019E-02
+    0.1495209647E-01
+   -0.3029202893E-03
+   -0.1889948926E-02
+
+    0.2622395072E-04
+    0.3682039585E-04
+   -0.3484560037E-04
+    0.1044400200E-04
+   -0.1346357753E-05
+   -0.1696820074E-04
+    0.9452329486E-04
+    0.1683706766E-04
+   -0.2973670447E-06
+    0.1596726796E-04
+   -0.3381844248E-02
+    0.5442476019E-03
+    0.3169178699E-01
+   -0.7604144409E-02
+   -0.1432957713E+00
+    0.6127323127E-01
+    0.4813597833E+00
+   -0.7771855710E+00
+    0.3644418761E+00
+    0.5194577328E-01
+   -0.2721902826E-01
+   -0.4913717014E-01
+    0.3808751988E-02
+    0.1495225819E-01
+   -0.3029205141E-03
+   -0.1889950329E-02
+
+    0.2304180410E-07
+    0.3235242306E-07
+   -0.2626045803E-07
+    0.1082307302E-07
+    0.4577834066E-08
+   -0.1211150005E-07
+    0.7406609086E-07
+    0.2062688911E-07
+    0.1399229053E-08
+    0.1155742488E-07
+    0.3531713891E-08
+    0.3080661641E-09
+   -0.3382419079E-02
+    0.5421367809E-03
+    0.3169508577E-01
+   -0.7607487647E-02
+   -0.1432942382E+00
+    0.6127335935E-01
+    0.4813596512E+00
+   -0.7771857518E+00
+    0.3644418948E+00
+    0.5194583812E-01
+   -0.2721902992E-01
+   -0.4913717967E-01
+    0.3808752014E-02
+    0.1495225834E-01
+   -0.3029205147E-03
+   -0.1889950333E-02
+
+
+
+
+
+**************************************************************************
+
+
+RIGHT EDGE SCALING FUNCTION COEFFICIENTS.
+*****************************************
+
+
+N=2
+
+  0.848528137424
+  0.529150262213
+								 
+- 0.132287565553
+  0.212132034356
+  0.838525491562
+  0.484122918276
+
+
+
+N=3
+
+  0.889500699418
+  0.456933808921
+
+- 0.198411021088
+  0.386241373662
+  0.832668382346
+  0.343677222149
+
+  0.0390630495665
+- 0.0760429831027
+- 0.143921176769
+  0.456707890812
+  0.807766275151
+  0.33303120718
+
+- 0.000276799784313
+  0.000538838660959
+  0.0349752642807
+- 0.085504178774
+- 0.134969198046
+  0.459895243878
+  0.806892290508
+  0.332670875027
+
+
+
+N=4
+
+    0.7629809303E+00
+   -0.6464209928E+00
+
+    0.1555526564E+00
+    0.1836012627E+00
+    0.4620817399E+00
+   -0.8535657052E+00
+
+    0.3793246643E+00
+    0.4477229057E+00
+    0.4284467089E+00
+    0.3973740378E+00
+   -0.2021221018E+00
+   -0.5228106220E+00
+
+    0.2385999808E+00
+    0.2816233343E+00
+    0.1056438723E+00
+    0.1612498770E+00
+    0.8548427132E+00
+    0.2929411663E+00
+   -0.3647382801E-01
+   -0.9324840384E-01
+
+    0.6526723701E-01
+    0.7703595299E-01
+    0.7744666349E-01
+    0.7039069048E-01
+   -0.6529437593E-01
+    0.2555397028E+00
+    0.8099281093E+00
+    0.4965300820E+00
+   -0.2995738718E-01
+   -0.7658857572E-01
+
+    0.1517778948E-02
+    0.1791458518E-02
+   -0.3127686151E-02
+   -0.1031248163E-02
+    0.3237561439E-01
+   -0.1322822647E-01
+   -0.9898430026E-01
+    0.2979273659E+00
+    0.8037308261E+00
+    0.4975940939E+00
+   -0.2963560969E-01
+   -0.7576592454E-01
+
+
+
+N=5
+
+    0.9116496405E+00
+    0.4109682870E+00
+
+   -0.1759262671E+00
+    0.3902566773E+00
+    0.6301011968E+00
+    0.6478596732E+00
+
+    0.2825379610E-03
+   -0.6267530579E-03
+    0.4175827162E+00
+   -0.4056820940E+00
+    0.6289312762E+00
+    0.5152588582E+00
+
+   -0.5113299639E-01
+    0.1134281628E+00
+    0.4836999717E+00
+   -0.5526531145E+00
+   -0.2269223725E+00
+   -0.5499800740E+00
+    0.2214856571E+00
+    0.2051843068E+00
+
+    0.2756002147E-02
+   -0.6113630773E-02
+   -0.1460819570E+00
+    0.1465088170E+00
+    0.1654940540E+00
+    0.3172833766E-01
+    0.9500926016E+00
+   -0.1444971260E-01
+    0.1180200176E+00
+    0.1092786192E+00
+
+    0.1425700173E-01
+   -0.3162626148E-01
+   -0.7075177701E-01
+    0.9173486581E-01
+   -0.6745433251E-01
+    0.2118550693E+00
+   -0.1051600438E-01
+    0.9395202801E+00
+    0.1694709068E+00
+   -0.1464208651E+00
+    0.4001747247E-01
+    0.3705349502E-01
+
+   -0.1315787444E-02
+    0.2918807090E-02
+    0.1730939444E-01
+   -0.1895045515E-01
+   -0.1537869850E-02
+   -0.2706707215E-01
+   -0.1556669346E+00
+   -0.6193750436E-05
+    0.6330645158E+00
+    0.7286274296E+00
+    0.1987062136E+00
+   -0.3988654553E-01
+    0.2953429005E-01
+    0.2734677134E-01
+
+   -0.8561071719E-04
+    0.1899099809E-03
+   -0.9013424188E-06
+   -0.1367686226E-03
+   -0.3599933730E-03
+    0.3327378221E-03
+    0.1961899121E-01
+   -0.2117649690E-01
+   -0.1753299891E+00
+    0.1662647625E-01
+    0.6339762696E+00
+    0.7234044479E+00
+    0.1993976399E+00
+   -0.3913415866E-01
+    0.2951949191E-01
+    0.2733306926E-01
+
+
+
+N=6
+
+    0.6512594203E+00
+    0.7588551689E+00
+
+   -0.6896282953E-01
+    0.5918480130E-01
+   -0.9848250307E+00
+    0.1478544768E+00
+
+   -0.1667727153E-01
+    0.1431265231E-01
+    0.1090239805E+00
+    0.7126760308E+00
+   -0.1719730277E+00
+    0.6709313982E+00
+
+    0.9785571254E-01
+   -0.8398105097E-01
+    0.6834310191E-02
+    0.1247808574E+00
+    0.7236789907E-01
+   -0.1108818957E+00
+    0.1804007431E+00
+    0.9579551851E+00
+
+   -0.5378738739E+00
+    0.4616103858E+00
+    0.2733949616E-01
+   -0.2535533852E+00
+    0.3484637175E+00
+    0.3309876136E+00
+   -0.2950887461E+00
+    0.1958019515E+00
+    0.6099724771E-01
+    0.2691738861E+00
+
+   -0.2335808916E+00
+    0.2004621729E+00
+    0.5067312783E-01
+    0.1483313327E+00
+    0.4193562472E+00
+   -0.6838768540E-01
+    0.8092621294E+00
+   -0.1702431983E+00
+   -0.5881963586E-01
+   -0.1104006534E+00
+    0.5469174586E-02
+    0.2413483588E-01
+
+    0.7905558067E-01
+   -0.6784653218E-01
+   -0.2413743535E-02
+    0.4795434784E-01
+   -0.2979345169E-01
+   -0.5477003063E-01
+    0.1575224560E+00
+   -0.5400590327E-01
+    0.8600210456E+00
+    0.4427411664E+00
+   -0.5350546863E-01
+   -0.1279990455E+00
+    0.3964078767E-02
+    0.1749302183E-01
+
+    0.4472356538E-01
+   -0.3838234812E-01
+   -0.1245771188E-02
+    0.2792643621E-01
+   -0.2285669131E-01
+   -0.3338969826E-01
+    0.4201463682E-01
+   -0.2161240035E-01
+   -0.6527800067E-01
+    0.3288435947E+00
+    0.7890314114E+00
+    0.4902682296E+00
+   -0.4839771981E-01
+   -0.1181080824E+00
+    0.3500297801E-02
+    0.1544640999E-01
+
+   -0.2366701878E-04
+    0.2031134472E-04
+   -0.3373738591E-03
+   -0.2266339823E-02
+   -0.2165041937E-02
+    0.1906206337E-02
+   -0.7087323880E-02
+    0.2020684368E-02
+    0.4460763770E-01
+   -0.2107187698E-01
+   -0.7263524048E-01
+    0.3379418668E+00
+    0.7876410397E+00
+    0.4910540301E+00
+   -0.4831177914E-01
+   -0.1179902457E+00
+    0.3490713064E-02
+    0.1540411365E-01
+
+   -0.1333785556E-05
+    0.1144672190E-05
+    0.4933806493E-06
+    0.2205985224E-05
+   -0.3259284258E-06
+   -0.2564526296E-05
+   -0.1197305244E-05
+   -0.1010124086E-06
+   -0.7800395608E-02
+    0.1767376409E-02
+    0.4472504864E-01
+   -0.2106027212E-01
+   -0.7263753168E-01
+    0.3379294037E+00
+    0.7876411418E+00
+    0.4910559454E+00
+   -0.4831174259E-01
+   -0.1179901111E+00
+    0.3490712084E-02
+    0.1540410933E-01
+
+
+
+N=7
+    0.7004199839E+00
+    0.7137309340E+00
+
+    0.1053864722E-01
+   -0.1034210340E-01
+    0.6658963651E+00
+    0.7458981223E+00
+
+   -0.1757138133E+00
+    0.1724367832E+00
+   -0.1665581445E+00
+    0.1535673633E+00
+   -0.4422666014E+00
+    0.8321453685E+00
+
+    0.1613128649E+00
+   -0.1583044098E+00
+   -0.3601719723E+00
+    0.3170674120E+00
+    0.7182714497E+00
+    0.3180082506E+00
+   -0.1351100609E+00
+    0.2887289881E+00
+
+    0.2626733923E+00
+   -0.2577745821E+00
+    0.5300977359E-01
+   -0.5460956119E-01
+   -0.7894206983E-01
+    0.8761351181E-01
+    0.1138292645E+00
+   -0.8840156389E-02
+    0.1186027472E+00
+    0.9042968950E+00
+
+   -0.9906552530E-01
+    0.9721797156E-01
+    0.1575818939E+00
+   -0.1379327181E+00
+    0.2550022277E+00
+    0.1514595280E+00
+    0.8750776361E+00
+    0.6499770717E-01
+    0.2324452664E+00
+   -0.9349432145E-01
+   -0.4623379279E-01
+    0.1183889785E+00
+
+   -0.6250197855E-01
+    0.6133632819E-01
+    0.7570194334E-02
+   -0.5024723655E-02
+    0.2646032111E-01
+   -0.9402290802E-02
+    0.6149372377E-01
+    0.5681683063E-01
+    0.2562598477E-01
+    0.2756686809E-01
+    0.9366103730E+00
+   -0.3120657710E+00
+   -0.3336171928E-01
+    0.8542222229E-01
+
+   -0.4715917315E+00
+    0.4627966328E+00
+   -0.9443328396E-02
+    0.2151032037E-01
+    0.4754578984E-01
+   -0.1760708900E+00
+   -0.1591797424E+00
+    0.4829772924E+00
+    0.2074893977E+00
+    0.2895141132E+00
+   -0.4058619450E-01
+    0.1026407474E+00
+    0.3418617349E+00
+   -0.1182037757E+00
+   -0.1210726949E-01
+    0.3100049663E-01
+
+   -0.9439529077E-01
+    0.9263483604E-01
+   -0.7325279539E-01
+    0.6801412471E-01
+   -0.2325217040E-01
+   -0.7869955176E-01
+   -0.8937965975E-01
+    0.4016014208E-01
+    0.1328240580E+00
+    0.6204454273E-01
+    0.1623006055E+00
+    0.6626531984E+00
+   -0.6074912864E+00
+    0.2552288166E+00
+    0.1574205947E+00
+   -0.1004613457E+00
+   -0.4839078318E-02
+    0.1239039332E-01
+
+    0.1594142646E+00
+   -0.1564412180E+00
+    0.7441639637E-02
+   -0.1106491958E-01
+   -0.2825478866E-01
+    0.5459386943E-01
+   -0.9775758534E-02
+   -0.1478196128E+00
+   -0.1113587794E+00
+   -0.8536948628E-01
+    0.2751605400E+00
+    0.6421729864E+00
+    0.6324608023E+00
+   -0.1525303792E-01
+   -0.8448334026E-01
+    0.8762658370E-01
+    0.3318133734E-01
+   -0.1602650231E-01
+   -0.1102323809E-02
+    0.2822484916E-02
+
+   -0.6037533035E-02
+    0.5924934159E-02
+    0.1534054302E-02
+   -0.1202064256E-02
+    0.3182693183E-02
+   -0.2822206008E-03
+    0.8251845825E-02
+    0.6110061754E-02
+    0.6347460794E-02
+    0.1773857064E-02
+   -0.1077767325E+00
+   -0.1373538162E+00
+    0.2848100511E+00
+    0.7687892964E+00
+    0.5372655282E+00
+    0.1673410769E-01
+   -0.4968993169E-01
+    0.6802066194E-01
+    0.3052110650E-01
+   -0.1264613714E-01
+   -0.1047456655E-02
+    0.2681998325E-02
+
+   -0.2814830317E-04
+    0.2762334252E-04
+   -0.2993814193E-04
+    0.2750781612E-04
+    0.1564675966E-04
+   -0.1442059454E-04
+    0.2143345853E-04
+   -0.4969368764E-04
+   -0.5136649938E-04
+    0.2578289227E-04
+    0.1026729934E-01
+    0.4010109626E-02
+   -0.1078074809E+00
+   -0.1400480006E+00
+    0.2886301179E+00
+    0.7677642441E+00
+    0.5361017227E+00
+    0.1744136474E-01
+   -0.4955281693E-01
+    0.6789267353E-01
+    0.3051551282E-01
+   -0.1263630236E-01
+   -0.1047384891E-02
+    0.2681814574E-02
+
+
+
+N=8
+
+    0.8154844606E+00
+    0.5787789687E+00
+
+   -0.1247831717E+00
+    0.1758162321E+00
+   -0.3656686728E+00
+    0.9054304139E+00
+
+    0.2997291603E-02
+   -0.4223105639E-02
+    0.1242773642E-01
+    0.6252204333E-02
+   -0.9904302529E+00
+    0.1372135453E+00
+
+    0.1966225161E-01
+   -0.2770359932E-01
+   -0.7546094737E+00
+   -0.2966686120E+00
+    0.3499437320E-01
+    0.3331775846E+00
+   -0.2987492141E+00
+    0.3740523778E+00
+
+    0.4323222764E-02
+   -0.6091308037E-02
+    0.7954572256E-01
+    0.3390409091E-01
+    0.9217898627E-01
+    0.6563318928E+00
+    0.3523462443E+00
+   -0.1251353548E+00
+    0.4042229670E+00
+    0.4999957374E+00
+
+   -0.2660208461E-01
+    0.3748164289E-01
+   -0.9461286592E-03
+   -0.1132648426E-01
+   -0.9275963658E-02
+   -0.6461897138E-01
+    0.1372894292E-01
+    0.6267297020E-01
+    0.2202320256E+00
+   -0.8389760645E-01
+   -0.1403041536E+00
+    0.9561140215E+00
+
+    0.2524537323E+00
+   -0.3557007197E+00
+    0.1516837508E-01
+    0.1099880629E+00
+    0.1862464672E-01
+    0.1115880939E+00
+    0.2254220157E-01
+   -0.4913049824E-02
+   -0.5563920979E+00
+    0.2664015938E+00
+    0.3095222627E+00
+    0.2269636732E+00
+   -0.8010927222E-01
+    0.4998095408E+00
+
+    0.2456578749E+00
+   -0.3461255340E+00
+    0.9925065785E-02
+    0.1050746034E+00
+   -0.4318903116E-01
+   -0.3334514090E+00
+    0.2290161361E+00
+    0.5487762846E+00
+    0.5044722993E+00
+   -0.1254772285E-02
+    0.1029941228E+00
+   -0.1417543694E+00
+   -0.2283734323E-01
+    0.2364674480E+00
+   -0.3231151084E-02
+    0.2015946352E-01
+
+   -0.2349913172E+00
+    0.3310966326E+00
+   -0.5311446508E-01
+   -0.1181288132E+00
+   -0.9603473986E-02
+   -0.4380266939E-01
+    0.2600141912E+00
+    0.8361504832E-01
+    0.2510639110E-01
+   -0.1008073945E+00
+    0.8418631631E+00
+    0.7567187201E-01
+   -0.5157252055E-01
+   -0.1011324247E+00
+    0.1353427731E-01
+   -0.5842857844E-01
+   -0.8943337330E-03
+    0.5579834492E-02
+
+    0.1175808867E+00
+   -0.1656684005E+00
+    0.2116820474E-01
+    0.5692304840E-01
+   -0.3212417295E-03
+   -0.1449706939E-01
+    0.7608433230E-02
+    0.8842036371E-01
+   -0.1106702915E+00
+    0.1150658911E+00
+    0.1320221928E+00
+    0.5853544071E-01
+    0.8673441259E+00
+   -0.3405381015E+00
+   -0.7026544508E-01
+    0.1612247059E+00
+    0.8814953584E-02
+   -0.3651364229E-01
+   -0.6354725161E-03
+    0.3964774371E-02
+
+   -0.1869200178E+00
+    0.2633654264E+00
+   -0.1715897751E-01
+   -0.8383072732E-01
+   -0.5454552299E-04
+    0.1716903650E-01
+   -0.2459571155E-01
+   -0.1067048762E+00
+    0.1392253947E+00
+   -0.1312182020E+00
+   -0.6903207429E-01
+   -0.6174129657E-01
+    0.4567820059E+00
+    0.6659677770E+00
+    0.4075238681E+00
+   -0.8959489682E-01
+   -0.3070551742E-01
+    0.5834412826E-01
+    0.4209662663E-02
+   -0.1666652373E-01
+   -0.3299795784E-03
+    0.2058774443E-02
+
+   -0.5983387981E-04
+    0.8430437497E-04
+   -0.7367030616E-03
+   -0.3221424476E-03
+    0.2377031466E-03
+    0.1801086072E-02
+    0.6525360795E-02
+    0.1852858079E-02
+   -0.1304362553E-01
+    0.4142993226E-02
+    0.2877868990E-01
+    0.7490490000E-02
+   -0.1429947491E+00
+   -0.6137476013E-01
+    0.4811678727E+00
+    0.7773035028E+00
+    0.3644701648E+00
+   -0.5200003920E-01
+   -0.2722180405E-01
+    0.4914754640E-01
+    0.3808981800E-02
+   -0.1495346270E-01
+   -0.3029283977E-03
+    0.1889999515E-02
+
+    0.2133198342E-03
+   -0.3005620786E-03
+    0.1154368505E-03
+    0.1343825608E-03
+    0.1922522728E-04
+    0.1082819743E-03
+   -0.9178438545E-03
+   -0.5253253664E-03
+    0.5862560755E-03
+   -0.1372988867E-03
+   -0.3162915788E-02
+   -0.5366827388E-03
+    0.3167918922E-01
+    0.7662389238E-02
+   -0.1433799225E+00
+   -0.6122357795E-01
+    0.4813668294E+00
+    0.7771700444E+00
+    0.3644410683E+00
+   -0.5194231988E-01
+   -0.2721896821E-01
+    0.4913678918E-01
+    0.3808752164E-02
+   -0.1495225825E-01
+   -0.3029205498E-03
+    0.1889950551E-02
+
+   -0.2204602645E-06
+    0.3106227586E-06
+   -0.2497015754E-06
+   -0.1915445903E-06
+   -0.3628131005E-07
+   -0.2161647330E-06
+    0.1096077744E-05
+    0.4502869954E-06
+   -0.6259648891E-06
+    0.1952007624E-06
+   -0.5855423375E-06
+   -0.5654617843E-08
+   -0.3382391093E-02
+   -0.5421772240E-03
+    0.3169514253E-01
+    0.7607457819E-02
+   -0.1432942434E+00
+   -0.6127334917E-01
+    0.4813596518E+00
+    0.7771857494E+00
+    0.3644418948E+00
+   -0.5194583784E-01
+   -0.2721902992E-01
+    0.4913717967E-01
+    0.3808752014E-02
+   -0.1495225834E-01
+   -0.3029205147E-03
+    0.1889950333E-02
+
+
+
+
+
+
+
+*************************************************************************
+
+
+RIGHT SIDE WAVELET COEFFICIENTS.
+********************************
+
+
+N=2
+
+  0.512347538298
+- 0.821583836258
+  0.216506350946
+  0.125
+
+
+
+N=3
+
+- 0.409742284317
+  0.797634233593
+- 0.419058128916
+- 0.117669342504
+  0.0741631890253
+  0.0305764886814
+
+- 0.00261427398522
+  0.00508913652903
+  0.330328738376
+- 0.807556085169
+  0.460310974517
+  0.13519444871
+- 0.0854338960798
+- 0.0352232501168
+
+
+
+N=4
+
+   -0.4071236735E+00
+   -0.4805345164E+00
+    0.7323866385E+00
+    0.2189246571E+00
+    0.1377492261E+00
+    0.6432723244E-02
+   -0.5725128723E-03
+   -0.1463677232E-02
+
+   -0.1510687974E+00
+   -0.1783088929E+00
+   -0.2220387683E+00
+   -0.1860863787E+00
+    0.4453190824E+00
+   -0.7578721319E+00
+    0.2811170011E+00
+    0.9317065817E-01
+   -0.1190456353E-01
+   -0.3043501623E-01
+
+   -0.3568796396E-02
+   -0.4212306878E-02
+    0.7354216552E-02
+    0.2424802855E-02
+   -0.7612569411E-01
+    0.3110390153E-01
+    0.4970737955E+00
+   -0.8039165747E+00
+    0.2978757587E+00
+    0.9927560396E-01
+   -0.1260377436E-01
+   -0.3222260742E-01
+
+
+
+N=5
+
+    0.3667623662E+00
+   -0.8135877873E+00
+    0.3605867008E+00
+    0.2389793582E+00
+    0.1721476353E-01
+   -0.1262774479E+00
+    0.1354530290E-01
+    0.7338813977E-03
+   -0.1058396455E-03
+   -0.9800040389E-04
+
+    0.2440133283E-01
+   -0.5412939880E-01
+    0.1933279241E+00
+   -0.1487960520E+00
+   -0.7215807244E+00
+    0.6068591878E+00
+    0.1499494360E+00
+   -0.1537729673E+00
+    0.4017810927E-02
+    0.4249831221E-01
+   -0.5115722859E-02
+   -0.4736816190E-02
+
+   -0.2747616845E-02
+    0.6095029686E-02
+    0.2424194881E-01
+   -0.2799508244E-01
+   -0.5956481976E-02
+   -0.3440854634E-01
+   -0.1090515083E-01
+   -0.2236505386E+00
+    0.7232999959E+00
+   -0.6265589773E+00
+    0.1577095589E-01
+    0.1743929125E+00
+   -0.2107998910E-01
+   -0.1951865580E-01
+
+   -0.1197613924E-03
+    0.2656663148E-03
+   -0.1260893172E-05
+   -0.1913265215E-03
+   -0.5035970875E-03
+    0.4654691185E-03
+    0.2744513531E-01
+   -0.2962394021E-01
+   -0.3913691676E-01
+   -0.1993634542E+00
+    0.7234039987E+00
+   -0.6339835070E+00
+    0.1660226434E-01
+    0.1753282263E+00
+   -0.2110183265E-01
+   -0.1953888146E-01
+
+
+
+N=6
+
+    0.4378023718E+00
+   -0.3757277153E+00
+   -0.6873475431E-01
+   -0.1032247812E+00
+    0.7266439214E+00
+    0.3259673475E+00
+   -0.1186803367E+00
+   -0.5853826628E-01
+   -0.3032048461E-03
+   -0.4670847828E-04
+    0.1703850068E-05
+    0.7518930104E-05
+
+   -0.9713836045E-01
+    0.8336541004E-01
+    0.1006861439E+00
+    0.5919694503E+00
+    0.3702101657E+00
+   -0.5544630394E+00
+   -0.4149317683E+00
+   -0.7460178119E-01
+    0.2790428530E-01
+    0.5912930318E-02
+   -0.1712035030E-02
+   -0.3636645827E-02
+    0.1436692465E-03
+    0.6339957943E-03
+
+   -0.8958975532E-01
+    0.7688709850E-01
+    0.1185119667E-02
+   -0.6467017684E-01
+    0.3743730652E-01
+    0.7423011440E-01
+   -0.1113332259E+00
+    0.5103740064E-01
+    0.4816519926E+00
+   -0.7799800339E+00
+    0.3345221160E+00
+    0.7239621136E-01
+   -0.2085354320E-01
+   -0.4433542083E-01
+    0.1748540164E-02
+    0.7716105825E-02
+
+    0.4166215409E-04
+   -0.3575500495E-04
+    0.6680919371E-03
+    0.4483753011E-02
+    0.4274088494E-02
+   -0.3773957888E-02
+    0.1399084946E-01
+   -0.3990648231E-02
+   -0.1177575130E+00
+    0.4833340703E-01
+    0.4910525706E+00
+   -0.7876666869E+00
+    0.3379295212E+00
+    0.7264103605E-01
+   -0.2106021362E-01
+   -0.4472460633E-01
+    0.1767709932E-02
+    0.7800699800E-02
+
+    0.2633834884E-05
+   -0.2260391508E-05
+   -0.9742819475E-06
+   -0.4356173277E-05
+    0.6436128145E-06
+    0.5064186603E-05
+    0.2364326456E-05
+    0.1994698649E-06
+    0.1540349180E-01
+   -0.3490049659E-02
+   -0.1179904012E+00
+    0.4831170232E-01
+    0.4910559595E+00
+   -0.7876411054E+00
+    0.3379294202E+00
+    0.7263751587E-01
+   -0.2106029251E-01
+   -0.4472490177E-01
+    0.1767711864E-02
+    0.7800708325E-02
+
+
+
+N=7
+
+    0.3287269241E+00
+   -0.3225962277E+00
+   -0.3486576217E-01
+    0.2200880144E-01
+   -0.4013253310E+00
+   -0.8807413471E-01
+    0.7139363748E-01
+    0.7005967686E+00
+    0.2475030985E+00
+   -0.2451712749E+00
+    0.7181777146E-02
+    0.2499604984E-04
+   -0.8073680719E-08
+   -0.3908981471E-07
+
+    0.5957737342E-01
+   -0.5846626641E-01
+    0.4582097589E+00
+   -0.4107166017E+00
+    0.2022914839E+00
+    0.2997172270E+00
+   -0.3986325494E+00
+   -0.6261552962E-01
+    0.5532851486E+00
+   -0.1200134025E+00
+    0.1616443953E-01
+   -0.3615532478E-02
+   -0.1770925212E-02
+    0.1363254906E-02
+    0.5071037744E-04
+   -0.1298432110E-03
+
+    0.1154439687E-01
+   -0.1132909600E-01
+   -0.3933408112E+00
+    0.3508326132E+00
+   -0.1045297744E+00
+   -0.1942431291E+00
+    0.4053278706E-01
+   -0.3956498210E+00
+    0.7001774443E+00
+   -0.5344583491E-01
+   -0.6098922304E-02
+   -0.7677883475E-01
+    0.1158196639E+00
+   -0.4412947160E-01
+   -0.2089669169E-01
+    0.1616290641E-01
+    0.5971498449E-03
+   -0.1528993947E-02
+
+    0.3435795707E-01
+   -0.3371718752E-01
+    0.3919592661E-02
+   -0.4452130171E-02
+   -0.2728348640E-02
+    0.1439788762E-01
+    0.1012896303E-01
+   -0.3223449962E-01
+   -0.2185300516E-01
+   -0.2044704093E-01
+    0.6843499760E-01
+    0.2980333628E-01
+    0.4539318191E-01
+   -0.5452752162E+00
+    0.7607344157E+00
+   -0.2839752561E+00
+   -0.1395508493E+00
+    0.1071639975E+00
+    0.4000222290E-02
+   -0.1024251403E-01
+
+   -0.1619528496E-02
+    0.1589324589E-02
+    0.3554364827E-03
+   -0.2723954613E-03
+    0.8549575210E-03
+   -0.9551275473E-04
+    0.2187750783E-02
+    0.1520814609E-02
+    0.1580292226E-02
+    0.5022963426E-03
+   -0.1263138978E-01
+   -0.2981485818E-01
+    0.6690165825E-01
+    0.4983337040E-01
+    0.1775563260E-01
+   -0.5362889286E+00
+    0.7677311001E+00
+   -0.2885962362E+00
+   -0.1400458666E+00
+    0.1078059333E+00
+    0.4010225471E-02
+   -0.1026812703E-01
+
+   -0.7351578516E-05
+    0.7214472934E-05
+   -0.7819175985E-05
+    0.7184425358E-05
+    0.4086432729E-05
+   -0.3766364036E-05
+    0.5597958787E-05
+   -0.1297860916E-04
+   -0.1341567344E-04
+    0.6733817189E-05
+    0.2681585429E-02
+    0.1047349568E-02
+   -0.1263610581E-01
+   -0.3051571178E-01
+    0.6789282065E-01
+    0.4955281636E-01
+    0.1744120464E-01
+   -0.5361018885E+00
+    0.7677643218E+00
+   -0.2886296370E+00
+   -0.1400472405E+00
+    0.1078082380E+00
+    0.4010244871E-02
+   -0.1026817671E-01
+
+
+
+N=8
+
+    0.2423397898E+00
+   -0.3414504387E+00
+   -0.1594658038E+00
+    0.3529902230E-01
+    0.1178925154E-02
+    0.5541735135E-02
+   -0.3397784131E+00
+   -0.6081576576E+00
+    0.3969712638E+00
+   -0.2244673049E+00
+    0.3235661995E+00
+    0.1864123221E-02
+   -0.3711413269E-03
+    0.1409795475E-06
+    0.1765799666E-07
+   -0.1432302065E-07
+
+    0.4513529643E-01
+   -0.6359445463E-01
+    0.4156183867E+00
+    0.1864214898E+00
+    0.8260455402E-01
+    0.5471723539E+00
+   -0.2060895161E+00
+    0.3195284622E+00
+   -0.1900505437E-01
+   -0.5728513561E+00
+    0.8401643267E-01
+   -0.7395446869E-02
+   -0.5473278975E-03
+    0.9194626204E-03
+    0.4880437220E-04
+   -0.2033336993E-03
+   -0.3477949227E-05
+    0.2169926352E-04
+
+    0.1250013206E+00
+   -0.1761235982E+00
+   -0.2969401780E+00
+   -0.6849590110E-01
+    0.1052599951E-01
+    0.9784281131E-01
+    0.7121369985E+00
+   -0.1923488214E+00
+   -0.1670869235E+00
+   -0.4966168654E+00
+   -0.1731874885E+00
+   -0.1213007854E-01
+    0.3720006761E-01
+   -0.2322200303E-01
+   -0.2923066799E-02
+    0.6878894624E-02
+    0.3616735843E-03
+   -0.1510315965E-02
+   -0.2565448314E-04
+    0.1600607975E-03
+
+    0.1176229912E+00
+   -0.1657277246E+00
+    0.1156398803E-01
+    0.5306159526E-01
+   -0.1350101618E-03
+   -0.1210974010E-01
+    0.8506023466E-02
+    0.6454872425E-01
+   -0.7545099201E-01
+    0.7860638961E-01
+    0.1423462206E-01
+    0.3160238725E-01
+   -0.6318521633E-01
+   -0.3456069087E+00
+    0.7552228032E+00
+   -0.4695151924E+00
+   -0.5958716642E-01
+    0.1395811538E+00
+    0.7391464073E-02
+   -0.3081345978E-01
+   -0.5261056159E-03
+    0.3282423723E-02
+
+   -0.1408148250E-03
+    0.1984044131E-03
+    0.3171629950E-03
+    0.7015727951E-04
+   -0.1485516761E-03
+   -0.1095011310E-02
+   -0.2896265919E-02
+   -0.6063657602E-03
+    0.6809567802E-02
+   -0.2202777079E-02
+   -0.1350306650E-01
+   -0.3747971165E-02
+    0.4898531345E-01
+    0.2723198199E-01
+   -0.5177607522E-01
+   -0.3645627219E+00
+    0.7771651866E+00
+   -0.4813205851E+00
+   -0.6127118296E-01
+    0.1432859367E+00
+    0.7607311222E-02
+   -0.3169412534E-01
+   -0.5421276476E-03
+    0.3382386726E-02
+
+   -0.1190143232E-03
+    0.1676880751E-03
+   -0.6429765381E-04
+   -0.7493111227E-04
+   -0.1071266241E-04
+   -0.6032714131E-04
+    0.5119585945E-03
+    0.2931623842E-03
+   -0.3270646712E-03
+    0.7655763607E-04
+    0.1767780640E-02
+    0.2998801694E-03
+   -0.1494339773E-01
+   -0.3839392904E-02
+    0.4918502279E-01
+    0.2719124334E-01
+   -0.5194987783E-01
+   -0.3644331897E+00
+    0.7771862176E+00
+   -0.4813616291E+00
+   -0.6127339397E-01
+    0.1432944583E+00
+    0.7607487270E-02
+   -0.3169508804E-01
+   -0.5421323123E-03
+    0.3382415829E-02
+
+    0.1231735693E-06
+   -0.1735483443E-06
+    0.1395294094E-06
+    0.1070254954E-06
+    0.2027240624E-07
+    0.1207834424E-06
+   -0.6124273534E-06
+   -0.2515754905E-06
+    0.3497458016E-06
+   -0.1090603783E-06
+    0.3271625017E-06
+    0.3159481233E-08
+    0.1889936443E-02
+    0.3029455986E-03
+   -0.1495228891E-01
+   -0.3808735528E-02
+    0.4913718250E-01
+    0.2721902439E-01
+   -0.5194583841E-01
+   -0.3644418935E+00
+    0.7771857517E+00
+   -0.4813596514E+00
+   -0.6127335907E-01
+    0.1432942384E+00
+    0.7607487325E-02
+   -0.3169508781E-01
+   -0.5421323318E-03
+    0.3382415951E-02
+
+
+
+
+
