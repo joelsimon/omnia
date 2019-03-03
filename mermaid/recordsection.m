@@ -14,14 +14,14 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 %           'atime': t=0 at theoretical first arrival
 %                    for every seismogram*
 % ampfac    Nondimensional amplitude multiplication factor (def: 3)
-% revdir    Path to directory containing 'reviewed' directory
+% revdir    Path to 'reviewed' directory
 %                (def: $MERMAID/events/)
-% procdir   Path to directory containing 'processed' directory
+% procdir   Path to 'processed' directory
 %                (def: $MERMAID/processed/)
-% normlize  true: normlize seismograms individually
-%                 (no amplitude decay with distance)
-%           false: normalize seismograms against
-%                  (amplitude decay with distance)
+% normlize  true: normalize each seismogram against itself
+%                 (removes amplitude decay with distance)
+%           false: normalize each seismogram against ensemble
+%                  (preserves amplitude decay with distance)
 %
 % Output:
 % F        Structure with figure handles and bits
