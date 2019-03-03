@@ -5,18 +5,17 @@ function sacfiles = mermaid_sacf(IDorUID,diro)
 % MERMAID SAC file in identified/unidentified if first input is 'ID',
 % 'UID', or 'all',
 %
-% --or--
+% -OR-
 %
 % MERMAID_SACF returns a single SAC file name if the first input is a
 % single SAC file (with or without full path).  If duplicates exist
 % (SAC file in both /identified/ and /unidentified/) it will return
 % the path to the former.  See mermaid_sacf_duplicate.m
 %
-% Inputs:
-% IDorUID         Case-insensitive string denoting request of identified or
-%                     unidentified event filenames (def: 'ID')
-%                     ('ID','identified' etc., and 'both','all' accepted)
-%                     --or-- a single SAC filename (with or without full path)
+% Input:
+% IDorUID         Case-insensitive string denoting request of identified  ('ID'), 
+%                     unidentified ('UID'), or all ('all') event filenames;  
+%                 -OR- a single SAC filename (with or without full path)
 %
 % diro            Directory which stores individual float dirs
 %                     (def: $MERAZUR) 
@@ -31,7 +30,7 @@ function sacfiles = mermaid_sacf(IDorUID,diro)
 % Ex2: (return full path to a single SAC file)
 %    sacfiles = MERMAID_SACF('m12.20150527T200008.sac')
 %
-% See also: mermaid_sacf_duplicate.m
+% See also: mermaid_sacf_duplicates.m, fullsac.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
