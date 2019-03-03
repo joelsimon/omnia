@@ -5,10 +5,10 @@ paths) must be added to your shell's configuruation file. For me:
 
 1) 
 
-export GITHUB=$HOME/github
-export OMNIA=$GITHUB/omnia
-export IFILES=$OMNIA/notmycode/fjs/IFILES
-export IRISFETCH=$GITHUB/irisFetch-matlab
+export GITHUB=$HOME/github<br/>
+export OMNIA=$GITHUB/omnia<br/>
+export IFILES=$OMNIA/notmycode/fjs/IFILES<br/>
+export IRISFETCH=$GITHUB/irisFetch-matlab<br/>
 
 2)
 
