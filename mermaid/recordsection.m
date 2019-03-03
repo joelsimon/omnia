@@ -1,23 +1,75 @@
-function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, revdir, procdir)
-% [F, EQ, sac] = RECORDSECTION(id, lohi, alignon, ampfac, revdir, procdir)
+function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
+                                      revdir, procdir, normlize)
+% [F, EQ, sac] = RECORDSECTION(id, lohi, alignon, ampfac, ...
+%                              revdir, procdir, normlize)
 %
+% Plots a record section of all MERMAID seismograms that recorded the
+% same event, read from 'identified.txt', output from evt2txt.m
+%
+% Input:
+% id        Event identification number (def: 10948555)
+% lohi      Bandpass corner frequencies in Hz, or
+%              NaN to plot raw seismograms  (def: [2.5 5])
+% aligon    'etime': t=0 at event rupture time (def: etime)
+%           'atime': t=0 at theoretical first arrival
+%                    for every seismogram*
+% ampfac    Nondimensional amplitude multiplication factor (def: 3)
 % revdir    Path to directory containing 'reviewed' directory
 %                (def: $MERMAID/events/)
+% procdir   Path to directory containing 'processed' directory
+%                (def: $MERMAID/processed/)
+% normlize  true: normlize seismograms individually
+%                 (no amplitude decay with distance)
+%           false: normalize seismograms against
+%                  (amplitude decay with distance)
+%
+% Output:
+% F        Structure with figure handles and bits
+% EQ       EQ strucutre, as returned found with sac2evt.m
+% sac      
+%
+% *if alignon='atime' travel time curves of latter-arriving phases
+% are not plotted
+%
+% Ex:
+% RECORDSECTION(10937540, [1/10 1/2], 'etime', 3, [], [], true)
+% RECORDSECTION(10937540, [1/10 1/2], 'etime', 3, [], [], false)
+% RECORDSECTION(10937540, [1/10 1/2], 'etime', 3, [], [], true)
+%
+% See also: evt2txt.m, getevt.m
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 07-Dec-2018, Version 2017b
+% Last modified: 02-Mar-2019, Version 2017b
 
+% Wish list:
+%
+% Overlaid travel time curves for 'atime' option.  Compute differences
+% between all phases and first-arriving phase at every distance.  Then
+% set first-arriving phase at every distance to 0 seconds and all
+% subsequent phase arrival times as those differences just computed.
+% Will not be trivial because tt(?).distances may not intersect and
+% thus would require interpolation between distances and times for
+% different phases.
+
+% Defaults.
 defval('id', 10948555)
 defval('lohi', [2.5 5]);
 defval('alignon', 'etime')
 defval('ampfac', 3)
 defval('revdir', fullfile(getenv('MERMAID'), 'events'))
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
+defval('normlize', true)
 
-% So long as (1) SAC filename is first column, (2) event ID is last
-% column, and (3) every line is formatted identically, this method of
-% arbitrary reading should be robust.  See evt2text.m for details of
-% 'textfile' write.
+% Assumes Princeton-owned, third-generation MERMAID float SAC file
+% naming convention (NOT older, GeoAzur SAC files).  Assuming
+% identified.txt is formatted such that:
+% (1) SAC filename is first column,
+% (2) event ID is last column,
+% (3) every line is formatted identically,
+% (4) the column separator is a space,
+% this method of arbitrary reading should be robust.
+% See evt2text.m for details of 'textfile' write.
 textfile = fullfile(revdir, 'reviewed', 'identified', 'txt', 'identified.txt');
 textlines = readtext(textfile);
 columnsep = strfind(textlines{1}, ' ');
@@ -26,11 +78,12 @@ columnsep = strfind(textlines{1}, ' ');
 % an asterisk "*", indicating possible multiple events
 eventid_index = [columnsep(end):length(textlines{1})];
 
+% Find the lines in identified.txt which include that event
+% identification number.
 id = num2str(id);
 num_matches = 0;
 for i = 1:length(textlines)
     eventid{i} = strtrim(textlines{i}(eventid_index));
-
     if strcmp(eventid{i}, id)
         num_matches = num_matches + 1;
         sac{num_matches} = strtrim(textlines{i}(1:columnsep(1)));
@@ -42,25 +95,31 @@ for i = 1:length(textlines)
         end
     end
 end
-
 if ~num_matches
     error('No matching event id: %s', id)
 
 end
 
+% Generate figure window.
 F.f = figure;
 F.ax = axes(F.f);
 hold(F.ax, 'on');
 
 phase_cell = {};
 for i = 1:length(sac)
+    % Retrieve the full path to the SAC file/
     fullpath_sac{i} = fullsac(sac{i}, procdir);
 
+    % Retrieve the event data associated with that SAC file, as
+    % found through sac2evt.m
     EQ{i} = getevt(fullpath_sac{i}, revdir);
+
+    % Parse the event info.
     evtdate = EQ{i}(1).TaupTimes(1).arrivaldatetime;
     dist(i) = EQ{i}(1).TaupTimes(1).distance;
     phase_cell = [phase_cell {EQ{i}(1).TaupTimes.phaseName}];
-    
+
+    % Read the SAC data.
     [x{i}, h{i}] = readsac(fullpath_sac{i});
     seisdate{i} = seistime(h{i});
 
@@ -81,36 +140,43 @@ for i = 1:length(sac)
         error('Please specify either ''etime'' or ''atime'' for input ''alignon''.')
 
     end
+    % Generate an x-axis.
     xax{i} = xaxis(length(x{i}), h{i}.DELTA, pt0);
 
+    % Filter, possibly.
     if ~isnan(lohi)
         x{i} = bandpass(x{i}, 1/h{i}.DELTA, lohi(1), lohi(2));
+
+        % Bandpassing leaves some edge artifacts. I could taper or otherwise
+        % preprocess the time series but given that this script is to
+        % display, and not otherwise analyze the data, I will simply
+        % remove some offending-samples from the start and end of the
+        % seismogram.  Do this before normalizing so the large spurious
+        % signals are removed.
+        x{i}(1:100) = NaN;
+        x{i}(end-100:end) = NaN;
         
     end
 
-
-    
-    % Normalize each trace.
-    x{i} = norm2max(x{i});
-    
-    % Alternatively could normalize to the max of the set to see
-    % the amplitude fall off.
-    %% Uncomment this for 1/sqrt(r) amplitude fall off.
-    % maxx(i) = nanmax(abs(x{i}));    
-    
-    % Bandpassing leaves some edge artifacts. Could taper.  Instead just
-    % chopping off ends.
-    x{i}(1:20) = NaN;
-    x{i}(end-19:end) = NaN;
-
 end
-
-%% Uncomment this for 1/sqrt(r) amplitude fall off.
-%maxx = max(maxx);
+% This is the max amplitude across all seismograms (i.e., likely the
+% one with the shortest epicentral distance, ignoring propagation
+% patterns etc.) and may be used below to normalize but maintain
+% distance decay.
+maxx = max(cellfun(@(xx) max(abs(xx)), x));
 
 for i = 1:length(x)
-    %% Uncomment this for 1/sqrt(r) amplitude fall off.
-    %x{i} = x{i} / maxx;
+    if normlize
+        % Normalize this seismogram with itself, thereby removing distance
+        % decay.
+        x{i} = norm2max(x{i});
+        
+    else
+          % Normalize this seismogram with max amplitude of all
+        % seismograms, thereby showing distance decay.
+        x{i} = x{i} / maxx;
+        
+    end
     
     % Assumes Princeton MERMAID float naming convention, where the float
     % number is the two digits immediately following the first period
@@ -128,6 +194,7 @@ F.ax.TickDir = 'out';
 grid(F.ax, 'on')
 
 EQ1 = EQ{1}(1);
+
 % Event time is the same for all here because it's the same event.
 evtdate = datetime(EQ1.PreferredTime, 'InputFormat', ['uuuu-MM-dd ' ...
                     'HH:mm:ss.SSS'], 'TimeZone', 'UTC');
@@ -141,11 +208,11 @@ timstr = sprintf('%s UTC', EQ1.PreferredTime(1:19));
 % Overlay travel time curves.
 current_xlim = get(F.ax, 'XLim');
 current_ylim = get(F.ax, 'YLim');
-%phase_cell = {EQ(1).TaupTimes.phaseName};
 
 phase_cell = unique(phase_cell);
 phase_str = strrep(strjoin(phase_cell), ' ', ',');
 tt = taupCurve('ak135', EQ1.PreferredDepth, phase_str);
+keyboard
 for i = 1:length(tt)
     F.ph(i) = plot(F.ax, tt(i).time, tt(i).distance, 'LineWidth', ...
                    1.5, 'LineStyle', '-');
@@ -156,9 +223,8 @@ set(F.ax, 'XLim', current_xlim);
 set(F.ax, 'YLim', current_ylim);
 F.lg = legend(F.ph, phase_cell, 'AutoUpdate', 'off')
 
-%% To be cleaned up!!!
+% Add title and labels.
 if strcmp(alignon, 'atime')
-
     F.tl = title(sprintf('%s UTC %s', datestr(evtdate), EQ1.FlinnEngdahlRegionName));
     F.magtx = text(F.tl.Position(1), F.tl.Position(2), F.ax, ...
                    sprintf('M%2.1f %s at %2.1f km depth', ...
@@ -171,15 +237,15 @@ else
     F.tl = title([magstr ' ' locstr ' at ' depthstr]);
     F.xl = xlabel(sprintf('time since %s (s)', timstr));
 
-
 end
 
+% Annotate figure with informative text boxes.
 [F.bhul, F.thul] = boxtexb('ul', F.ax, sprintf('%.2f~-~%.2f Hz', lohi), F.xl.FontSize);
 [F.bhlr, F.thlr] = boxtexb('lr', F.ax, sprintf('%s', id), F.xl.FontSize);
-
 F.bhul.Visible = 'off';
 F.bhlr.Visible = 'off';
 
+% Final cosmetics.
 F.yl = ylabel(F.ax, 'distance ($^{\circ}$)');
 F.tl.FontWeight = 'normal';
 latimes

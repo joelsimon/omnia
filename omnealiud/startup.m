@@ -11,7 +11,7 @@
 % symlinked a version to the above path (assuming $OMNIA is set, see
 % below):
 %
-% ln -s $OMNIA/omnealiud/startup.m /home/jdsimon/Documents/MATLAB/startup.m
+% ln -s $OMNIA/omnealiud/startup.m $HOME/Documents/MATLAB/startup.m
 %
 % Alternatively, one may simply move this file to the latter path.
 %
@@ -24,8 +24,8 @@
 % with "setenv" in csh-like (csh, tsch).
 %
 % For me:
-% export OMNIA='/home/jdsimon/github/omnia'
-% export IRISFETCH='/home/jdsimon/github/irisFetch-matlab'
+% export OMNIA=$HOME/github/omnia
+% export IRISFETCH=$HOME/github/irisFetch-matlab
 %
 % Assumes MATLAB is subsequently launched in said shell, such that
 % these environmental variables are then known to MATLAB.

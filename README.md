@@ -1,28 +1,29 @@
 Installation notes:
 
-1) Create the required (path) environmental variables in your
-preferred shell configuration file (eg., bashrc, or wherever you keep
-environmnetal variables).  For me (in zsh) the command is "export",
-for c-shell types, "setenv":
+Before running any code in omnia, the following environmental variables (all
+paths) must be added to your shell's configuruation file. For me:
 
-export OMNIA=/home/jdsimon/github/omnia 
+1) 
+
+export GITHUB=$HOME/github
+export OMNIA=$GITHUB/omnia
 export IFILES=$OMNIA/notmycode/fjs/IFILES
+export IRISFETCH=$GITHUB/irisFetch-matlab
 
-2) I have a startup.m file which is automatically executed when MATLAB
-is launched.  It lives in omnia/omnealiud.  If you already have a
-startup.m file somewhere else, append the relevant lines from my file
-to yours.  Otherwise you can leave it there
+2)
 
-If you already have a startup.m file, e.g. in your MATLAB "userpath", for me:
+ln -s $OMNIA/omnealiud/startup.m $HOME/MATLAB/startup.m
 
-'/home/jdsimon/Documents/MATLAB'
 
-append my startup.m lines to yours.
+3)
 
-3) Source your updated shell configuration file and launch MATLAB from
-the terminal, such that the environmental variables you just created
-may be known to MATLAB, for me:
 
-/usr/local/MATLAB/R2017b/bin/matlab
+matTaup
+taupPath([],550,'P,sS','deg',45.6)
 
+irisFetch
+tr = irisFetch.Traces('IU','ANMO','10','BHZ','2010-02-27 06:30:00', ...
+   '2010-02-27 10:30:00')
+
+       
 
