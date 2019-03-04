@@ -18,24 +18,32 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 %                (def: $MERMAID/events/)
 % procdir   Path to 'processed' directory
 %                (def: $MERMAID/processed/)
-% normlize  true: normalize each seismogram against itself
-%                 (removes amplitude decay with distance)
+% normlize  true: normalize each seismogram against itself (def: true)
+%                 (removes 1/sqrt(dist) amplitude decay)
 %           false: normalize each seismogram against ensemble
-%                  (preserves amplitude decay with distance)
+%                  (preserves 1/sqrt(dist) amplitude decay)
 %
 % Output:
 % F        Structure with figure handles and bits
-% EQ       EQ strucutre, as returned found with sac2evt.m
+% EQ       EQ structure, as returned found with sac2evt.m
 % sac      
 %
-% *if alignon='atime' travel time curves of latter-arriving phases
-% are not plotted
+% *Travel time are not plotted if alignon='atime'. Also note that a
+% vertical line at 0 seconds does not necessarily correspond to the
+% same phase / phase branch across different seismograms.  I.e., the 0
+% time for each seismogram is individually set to its first arrival,
+% even if that first-arriving phase is different from the
+% first-arriving phase of other seismograms plotted.  In the vast
+% majority of cases the first-arriving phase be the same across all
+% seismograms, but this is something to be aware of. Overlaid travel
+% time curves for 'atime' option are on the wish list.
 %
 % Ex:
-% RECORDSECTION(10937540, [1/10 1/2], 'etime', 3, [], [], true)
-% RECORDSECTION(10937540, [1/10 1/2], 'etime', 3, [], [], false)
-% RECORDSECTION(10937540, [1/10 1/2], 'etime', 3, [], [], true)
-%
+% RECORDSECTION(10948555, [], 'etime');
+% RECORDSECTION(10948555, [], 'atime');
+% RECORDSECTION(10937540, [1/10 1/2], 'etime', 3, [], [], true);
+% RECORDSECTION(10937540, [1/10 1/2], 'etime', 3, [], [], false);
+% 
 % See also: evt2txt.m, getevt.m
 %
 % Author: Joel D. Simon
@@ -50,7 +58,10 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 % subsequent phase arrival times as those differences just computed.
 % Will not be trivial because tt(?).distances may not intersect and
 % thus would require interpolation between distances and times for
-% different phases.
+% different phases.  Alternatively, could compute travel times
+% discretely for one phase given the tt(?).distance vector of another
+% phase of interest, such that you are directly computing phase travel
+% times at the same distances. This would be inefficient.
 
 % Defaults.
 defval('id', 10948555)
@@ -134,7 +145,7 @@ for i = 1:length(sac)
       case 'atime'
         % t = 0 at first phase arrival (subtract it from time series).
         pt0 = -(EQ{i}(1).TaupTimes(1).truearsecs - EQ{i}(1).TaupTimes(1).pt0);
-        xlstr = 'theoretical P-wave arrival';
+        xlstr = 'theoretical first arrival';
 
       otherwise
         error('Please specify either ''etime'' or ''atime'' for input ''alignon''.')
@@ -151,8 +162,8 @@ for i = 1:length(sac)
         % preprocess the time series but given that this script is to
         % display, and not otherwise analyze the data, I will simply
         % remove some offending-samples from the start and end of the
-        % seismogram.  Do this before normalizing so the large spurious
-        % signals are removed.
+        % seismogram.  Do this before normalizing so the large
+        % spurious signals are removed.
         x{i}(1:100) = NaN;
         x{i}(end-100:end) = NaN;
         
@@ -193,56 +204,68 @@ F.ax.Box = 'on';
 F.ax.TickDir = 'out';
 grid(F.ax, 'on')
 
+% Parse event info.  Event time is the same for all because it is the
+% same event.
 EQ1 = EQ{1}(1);
-
-% Event time is the same for all here because it's the same event.
 evtdate = datetime(EQ1.PreferredTime, 'InputFormat', ['uuuu-MM-dd ' ...
                     'HH:mm:ss.SSS'], 'TimeZone', 'UTC');
-
 magstr = sprintf('M%2.1f %s', EQ1.PreferredMagnitudeValue, ...
                  EQ1.PreferredMagnitudeType);
 depthstr = sprintf('%2.1f km depth', EQ1.PreferredDepth);
 locstr = sprintf('%s', EQ1.FlinnEngdahlRegionName);
-timstr = sprintf('%s UTC', EQ1.PreferredTime(1:19));
-
-% Overlay travel time curves.
-current_xlim = get(F.ax, 'XLim');
-current_ylim = get(F.ax, 'YLim');
-
-phase_cell = unique(phase_cell);
-phase_str = strrep(strjoin(phase_cell), ' ', ',');
-tt = taupCurve('ak135', EQ1.PreferredDepth, phase_str);
-keyboard
-for i = 1:length(tt)
-    F.ph(i) = plot(F.ax, tt(i).time, tt(i).distance, 'LineWidth', ...
-                   1.5, 'LineStyle', '-');
-
-end
-hold(F.ax, 'off')
-set(F.ax, 'XLim', current_xlim);
-set(F.ax, 'YLim', current_ylim);
-F.lg = legend(F.ph, phase_cell, 'AutoUpdate', 'off')
 
 % Add title and labels.
+hold(F.ax, 'on')
+current_xlim = get(F.ax, 'XLim');
+current_ylim = get(F.ax, 'YLim');
 if strcmp(alignon, 'atime')
+    % Title and labels specific to aligning on first-arrival.
     F.tl = title(sprintf('%s UTC %s', datestr(evtdate), EQ1.FlinnEngdahlRegionName));
     F.magtx = text(F.tl.Position(1), F.tl.Position(2), F.ax, ...
                    sprintf('M%2.1f %s at %2.1f km depth', ...
                            EQ1.PreferredMagnitudeValue, ...
                            EQ1.PreferredMagnitudeType, EQ1.PreferredDepth));
     F.xl = xlabel(sprintf('time relative to %s (s)', xlstr));
+    warning(['Theoretical first arrival may not be the same phase ' ...
+             'or phase branch across different seismograms'])
+
     F.magtx.HorizontalAlignment = 'center';
 
+    % Add vertical line at 0 seconds.
+    F.vl = plot(F.ax, [0 0], get(F.ax, 'XLim'), 'k');
+    bottom(F.vl)
+
 else
+    % Compute travel time curves for the phases present.
+    phase_cell = unique(phase_cell);
+    phase_str = strrep(strjoin(phase_cell), ' ', ',');
+    tt = taupCurve('ak135', EQ1.PreferredDepth, phase_str);
+
+    % Overlay travel time curves.
+    for i = 1:length(tt)
+        F.ph(i) = plot(F.ax, tt(i).time, tt(i).distance, 'LineWidth', ...
+                       1.5, 'LineStyle', '-');
+        
+    end
+    
+    % Title and labels specific to aligning on event-rupture time.
     F.tl = title([magstr ' ' locstr ' at ' depthstr]);
+    timstr = sprintf('%s UTC', EQ1.PreferredTime(1:19));
     F.xl = xlabel(sprintf('time since %s (s)', timstr));
+    F.lg = legend(F.ph, phase_cell, 'AutoUpdate', 'off');
 
 end
+hold(F.ax, 'off')
+set(F.ax, 'XLim', current_xlim);
+set(F.ax, 'YLim', current_ylim);
 
-% Annotate figure with informative text boxes.
-[F.bhul, F.thul] = boxtexb('ul', F.ax, sprintf('%.2f~-~%.2f Hz', lohi), F.xl.FontSize);
+% Annotate figure with bandpass corner frequencies and event id number.
+if ~isnan(lohi)
+    [F.bhul, F.thul] = boxtexb('ul', F.ax, sprintf('%.2f~-~%.2f Hz', lohi), F.xl.FontSize);
+    F.bhul.Visible = 'off';
+
+end
 [F.bhlr, F.thlr] = boxtexb('lr', F.ax, sprintf('%s', id), F.xl.FontSize);
-F.bhul.Visible = 'off';
 F.bhlr.Visible = 'off';
 
 % Final cosmetics.
