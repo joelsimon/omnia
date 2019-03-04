@@ -1,7 +1,8 @@
 function txt = evt2txt(revdir, procdir)
 % txt = EVT2TXT(revdir, procdir)
 %
-% EVT2TXT converts reviewed .evt files to human readable textfiles.
+% EVT2TXT converts reviewed .evt files (which are really .mat files)
+% to human readable textfiles.
 %
 % EVT2TXT (over)writes: 
 %    [revdir]/reviewed/identified/txt/identified.txt
@@ -49,10 +50,10 @@ function txt = evt2txt(revdir, procdir)
 defval('revdir', fullfile(getenv('MERMAID'), 'events'))
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 
+% Initialize empty struct to hold text lines and specify format.
 txt.all = [];
 txt.identified = [];
 txt.unidentified = [];
-
 fmt = ['%44s\t'  , ...
        '%23s\t'  , ...
        '%6.2f\t' , ...

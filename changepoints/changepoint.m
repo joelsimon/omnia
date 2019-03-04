@@ -6,6 +6,7 @@ function  CP = changepoint(domain, x, n, delta, pt0, snrcut, inputs, conf, fml)
 % CHANGEPOINT handles time.
 %
 % Input:
+% domain     'time' or 'time-scale'
 % x          The time series to be analyzed
 % n          Number of scales of wavelet decomposition
 % delta      Sampling interval in seconds (delta in SAC header)
@@ -14,16 +15,15 @@ function  CP = changepoint(domain, x, n, delta, pt0, snrcut, inputs, conf, fml)
 %                an "arrival" (def: 1)
 %                (use NaN or -inf, NOT [], to ignore this input)
 % inputs     Structure of other, less commonly adjusted inputs, 
-%                e.g., wavelet type
-%                (def:  cpinputs, see there)
-% conf       -1: skip confidence interval estimation with cpci.m (def)
-%             0  compute confidence interval with cpci.m
-%             1: compute confidence interval with cpci.m, M1 only
+%                e.g., wavelet type (def:  cpinputs, see there)
+% conf      -1: skip confidence interval estimation with cpci.m (def)
+%            0  compute confidence interval with cpci.m
+%            1: compute confidence interval with cpci.m, M1 only
 % fml        Smoothing, for 'time-scale' domain only:
-%           'first': smooths all times to start of dabe smear
-%           'middle: smooths all times to middle of dabe smear
-%           'last': smooths all times to end of dabe smear
-%           []: return complete time smear (def)
+%            'first': smooths all times to start of dabe smear
+%            'middle: smooths all times to middle of dabe smear
+%            'last': smooths all times to end of dabe smear
+%            []: return complete time smear (def)
 %
 % Output:    Changepoint structure, CP, with fields:
 % domain: 'time' or 'time-scale'
