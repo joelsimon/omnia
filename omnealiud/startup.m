@@ -44,3 +44,8 @@ javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', ...
 % For irisFetch-Matlab.
 addpath(genpath(getenv('IRISFETCH')))
 javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
+
+%____________________________________________________%
+
+% The rest is specific to JDS -- users who clone $OMNIA may delete.
+addpath(genpath(fullfile(getenv('MFILES'), 'papers', 'simon2019')));
