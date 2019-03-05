@@ -39,7 +39,7 @@
 % For my code, and code my code requires.
 addpath(genpath(getenv('OMNIA')))
 javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', ...
-                     'matTaup.jar'));
+                     'matTaup.jar'))
 
 % For irisFetch-Matlab.
 addpath(genpath(getenv('IRISFETCH')))

@@ -10,6 +10,15 @@ export OMNIA=$GITHUB/omnia<br/>
 export IFILES=$OMNIA/notmycode/fjs/IFILES<br/>
 export IRISFETCH=$GITHUB/irisFetch-matlab<br/>
 
+2)    
+
+addpath(genpath(getenv('OMNIA')))  
+javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', ...
+                     'matTaup.jar'))  
+addpath(genpath(getenv('IRISFETCH')))  
+javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))  
+
+
 2)
 
 ln -s $OMNIA/omnealiud/startup.m $HOME/MATLAB/startup.m
