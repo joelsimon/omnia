@@ -1,12 +1,12 @@
 function [region, code] = feregion(lat, lon, baseurl)
 % [region, code] = FEREGION(lat, lon, baseurl)
 %
-% FEREGION returns the Flinn-Engdahl Region name of the input latitude
-% and longitude.
+% FEREGION returns the Flinn-Engdahl region name and code given an
+% input latitude and longitude.
 %
-% This queries a web database (as opposed to querying a saved text
-% file) so it may be slow/unresponsive.  
-%
+% FEREGION requires an internet connection and queries the IRIS web
+% services by default.
+% 
 % Input:
 % lat, lon   Latitude, longitude 
 % baseurl    URL to send web query 

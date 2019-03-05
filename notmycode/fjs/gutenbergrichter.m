@@ -21,6 +21,9 @@ function A=gutenbergrichter(Mb,Del,T)
 % See also: REID, WOODANDERSON
 %
 % Last modified by fjsimons-at-alum.mit.edu, 06/24/2008
+% Last modified by jdsimon-at-princeton.edu, 03/04/2019
+%      to comment-out print print (disp) statements
+
 
 defval('T',1)
 
@@ -41,15 +44,17 @@ minQ=min(GutenbergRichter(:,2));
 maxQ=max(GutenbergRichter(:,2));
 
 if Del>maxd
-  disp(sprintf(...
-      'Input exceeds table range by %3.1f - highest value Q = %3.1f supplied',...
-      Del-maxd,maxQ))
-  Q=maxQ;
+    % JDS comment.
+    % disp(sprintf(...
+    %   'Input exceeds table range by %3.1f - highest value Q = %3.1f supplied',...
+    %   Del-maxd,maxQ))
+    Q=maxQ;
 elseif Del<mind
-  disp(sprintf(...
-      'Input exceeds table range by %3.1f - lowest value Q = %3.1f supplied',...
-      mind-Del,minQ))
-  Q=minQ;
+    %JDS comment.
+    % disp(sprintf(...
+    %     'Input exceeds table range by %3.1f - lowest value Q = %3.1f supplied',...
+    %     mind-Del,minQ))
+    Q=minQ;
 else
   % Look up the correction value
   Q=interp1(GutenbergRichter(:,1),GutenbergRichter(:,2),...
