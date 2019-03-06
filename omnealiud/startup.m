@@ -45,7 +45,8 @@ javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', ...
 addpath(genpath(getenv('IRISFETCH')))
 javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
 
+% The rest is specific to JDS -- users who clone $OMNIA, and other
+% repositories it depends on, may delete.
 %____________________________________________________%
 
-% The rest is specific to JDS -- users who clone $OMNIA may delete.
 addpath(genpath(fullfile(getenv('MFILES'), 'papers', 'simon2019')));
