@@ -14,6 +14,7 @@ function [t_err, tsf_err, tsm_err, tsl_err] = domaintest(lx, cp, ...
 %
 % Error (at scale j) is a defined as:
 % error = CP.cpsamp - cp
+%         (estimate - truth)
 %
 % Input:
 % lx          Length of time series (def: 4000)
