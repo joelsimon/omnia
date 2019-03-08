@@ -57,6 +57,8 @@ function varargout = wtrmedge(domain, x, tipe, nvm, n, pph, intel, rmedge)
 % Contact: jdsimon@princeton.edu
 % Last modified: 16-Jan-2019, Version 2017b
 
+% Wish list: thresholding option.
+
 % Defaults to wt.m.
 defval('tipe', 'CDF')
 defval('nvm', [2 4])
@@ -64,7 +66,9 @@ defval('n', 5)
 defval('pph', 4)
 defval('intel',0)
 defval('rmedge', true)
+defval('thresh', 0)
 
+% Sanity.
 if ~any(strcmp(domain, {'time', 'time-scale'}))
     error('Specify either ''time'' or ''time-scale'' for input: domain')
 
@@ -76,7 +80,7 @@ lx = length(x);
 [a, d, an, dn] = wt(x, tipe, nvm, n, pph, intel);
 [abe, dbe] = wtspy(lx, tipe, nvm, n, pph, intel);
 
-% Partially reconstruct input if domain = 'time'.
+% Compute subspace projection of x at every scale if domain = 'time'.
 if strcmp(domain, 'time')
     xj = iwt(a, d, an, dn, tipe, nvm, pph);
     [a, d] = iwtj2wtj(xj);

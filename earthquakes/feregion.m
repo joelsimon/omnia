@@ -27,7 +27,8 @@ function [region, code] = feregion(lat, lon, baseurl)
 % Default.
 defval('baseurl', 'http://service.iris.edu/irisws/flinnengdahl/2/query?')
 
-% Fetch it. Do not try to escape \&, must substitute in as string.
+% Fetch it. Do not try to escape \& in sprintf statement; it must be
+% substituted as string.
 querystr = sprintf('lat=%.4f%slon=%.4f%soutput=both', lat, '&', lon, '&'); 
 output = webread([baseurl querystr]);
 

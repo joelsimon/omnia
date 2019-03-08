@@ -142,13 +142,13 @@ else
             % *** See note at bottom about loop indices.
             if dtrnd 
                 %  To detrend: create a temp time series at every sample pretending
-                % that's the true changepoint.  Note: detrend(x, dtype,
-                % k) assumes a shared merge point, whereas aicx
-                % assumes no shared samples.
+                % that's the true changepoint.  Note: detrend(x,
+                % dtype, k) assumes a shared merge point, whereas aicx
+                % assumes no shared samples in our method (i.e., we
+                % can't use the builtin MATLAB option).
                 tmp = [detrend(x(1:k), 'linear')' detrend(x(k+1:end), 'linear')'];
 
                 % Akaike Information Criterion calculation for the detrended series.
-                %aicx(k) = k*log(var(tmp(1:k))) + (N-k)*log(var(tmp(k+1:N)));
                 aicx(k) = k*log(sampvar(tmp(1:k))) + (N-k)*log(sampvar(tmp(k+1:N)));
 
             else
@@ -197,18 +197,13 @@ else
     end
 end
 
-
-% *** Unbiased variance: Loop from i=2, and not i=1, because var1 is
-% undefined if k = 1 (denominator is 0; we use the unbiased estimate,
-% which has N-1 degrees of freedom).  Stops at N-2 because at i=(N-1)
-% and i=N var2 is undefined (the denominator in var2 would be 0 and
-% -1, respectively).
+% *** Loop indices, for BOTH BIASED AND UNBIASED:
 %
-% Biased variance: aicx(i) when i=1 or i=(N-1) is -Inf,
-% because variance of segment1(1) = 0 and variance of
-% segment2(N-1) = 0. These -inf values would be removed
-% anyway so just skip them.
-
+% -k=1:   Noise segment is of length 1, variance 0, aic(1)=-Inf.
+% -k=N-1: Signal segment is of length 1, variances 0, aic(N-1)=-Inf. 
+% -k=N:   Signal segment from [N+1:N], is empty, variance NaN, aic(N)=NaN
+%
+% +-Infs are converted to NaNs, so these values would be removed anyway.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Demo.
@@ -229,4 +224,3 @@ function demo
                    '%i'], km, kw))
     set(gca, 'TickDir', 'out')
     shg
-

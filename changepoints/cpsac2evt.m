@@ -75,30 +75,11 @@ rawpdfw = fullfile(rawdiro, 'pdf', [sans_sac '.windowed.raw.pdf']);
 % and return outputs if so.
 if ~redo && all([exist(rawevt, 'file') exist(rawpdfc, 'file') ...
                  exist(rawpdfw, 'file')] == 2)
+    outargs = {EQ, CP, rawevt, rawpdfc, rawpdfw};
+    varargout = outargs(1:nargout);
     fprintf(['\n%s.sac already processed by cpsac2evt:\n%s\nSet ''redo''= ' ...
              'true to run cpsac2evt again.\n\n'],  sans_sac, rawevt)
 
-    tmp = load(rawevt, '-mat');
-    EQ = tmp.EQ;
-
-    % Any event files generated before ??-???-???? were saved with an AIC
-    % structure instead of a CP structure.  This AIC structure was
-    % generated with (now obsolete) wcpcdf24.m.  Alert the user of
-    % this in case and return the AIC structure as if t
-    try
-        CP = tmp.CP;
-
-    catch
-        CP = [];
-        warning(['%s ran through event matching protocol using an ' ...
-                 'earlier version of changepoint.m (specifically ' ...
-                 'wbpcdf24.m, later renamed to wcpcdf24.m), which ' ...
-                 'is now obsolete.  Returning an empty CP structure.'], sac)
-        
-    end
-
-    outargs = {EQ, CP, rawevt, rawpdfc, rawpdfw};
-    varargout = outargs(1:nargout);
     return
     
 end
