@@ -311,7 +311,7 @@ switch lower(yn)
                 ph = input(sprintf(['     Matched TaupTimes(s) for ' ...
                                     'EQ(%i): '],  eq(i)), 's');
                 
-                if strcmpi(ph, 'restart')
+                if strcmpi(strtrim(ph), 'restart')
                     % !! Recursive !!
                     system(sprintf('killall %s', close_pdf));
                     clc
@@ -320,7 +320,7 @@ switch lower(yn)
 
                 end
                 
-                if strcmpi(ph, 'back')
+                if strcmpi(strtrim(ph), 'back')
                     fprintf(['\n     Paused execution again for repeat inspection.\n', ...
                              '     Type ''dbcont'' to continue.\n\n'])
                     keyboard
@@ -328,6 +328,13 @@ switch lower(yn)
                     
                 end
                 
+                if strcmp(strtrim(ph), ':')
+                    rev_EQ(i).TaupTimes = EQ(eq(i)).TaupTimes;
+                    phflag = true;
+                    continue
+
+                end
+
                 ph = str2num(ph);
                 if ~all(ismember(ph, [1:length(EQ(eq(i)).TaupTimes)])) || isempty(ph)
                     fprintf(['\n     Please specify integer value between ' ...
@@ -335,6 +342,7 @@ switch lower(yn)
                     continue
                     
                 end
+
                 rev_EQ(i).TaupTimes = EQ(eq(i)).TaupTimes(ph);
                 phflag = true;
 
@@ -360,14 +368,11 @@ if previously_reviewed
         % Must cd to directory, can't use git -C with archaic git version.
         startdir = pwd;  
         cd(old_review.folder)
-        [~, ~] = system(sprintf('git rm -- %s', old_review.name))
+        [~, ~] = system(sprintf('git rm -- %s', old_review.name));
         fprintf('\n\n Ran "git rm -- %s" in %s', old_review.name, ...
                 old_review.folder)        
 
         try
-            keyboard
-            % If you're in a directory just cleared (i.e. it had 1
-            % file in it, which wast just deleted) this will throw an error.
             cd(startdir)
 
         end
