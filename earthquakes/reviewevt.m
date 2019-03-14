@@ -365,7 +365,7 @@ if previously_reviewed
     if isgitfile(oldfile)
         git_tracked = true;
 
-        % Must cd to directory, can't use git -C with archaic git version.
+        % Must cd to directory; can't use git -C with archaic git version (<1.8.5).
         startdir = pwd;  
         cd(old_review.folder)
         [~, ~] = system(sprintf('git rm -- %s', old_review.name));
@@ -373,6 +373,12 @@ if previously_reviewed
                 old_review.folder)        
 
         try
+            % If you've just cleared a directory you can't cd into it; git
+            % 'removes' empty directories.  So if you started in a
+            % directory with 1 file, deleted it, then try to cd back
+            % to the directory (which you're already in), this fails.
+            % No big deal; your current path is somewhat of a
+            % purgatory at this point anyway.
             cd(startdir)
 
         end
