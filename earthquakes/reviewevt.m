@@ -196,11 +196,11 @@ if ~isempty(EQ)
     % These list the first phase of the largest earthquake.
     fprintf( '\n     Filename: %s\n', sacname)     
     fprintf( '\n     *First arrival associated with largest magnitude earthquake [EQ(1)]*')
-    fprintf( '\n     *Phase:             %5s', EQ(1).TaupTimes(1).phaseName)
-    fprintf( '\n     *Magnitude:         %5.1f', EQ(1).PreferredMagnitudeValue)
-    fprintf( '\n     *Distance:          %5.1f', EQ(1).TaupTimes(1).distance)
+    fprintf( '\n     *Phase:             %5s',       EQ(1).TaupTimes(1).phaseName)
+    fprintf( '\n     *Magnitude:         %5.1f',     EQ(1).PreferredMagnitudeValue)
+    fprintf( '\n     *Distance:          %5.1f',     EQ(1).TaupTimes(1).distance)
     fprintf( '\n     *Depth:             %5.1f\n\n', EQ(1).PreferredDepth)
-    fprintf( '\n     *TauP arrival time: %5.1f', EQ(1).TaupTimes(1).arsecs)
+    fprintf( '\n     *TauP arrival time: %5.1f',     EQ(1).TaupTimes(1).arsecs)
     fprintf(['\n     *JDS time residual:' sprintf(repmat('%6.1f', ...
             [1 length(JDSarsecs)]), JDSarsecs - EQ(1).TaupTimes(1).arsecs)])
 
@@ -229,7 +229,7 @@ if ~isempty(EQ)
     keyboard
 
     while ~ynflag
-        yn = input('\n     Is this event identified? [Y/N/M/back]: ', 's');
+        yn = strtrim(input('\n     Is this event identified? [Y/N/M/back]: ', 's'));
 
 
         if sum(strcmpi(yn, {'y' 'yes' 'n' 'no' 'm' 'maybe' 'back'})) ~= 1
@@ -272,7 +272,7 @@ switch lower(yn)
 
     eqflag = false;
     while ~eqflag
-        eq = input('     Matched EQ(s): ', 's');
+        eq = strtrim(input('     Matched EQ(s): ', 's'));
 
         if strcmpi(eq, 'restart')
             % !! Recursive !!

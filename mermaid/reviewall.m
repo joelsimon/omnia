@@ -15,3 +15,5 @@ for i = 1:length(s)
     clc
 
 end
+
+fprintf('All done.')
