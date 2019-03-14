@@ -15,13 +15,12 @@ if exist(filename, 'file') ~= 2
 end
 
 %  Parse filename info.
-[filedir, name, ext] = fileparts(filename);
+[pathstr, name, ext] = fileparts(filename);
 
 % Note the version of git; slightly different commands.  Wrap in try
 % command; if it fails likely don't have git installed.
 try
     [~, git_version]  = system('git version');
-
     
 catch
     error('''git version'' in the command line failed -- is git installed?')
@@ -34,12 +33,12 @@ git_version = str2double(strrep(git_version(13:17), '.', ''));
 % in another folder. In older versions of git you must cd to the
 % actual file's directory.
 if git_version >= 185
-    %Second output here to silence result of command in command window.
-    [result, ~] = system(sprintf('git -C %s ls-files --error-unmatch -- %s', filedir, [name ext]));    
+    % Second output here to silence result of command in command window.
+    [result, ~] = system(sprintf('git -C %s ls-files --error-unmatch -- %s', pathstr, [name ext]));    
 
 else
     startdir = pwd;
-    cd(filedir)
+    cd(pathstr)
     [result, ~] = system(sprintf('git ls-files --error-unmatch -- %s', [name ext]));
     cd(startdir)
 
