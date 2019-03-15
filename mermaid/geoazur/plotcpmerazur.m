@@ -1,5 +1,5 @@
-function [F, CP, tt] = plotcpmerazur(sacfile, inputs, conf)
-% [F, CP, tt] = PLOTCPMERAZUR(sacfile, inputs, conf)
+function [F, CP, tt] = plotcpmerazur(sacfile, inputs, conf, domain)
+% [F, CP, tt] = PLOTCPMERAZUR(sacfile, inputs, conf, domain)
 %
 % PLOTCPMERAZUR plots GeoAzur MERMAID seismograms with arrival times
 % and event metadata from the public catalog, along with changepoint.m
@@ -13,6 +13,7 @@ function [F, CP, tt] = plotcpmerazur(sacfile, inputs, conf)
 % inputs    changepoint.m inputs structure (def: cpinputs)
 % conf      logical true to compute confidence intervals 
 %               (def: -1)
+% domain    'time' or 'time-scale', for changepoint
 %
 % Output:
 % F        Struct of figure handles and bits
@@ -23,14 +24,15 @@ function [F, CP, tt] = plotcpmerazur(sacfile, inputs, conf)
 %    sacfile = 'm35.20140915T080858.sac';
 %    [F, CP, tt] = PLOTCPMERAZUR(sacfile)
 %
-%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 18-Feb-2019, Version 2017b
+% Last modified: 15-Mar-2019, Version 2017b
 
+% Defaults.
 defval('sacfile', 'm35.20140915T080858.sac')
 defval('inputs', cpinputs)
 defval('conf', -1)
+defval('domain', 'time')
 
 % Read specific SAC file data and header
 [x, h] = readsac(sacfile);
@@ -47,7 +49,8 @@ floatnum = sacfile(2:3);
 evtfile = fullfile(getenv('MERAZUR'), 'events', ...
                    sprintf('mermaid%s/m%s_events.txt', floatnum, floatnum));
 
-% mgrep.m the phase.  
+% 'grep' the 'events.txt' file(s) for the phase name GA reports is
+% associated with this event.
 [~, evtline] = mgrep(evtfile, sacfile);
 
 if isempty(evtline)        
@@ -106,7 +109,6 @@ if isempty(tt)
     end
 end
 
-
 % The number of wavelet scales to decompose the seismogram is based on
 % the sampling frequency. See discussion in header.
 fs = 1/h.DELTA;
@@ -121,7 +123,7 @@ end
 % Compute both multiscale arrival times
 offset = tt(1).truearsecs - tt(1).pt0;
 adjusted_pt0 = tt(1).time  - offset;
-CP = changepoint('time', x, n, h.DELTA, adjusted_pt0, 1, inputs, conf);
+CP = changepoint(domain, x, n, h.DELTA, adjusted_pt0, 1, inputs, conf);
 F = plotchangepoint(CP, 'all', 'ar');
 
 % Shrink the distance between each subplot -- 'multiplier' is adjusted
