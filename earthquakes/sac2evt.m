@@ -1,27 +1,31 @@
-function EQ = sac2evt(sac, model, ph,  varargin)
-% EQ = SAC2EVT(sac, redo, model, ph, [param, value])
+function EQ = sac2evt(sac, model, ph, baseurl, varargin)
+% EQ = SAC2EVT(sac, model, ph, baseurl, [param, value])
 %
 % SAC2EVT is the stupid SAC file to event matching tool.
 %
 % Input:
-% sac           SAC filename 
-% redo          logical true to return and overwrite any previous *.raw.evt/pdf files
-%               logical false to skip redundant sac2evt.m execution
-%               (def: false)
-% model         Taup model (def: 'ak135')
-% ph            Taup phases (def: taup_defaultphases)
-% [param, value]  Comma separated parameter, value pair list for irisFetch.Events
-%                   (def: 'includeallmagnitudes', true, 'includeallorigins', true)
+% sac             SAC filename 
+% model           Taup model (def: 'ak135')
+% ph              Taup phases (def: taup_defaultphases)
+% baseurl         1: 'http://service.iris.edu/fdsnws/event/1/' (def)
+%                 2: 'https://earthquake.usgs.gov/fdsnws/event/1/'
+%                 3: 'http://isc-mirror.iris.washington.edu/fdsnws/event/1/'
+%                 4: 'http://www.isc.ac.uk/fdsnws/event/1/'
+% [param, value]* Comma separated parameter, value pair list for irisFetch.Events
+%
+% N.B.: baseurls 2-4 either are buggy and/or straight up do not
+% work. Left here for future fixes (hopefully).
 %
 % Output: 
-% EQ            Event structure that concatenates output structures 
-%                   from irisFetch.Events and taupTime.m
+% EQ              Event structure that concatenates output structures 
+%                     from irisFetch.Events and taupTime.m
 %
-% SAC2EVT queries event information from the IRIS DMC for the time
-% duration beginning one hour before the start of the seismogram and
-% ending at the end time of the seismogram.  For each earthquake
-% returned it then calculates the theoretical travel times for the
-% specified seismic phases using taupTime.m.
+% By default SAC2EVT queries event information from the IRIS DMC for
+% the time duration beginning one hour before the start of the
+% seismogram and ending at the end time of the seismogram*.  For each
+% earthquake returned it then calculates the theoretical travel times
+% for the specified seismic phases using taupTime.m.  Overwrite
+% these times with 'start' and 'end' [param, value] optional arguments.
 %
 % By default SAC2EVT searches the entire globe for events and requests
 % all magnitudes (not just the "preferred magnitude") be returned to
@@ -29,58 +33,99 @@ function EQ = sac2evt(sac, model, ph,  varargin)
 % One of these is necessary for an expected phase-pressure
 % approximation via reid.m.  Be aware that altering the search area
 % and/or optional parameters may lower the rate of event matching
-% and/or EQ structure completeness.  All available parameters and
-% their effect may be found at http://service.iris.edu/fdsnws/event/1/ 
+% and/or EQ structure completeness.  Available parameters and their
+% effect may be found at the default baseurl:
+% http://service.iris.edu/fdsnws/event/1/
 %
 % SAC2EVT has external dependencies -
 % *taupTime.m: last tested with Nov. 2002 version written by Qin Li
 % *irisFetch.m: last tested with version = 2.0.10 and IRIS-WS-2.0.18.jar
 %
+% Ex1:
+%    EQ = SAC2EVT('centcal.1.BHZ.SAC');
+%
+% *Ex2: Look for M5+ events in a two minute time window;
+%       and overwrite default to not includeallmagnitudes 
+%    sac = 'm35.20140915T080858.sac';
+%    stime = '2014-09-15T08:04:00';
+%    etime = '2014-09-15T08:06:00';
+%    EQ = sac2evt(sac, [], [], 1, 'start', stime, 'end', etime, 'minmag', ...
+%                 5, 'includeallmagnitudes', false)
+%    EQ.Params    % Note time and other parameters overwritten from defaults
+%
 % See also: cpsac2evt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 3-Dec-2018, Version 2017b
+% Last modified: 17-Mar-2019, Version 2017b
 
 % Default I/O.
 defval('sac', 'centcal.1.BHZ.SAC')
 defval('model', 'ak135')
 defval('ph', taup_defaultphases)
+defval('baseurl', 1);
 EQ = [];
 
-% Read SAC data and set up reference time axis.
-[x, h] = readsac(sac);
-xax = xaxis(length(x), h.DELTA, h.B);
+% Read SAC data and header.
+[~, h] = readsac(sac);
 
-% Absolute start and end time of complete seismogram and search window
-% starting 1 hour before start of seismogram and ending at end of
-% seismogram.
+% By default: time searched is from one hour before the start time of
+% the seismogram to the end of the seismogram.  These times are
+% overwritten if 'start' and 'end' are specified as inputs.
 seisdate = seistime(h);
-startTime = seisdate.B - hours(1);
-endTime = seisdate.E;
-    
+stime =  fdsnwstime(seisdate.B - hours(1));  % converts datetime to datestr
+etime = fdsnwstime(seisdate.E);
+
+% Cases 2--4 are not suggested / don't work at the moment.
+switch baseurl
+  case 1
+    baseurl = 'http://service.iris.edu/fdsnws/event/1/';
+
+  case 2 
+    baseurl  = 'https://earthquake.usgs.gov/fdsnws/event/1/';
+
+  case 3
+    baseurl = 'http://isc-mirror.iris.washington.edu/fdsnws/event/1/';
+
+  case 4
+    baseurl = 'http://www.isc.ac.uk/fdsnws/event/1/';
+
+  otherwise
+    error('Specify integer 1--4 for baseurl')
+
+end
+
 % Fetch event data.  
-fprintf(['\n**************************\nSearching for events between ' ...
-         '%s and %s\n'], datestr(startTime), datestr(endTime));
-baseurl = 'http://service.iris.edu/fdsnws/event/1/';
-if isempty(varargin)
-    varargin = {'includeallmagnitudes', true, 'includeallorigins', true};
+fprintf('\n**************************\n')
 
-end
-ev = irisFetch.Events('startTime', startTime, 'endTime', endTime, ...
-                      'BASEURL', baseurl, varargin{:});
+% The irisFetch- pecific options 'startTime' and 'endTime' accept
+% datetime arrays, but I have seen some odd behavior with their use:
+% double ampersands (&&) in the parameter list when using them, which
+% breaks some baseurls other than the default IRIS. Thus I think it's
+% safer to use the general 'start' and 'end' times, known to all
+% fdsnws data centers, in string format.
 
-% Not interested in the .Picks field at the moment.
-if ~isempty(ev)
-    ev = rmfield(ev, 'Picks');
-
-end
+[ev, params] = irisFetch.Events('start', stime, 'end', etime, ...
+                                'includeallmagnitudes', true, ...
+                                'includeallorigins', true, 'baseurl', ...
+                                baseurl, varargin{:});
 
 % Loop over every phase for every event.
 evtidx = [];
 nevt = 0;
-for i = 1:length(ev)
+
+%  for all events...
+for i = 1:length(ev)  
     quake = ev(i);
+
+    % Move to next event if structure is empty, as is the case when
+    % alternate baseurls are specified, other than the IRIS default.
+    if isempty(quake.Type)
+        continue
+
+    end
+
+    % Set negative depths to 0 for taupTime.
     depth = quake.PreferredDepth;
     if depth < 0 
         depth = 0;
@@ -91,8 +136,8 @@ for i = 1:length(ev)
     evdate = datetime(quake.PreferredTime, 'InputFormat', ...
                      'uuuu-MM-dd HH:mm:ss.SSS', 'TimeZone', 'UTC');
 
-    % Compute travel times and arrival times w.r.t to xax generated above,
-    % where pt0 (time assigned to sample 1) is set at h.B seconds
+    % Compute travel times and arrival times w.r.t where pt0 (time
+    % assigned to sample 1) is set at h.B seconds
     tt = arrivaltime(h, evdate, [quake.PreferredLatitude ...
                         quake.PreferredLongitude], model, depth, ph, h.B);
 
@@ -110,12 +155,13 @@ for i = 1:length(ev)
     % file that is returned from fdsnws query (see url in
     % EQ(*).PublicID).  Use another web query to get the region name
     % from the preferred latitude and longitude.
-    if strcmpi(quake.FlinnEngdahlRegionName, 'Flinn-Engdahl region')
+    if strcmpi(quake.FlinnEngdahlRegionName, 'Flinn-Engdahl region') ...
+            || isempty(quake.FlinnEngdahlRegionCode);
 
         % Do not input baseurl as input to feregion.m: feregion.m and
         % sac2evt.m have different baseurls.
-        quake.FlinnEngdahlRegionName = feregion(quake.PreferredLatitude, ...
-                                                quake.PreferredLongitude); ...
+        [quake.FlinnEngdahlRegionName, quake.FlinnEngdahlRegionCode] ...
+            = feregion(quake.PreferredLatitude, quake.PreferredLongitude); 
 
     end
 
@@ -125,7 +171,9 @@ for i = 1:length(ev)
     % structure, tacked to larger EQ structure.
     evtidx = [evtidx i];
     nphase = 0;
-    for j = 1:length(tt)
+
+    % for all phases...
+    for j = 1:length(tt) 
         tp = tt(j);
         tpSamp = tp.arsamp;
         tpSecs = tp.arsecs;
@@ -146,6 +194,10 @@ for i = 1:length(ev)
                 EQ(nevt).(evfields{k}) = quake.(evfields{k});
 
             end
+
+            % Tack the query parameters onto the output structure.
+            EQ(nevt).Params = params;
+
         end
 
         tpfields = fieldnames(tp);
@@ -157,7 +209,6 @@ for i = 1:length(ev)
 end
 
 if ~isempty(EQ)
-
     % The following loop computes a rough approximation of the expected
     % pressure of each specific phase.  We would prefer to use magnitude
     % type 'Mb' (at 1 Hz) for this approximation, though magnitude type
@@ -255,7 +306,7 @@ if ~isempty(EQ)
     % Print followup to the initial irisFetch.Events message.
     fprintf(['\n%i %s found with phase arrivals in %s ************' ...
              '*\n**************************\n\n'], length(EQ), ...
-            plurals('event', length(EQ)),sac)
+            plurals('event', length(EQ)), strippath(sac))
     
 end
     
@@ -330,19 +381,3 @@ for M = {'MB', 'ML'}
         
     end
 end
-
-%________________________________________________________________________%
-
-
-%********************************************************************%
-
-% N.B. From http://service.iris.edu/fdsnws/event/1/, "Notice this web
-% service will not be offered long term," but none of these
-% alternative baseurls work for unknown reasons:
-% 
-% baseurl = 'http://service.scedc.caltech.edu/fdsnws/event/1/'
-% baseurl = 'http://service.ncedc.org/fdsnws/event/1/'
-% baseurl = 'http://earthquake.usgs.gov/fdsnws/event/1/'
-% baseurl = 'http://isc-mirror.iris.washington.edu/fdsnws/event/1/'
-%
-% Fix when/if this breaks, I suppose.

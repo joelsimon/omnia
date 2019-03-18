@@ -375,7 +375,7 @@ if previously_reviewed
         try
             % If you've just cleared a directory you can't cd into it; git
             % 'removes' empty directories.  So if you started in a
-            % directory with 1 file, deleted it, then try to cd back
+            % directory with one file, deleted it, then try to cd back
             % to the directory (which you're already in), this fails.
             % No big deal; your current path is somewhat of a
             % purgatory at this point anyway.

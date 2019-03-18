@@ -13,10 +13,6 @@ function varargout = readatimes2
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 22-Aug-2018, Version 2017b
- 
-% Change log -
-%
-% See change log of writeatimes.m, which this mirrors.
 
 % Open.
 afile = fullfile(getenv('MERAZUR'), 'textfiles', 'arrivaltimes2.txt');

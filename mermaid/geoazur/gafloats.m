@@ -2,7 +2,7 @@ function [floats, startdate, enddate] = gafloats(merazur)
 % [floats, startdate, enddate] = GAFLOATS(merazur)
 %
 % GAFLOATS returns the float numbers and dates of the first/last
-% seismograms contained in (recursively) in the path 'merazur'.
+% seismograms contained (recursively) in the path 'merazur'.
 %
 % Input: 
 % merazur       A path to GeoAzur MERMAID data (def: $MERAZUR)

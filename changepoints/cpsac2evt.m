@@ -1,6 +1,7 @@
-function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ph, diro, varargin)
+function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
+                               ph, diro, baseurl, varargin)
 % [EQ, CP, rawevt, rawpdfc, rawpdfw] = ...
-%    CPSAC2EVT(sac, redo, domain, n, inputs, model, ph, diro, [param, value])
+%    CPSAC2EVT(sac, redo, domain, n, inputs, model, ph, diro, baseurl, [param, value])
 %
 % CPSAC2EVT.m combines changepoint.m and sac2evt.m, and plots
 % sac2evt.m theoretical arrival times on the wavelet-decomposed input
@@ -9,7 +10,7 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ph, diro, va
 %
 % Input:
 % sac           SAC filename 
-% redo          logical true to return and overwrite any previous *.raw.evt/pdf files
+% redo          logical true to rerun and overwrite any previous *.raw.evt/pdf files
 %               logical false to skip redundant sac2evt.m execution
 %               (def: false)
 % domain        'time' or 'time-scale', for changepoint.m
@@ -20,6 +21,7 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ph, diro, va
 % ph            TauP phases (def: defphases)
 % diro          Parent directory of 'raw' subdirectory, where .evt
 %                   and .pdf files saved (def: $MERMAID/events)
+% baseurl       Default URL of data center, see sac2evt.m (def: 1)
 % [param, value]  Comma separated parameter, value pair list for irisFetch.Events
 %                   (def: see sac2evt.m)
 % 
@@ -41,12 +43,12 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ph, diro, va
 % For the following example first make the required directories:
 % mkdir ~/cpsac2evt_example/raw/pdf ~/cpsac2evt_example/raw/evt
 %
-% Ex: (find all P phases for events deeper than 500 km)
+% Ex: (find the p phases for events deeper than 500 km)
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
 %    diro = '~/cpsac2evt_example';
 %    [EQ, CP] = CPSAC2EVT(sac, true, 'time', 5, cpinputs, 'ak135', ...
-%                         'P,p, S, s', diro, 'includeallmagnitudes', ...
-%                         true, 'includeallorigins', true, 'mindepth', 500);
+%                         'P,p', diro, 1, 'includeallmagnitudes', true, ...
+%                         'includeallorigins', true, 'mindepth', 500);
 %
 % See also: sac2evt.m, reviewevt.m, getevt.m
 %
@@ -62,6 +64,7 @@ defval('inputs', cpinputs)
 defval('model', 'ak135')
 defval('ph', defphases)
 defval('diro', fullfile(getenv('MERMAID'), 'events'))
+defval('baseurl', 1)
 
 % Separate filename from extension and determine if output files
 % already exist.
@@ -75,7 +78,11 @@ rawpdfw = fullfile(rawdiro, 'pdf', [sans_sac '.windowed.raw.pdf']);
 % and return outputs if so.
 if ~redo && all([exist(rawevt, 'file') exist(rawpdfc, 'file') ...
                  exist(rawpdfw, 'file')] == 2)
+    %% This needs to be fixed
+    EQ = [];
+    CP = [];
     outargs = {EQ, CP, rawevt, rawpdfc, rawpdfw};
+
     varargout = outargs(1:nargout);
     fprintf(['\n%s.sac already processed by cpsac2evt:\n%s\nSet ''redo''= ' ...
              'true to run cpsac2evt again.\n\n'],  sans_sac, rawevt)
@@ -85,7 +92,7 @@ if ~redo && all([exist(rawevt, 'file') exist(rawpdfc, 'file') ...
 end
 
 % Match SAC file to cataloged events.
-EQ = sac2evt(sac, model, ph, varargin{:});
+EQ = sac2evt(sac, model, ph, baseurl, varargin{:});
 
 % Generate a changepoint (arrival time) structure considering the
 % entire seismogram.
