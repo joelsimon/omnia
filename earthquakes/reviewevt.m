@@ -404,7 +404,7 @@ if previously_reviewed && git_tracked
     startdir = pwd;
     [new_review.folder, name, ext] = fileparts(newfile);
     new_review.name = [name ext];
-    cd(new_reveiw.folder)
+    cd(new_review.folder)
     [~, ~] = system(sprintf('git add -- %s', new_review.name));
     fprintf('\n\n Ran "git add -- %s" in %s', new_review.name, ...
             new_review.folder)

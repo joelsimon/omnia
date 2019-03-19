@@ -1,5 +1,5 @@
-function res = tres(sac, diro, inputs)
-% res = TRES(sac, diro, inputs)
+function [res, SNRj, M1] = tres(sac, diro, inputs)
+% [res, SNRj, M1] = TRES(sac, diro, inputs)
 %
 % TRES computes the travel time residuals associated with the input
 % SAC file where the user-pick is defined in the 'time' domain using
@@ -46,20 +46,29 @@ end
 switch efes(h)
   case 5
     n = 3
-    padd = [NaN NaN]
-    
+
   case 20
-    padd = [];
+    n = 5;
 
   otherwise
     error('Not programmed to NaN-pad for a sampling frequency of %i [Hz]', efes(h))
 
 end
 
-keyboard
+inputs.iters = 1;
+
 % Compute changepoint structure using entire SAC seismogram and inputs requested.
 CP = changepoint('time', x, n, h.DELTA, h.B, 1, inputs, 1);
 
+% Compute minimum travel time residual at every scale, allowing for
+% the matching of all phases.
+for j = 1:n+1
+    allres{j} = CP.arsecs{j} - [EQ(1).TaupTimes.truearsecs];  % considering all phases
+    [~, minidx] = min(abs(allres{j}));
+    tres(j) = allres{j}(minidx);
 
-keyboard
+end
 
+% Collect output arguments.
+SNRj = CP.SNRj;
+M1 = CP.ci.M1;

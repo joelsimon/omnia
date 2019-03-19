@@ -16,7 +16,7 @@ function EQ = reviewrematch(sac, redo, diro)
 %
 % Input:
 % sac       SAC filename (def: 'm12.20130416T105310.sac')
-% redo logical true to delete any existing reviewed .evt and rerun
+% redo      logical true to delete any existing reviewed .evt and rerun
 %               reviewevt.m on the input
 %           logical false to skip redundant review (def: false)
 % diro      Path to directory containing 'raw/' and 'reviewed' 

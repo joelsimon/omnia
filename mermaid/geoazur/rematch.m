@@ -53,6 +53,21 @@ else
 
 end
 
+% mgrep.m the phase.  
+[~, evtline] = mgrep(evtfile, sacfile)
+
+
+% Parse phase from matching line in 'events.txt'.
+ph = strtrim(evtline{1}(103:110));
+
+% Reformat phase into 'purist' notation for taupTime
+
+% In some very rare cases, exotic phases which would never ACTUALLY be
+% recorded by MERMAID are reported in events.txt (SnSn, SKiKP) for
+% example.  To ensure we are comparing apples-to-apples with the 
+gaphase = 
+allphases = [defphases gaphase]
+
 % For some reason the four SAC files below gave me trouble.  If you
 % look at the URL request output in the error message, and swap the
 % IRIS baseurl for USGS, it works in the web browser. Annoyingly, it
@@ -64,12 +79,12 @@ try
     %      'm31.20140910T053727.sac', ...
     %      'm32.20140629T173341.sac', ...
     %      'm33.20150211T191949.sac'};
-    EQ = cpsac2evt(sac, redo, [], n, [], [], defphases, diro, 1, 'start', ...
+    EQ = cpsac2evt(sac, redo, [], n, [], [], allphases, diro, 1, 'start', ...
                    stime, 'end', etime, 'minmag', minmag, 'maxradius', ...
                    maxradius, 'lat', lat, 'lon', lon);
     
 catch
-    EQ = cpsac2evt(sac, redo, [], n, [], [], defphases, diro, 1, ...
+    EQ = cpsac2evt(sac, redo, [], n, [], [], allphases, diro, 1, ...
                    'start', stime, 'end', etime);
 
 end
