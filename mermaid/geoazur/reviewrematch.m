@@ -7,7 +7,7 @@ function EQ = reviewrematch(sac, redo, diro)
 % If the raw .evt file only includes a single EQ it is copied over in
 % its entirety (all phases) to the [diro]/reviewed/identified folder.
 %
-% If the raw .evt file is empty is copied over in its entirety (all
+% If the raw .evt file is empty it is copied over in its entirety (all
 % phases) to the [diro]/reviewed/unidentified folder.
 %
 % Otherwise, if the raw .evt file includes multiple EQs then the input
@@ -15,10 +15,9 @@ function EQ = reviewrematch(sac, redo, diro)
 % manual review.
 %
 % Input:
-% sac       SAC filename 
-%               (def: 'm12.20130416T105310.sac')
-% redo      logical true to delete any existing reviewed .evt and
-%               rerun REVEIWEVT on the input 
+% sac       SAC filename (def: 'm12.20130416T105310.sac')
+% redo logical true to delete any existing reviewed .evt and rerun
+%               reviewevt.m on the input
 %           logical false to skip redundant review (def: false)
 % diro      Path to directory containing 'raw/' and 'reviewed' 
 %               subdirectories (def: $MERMAID/events/geoazur)

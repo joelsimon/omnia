@@ -15,7 +15,7 @@ function EQ = reviewevt(sac, redo, diro)
 % sac       SAC filename 
 %               (def: '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
 % redo      logical true to delete any existing reviewed .evt and
-%               rerun REVEIWEVT on the input 
+%               rerun REVIEWEVT on the input 
 %           logical false to skip redundant review (def: false)
 % diro      Path to directory containing 'raw/' and 'reviewed' 
 %               subdirectories (def: $MERMAID/events/)
@@ -25,7 +25,7 @@ function EQ = reviewevt(sac, redo, diro)
 % EQ       EQ earthquake structure after review 
 %
 % REVIEWEVT loads earthquake and CP arrival-time data (.evt) and their
-% associated plots (.raw.pdf) output from sac2evt.m and guides the
+% associated plots (.raw.pdf) output by cpsac2evt.m and guides the
 % user through a series of interactive prompts to review possible
 % earthquake and phase matches.  Writes a reviewed EQ structure to a
 % .evt file in one of three /reviewed/evt/ folders.
