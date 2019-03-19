@@ -104,11 +104,12 @@ fprintf('\n**************************\n')
 % breaks some baseurls other than the default IRIS. Thus I think it's
 % safer to use the general 'start' and 'end' times, known to all
 % fdsnws data centers, in string format.
-
 [ev, params] = irisFetch.Events('start', stime, 'end', etime, ...
                                 'includeallmagnitudes', true, ...
                                 'includeallorigins', true, 'baseurl', ...
                                 baseurl, varargin{:});
+
+qdate = datestr(datetime('now', 'TimeZone', 'UTC'));
 
 % Loop over every phase for every event.
 evtidx = [];
@@ -195,8 +196,9 @@ for i = 1:length(ev)
 
             end
 
-            % Tack the query parameters onto the output structure.
+            % Tack the query date and parameters onto the output structure.
             EQ(nevt).Params = params;
+            EQ(nevt).QueryDate = qdate;
 
         end
 
@@ -295,7 +297,8 @@ if ~isempty(EQ)
     [~, pidx] = sort(maxmag, 'descend');
     EQ = EQ(pidx);
     
-    % Move NaN magnitude values to end ('sort' omits NaN values).
+    % Add date of this query and move NaN magnitude values to end ('sort'
+    % omits NaN values).
     prefmagvals = [EQ.PreferredMagnitudeValue];
     [~, nanidx]  = unzipnan(prefmagvals);
     nan_EQ = EQ(nanidx);

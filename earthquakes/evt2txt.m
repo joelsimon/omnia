@@ -1,5 +1,5 @@
-function txt = evt2txt(revdir, procdir)
-% txt = EVT2TXT(revdir, procdir)
+function txt = evt2txt(revdir, procdir, geoazur)
+% txt = EVT2TXT(revdir, procdir, geoazur)
 %
 % EVT2TXT converts reviewed .evt files (which are really .mat files)
 % to human readable textfiles.
@@ -18,6 +18,8 @@ function txt = evt2txt(revdir, procdir)
 %               (def: $MERMAID/events)
 % procdir   Path to 'processed' directory containing SAC files
 %               e.g., for fullsac.m (def: $MERMAID/processed)
+% geoazur   logical true to assume GeoAzur's naming scheme 
+%               (def: false)
 %
 % Output:
 % *N/A*     Writes formatted textfiles
@@ -26,10 +28,12 @@ function txt = evt2txt(revdir, procdir)
 %           .unidentified
 %           .all  
 %
-% N.B EVT2TXT is written assuming the MERMAID SAC file naming
-% convention, specifically that the first 15 chars of the filename
-% specify the date and time of the first sample of the seismogram.
-% Adjust 'sactime' variable internally for different naming schemes.
+% GeoAzur naming scheme example:
+%    'm12.20130416T105310.sac'
+%
+% Current naming scheme example (default):
+%
+%
 %
 % Before running the example below run the example in reviewevt.m and
 % make these directories:
@@ -44,28 +48,43 @@ function txt = evt2txt(revdir, procdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 06-Dec-2018, Version 2017b
+% Last modified: 18-Mar-2019, Version 2017b
 
-% Default I/0.
+% Defaults.
 defval('revdir', fullfile(getenv('MERMAID'), 'events'))
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
+defval('geoazur', false)
 
 % Initialize empty struct to hold text lines and specify format.
 txt.all = [];
 txt.identified = [];
 txt.unidentified = [];
-fmt = ['%44s\t'  , ...
-       '%23s\t'  , ...
-       '%6.2f\t' , ...
-       '%7.2f\t' , ...
-       '%34s\t'  , ...
-       '%6.2f\t' , ...
-       '%6.2f\t' , ...
-       '%4.1f\t' , ...
-       '%6s\t'   , ...
-       '%13s\n'];
 
+if ~geoazur
+    fmt = ['%44s\t'  , ...
+           '%23s\t'  , ...
+           '%6.2f\t' , ...
+           '%7.2f\t' , ...
+           '%34s\t'  , ...
+           '%6.2f\t' , ...
+           '%6.2f\t' , ...
+           '%4.1f\t' , ...
+           '%6s\t'   , ...
+           '%13s\n'];
 
+else
+    fmt = ['%23s\t'  , ...
+           '%23s\t'  , ...
+           '%6.2f\t' , ...
+           '%7.2f\t' , ...
+           '%34s\t'  , ...
+           '%6.2f\t' , ...
+           '%6.2f\t' , ...
+           '%4.1f\t' , ...
+           '%6s\t'   , ...
+           '%13s\n'];
+
+end
 % Fetch and format data.
 allsactimes = {};
 review_status = {'identified', 'unidentified'};
@@ -93,7 +112,14 @@ for i = 1:2
     % !! Edit this line to accommodate different SAC naming schemes.  In
     % our case the first 15 chars of the filename tag the time of the
     % first sample of the seismogram.
-    sactime = cellfun(@(xx) xx(1:15), sac, 'UniformOutput', false);
+    if ~geoazur 
+        sactime = cellfun(@(xx) xx(1:15), sac, 'UniformOutput', false);
+
+    else
+        sactime = cellfun(@(xx) xx(5:19), sac, 'UniformOutput', false);
+
+    end
+
     [~, idx] = sort(sactime);
     sac = sac(idx);
     evt = evt(idx);

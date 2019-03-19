@@ -78,11 +78,14 @@ rawpdfw = fullfile(rawdiro, 'pdf', [sans_sac '.windowed.raw.pdf']);
 % and return outputs if so.
 if ~redo && all([exist(rawevt, 'file') exist(rawpdfc, 'file') ...
                  exist(rawpdfw, 'file')] == 2)
-    %% This needs to be fixed
-    EQ = [];
-    CP = [];
-    outargs = {EQ, CP, rawevt, rawpdfc, rawpdfw};
 
+    % Load the raw output .mat file and return the EQ and CP structures.
+    tmp = load(rawevt, '-mat');
+    EQ = tmp.EQ;
+    CP = tmp.CP;
+    clear tmp;
+
+    outargs = {EQ, CP, rawevt, rawpdfc, rawpdfw};
     varargout = outargs(1:nargout);
     fprintf(['\n%s.sac already processed by cpsac2evt:\n%s\nSet ''redo''= ' ...
              'true to run cpsac2evt again.\n\n'],  sans_sac, rawevt)

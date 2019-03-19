@@ -2,13 +2,13 @@ function s = fullsac(singl, diro)
 % s = FULLSAC(singl, diro)
 %
 % FULLSAC returns a cell array of full-path filenames of all SAC files
-% in "diro" if "singl" is left empty (default) (Ex. 1)
+% in "diro" if "singl" is left empty (default) (Ex1)
 %
 % -OR-
 %
 % FULLSAC returns a single full-path filename if "singl" is a SAC
 % partial-path filename, e.g., you want the full path on your system
-% to '20180811T094852.09_5B6F01F6.MER.DET.WLT5.sac' (Ex. 2)
+% to '20180811T094852.09_5B6F01F6.MER.DET.WLT5.sac' (Ex2)
 %
 % Input:
 % singl        Single SAC file, possibly with incomplete path, 

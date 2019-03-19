@@ -98,7 +98,7 @@ function EQ = reviewevt(sac, redo, diro)
 % having it open fresh without all the old windows.  Have to command-W
 % to clear the window when closing.
 
-%% !! Recursive !!
+%% Recursive.
 
 defval('sac', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
 defval('redo', false)
@@ -118,6 +118,7 @@ if ~isempty(old_review)
 end
 
 if ~redo && previously_reviewed
+    EQ = getevt(sac, diro);
     fprintf(['\n%s already processed by reviewevt:\n%s\n\nSet ' ...
              '''redo'' = true to run reviewevt again.\n\n'], ...
             sacname, fullfile(old_review.folder, old_review.name))
