@@ -22,7 +22,8 @@ function tt=taupTime(model,depth,phase,varargin)
 %            .srcDepth
 %            .rayParam
 %            .phaseName
-%            .incidenceAngle 
+%            .incidentDeg 
+%            .incidentRad
 %            
 % Example:
 %   taupTime([],50,'P,S','deg',45.6)
@@ -42,9 +43,12 @@ function tt=taupTime(model,depth,phase,varargin)
 %   qinli@u.washington.edu
 %   Nov, 2002
 %
-% Last modified by jdsimon@princeton.edu in Ver. 2017b, 14-Sep-2018.
+% Last modified by jdsimon@princeton.edu in Ver. 2017b, 20-Mar-2019.
 
 % Joel D. Simon changelog -
+%
+% 20-Mar-2019: renamed 'incidenceAngle' field to 'incidentDeg' and
+% added field 'incidentRad'.  
 %
 % 14-Sep-2018: ascending sort of tt structure based on 'time' field.
 %
@@ -147,9 +151,11 @@ for ii=1:arrivals.length
     tt(ii).rayParam=arrivals(ii).getRayParam;
 end;
 
-% jdsimon@princeton.edu edit -- add incidence angle.
+% jdsimon@princeton.edu edit to add incident angle.
 for i = 1:length(tt)
-    tt(i).incidenceAngle = phangle(tt(i).rayParam, tt(i).phaseName, model);
+    [~, ~, tt(i).incidentDeg, tt(i).incidentRad] = phangle(tt(i).rayParam, ...
+                                                      tt(i).phaseName, ...
+                                                      model, tt(i).srcDepth);
 end
 
 % jdsimon@princeton.edu edit -- sort the rows in ascending order

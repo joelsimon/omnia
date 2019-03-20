@@ -32,13 +32,22 @@ function ph = purist(ph)
 % Contact: jdsimon@princeton.edu
 % Last modified: 19-Mar-2019, Version 2017b
 
-% Wish list: handling for (multiply-)reflected phases (SKKSdf,
-% S3KSac), primed phases (P'P'), for which the string conversion rules
-% are non-trivial.
+% Wish list: 
+%
+% Handling for (multiply-)reflected phases (SKKSdf, S3KSac), primed
+% phases (P'P'), etc.  The rules for these aren't too complex but as I
+% haven't ever come across them I'm not going to spend time coding for
+% them.  Will add as necessary.
 
 % Sanity.
 if ~ischar(ph)
     error('Input character array for ''ph''')
+
+end
+
+% If the phase name is of length one, there is nothing to do here.
+if length(ph) == 1
+    return
 
 end
 
@@ -73,4 +82,5 @@ switch suffix
         ph = [ph_no_suffix(1:2) 'IK' ph_no_suffix(3)];
         
     end
+
 end

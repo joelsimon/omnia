@@ -273,7 +273,7 @@ if ~isempty(EQ)
 
             % Main routine to compute pressure.
             expp = reid(mbml_type, mbml_val, EQ(i).TaupTimes(j).distance, ...
-                        freq, EQ(i).TaupTimes(j).incidenceAngle, Vp, Vs);
+                        freq, EQ(i).TaupTimes(j).incidentDeg, Vp, Vs);
 
             % reid.m outputs a 2x1 array (P and S wave pressure).
             switch upper(EQ(i).TaupTimes(j).phaseName(1))
