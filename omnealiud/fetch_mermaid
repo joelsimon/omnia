@@ -1,0 +1,38 @@
+#! /bin/sh
+#
+# Script to pull Mermaid EQ data from GeoAzur ftp server.
+# 
+# Uses git to completely wipe the current events directory, and then
+# add the new events directory to the staging area when complete (does
+# not commit -- you can do that yourself after verifying everything is
+# in order).
+#
+# Requires $MERAZUR environmental variable (a path)
+# Requires $MERAZUR is tracked by git (edit internally if not)
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@princeton.edu
+# Last modified: 25-Jan-2019
+
+# First: delete any existing "events" directoy; SAC files may have
+# been shuffled around from unidentified to identified, for example.
+startdir=`pwd`
+cd $MERAZUR
+
+# Remove old data.
+git rm  -r -- events/
+
+# Grab from server
+wget -rSN -np -nH --cut-dirs=2 --reject="index.html*","gif" \
+http://geoazur.unice.fr/ftp/mermaid/ 
+
+# Unzip and remove .zip files
+cd events
+yes | unzip "*.zip"
+rm -f *zip
+
+# Write a "lastfetch.txt" file to log fetch time.
+cd ..
+git add -- events/
+date -u > $MERAZUR/lastfetch.txt
+cd $startdir

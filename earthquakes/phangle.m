@@ -1,20 +1,24 @@
 function [tdeg, trad, ideg, irad] = phangle(rayParam, phaseName, mod, depth)
 % [tdeg, trad, ideg, irad] = PHANGLE(rayParam, phaseName, mod)
 %
-% PHANGLE computes the incidence, angle, relative to the normal, of an
+% PHANGLE computes the incidence angle, relative to the normal, of an
 % incoming seismic phase at the surface of the Earth (r = 6371 km),
 % given a spherical Earth ray parameter in units of [deg/s], i.e.,
 %
 %           rayParam = 6371 * sind(theta) / v,
 %
-% as is returned from taupTime.
+% as is returned from taupTime.  
+%
+% PHANGLE expects phase names allowable in TauP, and does not accept
+% all IASPEI-approved phase names.
 %
 % Input:
 % rayParam    Spherical ray parameter in [deg/s] 
 %                 (e.g, from taupTime.m) 
-% phaseName   Phase name (e.g., 'P' or 'SKIKS')
+% phaseName   Phase names allowed in TauP 
+%                 (e.g., 'P' or 'SKIKS'; not 'P''' nor 'PcP2')
 % mod         Either 'ak135', 'iasp91', or 'prem'
-% depth       Event depth*
+% depth*      Event depth [km]
 %
 % Output: 
 % tdeg**      Takeoff angle of outgoing phase [deg]
@@ -157,10 +161,11 @@ trad = NaN;
 %
 % Therefore, the velocity at the source depth could determined by
 % linearly interpolating between the depths that bracket the requested
-% source depth, as read from the .tvel or .nd table.  I am not sure
-% what happens at discontinuities -- if it takes the velocity above or
-% below at the same depth, but my testing implies it takes the first
-% (above) velocity (need to verify this).
+% source depth, as read from the .tvel or .nd table.  Mind
+% discontinuities where there are two velocities and the proper
+% takeoff velocity will depend on the phase (though it will generally
+% be the larger of the two, due to Snell's Law, except in pathological
+% cases like an upgoing 'p' wave whose source depth is the CMB).
 %
 % Once you have this velocity the computation of the takeoff angle is
 % straightforward (the ray parameter is a constant!):
