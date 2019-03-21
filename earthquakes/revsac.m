@@ -10,7 +10,7 @@ function [sac, evt] = revsac(iup, diro)
 % [diro]/reviewed/unidentified/evt, or
 % [diro]/reviewed/purgatory/evt.
 %
-% Inputs:
+% Input:
 % iup       [diro]/reviewed/ directory (def: 1)
 %           1 identified
 %          -1 unidentified
@@ -19,26 +19,32 @@ function [sac, evt] = revsac(iup, diro)
 %               def: fullfile(getenv('MERMAID'), 'events'))
 %
 % Output:
-% sac       Cell array of SAC file names whose corresponding 
+% sac       Cell array of SAC filenames whose corresponding 
 %              .evt file is in the reviewed subdirectory of interest
+% evt        Cell array of .evt filenames whose corresponding 
+%              in the reviewed subdirectory of interest
 %           
 % Before running the example below run the example in reviewevt.m
 %
 % Ex: (load EQ data from an identified SAC file)
-%    diro = '~/sac2evt_example';
+%    diro = '~/cpsac2evt_example';
 %    [sac, evt] = REVSAC(1, diro);
 %    load(evt{1}, '-mat')
 %    EQ
 %
 % See also: getevt.m, reviewevt.m, fullsac.m
 %
-% Last modified in Ver. 2017b by jdsimon@princeton.edu, 24-Oct-2018.
+% Author: Joel D. Simon
+% Contact: jdsimon@princeton.edu
+% Last modified: 24-Oct-2018, Version 2017b
 
+% Defaults.
 defval('iup', 1)
 defval('diro', fullfile(getenv('MERMAID'), 'events'))
 sac = [];
 evt = [];
 
+% Switch the reviewed directory of interest.
 switch iup
   case 1
     status = 'identified';
@@ -54,8 +60,7 @@ switch iup
 
 end
 
-% Note: an empty directory (maybe purgatory has been cleared by
-% reviewevt.m) will throw an error here.
+% Find the relevant paths. 
 evt_path = fullfile(diro, 'reviewed', status, 'evt');
 diro = dir([evt_path '/*.evt']);
 if isempty(diro)
@@ -68,4 +73,3 @@ for i = 1:length(diro)
 
 end
 sac = strrep({diro.name}, '.evt', '.sac');
-

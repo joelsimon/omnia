@@ -1,5 +1,5 @@
-function txt = evt2txt(revdir, procdir, geoazur)
-% txt = EVT2TXT(revdir, procdir, geoazur)
+function txt = evt2txt(revdir, geoazur)
+% txt = EVT2TXT(revdir, geoazur)
 %
 % EVT2TXT converts reviewed .evt files (which are really .mat files)
 % to human readable textfiles.
@@ -10,14 +10,8 @@ function txt = evt2txt(revdir, procdir, geoazur)
 %    [revdir]/reviewed/all.txt
 %
 % Inputs:
-% iup       Reviewed subdirectory (def: 1)
-%           1 identified
-%          -1 unidentified
-%           0 purgatory
 % revdir    Path to directory containing 'reviewed' subdirectory
 %               (def: $MERMAID/events)
-% procdir   Path to 'processed' directory containing SAC files
-%               e.g., for fullsac.m (def: $MERMAID/processed)
 % geoazur   logical true to assume GeoAzur's naming scheme 
 %               (def: false)
 %
@@ -32,30 +26,30 @@ function txt = evt2txt(revdir, procdir, geoazur)
 %    'm12.20130416T105310.sac'
 %
 % Current naming scheme example (default):
-%
-%
+%    '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac'
 %
 % Before running the example below run the example in reviewevt.m and
 % make these directories:
-% mkdir ~/sac2evt_example/reviewed/identified/txt/
-% mkdir ~/sac2evt_example/reviewed/unidentified/txt/
 %
-% Ex: (write a line to identified.txt and all.txt)
-%    revdir = '~/sac2evt_example';
-%    txt = evt2txt(revdir)
+%    mkdir ~/cpsac2evt_example/reviewed/identified/txt/
+%    mkdir ~/cpsac2evt_example/reviewed/unidentified/txt/
+%
+% Ex: (write a line to identified.txt and all.txt; 
+%      nothing to write for unidentified)
+%    revdir = '~/cpsac2evt_example';
+%    txt = EVT2TXT(revdir)
 % 
-% See also: sac2evt.m, reviewevt.m, revsac.m, getevt.m
+% See also: cpsac2evt.m, reviewevt.m, revsac.m, getevt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 18-Mar-2019, Version 2017b
+% Last modified: 21-Mar-2019, Version 2017b
 
 % Defaults.
 defval('revdir', fullfile(getenv('MERMAID'), 'events'))
-defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('geoazur', false)
 
-% Initialize empty struct to hold text lines and specify format.
+% Initialize empty struct to hold text lines, and specify format.
 txt.all = [];
 txt.identified = [];
 txt.unidentified = [];
@@ -85,6 +79,7 @@ else
            '%13s\n'];
 
 end
+
 % Fetch and format data.
 allsactimes = {};
 review_status = {'identified', 'unidentified'};

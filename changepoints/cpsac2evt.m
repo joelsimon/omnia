@@ -9,12 +9,11 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
 % pdfs in [diro]/raw/[sac].pdf.
 %
 % Input:
-% sac           SAC filename 
+% sac           SAC filename (def: '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 % redo          logical true to rerun and overwrite any previous *.raw.evt/pdf files
-%               logical false to skip redundant sac2evt.m execution
-%               (def: false)
-% domain        'time' or 'time-scale', for changepoint.m
-% n             Number of scales of wavelet decomposition
+%               logical false to skip redundant sac2evt.m execution (def: false)
+% domain        'time' or 'time-scale', for changepoint.m (def: 'time')
+% n             Number of scales of wavelet decomposition (def: 5)
 % inputs        Structure of other, less commonly adjusted inputs, 
 %                   e.g., wavelet type (def:  cpinputs, see there)
 % model         TauP model (def: 'ak135')
@@ -41,11 +40,19 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
 %    (3) [diro]/raw/pdf/*.windowed.raw.pdf
 %
 % For the following example first make the required directories:
-% mkdir ~/cpsac2evt_example/raw/pdf ~/cpsac2evt_example/raw/evt
 %
-% Ex: (find the p phases for events deeper than 500 km)
+%    mkdir ~/cpsac2evt_example/raw/pdf 
+%    mkdir ~/cpsac2evt_example/raw/evt
+%
+% And for both examples, use these inputs:
+%
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
 %    diro = '~/cpsac2evt_example';
+%
+% Ex1: (match likely MERMAID phases, for all events globally)
+%    [EQ, CP] = CPSAC2EVT(sac, true, 'time', 5, [], [], [], diro);
+%
+% Ex2: (find the p phases for events deeper than 500 km)
 %    [EQ, CP] = CPSAC2EVT(sac, true, 'time', 5, cpinputs, 'ak135', ...
 %                         'P,p', diro, 1, 'includeallmagnitudes', true, ...
 %                         'includeallorigins', true, 'mindepth', 500);
@@ -56,6 +63,7 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
 % Contact: jdsimon@princeton.edu
 % Last modified: 08-Dec-2018, Version 2017b
 
+% Defaults.
 defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 defval('redo', false)
 defval('domain', 'time')

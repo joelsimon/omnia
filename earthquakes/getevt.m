@@ -1,7 +1,7 @@
 function [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = getevt(sac, diro, openpdf)
 % [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = GETEVT(sac, diro, openpdf)
 %
-% GETEVT returns the EQ structures built with sac2evt.m and winnowed
+% GETEVT returns the EQ structures built with cpsac2evt.m and winnowed
 % (reviewed) with reviewevt.m.
 %
 % Inputs: 
@@ -13,18 +13,18 @@ function [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = getevt(sac, diro, ope
 %
 % Outputs:
 % revEQ     Reviewed EQ structure returned by reviewevt.m 
-% rawEQ     Raw EQ structure returned by sac2evt.m 
+% rawEQ     Raw EQ structure returned by cpsac2evt.m 
 % rawCP     CP structure returned by cpsac2evt.m,
 %              or NaN if the CP structure was not saved in *raw.evt
-% rawPDF    Path to raw .pdfs returned by sac2evt.m
+% rawPDF    Path to raw .pdfs returned by cpsac2evt.m
 % rev_evt   Full path to reviewed .evt file, or [] if SAC not reviewed
 % raw_evt   Full path to raw .evt file
 %
 % N.B. rawEQ = [] means that the SAC file was found not to match any
-%              known earthquake in the catalog as queried by sac2evt.m.
+%              known earthquake in the catalog as queried by cpsac2evt.m.
 %
 %      revEQ = [] means that none of the possible events found by
-%              sac2evt.m are matches after review with reviewevt.m
+%              cpsac2evt.m are matches after review with reviewevt.m
 %
 %      revEQ = NAN means this SAC file hasn't been reviewed 
 %              (there exists no matching .evt file in the 'reviewed' directory)
@@ -33,31 +33,32 @@ function [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = getevt(sac, diro, ope
 % 
 % Ex: (retrieve reviewed EQ structure showing M4.8 P wave arrival)
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
-%    diro = '~/sac2evt_example';
+%    diro = '~/cpsac2evt_example';
 %    EQ  = GETEVT(sac, diro)
 %
-% See also: reviewevt.m, revsac.m, sac2evt.m, 
+% See also: reviewevt.m, revsac.m, cpsac2evt.m, 
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 18-Mar-2019, Version 2017b
+% Last modified: 21-Mar-2019, Version 2017b
 
 % Defaults.
 defval('sac', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
 defval('diro', fullfile(getenv('MERMAID'), 'events'))
 defval('openpdf', false);
 
-% Leave this -- do not wrap finding rev_evt and raw_evt into loop with
-% a dynamically named structure or something of that nature because
-% the path to the reviewed .evt is unknown without a recursive
-% directory search, while the path to the raw .evt file is determined
-% simply by 'diro'.  Ergo, a loop would be more work than necessary to
-% find raw_evt because finding the two .evt files does not follow the
-% same procedure.
+%% N.B.________________________________________________________________%
+% Do not wrap finding rev_evt and raw_evt into loop with a dynamically
+% named structure or something of that nature because the path to the
+% reviewed .evt is unknown without a recursive directory search, while
+% the path to the raw .evt file is determined simply by 'diro'.  Ergo,
+% a loop would be more work than necessary to find raw_evt because
+% finding the two .evt files does not follow the same procedure!
+
 sans_sac = strrep(strippath(sac), '.sac', '');
 raw_evt = fullfile(diro, 'raw', 'evt', [sans_sac '.raw.evt']);
 if ~exist(raw_evt, 'file') 
-    error(sprintf('%s does not exist', raw_evt))
+    error('%s does not exist', raw_evt)
     
 end
 
@@ -76,7 +77,7 @@ clear tmp
 % Check if the event has been reviewed.  Use dir.m recursive search to
 % look through 'identified/', 'unidentified/, and 'purgatory/'
 % subdirectories in 'reviewed'.
-rev_dir = dir(fullfile(diro, 'reviewed', '**/', 'evt', [sans_sac '.evt']));
+rev_dir = dir(fullfile(diro, 'reviewed', sprintf('**/%s.evt', sans_sac)));
 if isempty(rev_dir)
     revEQ = NaN;
     rev_evt = [];
@@ -88,13 +89,14 @@ else
     clear tmp
 
 end
+%% N.B.________________________________________________________________%
 
 % PDF paths.
 corw = {'complete' 'windowed'};
 for i = 1:length(corw)
     rawPDF{i} = fullfile(diro, 'raw', 'pdf', sprintf([sans_sac '.%s.raw.pdf'], corw{i}));
     if ~exist(rawPDF{i}, 'file') 
-        error(sprintf('%s does not exist', rawPDF{i}))
+        error('%s does not exist', rawPDF{i})
         
     end
 end

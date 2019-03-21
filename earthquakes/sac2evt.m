@@ -49,7 +49,7 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 %    sac = 'm35.20140915T080858.sac';
 %    stime = '2014-09-15T08:04:00';
 %    etime = '2014-09-15T08:06:00';
-%    EQ = sac2evt(sac, [], [], 1, 'start', stime, 'end', etime, 'minmag', ...
+%    EQ = SAC2EVT(sac, [], [], 1, 'start', stime, 'end', etime, 'minmag', ...
 %                 5, 'includeallmagnitudes', false)
 %    EQ.Params    % Note time and other parameters overwritten from defaults
 %

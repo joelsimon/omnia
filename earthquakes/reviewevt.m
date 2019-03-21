@@ -3,13 +3,14 @@ function EQ = reviewevt(sac, redo, diro)
 %
 % REVIEWEVT is the smart SAC file to event matching tool.
 %
-% After running sac2evt.m (or cpsac2evt.m) run this to hand-review all
-% potential matches and save only the true event matches.  REVIEWEVT
-% allows the smart re-review and movement of .evt between identified
-% and unidentified folders, and checks to see if a file being moved
-% from one folder to another is being tracked by git, and if so
+% After running cpsac2evt.m run REVIEWEVT to hand-review all potential
+% matches and save only the true event matches, and allows the smart
+% re-review and movement of .evt between identified and unidentified
+% folders.  Further, REVIEWEVT checks to see if a file being moved
+% from one folder to another is being tracked by git, and if so,
 % properly removes and adds them such that git history is maintained
-% (though it does not commit them; that you will have to do yourself).
+% (though it does not commit them, you will have to do yourself; nor
+% does it rm staged files already added but not committed).
 %
 % Input:
 % sac       SAC filename 
@@ -31,21 +32,23 @@ function EQ = reviewevt(sac, redo, diro)
 % .evt file in one of three /reviewed/evt/ folders.
 %
 % REVIEWEVT requires the following folders exist with write permission:
-%    (1) [diro]/reviewed/identified/evt/(& pdf/)
+%    (1) [diro]/reviewed/identified/evt/
 %    (2) [diro]/reviewed/unidentified/evt/ 
-%    (3) [diro]/reviewed/purgatory/evt/(^ pdf/)
+%    (3) [diro]/reviewed/purgatory/evt/
 %
 % In the example below the EQ and CP structure, as well as both pdfs
-% output from sac2evt.m are loaded.  Execution is paused for
+% output from cpsac2evt.m are loaded.  Execution is paused for
 % inspection of both structures and some helpful information is
 % printed to the workspace.  Here there is an obvious match:
 % EQ(1).TaupTimes(1) has a theoretical p wave arrival time of 95.2
 % seconds, ~1 second difference from my AIC-based arrival estimation.
 % Ergo, I would pick the first phase associated with the first
 % earthquake in the EQ structure positive identification (there is
-% another P wave associated with EQ(4) that also arrives nearby in
+% another P wave associated with EQ(7) that also arrives nearby in
 % time, but its a magnitude 2.2 41 degrees away, so it's definitely
-% not what generated the signal here).  
+% not what generated the signal here).  N.B.: event locations, times,
+% magnitudes are constantly changing so the EQ structure you are
+% looking at may be different than what I just quoted.
 %
 % Run example below and when prompted type:
 %
@@ -69,40 +72,44 @@ function EQ = reviewevt(sac, redo, diro)
 % After prompt 2 the user may type 'restart' to relaunch a fresh
 % instance of REVIEWEVT, useful if input error was made.
 %
-% For the following example run the first example in sac2evt.m, 
+% For the following example run the first Ex1 in cpsac2evt.m, 
 % then make these required directories:
-% mkdir ~/cpsac2evt_example/reviewed/identified/evt/
-% mkdir ~/cpsac2evt_example/reviewed/unidentified/evt/
-% mkdir ~/cpsac2evt_example/reviewed/purgatory/evt/
 %
-% Finally, 
+%    mkdir ~/cpsac2evt_example/reviewed/identified/evt/
+%    mkdir ~/cpsac2evt_example/reviewed/unidentified/evt/
 %
 % Ex: (winnow EQ structure by selecting first-arriving P wave assoc. w/ first event)
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
-%    diro = '~/cpsac2evt_example'
+%    diro = '~/cpsac2evt_example';
 %    EQ  = REVIEWEVT(sac, true, diro)    
 %    
-% See also: sac2evt.m, cpsac2evt.m
+% See also: cpsac2evt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 04-Dec-2018, Version 2017b
+% Last modified: 21-Mar-2019, Version 2017b
 
-% If running this code recursively on MAC it may be hard to close all
-% the windows with every new earthquake review. May need this; though
-% I'm unsure of its efficacy:
+% It may be hard to close all the windows with every new earthquake
+% review if running this code recursively on a MAC . May need this;
+% though I'm unsure of its efficacy:
 %
 % defaults write com.apple.Preview NSQuitAlwaysKeepsWindows -bool false
 %
 % Basically I have not had luck consistently killing Preview and
-% having it open fresh without all the old windows.  Have to command-W
-% to clear the window when closing.
+% having it open fresh without all the old windows.  Instead I use
+% command-W to clear the window when closing.
 
 %% Recursive.
 
+% Defaults.
 defval('sac', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
 defval('redo', false)
 defval('diro', fullfile(getenv('MERMAID'), 'events'))
+
+%% Check if SAC already reviewed.
+
+% !! JDS: Don't try to slot getevt.m here -- it's more complicated  !!
+% !! than it's worth.  This works, leave it.                        !!
 
 sacname = strippath(sac);
 sans_sac =  strrep(sacname, '.sac', '');
@@ -139,6 +146,8 @@ if isempty(pdfdir)
 
 end
 
+%% Open raw PDFs to conduct event review.
+
 switch computer
   case 'GLNXA64'
     open_pdf = 'evince %s &';
@@ -162,7 +171,7 @@ for i = 1:length(pdfdir)
 
 end
 
-%% Display EQ(s) info and ask if identified.
+%% Pick matched events.
 
 ynflag = false;
 if ~isempty(EQ)
@@ -257,8 +266,7 @@ else
 
 end
     
-
-%% Pick EQ(s) and phase(s), or initiate an empty reviwed EQ structure.
+%% Pick phases for every matched event.
 
 switch lower(yn)
   case {'y', 'yes', 'm', 'maybe'}
@@ -359,8 +367,18 @@ switch lower(yn)
 end
 system(sprintf('killall %s', close_pdf));
 
-% Delete old reviewed .evt file, if it exists.  If file is tracked by
-% git, use git rm.
+%% Delete (or 'git rm') the old review, if it exists.
+
+% N.B.: the code below doesn't handle the obscure case of a file that
+% has already been added but not yet committed, i.e., it won't run
+%
+% git rm --cached -- old_review.name
+%
+% in the case of a staged file.  I don't see this every happening
+% outside of testing so I'm not coding for it.  Further, it would
+% really confuse an end-user other than myself (JDS) unfamiliar with
+% that I'm doing here.
+
 if previously_reviewed
     oldfile = fullfile(old_review.folder, old_review.name);
     if isgitfile(oldfile)
@@ -370,7 +388,7 @@ if previously_reviewed
         startdir = pwd;  
         cd(old_review.folder)
         [~, ~] = system(sprintf('git rm -- %s', old_review.name));
-        fprintf('\n\n Ran "git rm -- %s" in %s', old_review.name, ...
+        fprintf('\n\nRan "git rm -- %s" in %s', old_review.name, ...
                 old_review.folder)        
 
         try
@@ -387,35 +405,34 @@ if previously_reviewed
     else
         git_tracked = false;
         delete(oldfile)
-        fprintf('Deleted: %s\n', oldfile)
+        fprintf('\nDeleted: %s\n', oldfile)
 
     end
 end
 
-% Save the new reviewed .evt file  (as a mat file).  
+
+%% Save (and possibly, 'git add') the new review.
+
 clear('EQ')
 EQ = rev_EQ;
 newfile = fullfile(rev_diro, status, 'evt', [sans_sac '.evt']);
 save(newfile, 'EQ', '-mat')
 
-% If moving a file previously tracked by git to a new location, use
-% git add.
 if previously_reviewed && git_tracked
     startdir = pwd;
     [new_review.folder, name, ext] = fileparts(newfile);
     new_review.name = [name ext];
     cd(new_review.folder)
     [~, ~] = system(sprintf('git add -- %s', new_review.name));
-    fprintf('\n\n Ran "git add -- %s" in %s', new_review.name, ...
+    fprintf('\n\nRan "git add -- %s" in %s', new_review.name, ...
             new_review.folder)
     
     try
+        % Same note for try statement, above.
         cd(startdir)
 
     end
-
 else
     fprintf('\nWrote: %s\n', newfile)
 
 end
-
