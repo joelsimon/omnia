@@ -16,4 +16,4 @@ for i = 1:length(s)
 
 end
 
-fprintf('All done.')
+fprintf('All done.\n')
