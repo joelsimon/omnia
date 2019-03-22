@@ -9,13 +9,13 @@
 % Last modified: 22-Mar-2019, Version 2017b
 
 % Default directories.
-sac_diro = getenv('MERAZUR');
-cp_diro = fullfile(getenv('MERMAID'), 'events', 'geoazur', 'changepoints');
+diro = fullfile(getenv('MERAZUR'), 'rematch', 'changepoints');
 
 % Nab all the SAC files.
 s = mermaid_sacf('id');
 
-for i = 1   
+parfor i = 1:length(s)  
+    i
     % Read data.
     [x, h] = readsac(s{i});
 
@@ -33,7 +33,7 @@ for i = 1
     sans_sac = strrep(strippath(s{i}), '.sac', '');
 
     % Compute changepoint and save the structure.
-    writechangepoint(sans_sac, cp_diro, false, 'time', x, n, h.DELTA, h.B, 1, cpinputs, 1);
+    writechangepoint(sans_sac, diro, false, 'time', x, n, h.DELTA, h.B, 1, cpinputs, 1);
 
 end
     
