@@ -188,7 +188,7 @@ for i = 1:length(ev)
         nphase = nphase + 1;
         if nphase == 1
             nevt = nevt  + 1;
-            EQ(nevt).FileName = strippath(sac);
+            EQ(nevt).Filename = strippath(sac);
             evfields = fieldnames(quake);
 
             for k = 1:length(evfields)
@@ -199,7 +199,7 @@ for i = 1:length(ev)
             % Tack the query date and parameters onto the output structure.
             EQ(nevt).Params = params;
             EQ(nevt).QueryDate = qdate;
-
+            EQ(nevt).PhasesConsidered = ph;
         end
 
         tpfields = fieldnames(tp);

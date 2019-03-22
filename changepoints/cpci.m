@@ -23,8 +23,8 @@ function [M1, M2] = cpci(x, cptype, iters, alphas, algo, dtrnd, bias, ...
 % Outputs: 
 % M1            Struct of Method 1 (sample error) collection with fields:
 % .ave              Mean sample error after all tests 
-% .sigma1           1 std. dev. of the sample errors after all tests 
-% .sigma2           2 std. dev. of the sample errors after all tests 
+% .onestd           1 std. dev. of the sample errors after all tests 
+% .twostd           2 std. dev. of the sample errors after all tests 
 % .raw              Raw sample error of each test
 %
 % M2            Struct of Method 2 (alpha tests) collection with fields:
@@ -107,8 +107,8 @@ else
     % Initialize outputs.
     M1.raw = zeros(1, length(iters));
     M1.ave = NaN;
-    M1.sigma1 = NaN;
-    M1.sigma2 = NaN;
+    M1.onestd = NaN;
+    M1.twostd = NaN;
 
     % Don't bother generating M2 struct unless alpha tests requested.
     if ~skip_alphas
@@ -187,8 +187,8 @@ else
     %% Summarize.
     % Method 1.
     M1.ave = nanmean(M1.raw);
-    M1.sigma1 = nanstd(M1.raw);
-    M1.sigma2 = 2 * M1.sigma1;
+    M1.onestd = nanstd(M1.raw);
+    M1.twostd = 2 * M1.onestd;
 
     % Skip the alpha summary if not requested; exit the function.
     if skip_alphas
@@ -233,7 +233,7 @@ else
     end
 
     % Cleanup output.
-    M1 = orderfields(M1, {'ave' 'sigma1' 'sigma2' 'raw'});
+    M1 = orderfields(M1, {'ave' 'onestd' 'twostd' 'raw'});
     if ~skip_alphas
         M2.restricted  = orderfields(M2.restricted, {'six8' 'nine5' ...
                             'h1' 'span'});

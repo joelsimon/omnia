@@ -18,7 +18,7 @@ function [seisdate, seiststr, seisertime, refdate, evtdate] = seistime(h)
 %
 % datetime -- useful for arithmetic between points in time
 % datestr  -- useful for annotating figures and writing text files
-% datenum  -- is a bit of a pain to work with
+% datenum  -- useful for date arithmetic and comparison (e.g., sorting)
 %
 % Input:
 % h           SAC header structure returned from readsac.m
@@ -62,7 +62,7 @@ function [seisdate, seiststr, seisertime, refdate, evtdate] = seistime(h)
 %
 % Ex:
 %    [~, h] = readsac('m12.20130416T105310.sac')
-%    [seisdate, seiststr, seisertime, refdate ] = SEISTIME(h)
+%    [seisdate, seiststr, seisertime, refdate] = SEISTIME(h)
 %
 % See also: arrivaltime.m, readsac.m
 % 

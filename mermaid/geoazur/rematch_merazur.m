@@ -1,5 +1,5 @@
-function EQ = rematch_merazur(sac, ga_diro, evt_diro, redo)
-% EQ = REMATCH_MERAZUR(sac, ga_diro, evt_diro, redo)
+function [EQ, CP, err] = rematch_merazur(sac, redo, diro)
+% [EQ, CP, err] = REMATCH_MERAZUR(sac, redo, diro)
 %
 % Rematches GeoAzur 'identified' SAC files to cataloged events, using
 % the origin time of the "event" in the header as a small time window
@@ -11,26 +11,34 @@ function EQ = rematch_merazur(sac, ga_diro, evt_diro, redo)
 % preliminary/initial matches.
 %
 % Input:
-% sac       Full path SAC filename (def: 'm12.20130416T105310.sac')
-% ga_diro   Path to GeoAzur parent directory, fetched with fetch_mermaid
-%               (def: $MERAZUR)
-% evt_diro  Path to 'raw' .evt directory (def: $MERMAID/events/geoazur)
-% redo      logical true to rerun and overwrite any previous *.raw.evt/pdf files
-%           logical false to skip redundant sac2evt.m execution (def: false)
+% sac           SAC filename (def: 'm12.20130416T105310.sac')
+% diro          Path to GeoAzur parent directory, fetched with fetch_mermaid
+%                   (def: $MERAZUR)
+% redo          logical true to rerun and overwrite any previous *.raw.evt/pdf files
+%               logical false to skip redundant sac2evt.m execution (def: false)
 %
 % Output:
-% EQ        Event structure that concatenates output structures 
-%               from irisFetch.Events and taupTime.m
+% EQ            Event structure that concatenates output structures 
+%                   from irisFetch.Events and taupTime.m
+% CP            Changepoint structure from cpsac2evt.m
+% err           True if initial (more narrow search) irisFetch.Events errors
+%
+% Requires these directories, for JDS on linux:
+%
+%    mkdir $MERAZUR/rematch/raw/evt
+%    mkdir $MERAZUR/rematch/raw/pdf 
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 18-Mar-2019, Version 2017b
+% Last modified: 22-Mar-2019, Version 2017b
 
 % Defaults.
 defval('sac', 'm12.20130416T105310.sac')
-defval('ga_diro', getenv('MERAZUR'))
-defval('evt_diro', fullfile(getenv('MERMAID'), 'events', 'geoazur'))
 defval('redo', false)
+defval('diro', getenv('MERAZUR'))
+
+% Get fullpath SAC filename.
+sac = fullsac(sac, diro);
 
 % Read data and parse header event (not station) information.
 [~, h] = readsac(sac);
@@ -42,9 +50,9 @@ hmag = h.MAG;
 [~, ~, ~, ~, hdate] = seistime(h);
 
 % Time and location search parameters, formatted per FDSNWS specification.
-stime = fdsnwstime(hdate - seconds(30));
-etime = fdsnwstime(hdate + seconds(30));
-maxradius = 5; % degrees
+stime = fdsnwstime(hdate - seconds(15));
+etime = fdsnwstime(hdate + seconds(15));
+maxradius = 1; % degree
 minmag = hmag - 1;
 
 % Number of wavelet scales is based on sampling frequency.
@@ -57,7 +65,7 @@ else
 end
 
 % Path to the events file.
-evtfile = fullfile(ga_diro, 'events', 'events.txt');
+evtfile = fullfile(diro, 'events', 'events.txt');
 
 % Locate the event line associated with this SAC file in 'events.txt'.
 [~, evtline] = mgrep(evtfile, strippath(sac), 1);
@@ -78,23 +86,30 @@ if ~contains(all_phases, ga_phase)
 
 end
 
+% Directory where 'raw' and 'reviewed' .evt files are to be sent.
+rematch_diro = fullfile(diro, 'rematch');
+
 % For some reason the four SAC files below gave me trouble.  If you
 % look at the URL request output in the error message, and swap the
 % IRIS baseurl for USGS, it works in the web browser. Annoyingly, it
 % does not work if you switch the baseurl in cpsac2evt.m.  In that
 % those cases, just rematch everything using the narrow time window.
 try
-    % These break:
+    % Historically these have broken:
     % s = {'m31.20140629T173408.sac', ...
     %      'm31.20140910T053727.sac', ...
     %      'm32.20140629T173341.sac', ...
     %      'm33.20150211T191949.sac'};
-    EQ = cpsac2evt(sac, redo, [], n, [], [], all_phases, evt_diro, ...
-                   1, 'start', stime, 'end', etime, 'minmag', ...
-                   minmag, 'maxradius', maxradius, 'lat', lat, 'lon', lon);
+    [EQ, CP] = cpsac2evt(sac, redo, [], n, [], [], all_phases, ...
+                         rematch_diro, 1, 'start', stime, 'end', ...
+                         etime, 'minmag', minmag, 'maxradius', ...
+                         maxradius, 'lat', lat, 'lon', lon);
+    err = false;
     
 catch
-    EQ = cpsac2evt(sac, redo, [], n, [], [], all_phases, evt_diro, ...
-                   1, 'start', stime, 'end', etime);
-
+    [EQ, CP] = cpsac2evt(sac, redo, [], n, [], [], all_phases, ...
+                         rematch_diro, 1, 'start', stime, 'end', etime);
+    err = true;
+    
 end
+

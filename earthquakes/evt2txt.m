@@ -142,7 +142,18 @@ for i = 1:2
 
             end
         
-            data = {EQ(1).FileName,
+
+            % I renamed this field to lowercase from mixed case after matching a
+            % bunch of SAC files.
+            try
+                fname = EQ(1).Filename;
+
+            catch
+                fname= EQ(1).FileName;
+                
+            end
+            
+            data = {fname, 
                     EQ(1).PreferredTime(1:19),
                     EQ(1).PreferredLatitude,
                     EQ(1).PreferredLongitude,

@@ -9,13 +9,13 @@ close all
 clear all
 
 redo = false;
-s = mermaid_sacf('id');
-defval('ga_diro', getenv('MERAZUR'))
-evt_diro = fullfile(getenv('MERMAID'), 'events', 'geoazur');
 
-idx = [];
-for i = 1:length(s);
-    EQ = rematch_merazur(s{i}, ga_diro, evt_diro, redo);
+s = mermaid_sacf('id');
+diro = getenv('MERAZUR');
+
+for i = 1:length(s)
+    [EQ, ~, err] = rematch_merazur(s{i}, redo, diro);
     close all
-    
+
 end
+
