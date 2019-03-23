@@ -19,6 +19,9 @@ function EQ = updateevt(EQ)
 % Contact: jdsimon@princeton.edu
 % Last modified: 23-Mar-2019, Version 2017b
 
+% Wish list: Recompute arrival times for updated defphases.m, and add
+% PhasesConsidered field.
+
 %% Recusrive.
 
 % Skip trivial case.
