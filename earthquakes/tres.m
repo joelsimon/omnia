@@ -1,74 +1,108 @@
-function [res, SNRj, M1] = tres(sac, diro, inputs)
-% [res, SNRj, M1] = TRES(sac, diro, inputs)
+function [tres_time, tres_phase, tres_EQ] = tres(EQ, CP, multi)
+% [tres_time, tres_phase, tres_EQ] = TRES(EQ, CP, multi)
 %
-% TRES computes the travel time residuals associated with the input
-% SAC file where the user-pick is defined in the 'time' domain using
-% changepoint.m and the theoretical travel time in defined in the
-% reviewed .evt file.  Only the first event in the reviewed .evt file
-% is considered here for computation of time residuals.
+% Returns the minimum of the multiscale travel time residuals between
+% changepoint estimates, recorded in CP, and theoretical arrival
+% times, recorded in EQ.
 %
-%          res = min([CP.arsecs - EQ(1).truearsecs]
-%
-% Inputs:
-% sac        Full path SAC filename
-% diro       Path to directory containing 'raw/' and 'reviewed' 
-%                subdirectories (def: $MERMAID/events/)
-% inputs     Structure of optional inputs for changepoint.m
-%                (def: cpinputs)
+% Input:
+% EQ          Event structure, EQ, returned from cpsac2evt.m
+% CP          Changepoint structure, from changepoint.m
+% multi       logical true to consider all phases for all earthquakes 
+%             logical false only to consider EQ(1) (def: false)
 %
 % Output:
-% res        Travel time residual in sec
+% tres_time   Minimum travel time residual (seconds) 
+% tres_phase  Phase associated with minimum travel time residual
+% tres_EQ     EQ index associated with tres_phase
+%
+% Before running the examples below, first run the examples in
+% getevt.m and getcp.m.
+%
+% Ex1: (minimum residual using reviewed [single] event)
+%    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
+%    diro = '~/cpsac2evt_example';
+%    EQ  = getevt(sac, diro);
+%    CP = getcp(sac, diro);
+%    [tres_time, tres_phase, tres_EQ] = TRES(EQ, CP, false)
+%
+% Ex2: (minimum residual at scale 5 associated with EQ(12) phase 'PcP.
+%       This example uses rawEQ, clearly not a match, to illustrate
+%       locating the minimum residual across multiple events).
+%    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
+%    diro = '~/cpsac2evt_example';
+%    [~, rawEQ]  = getevt(sac, diro);
+%    CP = getcp(sac, diro);
+%    [tres_time, tres_phase, tres_EQ] = TRES(rawEQ, CP, true)
+%
+% See also: getevt.m, getcp.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 19-Mar-2019, Version 2017b
+% Last modified: 23-Mar-2019, Version 2017b
 
-% Defaults.
-defval('sac', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
-defval('diro', fullfile(getenv('MERMAID'), 'events'))
-defval('inputs', cpinputs)
+%% Recusrive.
 
-% Load the EQ structure(s) from the reviewed .evt file.
-[EQ, ~, ~, ~, rev_evt] = getevt(sac, diro, false);
+% Default.
+defval('multi', false)
 
-% Ensure the reviewed .evt file (and thus EQ structure just loaded) exists.
-sacname = strippath(sac);
-if isempty(rev_evt)
-    error('No .evt file associated with %s found (recursively) in\n%s', strippath(sac), diro)
+if multi 
+    % Initialize arrays.
+    all_tres_time = NaN(length(EQ), length(CP.arsecs));
+    all_tres_phase = cell(1, length(EQ));
+
+    % Find minimum residuals (at every scale) for every earthquake,
+    % individually, and write them as a single row.  E.g., EQ indices
+    % are the rows and scales are the columns: 
+    % 
+    % all_tres_time(EQ, scale)
+    
+    for i = 1:length(EQ)
+
+        %% Recusrion.
+
+        [all_tres_time(i, :), all_tres_phase{i}] = tres(EQ(i), CP);
+
+    end
+
+    % 'minidx' is the EQ index representing the minimum residual for each
+    % scale (min.m works along the columns).
+    [~, minidx] = min(abs(all_tres_time), [], 1);
+
+    % Initialize arrays.
+    tres_time = NaN(1, length(CP.arsecs));
+    tres_phase = cell(1, length(CP.arsecs));
+    tres_EQ = NaN(1, length(CP.arsecs));
+
+    % Find minimum residual for every scale considering minimum residual
+    % for every earthquake.
+    for j = 1:length(minidx)
+        tres_time(j) = all_tres_time(minidx(j), j);
+        tres_phase(j) = all_tres_phase{minidx(j)}(j);
+        tres_EQ(j) = minidx(j);
+
+    end
+
+    return
+
+else
+    % Consider only the first event in the EQ structure and do not run
+    % tres.m recursively.
+    EQ = EQ(1);
+    tres_EQ = ones(1, length(CP.arsecs));
 
 end
 
-% Read the seismic data and metadata.
-[x, h] = readsac(sac);
+% Initialize arrays.
+all_tres = cell(1, length(CP.arsecs));
+tres_time = NaN(1, length(CP.arsecs));
+tres_phase = cell(1, length(CP.arsecs));
 
-% The number of wavelet scales of the decomposition is determined by
-% the sampling frequency.
-switch efes(h)
-  case 5
-    n = 3
-
-  case 20
-    n = 5;
-
-  otherwise
-    error('Not programmed to NaN-pad for a sampling frequency of %i [Hz]', efes(h))
-
+% Travel time residuals considering a single EQ.
+for j = 1:length(CP.arsecs)
+    all_tres{j} = CP.arsecs{j} - [EQ.TaupTimes.truearsecs]; 
+    [~, minidx] = min(abs(all_tres{j}));
+    tres_time(j) = all_tres{j}(minidx);
+    tres_phase{j} =  EQ.TaupTimes(minidx).phaseName;
+    
 end
-
-inputs.iters = 1;
-
-% Compute changepoint structure using entire SAC seismogram and inputs requested.
-CP = changepoint('time', x, n, h.DELTA, h.B, 1, inputs, 1);
-
-% Compute minimum travel time residual at every scale, allowing for
-% the matching of all phases.
-for j = 1:n+1
-    allres{j} = CP.arsecs{j} - [EQ(1).TaupTimes.truearsecs];  % considering all phases
-    [~, minidx] = min(abs(allres{j}));
-    tres(j) = allres{j}(minidx);
-
-end
-
-% Collect output arguments.
-SNRj = CP.SNRj;
-M1 = CP.ci.M1;

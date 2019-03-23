@@ -19,17 +19,17 @@ function [CP, filename] = writechangepoint(fname, diro, domain, x, ...
 % Before running example below, make the required directory, for JDS
 % on Linux:
 %
-%    mkdir $MERMAID/events/changepoints
+%    mkdir ~/cpsac2evt_example/changepoints
 %
 % Ex:
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
 %    [x, h] = readsac(sac);
 %    fname = strrep(sac, '.sac', '');
-%    diro = fullfile(getenv('MERMAID'), 'events', 'changepoints');
+%    diro = '~/cpsac2evt_example/changepoints';
 %    domain = 'time'; n = 5; delta = h.DELTA; pt0 = h.B;
 %    snrcut = 1; inputs = cpinputs; conf = -1; fml = [];
 %    [CP, filename] = WRITECHANGEPOINT(fname, diro, domain, x, n, ...
-%                                      delta, pt0, snrcut, inputs, conf, fml);
+%                                      delta, pt0, snrcut, inputs, conf, fml)
 %
 %
 % Author: Joel D. Simon

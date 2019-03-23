@@ -37,9 +37,12 @@ end
 % Recursion, for multiple events.
 if length(EQ) > 1
     for i = 1:length(EQ)
+
+        %% Recursion.
+
         % Declare temp structure because you can't concatenate structures with
         % different fields.
-        updateEQ(i) = updateevt(EQ(i));
+        updateEQ(i) = updateevt(EQ(i));  
 
     end
     clear('EQ')

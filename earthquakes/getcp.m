@@ -14,9 +14,9 @@ function [CP, filename] = getcp(sac, diro)
 % CP        Changepoint structure, or [] if no .cp file found
 % filename  Filename of .cp file
 %
-% Ex: (first run example in writechangepoint.m)
+% Ex: (first run examples in getevt.m and getcp.m)
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
-%    diro = fullfile(getenv('MERMAID'), 'events', 'changepoints');
+%    diro = fullfile(getenv('MERMAID'), 'events');
 %    [CP, filename] = GETCP(sac, diro)
 %
 % Author: Joel D. Simon
@@ -28,7 +28,7 @@ defval('sac', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
 defval('diro', fullfile(getenv('MERMAID'), 'events', 'changepoints'))
 
 % Find the .cp file via a recursive directory search.
-sans_sac = strrep(sac, '.sac', '');
+sans_sac = strrep(strippath(sac), '.sac', '');
 cp_dir = dir(fullfile(diro, sprintf('**/%s.cp', sans_sac)));
 
 % Load it, or return empty.
