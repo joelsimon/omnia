@@ -6,7 +6,7 @@ function  CP = changepoint(domain, x, n, delta, pt0, snrcut, inputs, conf, fml)
 % CHANGEPOINT handles time.
 %
 % Input:
-% domain     'time' or 'time-scale'
+% domain     'time' or 'time-scale' (def: 'time')
 % x          The time series to be analyzed
 % n          Number of scales of wavelet decomposition
 % delta      Sampling interval in seconds (delta in SAC header)
@@ -89,7 +89,7 @@ function  CP = changepoint(domain, x, n, delta, pt0, snrcut, inputs, conf, fml)
 % Last modified: 14-Feb-2019, Version 2017b
 
 % Default I/O.
-defval('domain', 'time-scale')
+defval('domain', 'time')
 defval('pt0', 0);
 defval('snrcut', 1);
 defval('inputs', cpinputs)

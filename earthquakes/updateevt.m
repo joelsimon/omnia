@@ -3,12 +3,16 @@ function EQ = updateevt(EQ)
 %
 % UPDATEEVT updates various EQ structure fields with their correct
 % fieldnames and/or values.  EQ structures are saved in .evt files
-% output by cpsac2evt.m
+% output by cpsac2evt.m.  Corrections, should they become necessary,
+% should be added here.
 %
-% Corrections, should they become necessary, should be added here:
-% e.g., first-generation EQ structures incorrectly computed incidence
-% angle.  Further, I changed the fieldname from tt.incidenceAngle to
-% tt.incidentDeg.
+% To date:
+%
+% *EQ.FileName --> EQ.Filename
+% *EQ.TaupTimes.incidenceAngle --> EQ.TaupTimes.incidentDeg
+%                                  EQ.TaupTimes.incidentRad
+% *EQ.TaupTimes.pressure computed with EQ.TaupTimes.phaseName(end),
+%     instead of EQ.TaupTimes.phaseName(1)
 %
 % Input/Output:
 % EQ           Event structure 'EQ' saved by cpsac2evt.m

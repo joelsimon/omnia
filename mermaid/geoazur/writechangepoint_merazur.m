@@ -13,8 +13,7 @@ diro = fullfile(getenv('MERAZUR'), 'rematch', 'changepoints');
 
 % Nab all the SAC files.
 s = mermaid_sacf('id');
-
-parfor i = 1:length(s)  
+parfor i = 1:length(s)
     i
     % Read data.
     [x, h] = readsac(s{i});
@@ -33,7 +32,7 @@ parfor i = 1:length(s)
     sans_sac = strrep(strippath(s{i}), '.sac', '');
 
     % Compute changepoint and save the structure.
-    writechangepoint(sans_sac, diro, false, 'time', x, n, h.DELTA, h.B, 1, cpinputs, 1);
+    writechangepoint(sans_sac, diro, 'time', x, n, h.DELTA, h.B, 1, cpinputs, 1);
 
 end
     
