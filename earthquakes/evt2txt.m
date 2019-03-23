@@ -8,6 +8,8 @@ function txt = evt2txt(revdir, geoazur)
 %    [revdir]/reviewed/identified/txt/identified.txt
 %    [revdir]/reviewed/unidentified/txt/unidentified.txt
 %    [revdir]/reviewed/all.txt
+% 
+% The paths to which must exist before running.
 %
 % Inputs:
 % revdir    Path to directory containing 'reviewed' subdirectory
@@ -141,19 +143,7 @@ for i = 1:2
                 eqphase = ['*' eqphase];
 
             end
-        
-
-            % I renamed this field to lowercase from mixed case after matching a
-            % bunch of SAC files.
-            try
-                fname = EQ(1).Filename;
-
-            catch
-                fname= EQ(1).FileName;
-                
-            end
-            
-            data = {fname, 
+            data = {EQ(1).Filename, 
                     EQ(1).PreferredTime(1:19),
                     EQ(1).PreferredLatitude,
                     EQ(1).PreferredLongitude,
