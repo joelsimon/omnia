@@ -246,7 +246,9 @@ if ~isempty(EQ)
         end
 
         for j = 1:length(EQ(i).TaupTimes)
-            % Input swtiches for reid.m
+            % Input switches for reid.m
+
+            % Use the default frequencies based on magnitude type in reid.m.
             switch mbml_type
               case 'Mb'
                 freq = 1;
@@ -255,7 +257,7 @@ if ~isempty(EQ)
                 freq = 5;
 
             end
-
+            
             switch model
               case 'ak135'
                 Vp = 5800; 
@@ -266,17 +268,20 @@ if ~isempty(EQ)
                 Vs = 3360;
                 
               case 'prem'
-                % Ignoring "Ocean" layer (Vs = 0).
-                Vp = 5800;
+                Vp = 5800; % Ignoring "Ocean" layer (Vs = 0).
                 Vs = 3200;
+
             end
 
             % Main routine to compute pressure.
             expp = reid(mbml_type, mbml_val, EQ(i).TaupTimes(j).distance, ...
                         freq, EQ(i).TaupTimes(j).incidentDeg, Vp, Vs);
 
-            % reid.m outputs a 2x1 array (P and S wave pressure).
-            switch upper(EQ(i).TaupTimes(j).phaseName(1))
+            % The output of reid.m is a 1x2 array or P and S wave pressure.  Use
+            % the last character of the phase name (not the first)
+            % because this is the incidence (incoming), not takeoff
+            % (outgoing), pressure.
+            switch upper(EQ(i).TaupTimes(j).phaseName(end))
               case 'P'
                 expp = expp(1);
                 
@@ -284,7 +289,7 @@ if ~isempty(EQ)
                 expp = expp(2);
 
               otherwise
-                error('Phase name must start with ''P'' or ''S'' (case-insensitive).')
+                error('Phase name must end either ''P'' or ''S'' (case-insensitive).')
 
             end
             EQ(i).TaupTimes(j).pressure = expp;

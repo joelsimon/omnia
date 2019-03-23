@@ -28,7 +28,6 @@ function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 %                when x-axis = xaxis(length(x), delta, pt0)
 %   .arsecs: time in seconds at sample nearest to the .truearsecs
 %   .arsamp: sample index whose corresponding time is nearest .truearsecs
-%
 %   .model: velocity model use
 %   .pt0: time in seconds assigned to first sample 
 %
@@ -119,9 +118,14 @@ xax = xaxis(h.NPTS, h.DELTA, pt0);
 len_tt = length(tt);
 no_arr = [];
 for i = 1:len_tt  
+    % The absolute theoretical arrival time is the estimated event
+    % (origin) time plus theoretical travel time.
     tt(i).arrivaldatetime = evtdate + seconds(tt(i).time);
     tt(i).arrivaldatenum = datenum(tt(i).arrivaldatetime);
 
+    % And that event is only recorded here if it has the specific phases
+    % associated with that event arrive in the time window of the
+    % seismogram.
     if  isbetween(tt(i).arrivaldatetime, seisdate.B, seisdate.E)
         tt(i).truearsecs = seconds(tt(i).arrivaldatetime - ...
                                        seisdate.B) + pt0;

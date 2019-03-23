@@ -57,7 +57,7 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
 %                         'P,p', diro, 1, 'includeallmagnitudes', true, ...
 %                         'includeallorigins', true, 'mindepth', 500);
 %
-% See also: sac2evt.m, reviewevt.m, getevt.m
+% See also: sac2evt.m, reviewevt.m, getevt.m, updateevt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu

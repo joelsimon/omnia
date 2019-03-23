@@ -22,7 +22,7 @@ function A=gutenbergrichter(Mb,Del,T)
 %
 % Last modified by fjsimons-at-alum.mit.edu, 06/24/2008
 % Last modified by jdsimon-at-princeton.edu, 03/04/2019
-%      to comment-out print print (disp) statements
+%      to comment-out display statements
 
 
 defval('T',1)
