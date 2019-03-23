@@ -19,6 +19,28 @@ function EQ = updateevt(EQ)
 % Contact: jdsimon@princeton.edu
 % Last modified: 23-Mar-2019, Version 2017b
 
+%% Recusrive.
+
+% Skip trivial case.
+if isempty(EQ)
+    return
+
+end
+
+% Recursion, for multiple events.
+if length(EQ) > 1
+    for i = 1:length(EQ)
+        % Declare temp structure because you can't concatenate structures with
+        % different fields.
+        updateEQ(i) = updateevt(EQ(i));
+
+    end
+    clear('EQ')
+    EQ = updateEQ;
+    return    
+    
+end
+
 % Update FileName field.
 if isfield(EQ, 'FileName')
     EQ.Filename = EQ.FileName;
