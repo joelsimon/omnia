@@ -98,18 +98,33 @@ end
 % Fetch event data.  
 fprintf('\n**************************\n')
 
-% The irisFetch- pecific options 'startTime' and 'endTime' accept
-% datetime arrays, but I have seen some odd behavior with their use:
-% double ampersands (&&) in the parameter list when using them, which
-% breaks some baseurls other than the default IRIS. Thus I think it's
-% safer to use the general 'start' and 'end' times, known to all
-% fdsnws data centers, in string format.
-[ev, params] = irisFetch.Events('start', stime, 'end', etime, ...
-                                'includeallmagnitudes', true, ...
-                                'includeallorigins', true, 'baseurl', ...
-                                baseurl, varargin{:});
+% The following 'if' statement allows the updating the EQ structure
+% with the most recent info by only searching for the identified event
+% (i.e., sac2evt.m has already been run and a match has been
+% identified).  The if statement is necessary because 'eventid' and
+% 'start/end' time options don't play nice together.
 
-qdate = datestr(datetime('now', 'TimeZone', 'UTC'));
+if isempty(varargin) || ~contains([varargin{:}], 'eventid', 'IgnoreCase', true)
+    % The irisFetch-specific options 'startTime' and 'endTime' accept
+    % datetime arrays, but I have seen some odd behavior with their use:
+    % double ampersands (&&) in the parameter list when using them, which
+    % breaks some baseurls other than the default IRIS. Thus I think it's
+    % safer to use the general 'start' and 'end' times, known to all
+    % fdsnws data centers, in string format.
+    [ev, params] = irisFetch.Events('start', stime, 'end', etime, ...
+                                    'includeallmagnitudes', true, ...
+                                    'includeallorigins', true, 'baseurl', ...
+                                    baseurl, varargin{:});
+
+else
+    [ev, params] = irisFetch.Events('includeallmagnitudes', true, ...
+                                    'includeallorigins', true, 'baseurl', ...
+                                    baseurl, varargin{:});
+    
+end
+
+% Keep track of the date this query was made.
+querytime = datestr(datetime('now', 'TimeZone', 'UTC'), 'yyyy-mm-dd HH:MM:SS.FFF');
 
 % Loop over every phase for every event.
 evtidx = [];
@@ -196,9 +211,9 @@ for i = 1:length(ev)
 
             end
 
-            % Tack the query date and parameters onto the output structure.
+            % Tack the query time and query parameters to the output structure.
             EQ(nevt).Params = params;
-            EQ(nevt).QueryDate = qdate;
+            EQ(nevt).QueryTime = querytime;
             EQ(nevt).PhasesConsidered = ph;
         end
 
@@ -277,19 +292,46 @@ if ~isempty(EQ)
             expp = reid(mbml_type, mbml_val, EQ(i).TaupTimes(j).distance, ...
                         freq, EQ(i).TaupTimes(j).incidentDeg, Vp, Vs);
 
-            % The output of reid.m is a 1x2 array or P and S wave pressure.  Use
+            % The output of reid.m is a 1x2 array of P and S wave pressure.  Use
             % the last character of the phase name (not the first)
             % because this is the incidence (incoming), not takeoff
             % (outgoing), pressure.
-            switch upper(EQ(i).TaupTimes(j).phaseName(end))
-              case 'P'
+
+            % Remove 'diff', 'g', or 'n', suffix, if it exists.  Other prefixes
+            % ('ab', etc.), are handled by purist.m, (nested in
+            % taupTime.m, itself nested in arrivaltime.m, above).
+            %
+            % N.B.: Other phase IASPEI-approved suffixes also exist (e.g., 'dif'
+            % in favor of 'diff'; 'pre'; 'PcP2' to mean multiple reflections; 'P''
+            % (prime); 'Sb', 'S*', etc.  Being that phangle.m is designed to be
+            % called most often as a subfunction of MatTaup I am only coding for
+            % phase names acceptable there (e.g., 'PcP2' throws an error and thus
+            % I am not coding a rule to remove suffixes that are numbers).
+            %
+            % See TauP_Instructions.pdf pg. 15 for the relevant suffixes.
+            ph_no_suffix = upper(EQ(i).TaupTimes(j).phaseName);
+            
+            if endsWith(ph_no_suffix, 'diff', 'IgnoreCase', true)
+                ph_no_suffix = ph_no_suffix(1:end-4);
+
+            end
+
+            if endsWith(ph_no_suffix, {'g' 'n'}, 'IgnoreCase', true)
+                ph_no_suffix = ph_no_suffix(1:end-1);
+
+            end
+
+            switch lower(ph_no_suffix(end))
+              case 'p'
                 expp = expp(1);
                 
-              case 'S'
+              case 's'
                 expp = expp(2);
 
               otherwise
-                error('Phase name must end either ''P'' or ''S'' (case-insensitive).')
+                error(['Phase name must end with either ''P'' or ' ...
+                       '''S'' (case-insensitive, and ignoring any ' ...
+                       '''diff'', ''n'', or ''g'' suffix) .'])
 
             end
             EQ(i).TaupTimes(j).pressure = expp;
@@ -302,8 +344,7 @@ if ~isempty(EQ)
     [~, pidx] = sort(maxmag, 'descend');
     EQ = EQ(pidx);
     
-    % Add date of this query and move NaN magnitude values to end ('sort'
-    % omits NaN values).
+    % Move NaN magnitude values to end ('sort' omits NaN values).
     prefmagvals = [EQ.PreferredMagnitudeValue];
     [~, nanidx]  = unzipnan(prefmagvals);
     nan_EQ = EQ(nanidx);

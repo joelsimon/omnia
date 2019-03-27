@@ -2,33 +2,23 @@
 % assuming JDS' system configuration.
 %
 % Compute M1 error estimation for every SAC file using 1000
-%iterations.
+% iterations.
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 23-Mar-2019, Version 2017b
 
-% Default directories.
 diro = fullfile(getenv('MERMAID'), 'events', 'changepoints');
-
-% Nab all the SAC files.
 s = fullsac;
-
-
-for i = 1:length(s)
+parfor i = 1:length(s)
     i
     CP = getcp(s{i}, diro);
     if isempty(CP)
-        % Remove .sac filename extension.
         sans_sac = strrep(strippath(s{i}), '.sac', '');
         [x, h] = readsac(s{i});
-        
-        
-        % Compute changepoint and save the structure.
         writechangepoint(sans_sac, diro, 'time', x, 5, h.DELTA, h.B, 1, cpinputs, 1);
+
     end        
-
-
 end
     
     

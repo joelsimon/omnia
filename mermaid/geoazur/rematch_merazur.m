@@ -12,7 +12,7 @@ function [EQ, CP, err] = rematch_merazur(sac, redo, diro)
 %
 % Input:
 % sac           SAC filename (def: 'm12.20130416T105310.sac')
-% diro          Path to GeoAzur parent directory, fetched with fetch_mermaid
+% diro          Path to GeoAzur parent directory, fetched with fetch_merazur
 %                   (def: $MERAZUR)
 % redo          logical true to rerun and overwrite any previous *.raw.evt/pdf files
 %               logical false to skip redundant sac2evt.m execution (def: false)

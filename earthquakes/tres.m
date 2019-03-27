@@ -39,7 +39,7 @@ function [tres_time, tres_phase, tres_EQ] = tres(EQ, CP, multi)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 23-Mar-2019, Version 2017b
+% Last modified: 25-Mar-2019, Version 2017b
 
 %% Recusrive.
 
@@ -69,17 +69,23 @@ if multi
     % scale (min.m works along the columns).
     [~, minidx] = min(abs(all_tres_time), [], 1);
 
-    % Initialize arrays.
+    % Initialize arrays with NaNs.
     tres_time = NaN(1, length(CP.arsecs));
-    tres_phase = cell(1, length(CP.arsecs));
-    tres_EQ = NaN(1, length(CP.arsecs));
+    tres_EQ = tres_time;
+    tres_phase = celldeal(CP.arsecs, NaN);
 
     % Find minimum residual for every scale considering minimum residual
     % for every earthquake.
     for j = 1:length(minidx)
+        % Check that the tres_time actually exists at this scale (minidx = 1
+        % if the array is all NaNs).
         tres_time(j) = all_tres_time(minidx(j), j);
-        tres_phase(j) = all_tres_phase{minidx(j)}(j);
-        tres_EQ(j) = minidx(j);
+
+        % Overwrite the default NaN values, if an arrival exists at this scale.
+        if ~isnan(tres_time(j))
+            tres_phase(j) = all_tres_phase{minidx(j)}(j);
+            tres_EQ(j) = minidx(j);
+        end
 
     end
 
@@ -93,16 +99,19 @@ else
 
 end
 
-% Initialize arrays.
-all_tres = cell(1, length(CP.arsecs));
+% Initialize cells and arrays with NaNs.
+all_tres = celldeal(CP.arsecs, NaN);
+tres_phase = all_tres;
 tres_time = NaN(1, length(CP.arsecs));
-tres_phase = cell(1, length(CP.arsecs));
 
 % Travel time residuals considering a single EQ.
 for j = 1:length(CP.arsecs)
-    all_tres{j} = CP.arsecs{j} - [EQ.TaupTimes.truearsecs]; 
-    [~, minidx] = min(abs(all_tres{j}));
-    tres_time(j) = all_tres{j}(minidx);
-    tres_phase{j} =  EQ.TaupTimes(minidx).phaseName;
-    
+    if ~isnan(CP.arsecs{j})
+        % Overwrite the default NaN value, if an arrival exists at this scale.
+        all_tres{j} = CP.arsecs{j} - [EQ.TaupTimes.truearsecs]; 
+        [~, minidx] = min(abs(all_tres{j}));
+        tres_time(j) = all_tres{j}(minidx);
+        tres_phase{j} =  EQ.TaupTimes(minidx).phaseName;
+
+    end
 end

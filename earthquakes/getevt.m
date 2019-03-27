@@ -4,14 +4,14 @@ function [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = getevt(sac, diro, ope
 % GETEVT returns the EQ structures built with cpsac2evt.m and winnowed
 % (reviewed) with reviewevt.m.
 %
-% Inputs: 
+% Input: 
 % sac       SAC filename 
 %               (def: '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
 % diro      Path to directory containing 'raw/' and 'reviewed' 
 %               subdirectories (def: $MERMAID/events/)
 % openpdf   logical true to open raw PDFs
 %
-% Outputs:
+% Output:
 % revEQ     Reviewed EQ structure returned by reviewevt.m 
 % rawEQ     Raw EQ structure returned by cpsac2evt.m 
 % rawCP     CP structure returned by cpsac2evt.m,

@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+# Simple shell script to:
+# 1) retrieve MERMAID data
+# 2) write new SAC files
+# 3) generate preliminary match to the seismic catalog
+#
+# No I/0 and requires internal editing (built for JDS' system
+# defaults).
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@princeton.edu
+# Last modified: 26-Mar-2019.
+
+start_dir=`pwd`
+
+# Pull most recent data.
+echo -e 'Copying server...\n'
+~/github/omnia/mermaid/servercopy
+echo -e '\n...completed server copy\n'
+
+# Generate SAC files.
+echo -e 'Writing SAC files...\n'
+cd $MERMAID
+source activate pymaid
+python scripts/main.py
+source deactivate 
+echo -e '\n...completed writing SAC files\n'
+
+# Generate raw matches to the IRIS catalog.
+echo -e '\nMatching to the seismic catalog...\n'
+/usr/local/MATLAB/R2017b/bin/matlab -nodisplay -r "run ~/github/omnia/mermaid/matchall.m; exit"
+
+# Display current count.
+echo -e '\nHere is the complete list:\n\n'
+~/github/omnia/mermaid/countsac
+
+# Return from whence you came.
+/usr/bin/cd $start_dir
+

@@ -9,10 +9,14 @@ function EQ = updateevt(EQ)
 % To date:
 %
 % *EQ.FileName --> EQ.Filename
+%
 % *EQ.TaupTimes.incidenceAngle --> EQ.TaupTimes.incidentDeg
 %                                  EQ.TaupTimes.incidentRad
+%
 % *EQ.TaupTimes.pressure computed with EQ.TaupTimes.phaseName(end),
-%     instead of EQ.TaupTimes.phaseName(1)
+%                           instead of EQ.TaupTimes.phaseName(1)
+% 
+% *EQ.QueryDate: '22-Mar-2019 16:01:20' ---> EQ.QueryTime: '2019/22/04 16:01:20'
 %
 % Input/Output:
 % EQ           Event structure 'EQ' saved by cpsac2evt.m
@@ -55,6 +59,21 @@ end
 if isfield(EQ, 'FileName')
     EQ.Filename = EQ.FileName;
     EQ = rmfield(EQ, 'FileName');
+
+end
+
+% Update the format of the QueryDate field and rename it to QueryTime, if it exists.
+if isfield(EQ, 'QueryDate')
+    querydate = datetime(EQ.QueryDate, 'InputFormat', 'dd-MMM-uuuu HH:mm:ss');
+    querytime = datestr(querydate, 'yyyy/mm/dd HH:MM:SS.FFF');
+    EQ.QueryTime = querytime;
+    EQ = rmfield(EQ, 'QueryDate');
+
+end
+
+% Add an empty QueryTime field, if it doesn't exist.
+if ~isfield(EQ, 'QueryTime')
+    EQ.QueryTime = [];
 
 end
 

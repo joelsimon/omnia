@@ -22,7 +22,7 @@ function EQ = reviewrematch_merazur(sac, redo, diro)
 % redo          logical true to delete any existing reviewed .evt 
 %                   and rerun reviewevt.m on the input
 %               logical false to skip redundant review (def: false)
-% diro          Path to GeoAzur parent directory, fetched with fetch_mermaid
+% diro          Path to GeoAzur parent directory, fetched with fetch_merazur
 %                   (def: $MERAZUR)
 % 
 % Output:

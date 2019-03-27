@@ -11,7 +11,7 @@ clear all
 
 s = fullsac;
 for i = 1:length(s)
-    [x, h] = readsac(s{i});
+   [x, h] = readsac(s{i});
     switch efes(h)
       case 20
         n = 5;
@@ -25,8 +25,6 @@ for i = 1:length(s)
     end
     cpsac2evt(s{i}, false, [], n);
     close all
-    clc
 
 end
-
 fprintf('All done.\n')
