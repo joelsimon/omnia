@@ -1,7 +1,7 @@
 % Script to run writechangepoint.m on all identified GeoAzur SAC files
 % assuming JDS' system configuration.
 %
-% Compute M1 error estimation for every SAC file using 1000
+% Computes M1 error estimation for every SAC file using 1000
 % iterations.
 %
 % Author: Joel D. Simon

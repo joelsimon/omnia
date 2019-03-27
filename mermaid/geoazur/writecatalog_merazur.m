@@ -1,6 +1,16 @@
 % Script to write updated GeoAzur MERMAID catalog assuming JDS' system
 % defaults.
 %
+% Preprocessing steps:
+% 1) Rematch earthquakes: rematch_merazur.m
+%
+% 2) Review those rematchs: reviewrematch_merazur.m
+%
+% 3) Compute and save changepoints and their confidence intervals
+% writechangepoint_merazur.m
+%
+% Finally, run this script to produce output catalog.
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 27-Mar-2019, Version 2017b
@@ -52,7 +62,6 @@ fclose(fid);
 fileattrib(filename, '-w')
 
 %________________________________________________________________________%
-
 
 function eb = eventblock_local(sac)
 % Local version of eventblock.m, modified to include event and phase
@@ -150,13 +159,6 @@ phase_info_line = sprintf('JDS multiscale phase picks: %1i scales at %i Hz\n', .
 
 % Parse arrivals and residuals.
 phase_header_line = 'Phase  Time    Tres     SNR       Mu  2Sigma\n';
-
-% phase_fmt = ['%5s '...
-%              '%8.3f ' ... 
-%              '%8.3f ' ... 
-%              '%7.3E ' ...
-%              '%8.3f ' ... 
-%              '%12.3f\n'];
 
 phase_fmt = ['%5s '...
              '%6.2f ' ... 

@@ -26,7 +26,7 @@ function EQ = reviewrematch_merazur(sac, redo, diro)
 %                   (def: $MERAZUR)
 % 
 % Output:
-% EQ        EQ structure after review
+% EQ            EQ structure after review
 %
 %
 % Requires this directory, for JDS on linux:

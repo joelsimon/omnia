@@ -8,8 +8,8 @@
 % Step 3: Compute changepoints and their confidence intervals:
 % writechangepoint_merazur.m
 %
-% Step 4: Run this script to produce output text file:
-% $MERMAID/events/geoazur/catalog.txt
+% Step 4: Run this script to produce output catalog.
+
 
 close all
 clear all
