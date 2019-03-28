@@ -39,7 +39,7 @@ function [tres_time, tres_phase, tres_EQ] = tres(EQ, CP, multi)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 25-Mar-2019, Version 2017b
+% Last modified: 28-Mar-2019, Version 2017b
 
 %% Recusrive.
 
