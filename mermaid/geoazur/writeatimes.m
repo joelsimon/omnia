@@ -14,7 +14,8 @@
 % including approximation, and is massively simplified to only save
 % the timing information for the complete segmentation (changepoint.m
 % not run again on a windowed segmentation of the seismogram).  Also
-% computes the arrival times time domain, not he time-scale domain.
+% computes the arrival times in the time domain, not the time-scale
+% domain.
 %
 % Columns of arrivaltimes.txt
 % (1): SAC filename

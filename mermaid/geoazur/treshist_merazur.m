@@ -91,15 +91,12 @@ moveh(ha(1:2), -0.01);
 moveh(ha(3:end), 0.01);
 
 latimes
+[lax, lth] = labelaxes(ha, 'ul', true, 'FontName', 'Helvetica', ...
+                       'Interpreter', 'Tex', 'FontSize', 12);
+movev(lax, -0.472)
+moveh(lax, -0.014)
 
-
-% [lax, lth] = labelaxes(ha, 'ul', true, 'FontName', 'Helvetica', ...
-%                        'Interpreter', 'Tex', 'FontSize', 12);
-
-% movev(lax, -0.505)
-% moveh(lax, -0.01)
-
-% savepdf(mfilename)
+savepdf('treshist')
 
 
 %_________________________%
