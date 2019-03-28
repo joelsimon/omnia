@@ -77,8 +77,11 @@ set(tx_freq(3:end), 'Position', [0 -70/locfac])
 set(ms(1:2), 'Position', [-5.5 72])
 set(ms(3:end), 'Position', [-5.5 72/locfac])
 
-tproj = text(ha(1), -11.5, -47, 'projection:');
-tfreq = text(ha(1), -11.5, -70, 'freq. band:');
+%tproj = text(ha(1), -11.5, -47, 'projection:');
+%tfreq = text(ha(1), -11.5, -70, 'freq. band:');
+
+tproj = text(ha(1), -9, -47, 'proj.:');
+tfreq = text(ha(1), -9, -70, 'freq.:');
 
 set(ha, 'XTick', [-6:2:6])
 movefac = linspace(-0.05, 0.05, 6);
@@ -94,9 +97,13 @@ for j = 1:6
     %    ha(j).XTickLabel([2:2:end]) = {''};
 
 end
-set([tx_proj tproj tx_freq tfreq tn], 'Interpreter', 'Latex', ...
+ set([tx_proj tproj tx_freq tfreq tn], 'Interpreter', 'Latex', ...
+                   'FontName', 'Times', 'FontSize', txfs, ...
+                   'HorizontalAlignment', 'Center')
+set([tx_proj tx_freq tn], 'Interpreter', 'Latex', ...
                   'FontName', 'Times', 'FontSize', txfs, ...
                   'HorizontalAlignment', 'Center')
+
 set(ms, 'Interpreter', 'Latex', 'FontName', 'Times', ...
         'HorizontalAlignment', 'Left', 'FontSize', axfs)
 
