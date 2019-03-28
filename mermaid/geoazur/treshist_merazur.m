@@ -41,24 +41,25 @@ longticks(ha, 0.75);
 axesfs(gcf, axfs, txfs)
 
 % Scale labels.
-% scal = {'$x_1$ at $20$ Hz', ...
-%         '$x_2$ at $20$ Hz', ...
-%         '$x_3$ at $20$ Hz\n$x_1$ at $5$ Hz', ...
-%         '$x_4$ at $20$ Hz\n$x_2$ at $5$ Hz', ...
-%         '$x_5$ at $20$Hz\n$x_3$ at $5$ Hz', ...
-%         '$\\overline{x}_5$ at $20$ Hz\n$\\overline{x}_3$ at $5$ Hz'};
+proj = {'$x_1$ if $f_s=20$', ...
+        '$x_2$ if $f_s=20$', ...
+        '$x_3$ if $f_s=20$\n$x_1$ if $f_s=5$', ...
+        '$x_4$ if $f_s=20$\n$x_2$ if $f_s=5$', ...
+        '$x_5$ if $f_s=20$\n$x_3$ if $f_s=5$', ...
+        '$\\overline{x}_5$ if $f_s=20$\n$\\overline{x}_3$ if $f_s=5$'};
 
-scal = {'$x_1$ if $f_s=20$\n$\\approx[10.0-5.0]$ Hz', ...
-        '$x_2$ if $f_s=20$\n$\\approx[5.0-2.5]$ Hz', ...
-        '$x_3$ if $f_s=20$\n$x_1$ if $f_s=5$\n$\\approx[2.5-1.2]$ Hz', ...
-        '$x_4$ if $f_s=20$\n$x_2$ if $f_s=5$\n$\\approx[1.2-0.6]$ Hz', ...
-        '$x_5$ if $f_s=20$\n$x_3$ if $f_s=5$\n$\\approx[0.6-0.3]$ Hz', ...
-        '$\\overline{x}_5$ if $f_s=20$\n$\\overline{x}_3$ if $f_s=5$\n$\\approx\\leq0.3$ Hz'};
+freq = {'$\\approx[10.0-5.0]$ Hz', ...
+        '$\\approx[5.0-2.5]$ Hz', ...
+        '$\\approx[2.5-1.2]$ Hz', ...
+        '$\\approx[1.2-0.6]$ Hz', ...
+        '$\\approx[0.6-0.3]$ Hz', ...
+        '$\\approx[0.3-0.1]$ Hz'};
 
 for j = 1:6
     % Outside bottom: scale number and sampling frequency,
-    tx(j) = text(ha(j), 0, 0, sprintf(scal{j}));
-
+    tx_proj(j) = text(ha(j), 0, 0, sprintf(proj{j}));
+    tx_freq(j) = text(ha(j), 0, 0, sprintf(freq{j}));
+    
     % Top right: mean and standard deviation 
     ms(j) = text(ha(j), 0, 0, sprintf(['$\\hat{\\mu}=%4.1f$\n$\\' ...
                         'hat{\\sigma}=%4.1f$'], mn(j), sd(j)));
@@ -67,10 +68,17 @@ for j = 1:6
     tn(j) = title(ha(j), sprintf('$\\mathrm{n}=%i~[%3.1f$%s]', n_plotted(j), dc(j), '\%'));
 
 end
-set(tx(1:2), 'Position', [0 -47])
-set(tx(3:end), 'Position', [0 -62])
+set(tx_proj(1:2), 'Position', [0 -47])
+set(tx_proj(3:end), 'Position', [0 -47/locfac])
+set(tx_freq(1:2), 'Position', [0 -70])
+set(tx_freq(3:end), 'Position', [0 -70/locfac])
+
+
 set(ms(1:2), 'Position', [-5.5 72])
-set(ms(3:end), 'Position', [-5.5 72*(1/locfac)])
+set(ms(3:end), 'Position', [-5.5 72/locfac])
+
+tproj = text(ha(1), -11.5, -47, 'projection:');
+tfreq = text(ha(1), -11.5, -70, 'freq. band:');
 
 set(ha, 'XTick', [-6:2:6])
 movefac = linspace(-0.05, 0.05, 6);
@@ -79,19 +87,18 @@ for j = 1:6
     hold(ha(j), 'on')
     plot(ha(j), [0 0], ylim(ha(j)), '-k');
     hold(ha(j), 'off')
+
     % Space the axes out.
      moveh(ha(j), movefac(j))
-
     % Remove every other XTickLabel.
     %    ha(j).XTickLabel([2:2:end]) = {''};
 
 end
-set(tx, 'Interpreter', 'Latex', 'FontName', 'Times', ...
-        'HorizontalAlignment', 'Right', 'FontSize', txfs, ...
-        'HorizontalAlignment', 'Center')
+set([tx_proj tproj tx_freq tfreq tn], 'Interpreter', 'Latex', ...
+                  'FontName', 'Times', 'FontSize', txfs, ...
+                  'HorizontalAlignment', 'Center')
 set(ms, 'Interpreter', 'Latex', 'FontName', 'Times', ...
         'HorizontalAlignment', 'Left', 'FontSize', axfs)
-set(tn, 'Interpreter', 'Latex', 'FontName','Times', 'FontSize', txfs)
 
 moveh(ha(1:2), -0.01);
 moveh(ha(3:end), 0.01);
@@ -103,7 +110,6 @@ movev(lax, -0.472)
 moveh(lax, -0.014)
 
 savepdf('treshist')
-
 
 %_________________________%
 function [hh, n_tot, n_plotted, mn, md, sd, dc] = hist_local(ha, tr, lim, n_avail)
