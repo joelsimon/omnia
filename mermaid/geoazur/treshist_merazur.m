@@ -5,6 +5,7 @@ clear all
 axfs = 8;
 txfs = 9;
 
+% Written with compile_merzur.m
 load(fullfile(getenv('MERAZUR'), 'rematch', 'tres.mat'))
 
 % Plot a gatres histogram.
@@ -12,42 +13,50 @@ figure
 ha = krijetem(subnum(1, 6));
 fig2print(gcf, 'fportrait')
 
-lim = 6.5;
+% Thresholds to allow pick:
+% tmax = maximum-allowed time residual between CP arrival time and ANY phase arrival.
+% umax = maximum 2\sigma uncertainty from CP.ci.M1.twosigma
+% Both in seconds.
+tmax = 6;
+umax = 1;
+
 n_avail = [repmat(339, 1, 2) repmat(445, 1, 4)];
 locfac = 339 / 445;
 
 for j = 1:6
     [hh(j), n_tot(j), n_plotted(j), mn(j), md(j), sd(j), dc(j), ...
      ph_plotted{j}, idx{j}] = hist_local(ha(j), tres_time(:, j), ...
-                                         lim, n_avail(j), tres_phase(:, j));
+                                         tmax, n_avail(j), tres_phase(:, ...
+                                                      j), twostd(:, j), umax);
 
 end
-set(ha, 'XLim', [-lim lim])
-xticks(ha, [-lim:2:lim])
+set(ha, 'XLim', [-tmax tmax])
+xticks(ha, [-tmax:2:tmax])
 
 axis(ha, 'square')
 shrink(ha, 0.75, 0.75)
 
-set(ha(1:2), 'YTick', [0:25:75])
-set(ha(1:2), 'YLim', [0  115*locfac])
+set(ha(1:2), 'YTick', [0:15:60])
+set(ha(1:2), 'YLim', [0  60])
 set(ha(2), 'YLabel', []);
 set(ha(2), 'YTickLabel', [])
 
-set(ha(3:end), 'YLim', [0 115])
-set(ha(3:end), 'YTick', [0:25:100])
+set(ha(3:end), 'YLim', [0 80])
+set(ha(3:end), 'YTick', [0:20:80])
 set(ha(3:end), 'YLabel', [])
 set(ha(4:end), 'YTickLabel', [])
 
 longticks(ha, 0.75);
 axesfs(gcf, axfs, txfs)
 
+
 % Scale labels.
 scal = {'$x_1$ if $f_s=20$', ...
         '$x_2$ if $f_s=20$', ...
-        '$x_1$ if $f_s=5$\n$x_3$ if $f_s=20$', ...
-        '$x_2$ if $f_s=5$\n$x_4$ if $f_s=20$', ...
-        '$x_3$ if $f_s=5$\n$x_5$ if $f_s=20$', ...
-        '$\\overline{x}_3$ if $f_s=5$\n$\\overline{x}_5$ if $f_s=20$'};
+        '$x_1$ if $f_s=5$,$~$\n$x_3$ if $f_s=20$', ...
+        '$x_2$ if $f_s=5$,$~$\n$x_4$ if $f_s=20$', ...
+        '$x_3$ if $f_s=5$,$~$\n$x_5$ if $f_s=20$', ...
+        '$\\overline{x}_3$ if $f_s=5$,$~$\n$\\overline{x}_5$ if $f_s=20$'};
 
 freq = {'$\\approx[10.0-5.0]$ Hz', ...
         '$\\approx[5.0-2.5]$ Hz', ...
@@ -60,29 +69,40 @@ for j = 1:6
     % Outside bottom: scale number and sampling frequency,
     tx_scal(j) = text(ha(j), 0, 0, sprintf(scal{j}));
     tx_freq(j) = text(ha(j), 0, 0, sprintf(freq{j}));
-    
+
     % Top right: mean and standard deviation 
-    ms(j) = text(ha(j), 0, 0, sprintf(['$\\hat{\\mu}=%4.1f$\n$\\' ...
-                        'hat{\\sigma}=%4.1f$'], mn(j), sd(j)));
+    meanstr = sprintf('%4.1f', mn(j));
+    if strcmp(meanstr, '-0.0')
+        meanstr = '0.0';
+        
+    end
+
+    stdstr = sprintf('%4.1f', sd(j));
+    if strcmp(stdstr, '-0.0')
+        stdstr = '0.0';
+        
+    end
+
+    ms(j) = text(ha(j), 0, 0, sprintf(['$\\hat{\\mu}=%s$\n$\\' ...
+                        'hat{\\sigma}=%s$'], meanstr, stdstr));
 
     % Title: number data in each histogram.
     tn(j) = title(ha(j), sprintf('$\\mathrm{n}=%i~[%3.1f$%s]', n_plotted(j), dc(j), '\%'));
 
 end
-set(tx_scal(1:2), 'Position', [0 -47])
-set(tx_scal(3:end), 'Position', [0 -47/locfac])
-set(tx_freq(1:2), 'Position', [0 -70])
-set(tx_freq(3:end), 'Position', [0 -70/locfac])
+tscal = text(ha(1), -8, -32, 'scale:');
+set(tx_scal(1:2), 'Position', [0 -32])
+set(tx_scal(3:end), 'Position', [0 -32*(4/3)])
+
+tfreq = text(ha(1), -8, -47, 'freq.:');
+set(tx_freq(1:2), 'Position', [0 -47])
+set(tx_freq(3:end), 'Position', [0 -47*(4/3)])
 
 
-set(ms(1:2), 'Position', [-5.5 72])
-set(ms(3:end), 'Position', [-5.5 72/locfac])
 
-%tscal = text(ha(1), -11.5, -47, 'scalection:');
-%tfreq = text(ha(1), -11.5, -70, 'freq. band:');
+set(ms(1:2), 'Position', [-5.2 49.5])
+set(ms(3:end), 'Position', [-5.2 49.5*(4/3)])
 
-tscal = text(ha(1), -9, -47, 'scale:');
-tfreq = text(ha(1), -9, -70, 'freq.:');
 
 set(ha, 'XTick', [-6:2:6])
 movefac = linspace(-0.05, 0.05, 6);
@@ -94,16 +114,12 @@ for j = 1:6
 
     % Space the axes out.
      moveh(ha(j), movefac(j))
-    % Remove every other XTickLabel.
-    %    ha(j).XTickLabel([2:2:end]) = {''};
+
 
 end
- set([tx_scal tscal tx_freq tfreq tn], 'Interpreter', 'Latex', ...
+set([tx_scal tscal tx_freq tfreq tn], 'Interpreter', 'Latex', ...
                    'FontName', 'Times', 'FontSize', txfs, ...
                    'HorizontalAlignment', 'Center')
-set([tx_scal tx_freq tn], 'Interpreter', 'Latex', ...
-                  'FontName', 'Times', 'FontSize', txfs, ...
-                  'HorizontalAlignment', 'Center')
 
 set(ms, 'Interpreter', 'Latex', 'FontName', 'Times', ...
         'HorizontalAlignment', 'Left', 'FontSize', axfs)
@@ -139,13 +155,7 @@ for j = 1:6
     
 end
 
-
-% Sort based on scale with most arrivals.
-% [~, mostph] = max(n_plotted);
-% [~, sorder] = sort(ph_count(:, mostph), 'descend');  % 3rd column currently
-% unique_ph = unique_ph(sorder);
-% ph_count = ph_count(sorder, :);
-
+% Sort based overall counts per phase, across all scales.
 sum_scal = sum(ph_count, 1);
 sum_ph = sum(ph_count, 2);
 
@@ -169,20 +179,27 @@ for i = 1:length(lyne)
     fprintf(fid, '%s', lyne{i});
 
 end
-fclose(fid)
+fprintf(fid, '%s', sprintf('\ntmax = %.1f s, umax = %.1f \n', tmax, umax));
+fclose(fid);
 
 %_________________________%
 function [hh, n_tot, n_plotted, mn, md, sd, dc, ph_plotted, idx] = ...
-        hist_local(ha, tr, lim, n_avail, ph)
+        hist_local(ha, tr, tmax, n_avail, ph, twostd, umax)
     
-    idx = find(abs(tr) <= max(lim));
+    idx = (find(abs(tr) <= tmax & twostd < umax));
     tr_plotted = tr(idx);
     ph_plotted = ph(idx);
     
     % Histogram travel time residual data.
-    hh = histogram(ha, tr_plotted, 'BinMethod', 'Integer', ...
-                   'Normalization', 'Count', 'FaceColor', 'k', ...
-                   'EdgeColor', 'k');
+    % hh = histogram(ha, tr_plotted, 'BinMethod', 'Integer', ...
+    %                'Normalization', 'Count', 'FaceColor', 'k', ...
+    %                'EdgeColor', 'k');
+
+
+    % Half second bins
+    hh = histogram(ha, tr_plotted, 'BinLimit', [-tmax tmax], ...
+                   'BinWidth', 1, 'Normalization', 'Count', ...
+                   'FaceColor', 'k', 'EdgeColor', 'k');
 
     % This is the number actually plotted.
     n_plotted = sum(hh.BinCounts);

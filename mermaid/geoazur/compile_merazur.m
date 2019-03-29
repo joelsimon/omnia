@@ -28,25 +28,28 @@ h = h(idx);
 % Load EQ and CP structures in order and compute travel-time residuals.
 tres_time = NaN(length(s), 6);
 tres_phase = cell(length(s), 6);
+twostd = NaN(length(s), 6);
 for i = 1:length(s)
     EQ(i) = getevt(s{i}, rematch_diro, false);
     CP(i) = getcp(s{i}, rematch_diro);
-    
+
     [temp_tres_time, temp_tres_phase] = tres(EQ(i), CP(i), false);
     fs(i) = efes(h{i});
     if fs(i) == 20
-        padd_time = [];
-        padd_phase = {};
+        padd_double = [];
+        padd_cell = {};
         
     else
-        padd_time = [NaN NaN];
-        padd_phase = {NaN NaN};
+        padd_double = [NaN NaN];
+        padd_cell = {NaN NaN};
         
     end
-    tres_time(i, :) = [padd_time temp_tres_time];
-    tres_phase(i, :) = [padd_phase temp_tres_phase];    
+    tres_time(i, :) = [padd_double temp_tres_time];
+    twostd(i, :) = [padd_double CP(i).ci.M1.twostd];
+    tres_phase(i, :) = [padd_cell temp_tres_phase];    
+
 
 end
 save(fullfile(rematch_diro, 'EQ.mat'), 'EQ', 'h');
 save(fullfile(rematch_diro, 'CP.mat'), 'CP', 's');
-save(fullfile(rematch_diro, 'tres.mat'), 'tres_time', 'tres_phase', 's', 'fs');
+save(fullfile(rematch_diro, 'tres.mat'), 'tres_time', 'tres_phase', 'twostd', 's', 'fs');
