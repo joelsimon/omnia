@@ -1,5 +1,5 @@
-function [s, f1, f2] = globalstations(redo, plt)
-% [s, f1, f2] = GLOBALSTATIONS(redo, plt)
+function [s, f1, f2, f3] = globalstations(redo, plt)
+% [s, f1, f2, f3] = GLOBALSTATIONS(redo, plt)
 %
 % GLOBALSTATIONS queries http://service.iris.edu/fdsnws/station/1/,
 % via irisFetch.Stations, the complete (for all time) global list of
@@ -12,7 +12,8 @@ function [s, f1, f2] = globalstations(redo, plt)
 % Output:
 % s     Struct of stations returned by irisFetch.Stations
 % f1    Labeled map of stations with outlines of coasts
-% f2    Unlabeled map of stations
+% f2    f1, with most recently-reported MERMAID locations also plotted
+% f3    Unlabeled map of stations
 %
 % If redo is false GLOBALSTATIONS will look for "globalstations.mat"
 % in the same folder where globalstations.m lives.
@@ -21,7 +22,7 @@ function [s, f1, f2] = globalstations(redo, plt)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 25-Feb-2019, Version 2017b
+% Last modified: 01-Apr-2019, Version 2017b
 
 % Defaults.
 defval('redo', false)
@@ -55,15 +56,11 @@ if plt
     lon = [s.Longitude];
     lat = [s.Latitude];
 
-    % Figure 2 uses FJS plotcont.m, where longitude goes from 0:360
+    % Figure 1 uses FJS plotcont.m, where longitude goes from 0:360
     % degrees, ergo must add 360 degrees to any negative longitudes.
     lon(find(lon<0)) = lon(find(lon<0)) + 360;
     
     %% Figure 1 does include the background map.
-
-
-    % longticks(f1.ha, 2)    
-
     f1.f = figure;
     f1.ha = gca;
 
@@ -79,30 +76,66 @@ if plt
     f1.ha.XTick = [0:60:360];
     f1.ha.YTick = [-90:30:90];
     
-    xlabel(f1.ha, 'longitude (${}^{\circ}$)')
-    ylabel(f1.ha, 'latitude (${}^{\circ}$)')
+    set(f1.ha, 'XTickLabels', {'0$^{\circ}$' '60$^{\circ}$E' ...
+                        '120$^{\circ}$E' '180$^{\circ}$' '120$^{\circ}$W' ...
+                        '60$^{\circ}$W' '0$^{\circ}$'})
+    set(f1.ha, 'YTickLabels', {'90$^{\circ}$S' '60$^{\circ}$S' ...
+                        '30$^{\circ}$S' '0$^{\circ}$' '30$^{\circ}$N' ...
+                        '60$^{\circ}$N' '90$^{\circ}$N'})
+
+    xlabel(f1.ha, 'longitude');
+    ylabel(f1.ha, 'latitude');
     
     latimes
     longticks(f1.ha, 2)    
     grid(f1.ha, 'on')
     axesfs(f1.f, 7, 9)
 
+    savepdf('globalstations_f1')
 
-    %% Figure 1 does not include the background map.
+    %% Figure 2 does include the background map, and the most recently
+    %% reported MERMAID locations.
     f2.f = figure;
     
-    % Copy the figure just made and delete the lines I don't want.
+    % Copy the figure just made.
     f2.ha = copyobj(f1.ha, f2.f)
+    
+    % Fetch the most recent MERMAID locations.
+    str = urlread('http://geoweb.princeton.edu/people/simons/SOM/all.txt');
+
+    % Split the text at newline characters and ditch the final (empty) string cell.
+    str = splitlines(str);
+    str = str(1:end-1);
+
+    mlat = cellfun(@(xx) str2double(xx(31:40)), str);
+    mlon = cellfun(@(xx) str2double(xx(43:53)), str);
+
+    % Again, map longitudes to plotcont.m convention.
+    mlon(find(mlon<0)) = mlon(find(mlon<0)) + 360;    
+
+    hold(f2.ha, 'on')
+    f2.pl = plot(f2.ha, mlon, mlat, '^', 'MarkerFaceColor', 'red', ...
+                 'MarkerEdgeColor', 'black', 'MarkerSize', 5);
+    hold(f2.ha, 'off')
+    savepdf('globalstations_f1')
+
+    %% Figure 3 does NOT include the background map.
+    f3.f = figure;
+    
+    % Copy the first figure.
+    f3.ha = copyobj(f1.ha, f3.f)
 
     % Delete the underlying map.
-    delete(f2.ha.Children(1))
+    delete(f3.ha.Children(1))
     
-    f2.ha.XTickLabel = {};
-    f2.ha.YTickLabel = {};
+    f3.ha.XTickLabel = {};
+    f3.ha.YTickLabel = {};
 
-    delete(f2.ha.XLabel)
-    delete(f2.ha.YLabel)
+    delete(f3.ha.XLabel)
+    delete(f3.ha.YLabel)
 
-    grid(f2.ha, 'off')
+    grid(f3.ha, 'off')
+
+    savepdf('globalstations_f3')
 
 end
