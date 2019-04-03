@@ -1,20 +1,23 @@
-function [tres_time, tres_phase, tres_EQ] = tres(EQ, CP, multi)
-% [tres_time, tres_phase, tres_EQ] = TRES(EQ, CP, multi)
+function [tres_time, tres_phase, tres_EQ, tres_TaupTime] = tres(EQ, CP, multi)
+% [tres_time, tres_phase, tres_EQ, tres_TaupTime] = TRES(EQ, CP, multi)
 %
 % Returns the minimum of the multiscale travel time residuals between
 % changepoint estimates, recorded in CP, and theoretical arrival
 % times, recorded in EQ.
 %
 % Input:
-% EQ          Event structure, EQ, returned from cpsac2evt.m
-% CP          Changepoint structure, from changepoint.m
-% multi       logical true to consider all phases for all earthquakes 
-%             logical false only to consider EQ(1) (def: false)
+% EQ            Event structure, EQ, returned from cpsac2evt.m
+% CP            Changepoint structure, from changepoint.m
+% multi         logical true to consider all phases for all earthquakes 
+%               logical false only to consider EQ(1) (def: false)
 %
 % Output:
-% tres_time   Minimum travel time residual (seconds) 
-% tres_phase  Phase associated with minimum travel time residual
-% tres_EQ     EQ index associated with tres_phase
+% tres_time     Minimum travel time residual (seconds) 
+% tres_phase    Phase associated with minimum travel time residual
+% tres_EQ       EQ index associated with tres_phase
+% tres_TaupTime TaupTime index associated with tres_EQ*
+%
+% *currently not supported if multi == true
 %
 % Before running the examples below, first run the Ex1 in cpsac2evt.m
 % and the examples in getevt.m and getcp.m.
@@ -39,9 +42,12 @@ function [tres_time, tres_phase, tres_EQ] = tres(EQ, CP, multi)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 28-Mar-2019, Version 2017b
+% Last modified: 03-Apr-2019, Version 2017b
 
-%% Recusrive.
+%  Wish list: TaupTimes index if multi = true. Should be relatively
+%  simply; haven't gotten around to it.
+
+%% Recursive.
 
 % Default.
 defval('multi', false)
@@ -68,8 +74,11 @@ if multi
     
     for i = 1:length(EQ)
 
-        %% Recusrion.
+        %% Recursion.
+        if nargout > 3
+            error('Have not yet programmed fourth output if ''multi'' = true')
 
+        end
         [all_tres_time(i, :), all_tres_phase{i}] = tres(EQ(i), CP);
 
     end
@@ -81,6 +90,7 @@ if multi
     % Initialize arrays with NaNs.
     tres_time = NaN(1, length(CP.arsecs));
     tres_EQ = NaN(1, length(CP.arsecs));
+    tres_TaupTime = NaN(1, length(CP.arsecs));
     tres_phase = celldeal(CP.arsecs, NaN);
 
     % Find minimum residual for every scale considering minimum residual
@@ -94,8 +104,8 @@ if multi
         if ~isnan(tres_time(j))
             tres_phase(j) = all_tres_phase{minidx(j)}(j);
             tres_EQ(j) = minidx(j);
-        end
 
+        end
     end
 
     return
@@ -112,6 +122,7 @@ end
 all_tres = celldeal(CP.arsecs, NaN);
 tres_phase = celldeal(CP.arsecs, NaN);
 tres_time = NaN(1, length(CP.arsecs));
+tres_TaupTime = NaN(1, length(CP.arsecs));
 
 % Travel time residuals considering a single EQ.
 for j = 1:length(CP.arsecs)
@@ -124,6 +135,10 @@ for j = 1:length(CP.arsecs)
         [~, minidx] = min(abs(all_tres{j}));
         tres_time(j) = all_tres{j}(minidx);
         tres_phase{j} =  EQ.TaupTimes(minidx).phaseName;
+        tres_TaupTime(j) = minidx;
+
+    else
+        tres_EQ(j) = NaN;
 
     end
 end
