@@ -1,9 +1,12 @@
 % TRESHIST.m
+% 
+% Script to plot current MERMAID histograms. 
 %
-
+% WIP -- needs cleanup.
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 01-Apr-2019, Version 2017b
+% Last modified: 03-Apr-2019, Version 2017b
 
 close all
 clear
@@ -44,13 +47,8 @@ xticks(ha, [-tmax:2:tmax])
 axis(ha, 'square')
 shrink(ha, 0.75, 0.75)
 set(ha, 'YLim', [0 125])
-%set(ha(1:2), 'YTick', [0:15:60])
-%set(ha(1:2), 'YLim', [0  60])
 set(ha(2:end), 'YLabel', []);
 set(ha(2:end), 'YTickLabel', [])
-
-%set(ha(3:end), 'YLim', [0 80])
-%set(ha(3:end), 'YTick', [0:20:80])
 
 longticks(ha, 0.75);
 axesfs(gcf, axfs, txfs)
