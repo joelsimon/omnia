@@ -58,6 +58,7 @@ if isempty(singl)
         s = [];
         warning('No .sac files found in %s', diro)
     end
+    s = s(:);
 
 else
     % Nab a single SAC file.
@@ -71,5 +72,3 @@ else
     end
     
 end
-
-    

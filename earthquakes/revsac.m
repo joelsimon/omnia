@@ -73,3 +73,4 @@ for i = 1:length(diro)
 
 end
 sac = strrep({diro.name}, '.evt', '.sac');
+sac = sac(:);

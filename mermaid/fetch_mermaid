@@ -5,13 +5,14 @@
 # 2) write new SAC files
 # 3) generate preliminary match to the seismic catalog
 #
-# No I/0 and requires internal editing (built for JDS' system
-# defaults).
+# No I/0 and requires internal editing as it was built for JDS' system
+# defaults.
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
 # Last modified: 26-Mar-2019.
 
+# Keep track of starting directory.
 start_dir=`pwd`
 
 # Pull most recent data.

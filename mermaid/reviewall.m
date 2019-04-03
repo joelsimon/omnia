@@ -15,5 +15,5 @@ for i = 1:length(s)
     clc
 
 end
-
+evt2txt;
 fprintf('All done.\n')

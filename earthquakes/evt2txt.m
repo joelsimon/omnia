@@ -123,7 +123,7 @@ for i = 1:2
 
     % Keep track of identified and unidentified sactimes in single array
     % sorting after concatenation.
-    allsactimes = [allsactimes  sactime];
+    allsactimes = [allsactimes; sactime];
 
     for j = 1:length(evt)
         tmp = load(evt{j}, '-mat');

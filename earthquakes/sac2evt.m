@@ -215,6 +215,7 @@ for i = 1:length(ev)
             EQ(nevt).Params = params;
             EQ(nevt).QueryTime = querytime;
             EQ(nevt).PhasesConsidered = ph;
+
         end
 
         tpfields = fieldnames(tp);

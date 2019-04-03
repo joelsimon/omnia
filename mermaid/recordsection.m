@@ -26,7 +26,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 % Output:
 % F        Structure with figure handles and bits
 % EQ       EQ structure, as returned found with sac2evt.m
-% sac      
+% sac      SAC files whose traces are plotted
 %
 % *Travel time are not plotted if alignon='atime'. Also note that a
 % vertical line at 0 seconds does not necessarily correspond to the
@@ -273,6 +273,5 @@ F.yl = ylabel(F.ax, 'distance ($^{\circ}$)');
 F.tl.FontWeight = 'normal';
 latimes
 
-
-
-
+% Send travel time curves to the bottom.
+botz(F.ph, F.ax);

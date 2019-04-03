@@ -49,4 +49,5 @@ javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
 % repositories it depends on, may delete.
 %____________________________________________________%
 
-addpath(genpath(fullfile(getenv('MFILES'), 'papers', 'simon2019')));
+addpath(genpath(fullfile(getenv('MFILES'), 'papers', 'simon2019')))
+addpath(fullfile(getenv('SPR19'), 'EGU', 'talk', 'code'))
