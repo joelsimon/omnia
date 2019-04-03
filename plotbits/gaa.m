@@ -9,7 +9,9 @@ function ha = gaa(f)
 % Output
 % ha           Axes handles in figure
 %
-% Last modified by jdsimon@princeton.edu, 03-August-2017
+% Author: Joel D. Simon
+% Contact: jdsimon@princeton.edu
+% Last modified: 03-Aug-2017, Version 2017b
 
 defval('f',gcf)
 assert(all(isgraphics(f,'figure')),...
