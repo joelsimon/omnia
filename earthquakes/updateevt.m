@@ -6,7 +6,8 @@ function EQ = updateevt(EQ)
 % output by cpsac2evt.m.  Corrections, should they become necessary,
 % should be added here.
 %
-% To date:
+% To date: all below have been completed and UPDATEEVT is currently a
+% pass-through function.
 %
 % *EQ.FileName --> EQ.Filename
 %
@@ -18,6 +19,13 @@ function EQ = updateevt(EQ)
 % 
 % *EQ.QueryDate: '22-Mar-2019 16:01:20' ---> EQ.QueryTime: '2019/22/04 16:01:20'
 %
+%% !! Do not do this for GeoAzur -- they consider some exotic phases in events.txt !!
+% *Recompute arrival times for updated defphases.m, and add
+%    'PhasesConsidered' field, keeping all phases in TaupTimes structure
+%    (saving every possible phase as a possible match, not just those I
+%    "see"
+%
+%
 % Input/Output:
 % EQ           Event structure 'EQ' saved by cpsac2evt.m
 %
@@ -25,12 +33,27 @@ function EQ = updateevt(EQ)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 23-Mar-2019, Version 2017b
+% Last modified: 03-Apr-2019, Version 2017b
 
-% Wish list: Recompute arrival times for updated defphases.m, and add
+% Wish list: refetch the event if 'QueryTime' or 'Params' field is
+% empty.
+
+
 % PhasesConsidered field.
 
 %% Recusrive.
+
+% The individual blocks below have all been run on all current
+% Princeton and GeoAzur SAC files (except for recomputing
+% 'PhasesConsidered' with defphases.m because certain GeoAzur SAC
+% files consider exotic phases reportedly associated with them in
+% 'events.txt') and thus are no longer run.  They are left here for
+% the purpose of documenting my updates over time.
+
+return
+
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+
 
 % Skip trivial case.
 if isempty(EQ)
@@ -51,10 +74,62 @@ if length(EQ) > 1
     end
     clear('EQ')
     EQ = updateEQ;
+
     return    
     
 end
+%_________________________________________________________%
 
+% Add empty 'Params' field if it doesn't exist -- wish list: refetch
+% using PublicId
+if ~isfield(EQ, 'Params')
+    EQ.Params= [];
+
+end
+
+%_________________________________________________________%
+% Add empty 'Picks' field if it doesn't exist -- wish list: refetch
+% using PublicId
+if ~isfield(EQ, 'Picks')
+    EQ.Picks= [];
+
+end
+
+%_________________________________________________________%
+% If 'PhasesConsidered' field doesn't exist, recompute with current
+% 'defphases' and keep all theoretical arrival times associated with
+% this event.
+if ~isfield(EQ, 'PhasesConsidered ')
+    [~, h] = readsac(fullsac(EQ.Filename));
+
+    % Update phase and model preferences here.
+    ph = defphases;
+    model = 'ak135';
+
+    % Event date for this EQ.
+    evdate = datetime(EQ.PreferredTime, 'InputFormat', ...
+                     'uuuu-MM-dd HH:mm:ss.SSS', 'TimeZone', 'UTC');
+
+    % Set negative depths to 0 for taupTime.
+    depth = EQ.PreferredDepth;
+    if depth < 0 
+        depth = 0;
+
+    end
+
+    % Compute travel times and arrival times w.r.t where pt0 (time
+    % assigned to sample 1) is set at h.B seconds
+    tt = arrivaltime(h, evdate, [EQ.PreferredLatitude ...
+                        EQ.PreferredLongitude], model, depth, ph, h.B);
+
+    EQ.TaupTimes = tt;
+    EQ.PhasesConsidered = ph;
+
+    EQ = orderfields(EQ);
+
+end
+
+%_________________________________________________________%
 % Update FileName field.
 if isfield(EQ, 'FileName')
     EQ.Filename = EQ.FileName;
@@ -62,6 +137,7 @@ if isfield(EQ, 'FileName')
 
 end
 
+%_________________________________________________________%
 % Update the format of the QueryDate field and rename it to QueryTime, if it exists.
 if isfield(EQ, 'QueryDate')
     querydate = datetime(EQ.QueryDate, 'InputFormat', 'dd-MMM-uuuu HH:mm:ss');
@@ -71,12 +147,14 @@ if isfield(EQ, 'QueryDate')
 
 end
 
+%_________________________________________________________%
 % Add an empty QueryTime field, if it doesn't exist.
 if ~isfield(EQ, 'QueryTime')
     EQ.QueryTime = [];
 
 end
 
+%_________________________________________________________%
 % Update incidence angle computation.
 tt = EQ.TaupTimes;
 for i = 1:length(tt)
@@ -161,3 +239,4 @@ end
 EQ = rmfield(EQ, 'TaupTimes');
 EQ.TaupTimes = tt;
 EQ = orderfields(EQ);
+%_________________________________________________________%

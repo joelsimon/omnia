@@ -1,12 +1,26 @@
-% Script to update all .evt files associated with MERMAID (Princeton
-% and GeoAzuR) SAC files assuming JDS' system defaults.
+function updateevt_all(porg)
+% UPDATEEVT_all(porg)
+%
+% Function to update all raw/ and review/ed .evt files associated with
+% MERMAID (from Princeton and/or GeoAzur) SAC files assuming JDS'
+% system defaults. Edit internally if local paths differ.
+%
+% Input:
+% porg     1: Princeton SAC files (generation 3 buoy)
+%          2: GeoAzur SAC files (generation 2 buoy)
+%          3: Both Princeton and GeoAzur
+%
+% Output:
+% N/A      Saves updated raw and reviewed .evt files
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 23-Mar-2019, Version 2017b
+% Last modified: 03-Apr-2019, Version 2017b
 
-
-% Princeton first.
+%% Recursive.
+    
+% Princeton.
+if porg == 1
 diro = fullfile(getenv('MERMAID'), 'events');
 s = fullsac;
 for i = 1:length(s);
@@ -21,7 +35,8 @@ for i = 1:length(s);
 
 end
 
-% Then GeoAzur.
+% GeoAzur.
+if porg == 2
 diro = fullfile(getenv('MERMAID'), 'geoazur', 'rematch');
 s = mermaid_sacf('id');
 for i = 1:length(s);
@@ -36,3 +51,12 @@ for i = 1:length(s);
 
 end
 
+% Both.
+if porg == 3
+    
+    %% Recursion.
+
+    updateevt_all(1);
+    updateevt_all(2)
+
+end
