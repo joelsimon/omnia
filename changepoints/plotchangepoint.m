@@ -146,6 +146,17 @@ for i = scales
             pl.vl{i}(2) = plot(ax, [vlsecs(2) vlsecs(2)], [0 1.25], 'r', 'LineWidth', 1.5 * lw);
             
         end
+
+        % Label the y-axis.
+        if i == length(CP.outputs.da)
+            lbl_str = sprintf('$a_{%i}$', i - 1);
+            
+        else
+            lbl_str = sprintf('$d_{%i}$', i);
+            
+        end
+        ylabel(ax, sprintf('%s', lbl_str))
+
     else 
         xvals = CP.outputs.xax;
         yvals_da = norm_da;
@@ -160,20 +171,20 @@ for i = scales
         % uncertainty!)
         pl.vl{i}(1) = plot(ax, [vlsecs(1) vlsecs(1)], [-1.25 1.25], 'r', 'LineWidth', 1.5 * lw);
 
+        % Label the y-axis.
+        if i == length(CP.outputs.da)
+            lbl_str = sprintf('$\\overline{x}_{%i}$', i - 1);
+            
+        else
+            lbl_str = sprintf('$x_{%i}$', i);
+            
+        end
+        ylabel(ax, sprintf('%s', lbl_str))
+
+
     end
     hold(ax, 'off')
 
-    % Label the y-axis.
-    if i == length(CP.outputs.da)
-        info_str = 'approximation';
-        lbl_str = sprintf('$a_{%i}$', i - 1);
-        
-    else
-        info_str = 'detail';
-        lbl_str = sprintf('$d_{%i}$', i);
-        
-    end
-    ylabel(ax, sprintf('%s', lbl_str))
 
 end
 set(ha, 'XLim', [CP.outputs.xax(1) CP.outputs.xax(end)])
