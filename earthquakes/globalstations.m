@@ -117,7 +117,8 @@ if plt
     f2.pl = plot(f2.ha, mlon, mlat, '^', 'MarkerFaceColor', 'red', ...
                  'MarkerEdgeColor', 'black', 'MarkerSize', 5);
     hold(f2.ha, 'off')
-    savepdf('globalstations_f1')
+    axesfs(f2.f, 7, 9)
+    savepdf('globalstations_f2')
 
     %% Figure 3 does NOT include the background map.
     f3.f = figure;
@@ -135,7 +136,7 @@ if plt
     delete(f3.ha.YLabel)
 
     grid(f3.ha, 'off')
-
+    %    axesfs(f1.f, 7, 9)
     savepdf('globalstations_f3')
 
 end
