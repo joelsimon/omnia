@@ -1,26 +1,14 @@
-Installation notes:
+## Installation:  
 
-Before running any code in omnia, the following environmental variables (all
-paths) must be added to your shell's configuruation file. For me:
-
-1) 
-
-export GITHUB=$HOME/github<br/>
-export OMNIA=$GITHUB/omnia<br/>
-export IFILES=$OMNIA/notmycode/fjs/IFILES<br/>
-export IRISFETCH=$GITHUB/irisFetch-matlab<br/>
-
-2)    
-
-addpath(genpath(getenv('OMNIA')))  
-javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', ...
-                     'matTaup.jar'))  
-addpath(genpath(getenv('IRISFETCH')))  
-javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))  
-
-
-2)
-
-ln -s $OMNIA/omnealiud/startup.m $HOME/MATLAB/startup.m
-       
-
+1. Before running any code in omnia, the following environmental variables (all
+paths) must be added to your shell's configuration file; for me --
+    - export GITHUB=$HOME/github
+    - export OMNIA=$GITHUB/omnia
+    - export IFILES=$OMNIA/notmycode/fjs/IFILES
+    - export IRISFETCH=$GITHUB/irisFetch-matlab
+    
+2. My startup.m must be added to your MATLAB path, or added to an existing
+startup.m file.  If you have not yet created one, type 'userpath' in the MATALB
+command window to find where it should be placed.  I softlinked mine to my
+userpath to maintain git version control; for me --
+    -  ln -s $OMNIA/omnealiud/startup.m ~/Documents/MATLAB/startup.m  
