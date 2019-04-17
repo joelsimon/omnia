@@ -50,4 +50,4 @@ javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
 %____________________________________________________%
 
 addpath(genpath(fullfile(getenv('MFILES'), 'papers', 'simon2019')))
-addpath(fullfile(getenv('SPR19'), 'EGU', 'talk', 'code'))
+addpath(fullfile(getenv('SPR19'), 'SSA', 'poster', 'code'))

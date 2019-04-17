@@ -5,11 +5,13 @@
 %
 % Allows tres computation considering "first" EQ (EQ(1)) only.
 %
-% Sends output tres.mat to: /home/jdsimon/mermaid/events/reviewed/identified/
+% Sends output tres.mat to --> /home/jdsimon/mermaid/events/reviewed/residuals/
+%
+% See also: writechangepointall.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 01-Apr-2019, Version 2017b
+% Last modified: 17-Apr-2019, Version 2017b
 
 close all
 clear 
@@ -52,5 +54,5 @@ parfor i = 1:length(s)
     snrj(i, :) = CP.SNRj;
 
 end
-diro = fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified');
+diro = fullfile(getenv('MERMAID'), 'events', 'reviewed', 'residuals');
 save(fullfile(diro, 'tres.mat'), 's', 'tres_time', 'tres_phase', 'twostd', 'ave', 'snrj');

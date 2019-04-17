@@ -45,7 +45,7 @@ function [tres_time, tres_phase, tres_EQ, tres_TaupTime] = tres(EQ, CP, multi)
 % Last modified: 03-Apr-2019, Version 2017b
 
 %  Wish list: TaupTimes index if multi = true. Should be relatively
-%  simply; haven't gotten around to it.
+%  simple; haven't gotten around to it.
 
 %% Recursive.
 
