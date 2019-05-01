@@ -9,7 +9,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 % Input:
 % id        Event identification number (def: 10948555)
 % lohi      Bandpass corner frequencies in Hz, or
-%              NaN to plot raw seismograms  (def: [2.5 5])
+%              NaN to plot raw seismograms  (def: [1 2])
 % aligon    'etime': t=0 at event rupture time (def: etime)
 %           'atime': t=0 at theoretical first arrival
 %                    for every seismogram*
@@ -65,7 +65,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 
 % Defaults.
 defval('id', 10948555)
-defval('lohi', [2.5 5]);
+defval('lohi', [1 2]);
 defval('alignon', 'etime')
 defval('ampfac', 3)
 defval('revdir', fullfile(getenv('MERMAID'), 'events'))
