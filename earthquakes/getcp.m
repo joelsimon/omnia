@@ -1,16 +1,16 @@
 function [CP, filename] = getcp(sac, diro)
-% [CP, filename] = getcp(sac, diro)
+% [CP, filename] = GETCP(sac, diro)
 %
 % GETCP returns the CP structure associated with the input SAC file
 % and saved with writechangepoint.m.
 %
-% Inputs: 
+% Input: 
 % sac       SAC filename 
 %               (def: '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
-% diro      Path to directory containing 'changepoints' 
-%               subdirectories (def: $MERMAID/events/changepoints)
+% diro      Path to directory 'changepoints' directory
+%               (def: $MERMAID/events/changepoints)
 %
-% Outputs:
+% Output:
 % CP        Changepoint structure, or [] if no .cp file found
 % filename  Filename of .cp file
 %
@@ -21,7 +21,7 @@ function [CP, filename] = getcp(sac, diro)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 23-Mar-2019, Version 2017b
+% Last modified: 01-May-2019, Version 2017b
 
 % Defaults.
 defval('sac', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')

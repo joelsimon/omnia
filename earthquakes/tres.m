@@ -1,5 +1,5 @@
-function [tres_time, tres_phase, tres_EQ, tres_TaupTime] = tres(EQ, CP, multi)
-% [tres_time, tres_phase, tres_EQ, tres_TaupTime] = TRES(EQ, CP, multi)
+function [tres_time, tres_phase, tres_EQ, tres_TaupTime] = tres(EQ, CP, multi, fml)
+% [tres_time, tres_phase, tres_EQ, tres_TaupTime] = TRES(EQ, CP, multi, fml)
 %
 % Returns the minimum of the multiscale travel time residuals between
 % changepoint estimates, recorded in CP, and theoretical arrival
@@ -10,7 +10,10 @@ function [tres_time, tres_phase, tres_EQ, tres_TaupTime] = tres(EQ, CP, multi)
 % CP            Changepoint structure, from changepoint.m
 % multi         logical true to consider all phases for all earthquakes 
 %               logical false only to consider EQ(1) (def: false)
-%
+% fml           For 'time-scale' domain only:
+%               'first': tres w.r.t to start of dabe smear
+%               'middle: tres w.r.t.to middle of dabe smear (def)
+%               'last': tres w.r.t end of dabe smear
 % Output:
 % tres_time     Minimum travel time residual (seconds) 
 % tres_phase    Phase associated with minimum travel time residual
@@ -51,6 +54,7 @@ function [tres_time, tres_phase, tres_EQ, tres_TaupTime] = tres(EQ, CP, multi)
 
 % Default.
 defval('multi', false)
+defval('fml', 'middle')
 
 % Return empty if either input is empty.
 if isempty(EQ) || isempty(CP)
@@ -118,6 +122,14 @@ else
 
 end
 
+% Tack the arrival time-smear to a single time; note that if it has
+% already been smoothed with smoothscale.m this won't change
+% anything.
+if strcmp(CP.domain, 'time-scale') 
+    CP.arsamp = smoothscale(CP.arsamp, fml);
+
+end
+
 % Initialize cells and arrays with NaNs.
 all_tres = celldeal(CP.arsecs, NaN);
 tres_phase = celldeal(CP.arsecs, NaN);
@@ -127,6 +139,9 @@ tres_TaupTime = NaN(1, length(CP.arsecs));
 % Travel time residuals considering a single EQ.
 for j = 1:length(CP.arsecs)
     if ~isnan(CP.arsecs{j})
+        % Tack arrival time-smear to a single sample, found above.
+        CP.arsecs{j} = CP.outputs.xax(CP.arsamp{j});
+
         % Convert both arrival times to offsets from 0 seconds (set the first
         % sample of the seismogram to 0 seconds).
         jds_time = CP.arsecs{j} - CP.inputs.pt0; 

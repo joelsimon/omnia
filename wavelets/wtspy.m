@@ -147,6 +147,7 @@ else
     % Either the full sparsity matrix ('sp') was requested as output
     % (which isn't saved in the 'spyfile'), and/or the experiment
     % requested doesn't exist in the precomputed results 'spyfile'.
+    disp('Generating new wtspy experiment...')
 
     % Calculate WT once outside loop to initialize final matrix
     % dimensions.

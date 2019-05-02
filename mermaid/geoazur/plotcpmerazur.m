@@ -229,4 +229,3 @@ for i = 1:length(F.lgsnr)
     tack2corner(F.ha(i + 1), F.lgsnr(i), 'SouthWest')
 
 end
-
