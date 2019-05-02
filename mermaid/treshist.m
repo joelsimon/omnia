@@ -16,7 +16,7 @@ axfs = 8;
 txfs = 9;
 
 % Written with compile.m
-diro = fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified');
+diro = fullfile(getenv('MERMAID'), 'events', 'reviewed', 'residuals');
 load(fullfile(diro, 'tres.mat'))
 
 % Plot a tres histogram.
