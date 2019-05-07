@@ -1,5 +1,5 @@
 % Script to make high vs. low frequency and high vs. low amplitude
-% plots of sin waves.  Output plots Used in "Sound.key", presented at
+% plots of sin waves.  Output plots used in "Sound.key", presented at
 % Littlebrook Elementary School Science Expo Day 2018, Princeton NJ,
 % 18-May-2018.
 %
@@ -30,6 +30,7 @@ axis off
 
 print(fig1, '-dpdf', 'amplitude.pdf');
 
+%________________________________________%
 
 % Frequency example.
 y1 = sin(x);

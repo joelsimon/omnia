@@ -10,6 +10,8 @@ function inputs = cpinputs
 %       pph: 4
 %     intel: 0
 %    rmedge: true
+%    thresh: 0      
+%      kind: 'soft'
 %
 % For wtsnr.m
 %      meth: 1
@@ -35,6 +37,8 @@ inputs.nvm = [2 4];
 inputs.pph = 4;
 inputs.intel = 0;
 inputs.rmedge = true;
+inputs.thresh = 0;
+inputs.kind = 'soft';
 inputs.meth = 1;
 inputs.algo = 'fast';
 inputs.dtrnd = false;
