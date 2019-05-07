@@ -125,7 +125,7 @@ x = detrend(x, 'linear');
 % Wavelet transform with edges removed (most likely, adjust with inputs.rmedge).
 [a, abe, iabe, d, dbe, idbe, ae1, ae2, de1, de2, an, dn] = ...
     wtrmedge(domain, x, inputs.tipe, inputs.nvm, n, inputs.pph, ...
-             inputs.intel, inputs.rmedge);
+             inputs.intel, inputs.rmedge, inputs.thresh, inputs.kind);
 
 % Concatenate wt.m outputs, ordered high to low resolution details,
 % then approximation.

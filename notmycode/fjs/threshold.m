@@ -21,6 +21,8 @@ function [c,cnz]=threshold(d,dn,kind,div)
 % SEE ALSO: THRESHOLD2
 %
 % Last modified by fjsimons-at-alum.mit.edu, 09/19/2007
+% Last modified by jdsimon-at-princeton.edu, 05/07/2019 to remove
+%      screen printout
 
 defval('kind','soft')
 defval('div',1)
@@ -54,12 +56,14 @@ else
      case 'hard'
       dist=abs(d{index})>T(index);
       c{index}=d{index}.*dist;
-      if index==1 ; disp('Hard thresholding') ; end
+      if index==1 ; %disp('Hard thresholding') ;
+      end
      case 'soft'
       dist=abs(d{index})-T(index);
       dist=(dist+abs(dist))/2;
       c{index}=sign(d{index}).*dist;
-      if index==1 ; disp('Soft thresholding') ; end
+      if index==1 ; %disp('Soft thresholding') ;
+      end
     end
     % Return effective number of (nonzero) coefficients
     cnz(index)=sum(~~dist);

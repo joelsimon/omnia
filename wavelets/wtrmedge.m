@@ -1,19 +1,24 @@
-function varargout = wtrmedge(domain, x, tipe, nvm, n, pph, intel, rmedge)
+function varargout = wtrmedge(domain, x, tipe, nvm, n, pph, intel, ...
+                              rmedge, thresh, kind)
 % [a, abe, iabe, d, dbe, idbe, ae1, ae2, de1, de2, an, dn] = ...
-%      WTRMEDGE(domain, x, tipe, nvm, n, pph, intel, rmedge)
+%      WTRMEDGE(domain, x, tipe, nvm, n, pph, intel, rmedge, thresh, kind)
 %
 % WTRMEDGE performs a wavelet transform of the input time series 'x'
 % and possibly removes samples sensitive to the edges.  See wtedge.m,
 % especially Ex3 for a discussion of the process.
 %
-% Inputs:
+% Input:
 % domain        'time-scale' (wt.m) -OR- 'time' (iwt.m)
 % x,...,intel   Inputs to wt.m (see there)
 % rmedge        logical true to set edges to NaN (def: true)
 %               logical false to report their indices, 
 %                   but not remove them
+% thresh        0: No thresholding (def)
+%               1: threshold.m (within each scale)
+%               2: threshold2.m (across all scales)
+% kind          For threshold only; 'soft' (def) or 'hard'
 %
-% Outputs:
+% Output:
 % a         Approximation (scaling) coefficients from wt.m 
 %                -OR- their partially reconstructed time domain
 %                samples from iwt.m, with edges set to NaN
@@ -55,9 +60,7 @@ function varargout = wtrmedge(domain, x, tipe, nvm, n, pph, intel, rmedge)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 16-Jan-2019, Version 2017b
-
-% Wish list: thresholding option.
+% Last modified: 07-May-2019, Version 2017b
 
 % Defaults to wt.m.
 defval('tipe', 'CDF')
@@ -67,6 +70,7 @@ defval('pph', 4)
 defval('intel',0)
 defval('rmedge', true)
 defval('thresh', 0)
+defval('kind', 'soft')
 
 % Sanity.
 if ~any(strcmp(domain, {'time', 'time-scale'}))
@@ -80,6 +84,26 @@ lx = length(x);
 [a, d, an, dn] = wt(x, tipe, nvm, n, pph, intel);
 [abe, dbe] = wtspy(lx, tipe, nvm, n, pph, intel);
 
+% Thresholding, if requested.
+switch (thresh)
+  case 0
+    % Pass through, no thresholding.
+    
+  case 1
+    d = threshold(d, dn, kind);
+    a =  threshold({a}, an(end), kind);
+    a = a{:};
+    
+  case 2
+    d = threshold2(d, dn, kind);
+    a =  threshold2({a}, an(end), kind);
+    a = a{:};
+
+  otherwise
+    error('Specify 0, 1, or 2 for input ''thresh''')
+    
+end
+    
 % Compute subspace projection of x at every scale if domain = 'time'.
 if strcmp(domain, 'time')
     xj = iwt(a, d, an, dn, tipe, nvm, pph);
@@ -106,5 +130,6 @@ else
 
 end
 
+% Organize output.
 outargs = {a, abe, iabe, d, dbe, idbe, ae1, ae2, de1, de2, an, dn};
 varargout = outargs(1:nargout);

@@ -18,9 +18,11 @@ function [c,cnz]=threshold2(d,dn,kind,div)
 % c       Thresholded coefficients
 % cnz     Number of nonzero coefficients in every cell
 %
-% SEE ALSO: THRESHOLD2
+% SEE ALSO: THRESHOLD
 %
 % Last modified by fjsimons-at-alum.mit.edu, 09/19/2007
+% Last modified by jdsimon-at-princeton.edu, 05/07/2019 to remove
+%      screen printout and edit typo in "SEE ALSO"
 
 defval('kind','soft')
 defval('div',1)
@@ -43,12 +45,14 @@ else
      case 'hard'
       dist=abs(d{index})>T;
       c{index}=d{index}.*dist;
-      if index==1 ; disp('Hard thresholding using THRESHOLD2') ; end
+      if index==1 ; %disp('Hard thresholding using THRESHOLD2') ;
+      end
      case 'soft'
       dist=abs(d{index})-T;
       dist=(dist+abs(dist))/2;
       c{index}=sign(d{index}).*dist;
-      if index==1 ; disp('Soft thresholding using THRESHOLD2') ; end
+      if index==1 ; %disp('Soft thresholding using THRESHOLD2') ;
+      end
     end
     % Return effective number of (nonzero) coefficients
     cnz(index)=sum(~~dist);
