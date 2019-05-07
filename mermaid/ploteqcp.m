@@ -27,8 +27,10 @@ F.tl.Position(2) = 2;
 
 % Mark arrivals matched with the residuals.
 [tres_time, tres_phase, tres_EQ, tres_TT] = tres(EQ, CP, false, 'middle');
-unique_res = tres_TT(~isnan(tres_TT));
+unique_res = unique(tres_TT(~isnan(tres_TT)));
 
+% Only plot phase labels for unique phases (the same phase may be the
+% tres match across multiple scales).
 for j = 1:1%length(EQ)
     for k = unique_res
         tp = EQ(j).TaupTimes(k);
@@ -63,8 +65,6 @@ diststr = sprintf('%.2f$^{\\circ}$', EQ(1).TaupTimes(1).distance);
 ax = F.f.ha(1);
 [F.lg(1), F.lgtx(1)] = textpatch(ax, 'NorthWest', magstr, 10);
 [F.lg(2), F.lgtx(2)] = textpatch(ax, 'NorthEast', [diststr ', ' depthstr], 10);
-%[F.lg(3), F.lgtx(3)] = textpatch(ax, 'SouthEast', depthstr, 10);
-%[F.lg(4), F.lgtx(4)] = textpatch(ax, 'SouthWest', EQ.Filename, 10);
 
 set([F.f.pl.aicj{:}], 'LineWidth', linewidth)
 set([F.f.pl.da{:}], 'LineWidth', linewidth)
@@ -130,8 +130,9 @@ for j = 1:length(CP.SNRj)
         xl = F.f.ha(j+1).XLim;
         xl = xl(2);
         yl = F.f.ha(j+1).YLim;
-        text(F.f.ha(j+1), xl*1.15, mean(yl),  tres_str, 'FontSize', ...
-             F.f.ha(end).XLabel.FontSize, 'HorizontalAlignment', 'Center')
+        F.tres{j} = text(F.f.ha(j+1), xl*1.15, mean(yl),  tres_str, ...
+                         'FontSize', F.f.ha(end).XLabel.FontSize, ...
+                         'HorizontalAlignment', 'Center');
         set(F.f.pl.vl{j}, 'LineWidth', 2*linewidth)
 
     else

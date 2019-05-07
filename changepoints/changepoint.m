@@ -132,9 +132,11 @@ x = detrend(x, 'linear');
 dabe = [dbe abe];
 idabe = [idbe iabe];
 da = [d a];
-dnan = [dn an];
+dnan = [dn an]; %*
 e1 = [de1 ae1];
 e2 = [de2 ae2];
+%* These are number of detail/approx. at each scale; NOT the edge
+%coefficients set to NaN
 
 % If requested, smooth time-scale domain coefficient time smears.
 if strcmp(domain, 'time-scale') && ~isempty(fml) 
