@@ -6,8 +6,8 @@ function EQ = updateevt(EQ)
 % output by cpsac2evt.m.  Corrections, should they become necessary,
 % should be added here.
 %
-% To date: all below have been completed and UPDATEEVT is currently a
-% pass-through function.
+% TO DATE: ALL BELOW HAVE BEEN COMPLETED AND UPDATEEVT IS CURRENTLY A
+% PASS-THROUGH FUNCTION.
 %
 % *EQ.FileName --> EQ.Filename
 %
@@ -22,9 +22,7 @@ function EQ = updateevt(EQ)
 %% !! Do not do this for GeoAzur -- they consider some exotic phases in events.txt !!
 % *Recompute arrival times for updated defphases.m, and add
 %    'PhasesConsidered' field, keeping all phases in TaupTimes structure
-%    (saving every possible phase as a possible match, not just those I
-%    "see"
-%
+%    (saving every possible phase as a possible match, not just those I "see")
 %
 % Input/Output:
 % EQ           Event structure 'EQ' saved by cpsac2evt.m
@@ -37,9 +35,6 @@ function EQ = updateevt(EQ)
 
 % Wish list: refetch the event if 'QueryTime' or 'Params' field is
 % empty.
-
-
-% PhasesConsidered field.
 
 %% Recusrive.
 
