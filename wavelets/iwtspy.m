@@ -22,7 +22,8 @@ function [iabe, idbe] = iwtspy(lx, tipe, nvm, n, pph, intel)
 % idbe          Time domain sample span associated with each time-scale 
 %                   detail coefficient index 
 %
-% This function is slow, slow, slow...
+% This function is slower than wtspy.m, but for a good reason, which
+% is explained at the end of the file.
 %
 % See also: wtspy.m
 %
@@ -122,3 +123,28 @@ fprintf('\nSaved new iwtspy experiment to %s.\n', spyfile)
 % reconstructions are all empty except for the relevant scale I'm
 % testing; i.e. the partial reconstruction and the summed inverse are
 % the same.
+
+
+%_________________________________________________________________%
+
+% A note about the speed of this function -- 
+
+% This function is slower than wtspy.m because it is more general than
+% wtspy.m (and also requires 'n' times more computations; one for each
+% wavelet scale -- we have to run iwt.m 'n' times here; wtspy.m only
+% has to run a single forward wavelet transform).  There, all
+% experiments are saved in a matrix proportional to [lx * lx].  This
+% makes computation fast, but requires a lot of overhead to initiate
+% the matrix and thus will fail for long time series. iwtspy.m is more
+% general in that it performs each experiment individually, requiring
+% much less disk-space to initiate the output (thus allowing for very
+% long time series) but much more computation time.
+%
+% Being that the initial use of iwtspy.m and wtspy.m were to
+% characterize the time smear of wavelet coefficients for short
+% seismograms upon which AIC picks were made, and that AIC methods
+% like short seismograms with single-phase arrivals anyway, perhaps
+% the more restrictive but faster method of wtspy.m is preferable to
+% the slower but more general method here. Perhaps both functions
+% would benefit from a switch statement that used procedures based on
+% length of the input.

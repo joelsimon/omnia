@@ -28,23 +28,28 @@ function  CP = changepoint(domain, x, n, delta, pt0, snrcut, inputs, conf, fml)
 % Output:    Changepoint structure, CP, with fields:
 % domain: 'time' or 'time-scale'
 %      x: the input time series, detrended and possibly with 1 sample removed
-% inputs: structure of inputs to changepoint 
-%outputs: structure of outputs not deemed worthy of the top level
-%     ci: confidence interval, if computed
+% inputs: structure of inputs to changepoint.m (literally 'inputs' input)
+%outputs: structure of outputs not deemed worthy of the top level*
+%     ci: structure of uncertainty estimates from cpci.m
 % cpsamp: changepoint index (time domain samples)**
 % cpsecs: changepoint time (s)**
 % arsamp: arrival index (time domain samples)**
 % arsecs: arrival time (s)**
 %   SNRj: SNR at every scale
 %
+% * This collects the outputs of various subfunctions called along the
+% way; e.g., CP.outputs.da concatenates the 'd' and 'a' outputs of
+% wtrmedge.m, which are sets representing the subspace projections
+% ('time') or raw coefficients ('time-scale') at the resolution of the
+% details and approximations.
+%
 % **if domain == 'time-scale' and 'fml' == [], these are returned as
 % 2x1 cells which bracket the time smear.
 %
-% The values in the top level of the CP structure are all in
-% the time domain, e.g., the arrival time is in seconds, even if it
-% was found in the 'time-scale' domain and mapped back.  All
-% domain-specific outputs are stored in the .outputs structure for
-% reference.
+% THE VALUES IN THE TOP LEVEL OF THE CP STRUCTURE ARE ALL IN THE TIME
+% DOMAIN, E.G., THE ARRIVAL TIME IS IN SECONDS, EVEN IF IT WAS FOUND
+% IN THE 'TIME-SCALE' DOMAIN AND MAPPED BACK.  ALL DOMAIN-SPECIFIC
+% OUTPUTS ARE STORED IN THE .OUTPUTS STRUCTURE FOR REFERENCE.
 %
 % For example, the time-scale domain changepoint coefficient index at
 % the first scale in example 1, below, is,

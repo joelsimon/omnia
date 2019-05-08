@@ -21,17 +21,27 @@ function varargout = wtrmedge(domain, x, tipe, nvm, n, pph, intel, ...
 % Output:
 % a         Approximation (scaling) coefficients from wt.m 
 %                -OR- their partially reconstructed time domain
-%                samples from iwt.m, with edges set to NaN
-% abe       Scaling coefficient time smear from wtspy.m
+%                values from iwt.m (the 'subspace projection')
+%                with edges set to NaN if requested
+% abe       Approximation coefficient time smear after 
+%               forward wavelet transform (wtspy.m)
+% abe       Approximation coefficient time smear after 
+%               inverse  wavelet transform (iwtspy.m)
 % d         Detail (wavelet) coefficients from wt.m -OR-
 %               their partially reconstructed time domain 
-%               samples from iwt.m, with edges set to NaN
-% dbe       Detail coefficient time smear from wtspy.m
-% ae1/2*    Scaling indices that see sample 1, lx
+%               values from iwt.m, (the 'subspace projection')
+%               with edges set to NaN if requested
+% dbe       Detail coefficient time smear after 
+%               forward wavelet transform (wtspy.m)
+% idbe      Detail coefficient time smear after 
+%               inverse  wavelet transform (iwtspy.m)
+% ae1/2*    Approximation indices that see sample 1, lx
 % de1/2*    Detail indices that see sample 1, lx
 % an/dn     Number of approximation/detail coefficients at each scale
 %
-% *returned as empty, [], if rmedge is false or if domain = 'time'
+% *returned as empty, [], if rmedge is false or if domain = 'time'.
+% See wtedge.m for specifics on what constitutes the 'first' and
+% 'last' samples (1, lx), as these definitions are domain-dependent.
 %
 % For both examples below first run:
 %    x = readsac('20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac');
