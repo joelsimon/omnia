@@ -1,0 +1,23 @@
+#!/bin/tcsh -f
+#
+# Counts SAC files for MERMAID data
+#
+# Last modified by fjsimons-at-alum.mit.edu, 02/12/2019
+
+set MERMAID = $MERMAID
+
+set floatnum = (06 07 08 09 10 11 12 13 16 17 18 19 20 21 22 23 24 25)
+
+set count = 0 
+
+set allsac = `find $MERMAID/processed/ -iname '*.sac'`
+
+foreach float ($floatnum[*])
+   set perfloat = `ls -l $allsac | awk '/P-'$float'/' | wc -l`
+   printf "Float P-%s : %4i\n" $float $perfloat
+   @ count += $perfloat
+end
+
+echo -----------------
+printf "Total      : %4i\n" $count
+
