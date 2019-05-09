@@ -175,23 +175,18 @@ end
 
 ynflag = false;
 if ~isempty(EQ)
-    % For domain = 'time-scale cpevet.m smooths the abe, dbe, and aicj
-    % curves s.t. they their normalized values are tacked to the
-    % (rough) middle of the representative time smear.  The two
-    % boundaries of the time smear of the arrival index, however, are
-    % plotted as vertical lines.  For the generic 'reference' time of
-    % the arrival, used below for a helpful message about difference
-    % between the theoretical and wavelet-AIC arrival times, again
-    % take the center of the time smear to be the representative
-    % arrival time.
+    % If domain = 'time-scale' and no smoothing was used (input 'fml'),
+    % take the rough center of the time smear as the reference time
+    % for the travel time residual printed to the screen.  
     switch CP(1).domain
-      case 'time-scale'
+      case 'time-scale' 
           for i = 1:length(CP(1).arsecs)
               if ~isnan(CP(1).arsamp{i})
                   beg_samp = CP(1).arsamp{i}(1);
                   end_samp  = CP(1).arsamp{i}(2);
                   mid_samp = round(beg_samp + 0.5*(end_samp - beg_samp));
                   JDSarsecs(i) = CP(1).outputs.xax(mid_samp);
+
               else
                   JDSarsecs(i) = NaN;
                   
