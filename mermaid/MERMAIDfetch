@@ -34,7 +34,7 @@ echo -e '\nMatching to the seismic catalog...\n'
 
 # Display current count.
 echo -e '\nHere is the complete list:\n'
-~/github/omnia/mermaid/countsac
+$OMNIA/notmycode/fjs/countsac
 echo 
 
 # Return from whence you came.
