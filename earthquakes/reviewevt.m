@@ -178,22 +178,18 @@ if ~isempty(EQ)
     % If domain = 'time-scale' and no smoothing was used (input 'fml'),
     % take the rough center of the time smear as the reference time
     % for the travel time residual printed to the screen.  
-    switch CP(1).domain
-      case 'time-scale' 
-          for i = 1:length(CP(1).arsecs)
-              if ~isnan(CP(1).arsamp{i})
-                  beg_samp = CP(1).arsamp{i}(1);
-                  end_samp  = CP(1).arsamp{i}(2);
-                  mid_samp = round(beg_samp + 0.5*(end_samp - beg_samp));
-                  JDSarsecs(i) = CP(1).outputs.xax(mid_samp);
-
-              else
-                  JDSarsecs(i) = NaN;
-                  
-              end
-          end
-
-      otherwise
+    %
+    % In either case, print residuals w.r.t. to CP(1); the changepoint
+    % estimates for the complete, and not the windowed, seismogram.
+    if strcmp(CP(1).domain, 'time-scale') && isempty(CP(1).inputs.fml)
+        for i = 1:length(CP(1).arsecs)
+            beg_samp = CP(1).arsamp{i}(1);
+            end_samp  = CP(1).arsamp{i}(2);
+            mid_samp = round(mean([beg_samp end_samp]));
+            JDSarsecs(i) = CP(1).outputs.xax(mid_samp);
+            
+        end
+    else
         JDSarsecs = cell2mat(CP(1).arsecs);
 
     end
@@ -201,21 +197,21 @@ if ~isempty(EQ)
     % These list the first phase of the largest earthquake.
     fprintf( '\n     Filename: %s\n', sacname)     
     fprintf( '\n     *First arrival associated with largest magnitude earthquake [EQ(1)]*')
-    fprintf( '\n     *Phase:             %5s',       EQ(1).TaupTimes(1).phaseName)
-    fprintf( '\n     *Magnitude:         %5.1f',     EQ(1).PreferredMagnitudeValue)
-    fprintf( '\n     *Distance:          %5.1f',     EQ(1).TaupTimes(1).distance)
-    fprintf( '\n     *Depth:             %5.1f\n\n', EQ(1).PreferredDepth)
-    fprintf( '\n     *TauP arrival time: %5.1f',     EQ(1).TaupTimes(1).arsecs)
-    fprintf(['\n     *JDS time residual:' sprintf(repmat('%6.1f', ...
+    fprintf( '\n     *Phase:             %7s',       EQ(1).TaupTimes(1).phaseName)
+    fprintf( '\n     *Magnitude:         %7.1f %s',  EQ(1).PreferredMagnitudeValue, EQ(1).PreferredMagnitudeType)
+    fprintf( '\n     *Distance (deg):    %7.1f',     EQ(1).TaupTimes(1).distance)
+    fprintf( '\n     *Depth (km):        %7.1f',     EQ(1).PreferredDepth)
+    fprintf( '\n     *Arrival time (s):  %7.1f',     EQ(1).TaupTimes(1).arsecs)
+    fprintf(['\n     *JDS residual (s):  ' sprintf(repmat('%7.1f', ...
             [1 length(JDSarsecs)]), JDSarsecs - EQ(1).TaupTimes(1).arsecs)])
 
 
     % These list all phases of largest earthquake.
-    fprintf(['\n     EQ(1) TauP phases:       ' sprintf(repmat('  %5s', [1 ...
+    fprintf(['\n\n\n     All EQ(1) phases:      ' sprintf(repmat('  %5s', [1 ...
                         length([EQ(1).TaupTimes.phaseName])]), ...
                                       EQ(1).TaupTimes.phaseName) '\n']);
 
-    fprintf([ '     EQ(1) TauP arrival times:' sprintf(repmat('  %5.1f', [1 ...
+    fprintf([ '     All EQ(1) arrivals (s):' sprintf(repmat('  %5.1f', [1 ...
                         length([EQ(1).TaupTimes.arsecs])]), ...
                                       EQ(1).TaupTimes.arsecs) '\n\n']);
 

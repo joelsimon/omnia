@@ -57,7 +57,7 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 17-Mar-2019, Version 2017b
+% Last modified: 10-May-2019, Version 2017b
 
 % Default I/O.
 defval('sac', 'centcal.1.BHZ.SAC')
@@ -98,13 +98,15 @@ end
 % Fetch event data.  
 fprintf('\n**************************\n')
 
-% The following 'if' statement allows the updating the EQ structure
+% The following 'if' statement allows updating of the EQ structure
 % with the most recent info by only searching for the identified event
 % (i.e., sac2evt.m has already been run and a match has been
 % identified).  The if statement is necessary because 'eventid' and
-% 'start/end' time options don't play nice together.
+% 'start/end' time options don't play nice together.  Assumes the
+% variable input argument list is properly formatted as [parameter,
+% value] pairs.
 
-if isempty(varargin) || ~contains([varargin{:}], 'eventid', 'IgnoreCase', true)
+if isempty(varargin) || ~contains([varargin{1:2:end}], 'eventid', 'IgnoreCase', true)
     % The irisFetch-specific options 'startTime' and 'endTime' accept
     % datetime arrays, but I have seen some odd behavior with their use:
     % double ampersands (&&) in the parameter list when using them, which

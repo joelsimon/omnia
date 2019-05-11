@@ -1,7 +1,7 @@
-function updateevt_all(porg)
-% UPDATEEVT_all(porg)
+function updateevtall(porg)
+% UPDATEEVTALL(porg)
 %
-% Function to update all raw/ and review/ed .evt files associated with
+% Function to update all raw and reviewed .evt files associated with
 % MERMAID (from Princeton and/or GeoAzur) SAC files assuming JDS'
 % system defaults. Edit internally if local paths differ.
 %
@@ -56,7 +56,7 @@ if porg == 3
     
     %% Recursion.
 
-    updateevt_all(1);
-    updateevt_all(2)
+    updateevtall(1);
+    updateevtall(2)
 
 end
