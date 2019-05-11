@@ -23,7 +23,7 @@ for i = 1:length(s)
         error('Unrecognized sampling frequency')
         
     end
-    cpsac2evt(s{i}, false, [], n);
+    cpsac2evt(s{i}, false, 'time', n);
     close all
 
 end

@@ -1,7 +1,8 @@
 function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
-                               ph, diro, baseurl, varargin)
+                               ph, conf, fml, diro, baseurl, varargin)
 % [EQ, CP, rawevt, rawpdfc, rawpdfw] = ...
-%    CPSAC2EVT(sac, redo, domain, n, inputs, model, ph, diro, baseurl, [param, value])
+%    CPSAC2EVT(sac, redo, domain, n, inputs, model, ph, ...
+%              conf, fml, diro, baseurl, [param, value])
 %
 % CPSAC2EVT.m combines changepoint.m and sac2evt.m, and plots
 % sac2evt.m theoretical arrival times on the wavelet-decomposed input
@@ -18,6 +19,14 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
 %                   e.g., wavelet type (def:  cpinputs, see there)
 % model         TauP model (def: 'ak135')
 % ph            TauP phases (def: defphases)
+% conf         -1: skip confidence interval estimation with cpci.m (def)
+%               0  compute confidence interval with cpci.m
+%               1: compute confidence interval with cpci.m, M1 only
+% fml           Smoothing, for 'time-scale' domain only:
+%               'first': smooths all times to start of dabe smear
+%               'middle: smooths all times to middle of dabe smear
+%               'last': smooths all times to end of dabe smear
+%               []: return complete time smear (def)
 % diro          Parent directory of 'raw' subdirectory, where .evt
 %                   and .pdf files saved (def: $MERMAID/events)
 % baseurl       Default URL of data center, see sac2evt.m (def: 1)
@@ -50,18 +59,19 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
 %    diro = '~/cpsac2evt_example';
 %
 % Ex1: (match likely MERMAID phases, for all events globally)
-%    [EQ, CP] = CPSAC2EVT(sac, true, 'time', 5, [], [], [], diro);
+%    [EQ, CP] = CPSAC2EVT(sac, true, 'time', 5, [], [], [], [], [], diro);
 %
-% Ex2: (find the p phases for events deeper than 500 km)
+% Ex2: (find p and P phases for events deeper than 500 km)
 %    [EQ, CP] = CPSAC2EVT(sac, true, 'time', 5, cpinputs, 'ak135', ...
-%                         'P,p', diro, 1, 'includeallmagnitudes', true, ...
+%                         'P,p', -1, [], diro, 1, ...
+%                         'includeallmagnitudes', true, ...
 %                         'includeallorigins', true, 'mindepth', 500);
 %
 % See also: sac2evt.m, reviewevt.m, getevt.m, updateevt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 08-Dec-2018, Version 2017b
+% Last modified: 10-May-2019, Version 2017b
 
 % Defaults.
 defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -71,6 +81,8 @@ defval('n', 5)
 defval('inputs', cpinputs)
 defval('model', 'ak135')
 defval('ph', defphases)
+defval('conf', -1)
+defval('fml', [])
 defval('diro', fullfile(getenv('MERMAID'), 'events'))
 defval('baseurl', 1)
 
@@ -109,7 +121,7 @@ EQ = sac2evt(sac, model, ph, baseurl, varargin{:});
 % entire seismogram.
 [x, h] = readsac(sac);
 seisdate = seistime(h);
-CP(1) = changepoint(domain, x, n, h.DELTA, h.B, 1, inputs);
+CP(1) = changepoint(domain, x, n, h.DELTA, h.B, 1, inputs, conf, fml);
 
 % Window the seismogram such that it is 100 seconds long centered on
 % the first arrival associated with the largest earthquake (or,
@@ -128,7 +140,7 @@ end
 % Windowed changepoint (arrival time) structure with the starting
 % point being the time (in seconds) assigned in x to first sample of
 % xw.
-CP(2) = changepoint(domain, xw, n, h.DELTA, W.xlsecs, 1, inputs);
+CP(2) = changepoint(domain, xw, n, h.DELTA, W.xlsecs, 1, inputs, conf, fml);
 
 % Plot the arrivals theoretical arrivals on top of the seismogram and
 % the wavelet-AIC arrivals at every scale.

@@ -3,17 +3,31 @@
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 10-Mar-2019, Version 2017b
+% Last modified: 10-May-2019, Version 2017b
 
+clear
 close all
-clear all
 
 s = fullsac;
+fprintf('Searching for unreviewed SAC files...\n')
 for i = 1:length(s)
-    i
-    reviewevt(s{i}, false);
+    previously = getevt(s{i});
+    if isstruct(previously) || isempty(previously)
+        % Output of getevt either a structure or isempty; in either case the
+        % SAC file has been previously reviewed (otherwise, getevt
+        % returns NaN).
+        continue
+
+    else
+        clc
+        reviewevt(s{i});
+
+    end
     clc
+    fprintf('Searching for unreviewed SAC files...\n')
 
 end
+clc
+fprintf('Updating event text files...\n')
 evt2txt;
 fprintf('All done.\n')

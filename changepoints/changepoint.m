@@ -28,7 +28,8 @@ function  CP = changepoint(domain, x, n, delta, pt0, snrcut, inputs, conf, fml)
 % Output:    Changepoint structure, CP, with fields:
 % domain: 'time' or 'time-scale'
 %      x: the input time series, detrended and possibly with 1 sample removed
-% inputs: structure of inputs to changepoint.m (literally 'inputs' input)
+% inputs: structure that concatenates all inputs to changepoint.m,
+%         including those in the 'input' structure itself
 %outputs: structure of outputs not deemed worthy of the top level*
 %     ci: structure of uncertainty estimates from cpci.m
 % cpsamp: changepoint index (time domain samples)**

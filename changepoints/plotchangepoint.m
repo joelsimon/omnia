@@ -81,6 +81,8 @@ col.t = [0.5 0 1];
 if ~isempty(CP.inputs.fml)
     issmooth = true;
     
+    % Per the color-scheme of Simon & Simons, 2019: start of smear is
+    % blue; middle of smear is red; end of smear is green.    switch CP.inputs.fml
     switch CP.inputs.fml
       case 'first'
         Color =  col.tsf;
@@ -127,11 +129,6 @@ for i = scales
 
     if strcmp(CP.domain, 'time-scale')
         if issmooth
-            % Per the color-scheme of Simon & Simons, 2019: start of smear is
-            % blue; middle of smear is red; end of smear is green.
-            col.t = [0.5 0 1];
-
-
             % Smoothing requested: smooth abe/dbe time smears to a single, 'representative' sample.
             smooth_xvals = CP.outputs.xax(CP.outputs.dabe{i});
             pl.da{i} = plot(ax, smooth_xvals, norm_da, 'Color', ...
