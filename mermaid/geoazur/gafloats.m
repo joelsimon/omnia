@@ -1,5 +1,6 @@
-function [floats, startdate, enddate, alldate] = gafloats(plt, merazur)
-% [floats, startdate, enddate, alldate] = GAFLOATS(plt, merazur)
+function [floats, startdate, enddate, alldate] = gafloats(plt, ...
+                                                  merazur, updated, rematch)
+% [floats, startdate, enddate, alldate] = GAFLOATS(plt, merazur, updated, rematch)
 %
 % GAFLOATS returns the float numbers and dates of the first/last
 % "identified" seismograms contained (recursively) in the path
@@ -10,6 +11,11 @@ function [floats, startdate, enddate, alldate] = gafloats(plt, merazur)
 % Input: 
 % plt             true to plot crude map of ray paths (def: false)
 % merazur         A path to GeoAzur MERMAID data (def: $MERAZUR)
+% updated         true: use JDS updated event information (def: true)
+%                 false: use event information from SAC header 
+% rematch         Directory to find reviewed .evt files for updated 
+%                     event info (def: $MERAZUR/rematch/)
+%            
 %
 % Output:
 % floats          Array of 2-digit float numbers
@@ -23,6 +29,8 @@ function [floats, startdate, enddate, alldate] = gafloats(plt, merazur)
 % Default.
 defval('plt', false)
 defval('merazur', getenv('MERAZUR'))
+defval('updated', true)
+defval('rematch', fullfile(getenv('MERAZUR'), 'rematch'))
 
 % Fetch all data and parse relevant info from filename.
 s = mermaid_sacf('id', merazur);
@@ -38,9 +46,17 @@ for i = 1:length(s)
     stlo(i) = h.STLO;
 
     % Get EVENT location
-    evla(i) = h.EVLA;
-    evlo(i) = h.EVLO;
+    if ~updated
+        evla(i) = h.EVLA;
+        evlo(i) = h.EVLO;
 
+    else
+        EQ = getevt(s{i}, rematch);
+        evla(i) = EQ.PreferredLatitude;
+        evlo(i) = EQ.PreferredLongitude;
+
+    end
+        
     % Compute great circle between them.
     [trla{i}, trlo{i}] = track2(stla(i), stlo(i), evla(i), evlo(i));
 
