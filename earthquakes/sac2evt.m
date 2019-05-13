@@ -137,8 +137,8 @@ for i = 1:length(ev)
     quake = ev(i);
 
     % Move to next event if structure is empty (which is signaled by no
-    % time event time attribute), as is the case when alternate
-    % baseurls are specified, other than the IRIS default.
+    % event time attribute), as is often the case when alternate
+    % baseurls other than the IRIS default are specified.
     if isnan(quake.PreferredTime)
         continue
 
