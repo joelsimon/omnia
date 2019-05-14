@@ -4,6 +4,9 @@ function  status = isgitfile(filename)
 % ISGITFILE(filename) returns true if a FULL PATH filename is under
 % git version control.  Assumes user has git installed.
 %
+% Tested in: git version 1.8.3.1
+%            git version 2.6.4 (Apple Git-63)
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 06-Dec-2018, Version 2017b
