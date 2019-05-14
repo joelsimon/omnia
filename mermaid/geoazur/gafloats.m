@@ -45,7 +45,7 @@ for i = 1:length(s)
     stla(i) = h.STLA;
     stlo(i) = h.STLO;
 
-    % Get EVENT location
+    % Get EVENT location.
     if ~updated
         evla(i) = h.EVLA;
         evlo(i) = h.EVLO;
