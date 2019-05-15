@@ -1,9 +1,10 @@
 % Script to write all EQ and CP structures, and travel-time residuals
-% for all GeoAzur identified SAC files, assuming JDS system defaults.
+% for all GeoAzur identified SAC files to the rematched directory,
+% assuming JDS system defaults.
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 27-Mar-2019, Version 2017b
+% Last modified: 15-May-2019, Version 2017b
 
 close all
 clear all
@@ -47,9 +48,9 @@ for i = 1:length(s)
     tres_time(i, :) = [padd_double temp_tres_time];
     twostd(i, :) = [padd_double CP(i).ci.M1.twostd];
     tres_phase(i, :) = [padd_cell temp_tres_phase];    
-
+    snrj(i, :) = [padd_double CP(i).SNRj];
 
 end
 save(fullfile(rematch_diro, 'EQ.mat'), 'EQ', 'h');
 save(fullfile(rematch_diro, 'CP.mat'), 'CP', 's');
-save(fullfile(rematch_diro, 'tres.mat'), 'tres_time', 'tres_phase', 'twostd', 's', 'fs');
+save(fullfile(rematch_diro, mfilename), 'tres_time', 'tres_phase', 'twostd', 's', 'fs', 'snrj');
