@@ -7,12 +7,9 @@ function F = plotchangepoint(CP, scales, cpar)
 % Input:
 % CP        Output of changepoint.m
 % scales    An array of scales to plot, or 'all' (def: 'all')
-%                   1 = highest detail resolution (d1)
-%                   n = lowest detail resolution (dn)
-%               n + 1 = approximation 
-% cpar      'cp': plot vertical lines at cpsecs (def: 'cp')
-%           'ar': plot vertical lines at arsecs
-%
+% cpar      'ar': plot vertical lines at arsecs (def)
+%           'cp': plot vertical lines at cpsecs 
+
 % Output:
 % F         Structure containing figure handles
 %
@@ -36,7 +33,7 @@ function F = plotchangepoint(CP, scales, cpar)
 
 % Defaults.
 defval('scales', 'all')
-defval('cpar', 'cp')
+defval('cpar', 'ar')
 
 if strcmp(lower(scales), 'all')
     scales = 1:length(CP.outputs.da);
