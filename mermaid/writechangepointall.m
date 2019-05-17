@@ -11,7 +11,6 @@
 diro = fullfile(getenv('MERMAID'), 'events', 'changepoints');
 s = fullsac;
 parfor i = 1:length(s)
-    i
     CP = getcp(s{i}, diro);
     if isempty(CP)
         sans_sac = strrep(strippath(s{i}), '.sac', '');
