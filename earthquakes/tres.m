@@ -5,6 +5,10 @@ function [tres_time, tres_phase, tres_EQ, tres_TaupTime] = tres(EQ, CP, multi, f
 % changepoint estimates, recorded in CP, and theoretical arrival
 % times, recorded in EQ.
 %
+% The residual at each scale is defined as:
+%
+% AIC-based arrival time estimate - theoretical arrival time (TauP)
+%
 % Input:
 % EQ            Event structure, EQ, returned from cpsac2evt.m
 % CP            Changepoint structure, from changepoint.m

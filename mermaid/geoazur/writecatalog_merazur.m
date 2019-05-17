@@ -2,6 +2,7 @@
 % defaults.
 %
 % Preprocessing steps:
+%
 % 1) Rematch earthquakes: rematch_merazur.m
 %
 % 2) Review those rematchs: reviewrematch_merazur.m
@@ -15,7 +16,7 @@
 % Contact: jdsimon@princeton.edu
 % Last modified: 27-Mar-2019, Version 2017b
 
-clear all
+clear
 close all
 
 % Load data. 
