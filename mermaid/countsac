@@ -1,0 +1,47 @@
+#!/bin/tcsh -f
+#
+# Counts SAC files for MERMAID data, as well as raw and reviewed .evt
+# and .pdf files, and changepoint (.cp) files.
+#
+# Last modified by fjsimons-at-alum.mit.edu, 02/12/2019
+# Last modified by jdsimon-at-printceton.edu, 05/17/2019
+
+set MERMAID = $MERMAID
+
+# Count SAC files.
+set floatnum = (06 07 08 09 10 11 12 13 16 17 18 19 20 21 22 23 24 25)
+
+set sac_count = 0 
+
+set allsac = `find $MERMAID/processed/ -iname '*.sac'`
+
+foreach float ($floatnum[*])
+   set perfloat = `ls -l $allsac | awk '/P-'$float'/' | wc -l`
+   printf "Float P-%s : %4i\n" $float $perfloat
+   @ sac_count += $perfloat
+end
+
+echo -----------------
+printf "Total .sac:   %4i\n\n" $sac_count
+
+# Count .evt files.
+set rawevt_count = 0 
+set rawevt_count = `find $MERMAID/events/raw -iname '*.evt' | wc -l`
+set double_rawevt_count = `echo "2*$rawevt_count" | bc`  # Should equal number of pdfs
+
+set revevt_count = 0 
+set revevt_count = `find $MERMAID/events/reviewed -iname '*.evt' | wc -l`
+
+# Count raw .pdf files (should be twice the raw .evt count)
+set rawpdf_count = 0 
+set rawpdf_count = `find $MERMAID/events/raw -iname '*.pdf' | wc -l`
+
+# Count .cp files.
+set cp_count = 0 
+set cp_count = `find $MERMAID/events/changepoints/ -iname '*.cp' | wc -l`
+
+echo -----------------
+printf "Total raw .evt: %4i\n" $rawevt_count
+printf "Total raw .pdf: %4i [2 * raw .evt = %4i]\n" $rawpdf_count $double_rawevt_count
+printf "Total .cp:      %4i\n" $cp_count
+printf "Total rev .evt: %4i\n" $revevt_count
