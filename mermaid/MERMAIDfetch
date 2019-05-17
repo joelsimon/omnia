@@ -2,8 +2,10 @@
 #
 # Simple shell script to:
 # 1) retrieve MERMAID data
-# 2) write new SAC files
-# 3) generate preliminary match to the seismic catalog
+# 2) write new SAC (.sac) files
+# 3) write changepoint (.cp) files with uncertainty estimates 
+# 4) generate preliminary match to the seismic catalog and write
+#    corresponding .evt and .pdf files
 #
 # No I/0 and requires internal editing as it was built for JDS' system
 # defaults.
@@ -28,15 +30,23 @@ python scripts/main.py
 source deactivate 
 echo -e '\n...completed writing SAC files\n'
 
-# Generate raw matches to the IRIS catalog.
+# Generate raw matches to the IRIS catalog.  Note that upon exiting
+# MATLAB you may get the following message.
+#
+#    Identifier: 'MATLAB:connector:connector:ConnectorNotRunning'
+#     Arguments: {}
+#
+# I have only noticed this since adding the parallel
+# writechangepointall.m to matchall.m.  I assume it has something to
+# do with MATLAB closing before the parallel pool is completely shut
+# down.  Doesn't seem to affect the output of this code, however.
 echo -e '\nMatching to the seismic catalog...\n'
-/usr/local/MATLAB/R2017b/bin/matlab -nodisplay -r "run ~/github/omnia/mermaid/matchall.m; exit"
+/usr/local/MATLAB/R2017b/bin/matlab -nodisplay -r "run ~/github/omnia/mermaid/matchall.m; run exit"
 
 # Display current count.
 echo -e '\nHere is the complete list:\n'
-$OMNIA/notmycode/fjs/countsac
+$OMNIA/mermaid/countsac
 echo 
 
 # Return from whence you came.
 /usr/bin/cd $start_dir
-
