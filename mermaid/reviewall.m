@@ -28,6 +28,7 @@ for i = 1:length(s)
 
 end
 clc
+fprintf('Manual review complete...\n')
 fprintf('Updating event text files...\n')
 evt2txt;
 fprintf('All done.\n')
