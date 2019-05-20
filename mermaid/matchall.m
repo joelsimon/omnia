@@ -32,14 +32,14 @@ for i = 1:length(s)
 end
 
 % Open parallel pool for writechangepointall.m if none exists.
-if isempty(gcp('nocreate'))
-    gcp;
-
-end
+pool = gcp;
 
 % Write changepoint (.cp) files.
 fprintf('Writing changepoint files...\n')
 writechangepointall;
-delete(gcp)
+delete(pool)
+
+% Write a list of current SAC files for use in reviewall.m
+save(fullfile(getenv('MERMAID'), 'events','sacfiles.mat'), 's')
 
 fprintf('All done.\n')

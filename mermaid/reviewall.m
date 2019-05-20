@@ -19,8 +19,13 @@ function reviewall(writecp)
 clc
 defval('writecp', true)
 
-s = fullsac;
 fprintf('Searching for unreviewed SAC files...\n')
+
+% Load the list (a cell) of all processed SAC filenames saved by
+% matchall.m.  This list allows you to match events remotely with just
+% the $MERMAID/events directory and without requiring you physically
+% have the data.
+load(fullfile(getenv('MERMAID'), 'events', 'sacfiles.mat'))
 for i = 1:length(s)
     previously = getevt(s{i});
     if isstruct(previously) || isempty(previously)
