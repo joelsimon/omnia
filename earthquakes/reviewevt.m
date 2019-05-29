@@ -230,12 +230,12 @@ if ~isempty(EQ)
     keyboard
 
     while ~ynflag
-        yn = strtrim(input('\n     Is this event identified? [Y/N/M/back]: ', 's'));
+        yn = strtrim(input('\n     Is this event identified? [Y/N/M/back/skip]: ', 's'));
 
 
-        if sum(strcmpi(yn, {'y' 'yes' 'n' 'no' 'm' 'maybe' 'back'})) ~= 1
+        if sum(strcmpi(yn, {'y' 'yes' 'n' 'no' 'm' 'maybe' 'back' 'skip'})) ~= 1
             fprintf(['\n     Please input either ''Y'' (yes), ''N'' (no), ' ...
-                     '''M'' (maybe) or ''back''.\n'])
+                     '''M'' (maybe), ''back'', or ''skip''.\n'])
             
         elseif strcmpi(yn, 'back')
             fprintf(['\n     Paused execution again for repeat inspection.\n', ...
@@ -243,6 +243,12 @@ if ~isempty(EQ)
             keyboard
             continue
                 
+        elseif strcmpi(yn, 'skip')
+            % Close .pdfs, return NaN.
+            system(sprintf('killall %s', close_pdf));
+            EQ = NaN;
+            return
+
         else
             ynflag = true;
 
@@ -272,7 +278,7 @@ switch lower(yn)
 
     eqflag = false;
     while ~eqflag
-        eq = strtrim(input('     Matched EQ(s): ', 's'));
+        eq = strtrim(input('     Matched EQ(s) [or restart]: ', 's'));
 
         if strcmpi(eq, 'restart')
             % !! Recursive !!
