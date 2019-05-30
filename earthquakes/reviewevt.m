@@ -257,8 +257,9 @@ if ~isempty(EQ)
 else
     yn = 'N';
     fprintf(['     EQ structure is empty and thus this event is unidentified.\n', ...
-             '     Execution paused for inspection, though no further action required.\n', ...
+             '     Execution paused for waveform inspection, though no further action required.\n', ...
              '     Type ''dbcont'' to continue.\n\n'])
+    fprintf( '     SAC Filename: %s\n\n', sacname)
     keyboard
 
 end
