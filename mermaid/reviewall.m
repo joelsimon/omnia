@@ -49,8 +49,15 @@ fprintf('Updating event text files...\n')
 evt2txt;
 
 if writecp
-    fprintf('Writing .cp files with error estimates...\n')
-    writechangepointall
+    try
+        fprintf('Writing .cp files with error estimates...\n')
+        writechangepointall
 
+    catch
+        % This warning will trip if you do not have the actual waveform data
+        % saved locally (e.g., Joel on his Mac).
+        warning('Unable to write .cp files...see note in code.')
+
+    end
 end
 fprintf('All done.\n')
