@@ -39,7 +39,4 @@ fprintf('Writing changepoint files...\n')
 writechangepointall;
 delete(pool)
 
-% Write a list of current SAC files for use in reviewall.m
-save(fullfile(getenv('MERMAID'), 'events','sacfiles.mat'), 's')
-
 fprintf('All done.\n')
