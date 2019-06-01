@@ -14,20 +14,21 @@ function reviewall(writecp)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 17-May-2019, Version 2017b
+% Last modified: 01-Jun-2019, Version 2017b
 
-clc
+% Default.
 defval('writecp', true)
 
-fprintf('Searching for unreviewed SAC files...\n')
+% Grab directory containing the raw .evt files.  We will loop over
+% each .raw.evt file below and check if there is a corresponding
+% reviewed .evt file; if not, we review.
+d = skipdotdir(dir(fullfile(getenv('MERMAID'), 'events', 'raw', 'evt')));
 
-% Load the list (a cell) of all processed SAC filenames saved by
-% matchall.m.  This list allows you to match events remotely with just
-% the $MERMAID/events directory and without requiring you physically
-% have the data.
-load(fullfile(getenv('MERMAID'), 'events', 'sacfiles.mat'))
-for i = 1:length(s)
-    previously = getevt(s{i});
+clc
+fprintf('Searching for unreviewed SAC files...\n')
+for i = 1:length(d)
+    sac = strrep(d(i).name, '.raw.evt', '.sac');
+    previously = getevt(sac);
     if isstruct(previously) || isempty(previously)
         % Output of getevt either a structure or isempty; in either case the
         % SAC file has been previously reviewed (otherwise, getevt
@@ -36,7 +37,7 @@ for i = 1:length(s)
 
     else
         clc
-        reviewevt(s{i});
+        reviewevt(sac);
 
     end
     clc
