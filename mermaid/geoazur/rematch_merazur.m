@@ -50,8 +50,8 @@ hmag = h.MAG;
 [~, ~, ~, ~, hdate] = seistime(h);
 
 % Time and location search parameters, formatted per FDSNWS specification.
-stime = fdsnwstime(hdate - seconds(15));
-etime = fdsnwstime(hdate + seconds(15));
+stime = fdsndate2str(hdate - seconds(15));
+etime = fdsndate2str(hdate + seconds(15));
 maxradius = 1; % degree
 minmag = hmag - 1;
 

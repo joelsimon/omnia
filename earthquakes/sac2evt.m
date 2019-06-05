@@ -42,7 +42,7 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 % *irisFetch.m: last tested with version = 2.0.10 and IRIS-WS-2.0.18.jar
 %
 % Ex1:
-%    EQ = SAC2EVT('centcal.1.BHZ.SAC');
+%    EQ = SAC2EVT('centcal.1.BHZ.SAC')
 %
 % *Ex2: Look for M5+ events in a two minute time window;
 %       and overwrite default to not includeallmagnitudes 
@@ -73,8 +73,8 @@ EQ = [];
 % the seismogram to the end of the seismogram.  These times are
 % overwritten if 'start' and 'end' are specified as inputs.
 seisdate = seistime(h);
-stime =  fdsnwstime(seisdate.B - hours(1));  % converts datetime to datestr
-etime = fdsnwstime(seisdate.E);
+stime =  fdsndate2str(seisdate.B - hours(1)); 
+etime = fdsndate2str(seisdate.E);
 
 % Cases 2--4 are not suggested / don't work at the moment.
 switch baseurl
