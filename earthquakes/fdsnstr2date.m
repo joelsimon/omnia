@@ -1,7 +1,7 @@
-function tdate = fdsnwsdate(tstr)
-% tdate = FDSNWSDATE(tstr)
+function tdate = fdsnstr2date(tstr)
+% tdate = FDSNSTR2DATE(tstr)
 %
-% FDSNWSDATE converts a datestr character array, formatted per the
+% FDSNSTR2DATE converts a datestr character array, formatted per the
 % International Federation of Digital Seismograph Networks (FDSN) Web
 % Service Specifications Version 1.1, e.g.
 %
@@ -22,11 +22,12 @@ function tdate = fdsnwsdate(tstr)
 %             
 % Ex: (datetime and datestr of reported event time)
 %    [~, h] = readsac('m35.20140915T080858.sac');
-%    [~, ~, ~, tdate1] = seistime(h)
-%    tstr = fdsnwstime(tdate1)
-%    tdate2 = FDSNWSDATE(tstr)
+%    [~, ~, ~, ~, tdate1] = seistime(h)
+%    tstr = fdsndate2str(tdate1)
+%    tdate2 = FDSNSTR2DATE(tstr)
+%    second(tdate2)
 %
-% See also: fdsnwstime
+% See also: fdsndate2str
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
