@@ -52,7 +52,7 @@ lw = 1;
 
 % Plot normalized time series in first subplot.
 norm_x = norm2ab(CP.x, -1, 1);
-pl.x = plot(ha(1), CP.outputs.xax, norm_x, 'Color', [0.5 0.5 0.5], 'LineWidth', 1.5 * lw);
+pl.x = plot(ha(1), CP.outputs.xax, norm_x, 'Color', 'blue', 'LineWidth', 1.5 * lw);
 ylim(ha(1), [-1.25 1.25])
 ylabel(ha(1), '$x$')
 
