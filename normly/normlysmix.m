@@ -79,10 +79,9 @@ function [enk,esk,lnk,lsk,y,cnk,csk] = normlysmix(perc,trusigmas,normvars,npts,l
 % Ex: (25 percent mixing between noise~N(0,1) and signal~N(0,8))
 %    [enk,esk,lnk,lsk] = NORMLYSMIX(25,[2 4],[0.5 3])
 %    
-%
 % Citation: ??
 %
-% See also: suggestsigmas.m, plotnormlysmix.m, plot2normlystest.m
+% See also: suggestsigmas.m, plotnormlysmix.m, plot2normlysmix.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu

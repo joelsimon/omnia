@@ -9,6 +9,11 @@ function f = plot2normlystest(trusigmas, axlim, npts, lx, bp, ntests)
 % (f.f1.xhairhg). No formatting (shifting and sizing of text boxes,
 % for example) is done. Will require cleanup to make pretty.
 %
+% In keeping with notation of simon+2019.pdf, standard deviation and
+% variance statistics are returned in their biased forms: 
+%
+%                       1/N; not 1/(N-1)
+%
 % Inputs:
 % trusigmas   Vector of 2 true sigmas to estimate (def: [1 sqrt(2)])
 % axlim       x-axis limits of likelihood plots,
