@@ -57,6 +57,7 @@ function sigmas = suggestsigmas(trusigma, axlim, npts, linen)
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 29-May-2019, Version 2017b
+% Documented pg. 32, 2017.2
 
 % Defaults.
 defval('axlim', [0.5 2])
