@@ -6,6 +6,17 @@ function EQ = updateevt(EQ)
 % output by cpsac2evt.m.  Corrections, should they become necessary,
 % should be added here.
 %
+% This code has become unwieldy as multiple versions of .evt files
+% exist and multiple git branches with different stages of their
+% evolution are analyzed concurrently for a final merge at some point.
+%
+% So: disregard the capitalized-remark below; not all blocks have been
+% run because I've simply gone back and rematched a lot of SAC files
+% with the current gen of cpsac2evt.m and they are in different git
+% branches.  Anything that you want to update just set that block as
+% the only one executing by moving to the top and putting a return
+% under it.
+%
 % TO DATE: ALL BELOW HAVE BEEN COMPLETED AND UPDATEEVT IS CURRENTLY A
 % PASS-THROUGH FUNCTION.
 %
@@ -18,6 +29,8 @@ function EQ = updateevt(EQ)
 %                           instead of EQ.TaupTimes.phaseName(1)
 % 
 % *EQ.QueryDate: '22-Mar-2019 16:01:20' ---> EQ.QueryTime: '2019/22/04 16:01:20'
+%
+% And then more futzing: EQ.QueryTime: '2019/22/04 16:01:20' --> EQ.QueryTime: '2019-22-04 16:01:20'
 %
 %% !! Do not do this for GeoAzur -- they consider some exotic phases in events.txt !!
 % *Recompute arrival times for updated defphases.m, and add
@@ -45,13 +58,13 @@ function EQ = updateevt(EQ)
 % 'events.txt') and thus are no longer run.  They are left here for
 % the purpose of documenting my updates over time.
 
-return
-
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
 
+return
 
-% Skip trivial case.
-if isempty(EQ)
+% Skip trivial cases 
+if ~isstruct(EQ)
+    % See getevt.m; if EQ is not a structure there will be no fields to edit.
     return
 
 end
@@ -73,6 +86,14 @@ if length(EQ) > 1
     return    
     
 end
+
+% Change QueryTime format.
+if contains(EQ.QueryTime, '/')
+    EQ.QueryTime = strrep(EQ.QueryTime, '/', '-');
+
+end
+
+return
 %_________________________________________________________%
 
 % Add empty 'Params' field if it doesn't exist -- wish list: refetch
