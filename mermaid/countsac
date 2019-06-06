@@ -22,7 +22,7 @@ foreach float ($floatnum[*])
 end
 
 echo -----------------
-printf "Total .sac:   %4i\n\n" $sac_count
+printf "Total .sac:  %4i\n\n" $sac_count
 
 # Count .evt files.
 set rawevt_count = 0 
@@ -42,6 +42,6 @@ set cp_count = `find $MERMAID/events/changepoints/ -iname '*.cp' | wc -l`
 
 echo -----------------
 printf "Total raw .evt: %4i\n" $rawevt_count
-printf "Total raw .pdf: %4i [2 * raw .evt = %4i]\n" $rawpdf_count $double_rawevt_count
 printf "Total .cp:      %4i\n" $cp_count
+printf "Total raw .pdf: %4i [2 * raw .evt = %4i]\n" $rawpdf_count $double_rawevt_count
 printf "Total rev .evt: %4i\n" $revevt_count
