@@ -2,12 +2,13 @@ function [x, y] = normlysmixvals(k, trusigmas, N, ko)
 % [x, y] = NORMLYSMIXVALS(k, trusigmas, N, ko)
 %
 % Returns the x (the normalized MLE of the variance) and y (its
-% corresponding summed log-likelihood) values given a theoretical time
-% series and (POSSIBLY INCORRECT) changepoint, 'k', after summing
-% log-likelihoods at that 'k'.  I.e., returns the theoretical x,y
-% values, as ntests goes to infinity, of plotnormlystest.m given some
-% mixing defined by the difference between 'k' (the assumed
-% changepoint) and 'ko' (the true changepoint).
+% corresponding summed log-likelihood) values PARAMETERS TO A
+% THEORETICAL time series and (POSSIBLY INCORRECT) changepoint, 'k',
+% after summing log-likelihoods at that 'k'.  I.e., returns the
+% theoretical x,y values, as ntests goes to infinity, of
+% plotnormlystest.m given some mixing defined by the difference
+% between 'k' (the assumed changepoint) and 'ko' (the true
+% changepoint).
 %
 % Theoretical time series is assumed to be drawn from
 % normrnd(0,trusigmas(1)) for x(1:ko) (the noise), and normrnd(0,
