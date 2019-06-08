@@ -31,7 +31,6 @@ catch
 end
 git_version = str2double(strrep(git_version(13:17), '.', ''));
 
-
 % Version 1.8.5 and above you can use git -C to perform git operations
 % in another folder. In older versions of git you must cd to the
 % actual file's directory.
@@ -55,6 +54,3 @@ else
     status = false;
 
 end
-
-
-
