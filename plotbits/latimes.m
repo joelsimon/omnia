@@ -5,6 +5,8 @@ function latimes(fig, degs)
 % figure(s) to 'Times', and set the interpreter to 'Latex', where
 % applicable.
 %
+% WISHLIST: COLORBARS
+%
 % Input:
 % fig         Figure object handle (def: gaf)
 % degs        Figure includes text degree ('^{\circ}') symbols (def: false)
@@ -12,6 +14,11 @@ function latimes(fig, degs)
 % Output: 
 % All fonts set to 'Times' and Interpreters 'Latex' where
 % applicable. N.B. axes don't have an interpreter field.
+%
+% Ex:
+%    plot(randn(1,100))
+%    title('$\alpha\,, beta\,, \gamma$')
+%    LATIMES(gcf)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
@@ -32,7 +39,7 @@ for i = 1:length(fig)
     ax = findall(fig(i), 'type', 'axes');
     lg = findall(fig(i), 'type', 'legend');
 
-    % This should work but doesn't for unknown reasons.
+    % This should work, but does not for unknown reasons.
     %findobj(gcf, 'type', 'text', '-depth', inf) 
 
     if degs 

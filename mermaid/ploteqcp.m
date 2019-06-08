@@ -14,7 +14,6 @@ fonts = 11;
 % smooth by setting abe/dbe to central point of the time smear.
 F.fig = figure;
 F.f = plotchangepoint(CP, 'all', 'ar');
-%set(F.f.ha, 'YLim', [-2 2]);
 
 %% PLOT THEORETICAL ARRIVAL TIMES.
 
@@ -54,12 +53,21 @@ for j = 1:1%length(EQ)
 end
 hold(ax, 'off')
 
-% Annotate the seismogram with the largest event info.
-magstr = sprintf('%.1f~%s', EQ(1).PreferredMagnitudeValue, ...
-                 EQ(1).PreferredMagnitudeType);
+%% Annotate the seismogram with the largest event info.
+
+% Capitalize only the first character of the magnitude string.
+magtype = lower(EQ(1).PreferredMagnitudeType);
+magtype(1) = upper(magtype(1));
+
+% Set Mww to generic Mw notation.
+if strcmp(magtype, 'Mww')
+    magtype = 'Mw';
+
+end
+
+magstr = sprintf('%.1f~%s', EQ(1).PreferredMagnitudeValue, magtype);
 depthstr = sprintf('%.2f~km', EQ(1).PreferredDepth);
 diststr = sprintf('%.2f$^{\\circ}$', EQ(1).TaupTimes(1).distance);
-
 
 % Order clockwise from upper left.
 ax = F.f.ha(1);
@@ -68,7 +76,6 @@ ax = F.f.ha(1);
 
 set([F.f.pl.aicj{:}], 'LineWidth', linewidth)
 set([F.f.pl.da{:}], 'LineWidth', linewidth)
-
 
 % Shrink the distance between each subplot -- 'multiplier' is adjusted
 % depending on the number of subplots (the number of wavelet scales

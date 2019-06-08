@@ -3,15 +3,15 @@ function [km, sumly] = cpsumly(x, verify)
 %
 % Changepoint Estimator via Summed Log-Likelihoods:
 %
-% Using the notation of and equation numbers of Simon & Simons, 2019:
-% At every sample index, k = [1,...,N], CPSUMLY splits 'x' into an
-% assumed "noise" segment [x(1:k)], and an assumed "signal" segment
-% [x(k+1:end)].  At each split it computes the log-likelihood of both
-% segments assuming: each is i.i.d and drawn from a Gaussian
-% distribution, and the sample variances are the true population
-% variances (equations 8 and 13 for the "noise" and "signal",
-% respectively).  It then sums both log-likelihoods at every sample to
-% build a summed log-likelihood curve (equation 15).
+% Using the notation equation numbers of Simon+2019: At every sample
+% index, k = [1,...,N], CPSUMLY splits 'x' into an assumed "noise"
+% segment [x(1:k)], and an assumed "signal" segment [x(k+1:end)].  At
+% each split it computes the log-likelihood of both segments assuming:
+% each is i.i.d and drawn from a Gaussian distribution, and the sample
+% variances are the true population variances (evaluated: equations 8
+% and 13 for the "noise" and "signal", respectively).  It then sums
+% both log-likelihoods at every sample to build a summed
+% log-likelihood curve (equation 15).
 %
 % Input:
 % x         Time series, e.g. a seismogram
@@ -34,7 +34,7 @@ function [km, sumly] = cpsumly(x, verify)
 %    legend('time series', 'summed log-likelihood', ...
 %           'max. summed log-likelihood')
 %
-% Citation: Simon and Simons, 2019.
+% Citation: ??
 %
 % See also: cpest.m, normly.m
 %
@@ -60,7 +60,10 @@ if iscell(x)
 
     % Break up cell and run cpsumly.m on individual vectors.
     for i = 1:length(sumly)
-        [km(i), sumly{i}] = cpsumly(x{i});
+        
+        %% Recursion.
+        
+        [km(i), sumly{i}] = cpsumly(x{i}, verify);
 
     end
 
@@ -91,9 +94,7 @@ else
         noise = x(1:k);
         signal = x(k+1:end);
 
-        % Equation 7: can't use builtin var.m or my cumstats.m because of
-        % normalization by N-1.  (16-May-2018 edit: cumstats.m now
-        % includes 'bias' option; leaving this for clarity, however..)
+        % Equation 7.
         var1 = 1/k * sum([noise - mean(noise)].^2);
         
         % Equation 12.
@@ -144,7 +145,7 @@ function check_math(noise, signal, var1, var2, sumly, N, k)
 
     %________________________________________________%
 
-    % Equation 10 should equal equation 13 when the MLE variance of the
+    % Equation 10 should equal equation13 when the MLE variance of the
     % "signal" is used.
     eq10 = normly(mean(signal), sqrt(var2), signal);
     fprintf('Difference between eqs. 13 and 10 = %e\n', eq13 - eq10)

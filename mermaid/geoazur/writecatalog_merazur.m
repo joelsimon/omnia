@@ -97,7 +97,7 @@ CP = getcp(sac, rematch_diro);
 event_line = sprintf('Filename %23s\n', EQ(1).Filename);
 eventid = fx(strsplit(EQ(1).PublicId, 'eventid='),  2);
 id_line = sprintf('IRIS Event ID %7s %34s\n', eventid, EQ(1).FlinnEngdahlRegionName);
-last_queried_line = sprintf('Last updated %10s\n\n', EQ(1).QueryTime(1:10));
+last_queried_line = sprintf('Last updated %10s\n\n', strrep(EQ(1).QueryTime(1:10), '-', '/'));
 event_block = sprintf([event_line id_line last_queried_line]);
 
 %______________________________________________________%

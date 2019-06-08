@@ -21,34 +21,42 @@ function updateevtall(porg)
     
 % Princeton.
 if porg == 1
-diro = fullfile(getenv('MERMAID'), 'events');
-s = fullsac;
-for i = 1:length(s);
-    [revEQ, rawEQ, rawCP, ~, rev_evt, raw_evt] = getevt(s{i}, diro, false);
-    
-    EQ = updateevt(rawEQ);
-    CP = rawCP;
-    save(raw_evt, 'EQ', 'CP', '-mat')
+    diro = fullfile(getenv('MERMAID'), 'events');
+    s = fullsac;
+    for i = 1:length(s);
+        [revEQ, rawEQ, rawCP, ~, rev_evt, raw_evt] = getevt(s{i}, diro, false);
 
-    EQ = updateevt(revEQ);
-    save(rev_evt, 'EQ', '-mat')
-
+        if isstruct(rawEQ)
+            EQ = updateevt(rawEQ);
+            CP = rawCP;
+            save(raw_evt, 'EQ', 'CP', '-mat')
+        
+        end
+        
+        if isstruct(revEQ)
+            EQ = updateevt(revEQ);
+            save(rev_evt, 'EQ', '-mat')
+            
+        end
+        
+    end
 end
 
 % GeoAzur.
 if porg == 2
-diro = fullfile(getenv('MERMAID'), 'geoazur', 'rematch');
-s = mermaid_sacf('id');
-for i = 1:length(s);
-    [revEQ, rawEQ, rawCP, ~, rev_evt, raw_evt] = getevt(s{i}, diro, false);
-    
-    EQ = updateevt(rawEQ);
-    CP = rawCP;
-    save(raw_evt, 'EQ', 'CP', '-mat')
+    diro = fullfile(getenv('MERMAID'), 'geoazur', 'rematch');
+    s = mermaid_sacf('id');
+    for i = 1:length(s);
+        [revEQ, rawEQ, rawCP, ~, rev_evt, raw_evt] = getevt(s{i}, diro, false);
+        
+        EQ = updateevt(rawEQ);
+        CP = rawCP;
+        save(raw_evt, 'EQ', 'CP', '-mat')
 
-    EQ = updateevt(revEQ);
-    save(rev_evt, 'EQ', '-mat')
+        EQ = updateevt(revEQ);
+        save(rev_evt, 'EQ', '-mat')
 
+    end
 end
 
 % Both.

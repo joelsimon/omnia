@@ -6,10 +6,10 @@ function [floats, startdate, enddate, alldate] = gafloats(plt, ...
 % "identified" seismograms contained (recursively) in the path
 % 'merazur', and plots a global map (Robinson projection) showing
 % events and the stations that recorded them, connected by their great
-% circle path
+% circle paths.
 %
 % Input: 
-% plt             true to plot crude map of ray paths (def: false)
+% plt             true to plot crude map of ray paths (def: true)
 % merazur         A path to GeoAzur MERMAID data (def: $MERAZUR)
 % updated         true: use JDS updated event information (def: true)
 %                 false: use event information from SAC header 
@@ -24,10 +24,10 @@ function [floats, startdate, enddate, alldate] = gafloats(plt, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 13-May-2019, Version 2017b
+% Last modified: 31-May-2019, Version 2017b
 
 % Default.
-defval('plt', false)
+defval('plt', true)
 defval('merazur', getenv('MERAZUR'))
 defval('updated', true)
 defval('rematch', fullfile(getenv('MERAZUR'), 'rematch'))
@@ -68,8 +68,9 @@ end
 
 if plt
     % Set up map axes.
-    axesm('MapProjection','Robinson','MapLatLimit',[-90 90], 'MapLonLimit', [-180 180])
-    geoshow('landareas.shp', 'FaceColor', repmat(0.95, 1, 3))
+    figure
+    axesm('MapProjection', 'Robinson', 'Origin', [15 50 0])
+    geoshow('landareas.shp', 'FaceColor', repmat(0.85, 1, 3))
     hold(gca, 'on')
 
     % MarkerSize and LineWidth.

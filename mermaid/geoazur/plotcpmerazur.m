@@ -53,29 +53,11 @@ evtfile = fullfile(getenv('MERAZUR'), 'events', ...
 % associated with this event.
 [~, evtline] = mgrep(evtfile, sacfile);
 
-if isempty(evtline)        
-    % Event line wasn't found in "m??-events.txt" so look for it in
-    % "events.txt" in the top-level directory.  For some reason,
-    %
-    % 'm16.20150323T102337.sac'
-    % 'm16.20150512T071310.sac'
-    % 'm16.20150902T012650.sac'    
-    %
-    % are not included in the "m16_events.txt" but are in "events.txt".
-
-    % Fetch 16-Jul-2018: I verified that if event line in both text files
-    % they are identical so it doesn't matter which order I search
-    % ("m??_events.txt" or "events.txt" first).
-
-    evtfile = fullfile(getenv('MEREVENTS'), 'events.txt');
-    [~, evtline] = mgrep(evtfile, sacfile);
-
-    if isempty(evtline)
-        % No event line in either "m??_events.txt" or events.txt
-        error(sprintf('No evtline for %s', sacfile))
-        
-    end
-end
+% N.B.: While previously the global 'events.txt' file and the
+% individual floats' 'm??_events.txt' files differed, as of the
+% current fetch Fri Mar 22 15:09:54 UTC 2019, they are
+% identical. Therefore you only have to search one and not both for
+% the proper event line.  See gafloats.m
 
 % Parse phase from matching line in 'events.txt'.
 ga_phase = purist(strtrim(evtline{1}(103:110)));

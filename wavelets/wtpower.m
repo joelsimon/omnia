@@ -59,7 +59,7 @@ switch meth
     powfunc = @(zz) mean(zz.^2);    
 
   case 3
-    % Mean absolute value -- Sukhovich (2011) estimate of the power.
+    % Mean absolute value -- Sukhovich et al. (2011) estimate of the power.
     powfunc = @(zz) mean(abs(zz));
   
   otherwise
