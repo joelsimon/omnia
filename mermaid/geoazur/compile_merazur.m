@@ -2,12 +2,15 @@
 % for all GeoAzur identified SAC files to the rematched directory,
 % assuming JDS system defaults.
 %
+% Writes 'compile_merazur.mat', read by fig20.m of simon+2019 (travel
+% time residual histograms).
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 15-May-2019, Version 2017b
 
+clear
 close all
-clear all
 
 % Load data. 
 defval('sac_diro', getenv('MERAZUR'));
