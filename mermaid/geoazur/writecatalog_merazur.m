@@ -46,7 +46,7 @@ end
 % GeoAzur-specific paths.
 base_diro = getenv('MERAZUR');
 rematch_diro = fullfile(getenv('MERAZUR'), 'rematch');
-filename = fullfile(rematch_diro, 'rematch.misf');
+filename = fullfile(rematch_diro, 'catalog.txt');
     
 % Grant write access to file, if write-protected.
 if exist(filename, 'file') == 2
@@ -61,6 +61,9 @@ fclose(fid);
 
 % Write protect the file.
 fileattrib(filename, '-w')
+
+% Exit with path to file just written.
+fprintf('Sucess: %s\n', filename)
 
 %________________________________________________________________________%
 
