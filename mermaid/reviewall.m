@@ -5,8 +5,8 @@ function reviewall(writecp)
 % same system configuration as JDS.
 % 
 % Input:
-% writecp   true to run writechangepointall.m after review (def)
-%           false to skip running writechangepointall.m
+% writecp   true to run writechangepointall.m after review
+%           false to skip running writechangepointall.m (def)
 %
 % Output:
 % N/A       Writes reviewed .evt files, updates .txt files, 
@@ -17,7 +17,7 @@ function reviewall(writecp)
 % Last modified: 01-Jun-2019, Version 2017b
 
 % Default.
-defval('writecp', true)
+defval('writecp', false)
 
 % Grab directory containing the raw .evt files.  We will loop over
 % each .raw.evt file below and check if there is a corresponding
