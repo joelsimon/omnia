@@ -126,7 +126,7 @@ else
 end
 
 % Keep track of the date this query was made.
-querytime = datestr(datetime('now', 'TimeZone', 'UTC'), 'yyyy-mm-dd HH:MM:SS.FFF');
+querytime = irisdate2str(datetime('now', 'TimeZone', 'UTC'), 1);
 
 % Loop over every phase for every event.
 evtidx = [];
