@@ -22,7 +22,7 @@ function [s, f1, f2, f3] = globalstations(redo, plt)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 01-Apr-2019, Version 2017b
+% Last modified: 14-Jun-2019, Version 2017b
 
 % Defaults.
 defval('redo', false)
@@ -101,7 +101,7 @@ if plt
     f2.ha = copyobj(f1.ha, f2.f)
     
     % Fetch the most recent MERMAID locations.
-    str = urlread('http://geoweb.princeton.edu/people/simons/SOM/all.txt');
+    str = webread('http://geoweb.princeton.edu/people/simons/SOM/all.txt');
 
     % Split the text at newline characters and ditch the final (empty) string cell.
     str = splitlines(str);
