@@ -1,5 +1,5 @@
-function EQ = reviewevt(sac, redo, diro)
-% EQ = REVIEWEVT(sac, redo, diro)
+function EQ = reviewevt(sac, redo, diro, viewr)
+% EQ = REVIEWEVT(sac, redo, diro, viewer)
 %
 % REVIEWEVT is the smart SAC file to event matching tool.
 %
@@ -20,6 +20,11 @@ function EQ = reviewevt(sac, redo, diro)
 %           logical false to skip redundant review (def: false)
 % diro      Path to directory containing 'raw/' and 'reviewed' 
 %               subdirectories (def: $MERMAID/events/)
+% viewr     Preferred .pdf viewer  -- 
+%           1: xpdf (Linux/Unix) (def)
+%           2: evince (Linux/Unix)
+%           3: Preview (Mac)
+%           4: [currently throws error, but add your favorite here!]
 %
 % Output:   
 % *N/A*     (writes reviewed .evt file)
@@ -87,11 +92,13 @@ function EQ = reviewevt(sac, redo, diro)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 21-Mar-2019, Version 2017b
+% Last modified: 17-Jun-2019, Version 2017b
 
+% If using viewr = 3 (Preview) on Mac:
+%
 % It may be hard to close all the windows with every new earthquake
-% review if running this code recursively on a MAC . May need this;
-% though I'm unsure of its efficacy:
+% review if running this code recursively. May need this; though I'm
+% unsure of its efficacy:
 %
 % defaults write com.apple.Preview NSQuitAlwaysKeepsWindows -bool false
 %
@@ -105,6 +112,7 @@ function EQ = reviewevt(sac, redo, diro)
 defval('sac', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
 defval('redo', false)
 defval('diro', fullfile(getenv('MERMAID'), 'events'))
+defval('viewr', 1) 
 
 %% Check if SAC already reviewed.
 
@@ -148,21 +156,24 @@ end
 
 %% Open raw PDFs to conduct event review.
 
-switch computer
-  case 'GLNXA64'
+switch viewr
+  case 1
+    open_pdf = 'xpdf %s &';
+    close_pdf = 'xpdf';
+
+  case 2
     open_pdf = 'evince %s &';
     close_pdf = 'evince';
-
-  case 'MACI64'
+    
+  case 3
     % Must use '-F' option to not reopen every previous .pdf (killall on
-    % Mac with Preview reopens all previous windows).  This does
-    % not always work and is annoying.
+    % Mac with Preview reopens all previous windows).  This does not
+    % always work and is annoying.
     open_pdf = 'open -F %s';
     close_pdf = 'Preview';
 
   otherwise
-    error(['\No known viewer .pdf for your system.  Update switch/case ' ...
-           'block with preferred viewer.'])
+    error('Input one of 1, 2, or 3 for input: ''viewr''')
 
 end
 
