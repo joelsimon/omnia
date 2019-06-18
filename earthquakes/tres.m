@@ -23,11 +23,14 @@ function [tres_time, tres_phase, tres_EQ, tres_TaupTime] = tres(EQ, CP, multi, f
 % ph            Comma-separated phase list to consider 
 %                   (def: EQ.PhasesConsidered)
 %
-% Output:
+% Output:*
 % tres_time     Minimum travel time residual (seconds) 
 % tres_phase    Phase associated with minimum travel time residual
 % tres_EQ       EQ index associated with tres_phase
 % tres_TaupTime TaupTime index associated with tres_EQ
+%
+% * TRES returns the first phase and travel time residual in the case
+% of multiple phases arriving at exactly the same time.
 %
 % Before running the examples below, first run the Ex1 in cpsac2evt.m
 % and the examples in getevt.m and getcp.m.
@@ -187,7 +190,7 @@ else
     for j = 1:length(CP.arsecs)
         if ~isnan(CP.arsecs{j})
             % Find arrival time using arrival sample index.
-            arsecs{j} = CP.outputs.xax(arsamp{j}); % * See note at bottom.
+            arsecs{j} = CP.outputs.xax(arsamp{j}); % ** See note at bottom.
 
             % Convert both arrival times to offsets from 0 seconds (set the first
             % sample of the seismogram to 0 seconds).
@@ -206,7 +209,7 @@ else
     end
 end
 
-% This is always true:
+% ** This is always true:
 %
 % CP.arsecs == CP.outputs.xax(arsamp)    
 %
@@ -215,3 +218,36 @@ end
 % via smoothscale.m and then find that arrival time by pulling its
 % corresponding value on the x-xaxis (time axis).  For 'time' domain,
 % this step would be unnecessary and would could just use CP.arsecs.
+
+return
+
+% Note to self -- 
+%
+
+% This function relies on the indices returned by min.m, which are
+% simply the first instance of a minimum value in the case of multiple
+% minimums. Ergo, if multiple phases all arrive at the same time, the
+% first phase and its corresponding residual will be returned.  For
+% example, extending Ex1 above:
+sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
+diro = '~/cpsac2evt_example';
+EQ  = getevt(sac, diro);
+CP = getcp(sac, diro);
+
+% Repeat the first travel time and rename the phases.
+EQ.TaupTimes(2) = EQ.TaupTimes(1);
+EQ.TaupTimes(3) = EQ.TaupTimes(1);
+
+EQ.TaupTimes(1).phaseName = 'first';
+EQ.TaupTimes(2).phaseName = 'second';
+EQ.TaupTimes(3).phaseName = 'third';
+
+% Order of input phase-list does not matter
+[tres_time, tres_phase, tres_EQ, tres_TaupTime] = tres(EQ, CP, false, [], 'first, second, third')
+[tres_time, tres_phase, tres_EQ, tres_TaupTime] = tres(EQ, CP, false, [], 'third, second, first')
+
+% To verify the multi-earthquake TaupTime indexing works, duplicate EQ
+% and make the third TaupTime exactly equal to the last CP.arsecs.
+EQ(2) = EQ(1);
+EQ(2).TaupTimes(3).truearsecs = CP.arsecs{end};
+[tres_time, tres_phase, tres_EQ, tres_TaupTime] = tres(EQ, CP, true, [], 'first, second, third')
