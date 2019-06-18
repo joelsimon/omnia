@@ -1,5 +1,5 @@
 function [xl,yl] = symaxes(ha,ax)
-% [xl,yl] = SYMEAXES(has,ax)
+% [xl,yl] = SYMAXES(ha,ax)
 %
 % Adjusts axes so that they are symmetric about 0.
 %
