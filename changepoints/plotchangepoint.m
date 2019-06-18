@@ -9,7 +9,7 @@ function F = plotchangepoint(CP, scales, cpar)
 % scales    An array of scales to plot, or 'all' (def: 'all')
 % cpar      'ar': plot vertical lines at arsecs (def)
 %           'cp': plot vertical lines at cpsecs 
-
+%
 % Output:
 % F         Structure containing figure handles
 %

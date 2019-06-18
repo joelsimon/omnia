@@ -11,8 +11,8 @@ function [M1, M2] = cpci(x, cptype, iters, alphas, algo, dtrnd, bias, ...
 % if only 1 output (M1) requested code is much faster.
 %
 % Inputs: 
-% x             A time series (double or cell)
-% cptype        Changepoint to test, 'kw' or 'kw' (def: 'kw')
+% x             The time series (double or cell)
+% cptype        Changepoint to test, 'km' or 'kw' (def: 'kw')
 % iters         Number of test iterations (def: 100)
 % alphas        Alpha levels (percentages) to test (def: [0:100])
 % algo,...,bias Input to cpest.m, see there (def: 'fast', false, true)
