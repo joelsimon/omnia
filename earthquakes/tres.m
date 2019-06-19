@@ -33,29 +33,23 @@ function [tres_time, tres_phase, tres_EQ, tres_TaupTime] = tres(EQ, CP, multi, f
 % of multiple phases arriving at exactly the same time.
 %
 % Before running the examples below, first run the Ex1 in cpsac2evt.m
-% and the examples in getevt.m and getcp.m.
+% and the examples in getevt.m and getcp.m.  And for all the examples
+% below, first run this --
 %
-% Ex1: (minimum residual using reviewed [single] event)
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
 %    diro = '~/cpsac2evt_example';
-%    EQ  = getevt(sac, diro);
+%    [EQ, rawEQ]  = getevt(sac, diro);
 %    CP = getcp(sac, diro);
+%
+% Ex1: (minimum residual using reviewed [single] event)
 %    [tres_time, tres_phase, tres_EQ, tres_TaupTime] = TRES(EQ, CP, false)
 %
 % Ex2: (minimum residual at scale 5 associated with EQ(12) phase 'PcP.
 %       This example uses rawEQ, clearly not a match, to illustrate
 %       locating the minimum residual across multiple events).
-%    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
-%    diro = '~/cpsac2evt_example';
-%    [~, rawEQ]  = getevt(sac, diro);
-%    CP = getcp(sac, diro);
 %    [tres_time, tres_phase, tres_EQ, tres_TaupTime] = TRES(rawEQ, CP, true)
 %
 % Ex3: (Ex2, except we only allow residuals w.r.t. to 'p', and not 'PcP')
-%    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
-%    diro = '~/cpsac2evt_example';
-%    [~, rawEQ]  = getevt(sac, diro);
-%    CP = getcp(sac, diro);
 %    [tres_time, tres_phase, tres_EQ, tres_TaupTime] = TRES(rawEQ, CP, true, [], 'p')
 %
 % See also: getevt.m, getcp.m
