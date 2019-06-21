@@ -51,7 +51,7 @@ fig2print(gcf, 'fportrait');
 lw = 1;
 
 % Plot normalized time series in first subplot.
-norm_x = norm2ab(CP.x, -1, 1);
+norm_x = norm2max(CP.x);
 pl.x = plot(ha(1), CP.outputs.xax, norm_x, 'Color', 'blue', 'LineWidth', 1.5 * lw);
 ylim(ha(1), [-1.25 1.25])
 ylabel(ha(1), '$x$')
@@ -60,11 +60,13 @@ ylabel(ha(1), '$x$')
 % [0:1] for time-scale domain (absolute values)
 % [-1:1] for time domain.
 if strcmp(CP.domain, 'time-scale')
-    normfunc = @(xx) norm2ab(abs(xx), 0, 1);
+    da_normfunc = @(xx) norm2ab(abs(xx), 0, 1);
+    aic_normfunc = @(xx) norm2ab(abs(xx), 0, 1);
 
 else 
-    normfunc = @(xx) norm2ab(xx, -1, 1);
-    
+    da_normfunc = @(xx) norm2max(xx);
+    aic_normfunc = @(xx) norm2ab(xx, -1, 1);
+
 end
 
 % AIC-pick  colors.
@@ -121,8 +123,8 @@ for i = scales
     end
 
     % Normalize the data using the anonymous functions defined above loop.
-    norm_da = normfunc(da);
-    norm_aicj = normfunc(aicj);
+    norm_da = da_normfunc(da);
+    norm_aicj = aic_normfunc(aicj);
 
     if strcmp(CP.domain, 'time-scale')
         if issmooth
