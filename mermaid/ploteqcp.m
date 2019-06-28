@@ -1,19 +1,26 @@
 function F = ploteqcp(EQ, CP, h)
+% F = ploteqcp(EQ, CP, h)
+%
+% NEEDS HEADER
+%
+% See also: reviewevt.m, plotchangepoint.m
+%
+% Author: Joel D. Simon
+% Contact: jdsimon@princeton.edu
+% Last modified: 21-Jun-2019, Version 2017b
 %% This assumes a single EQ. %%
 
 defval('diro', fullfile(getenv('MERMAID'), 'processed'))
 
 % Some plotting defaults.
-linewidth = 1;
-fonts = 11;
-
+LineWidth = 1;
 
 %% PLOT CHANGEPOINT
 
 % Plot arrival times for all scales -- in case of time-scale domain,
 % smooth by setting abe/dbe to central point of the time smear.
 F.fig = figure;
-F.f = plotchangepoint(CP, 'all', 'ar');
+F.f = plotchangepoint(CP, 'all', 'ar', true, true);
 
 %% PLOT THEORETICAL ARRIVAL TIMES.
 
@@ -38,7 +45,7 @@ for j = 1:1%length(EQ)
         if tparr >= CP.outputs.xax(1) && ...
                     tparr <= CP.outputs.xax(end)
             F.tp{j}{k} = plot(ax, repmat(tparr, [1, 2]), ...
-                              ax.YLim, 'k', 'LineWidth', 2*linewidth);
+                              ax.YLim, 'k', 'LineWidth', 2*LineWidth);
             phstr = sprintf('%s', tp.phaseName);
             F.tx{j}{k} = text(ax, tparr, 1.7, phstr, ...
                               'HorizontalAlignment', 'Center', ...
@@ -74,8 +81,8 @@ ax = F.f.ha(1);
 [F.lg(1), F.lgtx(1)] = textpatch(ax, 'NorthWest', magstr, 10);
 [F.lg(2), F.lgtx(2)] = textpatch(ax, 'NorthEast', [diststr ', ' depthstr], 10);
 
-set([F.f.pl.aicj{:}], 'LineWidth', linewidth)
-set([F.f.pl.da{:}], 'LineWidth', linewidth)
+set([F.f.pl.aicj{:}], 'LineWidth', LineWidth)
+set([F.f.pl.da{:}], 'LineWidth', LineWidth)
 
 % Shrink the distance between each subplot -- 'multiplier' is adjusted
 % depending on the number of subplots (the number of wavelet scales
@@ -119,17 +126,15 @@ F.f.ha(end).XLabel.String = sprintf(['time relative to %s UTC ' ...
 F.f.ha(end).XLabel.FontSize = 13;
 longticks(F.f.ha, 3)
 
-% % Add the scale-specific SNR, tres, and fatten CP arrival marks.
+% The axes have been shifted -- need to adjust the second (AIC) adjust and re-tack2corner the annotations.
+for l = 1:length(F.f.ha)
+    F.f.ha2(l).Position = F.f.ha(l).Position;
+    
+end
+
+% Add the scale-specific SNR, tres, and fatten CP arrival marks.
 for j = 1:length(CP.SNRj)
     if CP.SNRj(j) > CP.inputs.snrcut % Cp.arsecs = NaN
-        
-        % SNR
-        [F.lgsnr(j), F.lgsnrtx(j)] = textpatch(F.f.ha(j + 1), ...
-                                               'SouthWest', ...
-                                               sprintf('SNR = %.1f', ...
-                                                       CP.SNRj(j)), 10);
-        tack2corner(F.f.ha(j+1), F.lgsnr(j),'SouthWest');
-
         tres_str = sprintf(['tres. [%s] = %.1f s\n2$\\cdot$SD = %.1f ' ...
                             's'], tres_phase{j}, tres_time(j), ...
                            CP.ci.M1(j).twostd);
@@ -140,16 +145,10 @@ for j = 1:length(CP.SNRj)
         F.tres{j} = text(F.f.ha(j+1), xl*1.15, mean(yl),  tres_str, ...
                          'FontSize', F.f.ha(end).XLabel.FontSize, ...
                          'HorizontalAlignment', 'Center');
-        set(F.f.pl.vl{j}, 'LineWidth', 2*linewidth)
+        set(F.f.pl.vl{j}, 'LineWidth', 2*LineWidth)
 
-    else
-        [F.lgsnr(j), F.lgsnrtx(j)] = textpatch(F.f.ha(j + 1), ...
-                                               'SouthWest', ...
-                                               sprintf('SNR $\\leq$ %.1f', ...
-                                                       CP.inputs.snrcut), 10);
-        
     end
-    tack2corner(F.f.ha(j+1), F.lgsnr(j),'SouthWest');
+    tack2corner(F.f.ha(j+1), F.f.lgSNR(j),'SouthWest');
     F.f.ha(j+1).XLim = [0 F.f.ha(j+1).XLim(2)];
 
 end

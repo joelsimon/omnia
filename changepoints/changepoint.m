@@ -66,24 +66,22 @@ function  CP = changepoint(domain, x, n, delta, pt0, snrcut, inputs, conf, fml)
 %
 %    CP.outputs.dabe{1}(CP.outputs.cp(1), :) = [415 417]
 %
+% For each of the examples below, first run --
+%        sacf = 'm12.20130416T105310.sac';
+%        [x, h] = readsac(sacf);
+%
 % Ex1: Detail changepoint sample at scale 1 after 5 scales of decomposition.
-%    sacf = 'm12.20130416T105310.sac';
-%    [x, h] = readsac(sacf);
 %    CP = CHANGEPOINT('time', x, 3, h.DELTA, h.B)
 %    figure; plot(x); vertline(CP.cpsamp{1});
 %    xlabel('sample'); ylabel('amplitude')
 %
 % Ex2: Detail changepoint time (s) at scale 1 after 5 scales of decomposition.
-%    sacf = 'm12.20130416T105310.sac';
-%    [x, h] = readsac(sacf);
 %    CP = CHANGEPOINT('time', x, 3, h.DELTA, h.B)
 %    figure; plot(CP.outputs.xax, CP.x); vertline(CP.cpsecs{1});
 %    xlabel('time (s)'); ylabel('amplitude')
 %
 % Ex3: Changepoint estimation made in time-scale domain and plotted at scale 3, 
 %      note time domain smear of changepoint detail at scale 3 (see CP.dbe{3}).
-%    sacf = 'm12.20130416T105310.sac';
-%    [x, h] = readsac(sacf);
 %    CP = CHANGEPOINT('time-scale', x, 3, h.DELTA, h.B)
 %    figure; plot(CP.x); vertline(CP.cpsamp{3});
 %    xlabel('sample'); ylabel('amplitude')

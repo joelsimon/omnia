@@ -12,7 +12,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 18-May-2019.
+# Last modified: 28-Jun-2019.
 
 # Keep track of starting directory.
 start_dir=`pwd`
@@ -49,7 +49,14 @@ echo -e '\n...completed writing SAC files\n'
 # do with MATLAB closing before the parallel pool is completely shut
 # down.  Doesn't seem to affect the output of this code, however.
 echo -e '\nMatching to the seismic catalog...\n'
-/usr/local/MATLAB/R2017b/bin/matlab -nodisplay -r "run ~/github/omnia/mermaid/matchall.m; run exit"
+/usr/local/MATLAB/R2017b/bin/matlab -r "run matchall.m; exit"
+
+## 28-Jun-2019
+## -nodisplay does not work with updated plotchangepoint.m, which sets
+## -the interpreter to LaTeX, which MATLAB does not like unless the
+## -GUI is opened interactively, unfortunately.
+#/usr/local/MATLAB/R2017b/bin/matlab -nodisplay -r "run ~/github/omnia/mermaid/matchall.m; run exit"
+
 
 # Display current count.
 echo -e '\nHere is the complete list:\n'

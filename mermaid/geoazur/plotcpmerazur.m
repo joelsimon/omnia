@@ -26,7 +26,7 @@ function [F, CP, tt] = plotcpmerazur(sacfile, inputs, conf, domain)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 15-Mar-2019, Version 2017b
+% Last modified: 21-Jun-2019, Version 2017b
 
 % Defaults.
 defval('sacfile', 'm35.20140915T080858.sac')
@@ -106,7 +106,7 @@ end
 offset = tt(1).truearsecs - tt(1).pt0;
 adjusted_pt0 = tt(1).time  - offset;
 CP = changepoint(domain, x, n, h.DELTA, adjusted_pt0, 1, inputs, conf);
-F = plotchangepoint(CP, 'all', 'ar');
+F = plotchangepoint(CP, 'all', 'ar', true, true);
 
 % Shrink the distance between each subplot -- 'multiplier' is adjusted
 % depending on the number of subplots (the number of wavelet
@@ -130,11 +130,19 @@ switch n
     end
     movev(F.ha, -0.1)
     
+    
+    
 end
 
 for i = 1:length(F.ha) - 1
     F.ha(i).XTickLabels = {};
 
+end
+
+% The axes have been shifted -- need to adjust the second (AIC) adjust and re-tack2corner the annotations.
+for l = 1:length(F.ha)
+    F.ha2(l).Position = F.ha(l).Position;
+    
 end
 
 % Update seismogram x-axis with adjusted, time-since-event x-axis.
@@ -181,22 +189,13 @@ diststr = sprintf('$%6.2f^{\\circ}$', tt(1).distance);
 [F.lg(3), F.tx(3)] = textpatch(ax, 'SouthEast', depthstr, 10);
 [F.lg(4), F.tx(4)] = textpatch(ax, 'SouthWest', strippath(sacfile), 10);
 
-% Annotate the scales with SNR. 
-for i = 1:length(CP.SNRj)
-    ax = F.ha(i + 1);
-    [F.lgsnr(i), F.txsnr(i)] = textpatch(ax, 'SouthWest', ...
-                                         sprintf('$%6.1f$', CP.SNRj(i)), 10); 
-
-end
-
-
 % Add time axis on bottom.
 xlabel(F.ha(end), sprintf('time since %s (s)', datestr(evtdate)));
 
 axesfs([], 10, 13)
 latimes
 
-lgtxlatimesfs([F.lg F.lgsnr], [F.tx F.txsnr], 10)
+lgtxlatimesfs([F.lg F.lgSNR], [F.tx F.txSNR], 10)
 F.tl.FontSize = 20;
 
 longticks(F.ha, 3)
@@ -207,7 +206,7 @@ tack2corner(F.ha(1), F.lg(1), 'NorthWest')
 tack2corner(F.ha(1), F.lg(2), 'NorthEast')
 tack2corner(F.ha(1), F.lg(3), 'SouthEast')
 tack2corner(F.ha(1), F.lg(4), 'SouthWest')
-for i = 1:length(F.lgsnr)
-    tack2corner(F.ha(i + 1), F.lgsnr(i), 'SouthWest')
+for i = 1:length(F.lgSNR)
+    tack2corner(F.ha(i + 1), F.lgSNR(i), 'SouthWest')
 
 end

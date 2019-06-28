@@ -147,33 +147,20 @@ CP(2) = changepoint(domain, xw, n, h.DELTA, W.xlsecs, 1, inputs, conf, fml);
 for i = 1:2
     
     % Some plotting defaults.
-    linewidth = 1;
-    fonts = 11;
+    LineWidth = 1;
 
     % Plot arrival times for all scales -- in case of time-scale domain,
     % smooth by setting abe/dbe to central point of the time smear.
     F(i).fig = figure;
-    F(i).f = plotchangepoint(CP(i), 'all', 'ar');
+    F(i).f = plotchangepoint(CP(i), 'all', 'ar', false, true);
 
-     % Add the scale-specific SNR and fatten arrival marks.
-     for j = 1:length(CP(i).SNRj)
-         if CP(i).SNRj(j) > CP(i).inputs.snrcut
-             [F(i).bh(j), F(i).th(j)] = boxtexb('ul', F(i).f.ha(j + 1), ...
-                                                sprintf('%8.1f', ...
-                                                        CP(i).SNRj(j)), fonts);
-             set(F(i).f.pl.vl{j}, 'LineWidth', 2*linewidth)
-
-         end
-     end
-     
     if ~isempty(EQ)
-
         % Title the seismogram (first subplot).
         ax = F(i).f.ha(1);
         hold(ax, 'on')
         F(i).tl = title(ax, EQ(1).FlinnEngdahlRegionName, 'FontSize', ...
                         17, 'FontWeight', 'normal');
-        F(i).tl.Position(2) = 1.7;
+        F(i).tl.Position(2) = ax.YLim(2) + 0.4*range(ax.YLim);
 
         % Mark all arrivals on the seismogram (first subplot).
         for j = 1:length(EQ)
@@ -184,10 +171,12 @@ for i = 1:2
                 if tparr >= CP(i).outputs.xax(1) && ...
                             tparr <= CP(i).outputs.xax(end)
                     F(i).tp{j}{k} = plot(ax, repmat(tparr, [1, 2]), ...
-                                         ax.YLim, 'k--', 'LineWidth', linewidth);
+                                         ax.YLim, 'k--', 'LineWidth', LineWidth);
                     phstr = sprintf('%s$_{%i}$', tp.phaseName, j);
-                    F(i).tx{j}{k} = text(ax, tparr, 1.5, phstr, ...
+                    F(i).tx{j}{k} = text(ax, tparr, 0, phstr, ...
                                          'HorizontalAlignment', 'Center');
+                    F(i).tx{j}{k}.Position(2) = ax.YLim(2) + 0.2*range(ax.YLim);
+
                 else        
                     F(i).tp{j}{k} = [];
                     F(i).tx{j}{k} = [];
@@ -201,66 +190,49 @@ for i = 1:2
         if ~isempty(F(i).tp{1}{1})
             F(i).tp{1}{1}.Color = 'r';
             F(i).tp{1}{1}.LineStyle = '-';
-            F(i).tp{1}{1}.LineWidth = 2*linewidth;
-            F(i).tx{1}{1}.Position(2) = 0.9;
+            F(i).tp{1}{1}.LineWidth = 2*LineWidth;
+            F(i).tx{1}{1}.Position(2) = ax.YLim(2) + 0.3*range(ax.YLim);
             F(i).tx{1}{1}.FontSize = 25;
             F(i).tx{1}{1}.FontWeight = 'bold';            
 
         end
 
-        % Annotate the seismogram with the largest event info.
-        magstr = sprintf('Mag.~=~%2.1f~%s', EQ(1).PreferredMagnitudeValue, ...
-                         EQ(1).PreferredMagnitudeType);
-        depthstr = sprintf('Depth~=~%6.2f~km', EQ(1).PreferredDepth);
-        diststr = sprintf('$\\Delta$~=~%6.2f$^{\\circ}$', EQ(1).TaupTimes(1).distance);
-        [F(i).bhul, F(i).thul] = boxtexb('ul', ax, strrep(magstr, ...
-                                                          '_', '\_'), fonts);
-        [F(i).bhll, F(i).thll] = boxtexb('ll', ax, strrep(strippath(sac), ...
-                                                          '_', '\_'), fonts);
-        [F(i).bhur, F(i).thur] = boxtexb('ur', ax, diststr, fonts);        
-        [F(i).bhlr, F(i).thlr] = boxtexb('lr', ax, depthstr, fonts);        
-        F(i).f.pl.x.LineWidth = linewidth;
-        set([F(i).f.pl.aicj{:}], 'LineWidth', linewidth)
-        set([F(i).f.pl.da{:}], 'LineWidth', linewidth)
+        % Capitalize only the first character of the magnitude string.
+        magtype = lower(EQ(1).PreferredMagnitudeType);
+        magtype(1) = upper(magtype(1));
 
-    end
+        % Set Mww to generic Mw notation.
+        if strcmp(magtype, 'Mww')
+            magtype = 'Mw';
 
-    % Shrink the distance between each subplot -- 'multiplier' is adjusted
-    % depending on the number of subplots (the number of wavelet
-    % scales plotted).
-    multiplier = 0;
-    switch CP(i).inputs.n
-      case 3
-        shrink(F(i).f.ha, 1, 1.53)
-        for l = 1:length(F(i).f.ha)
-            multiplier = multiplier + 1;
-            movev(F(i).f.ha(l), multiplier * 0.08)
-            
         end
-        movev(F(i).f.ha, -0.1)
-    
-      case 5
-        for l = 1:length(F(i).f.ha)
-            multiplier = multiplier + 1;
-            movev(F(i).f.ha(l), multiplier * 0.02)
-            
-        end
-        movev(F(i).f.ha, -0.1)
-            
-      otherwise
-        % Add to this list with trial and error given more examples with
-        % differing sampling frequencies.
-        warning('No figure formatting scheme available for %i %s', ...
-                CP(i).n, plurals('scale', CP(i).n))
+        magstr = sprintf('%.1f~%s', EQ(1).PreferredMagnitudeValue, magtype);
+
+        depthstr = sprintf('%.2f~km', EQ(1).PreferredDepth);
+        diststr = sprintf('%.2f$^{\\circ}$', EQ(1).TaupTimes(1).distance);
+
+        [F(i).f.lgmag, F(i).f.lgmagtx] = textpatch(ax, 'NorthWest', magstr);
+        [F(i).f.lgdist, F(i).lgdisttx] = textpatch(ax, 'SouthWest', [diststr ', ' depthstr]);
+
+        tack2corner(ax, F(i).f.lgmag, 'NorthWest');
+        tack2corner(ax, F(i).f.lgdist, 'SouthWest');
+
+        F(i).f.ha(end).XLabel.String = sprintf(['time relative to %s UTC ' ...
+                            '(s)\n[%s]'], datestr(seisdate.B), ...
+                                               strrep(EQ(1).Filename, '_', '\_'));
         
     end
-    
-    % Remove x-tick labels from all but last plot and label the lower x-axis.
-    set(F(i).f.ha(1:end-1), 'XTickLabel', '')
-    F(i).f.ha(1).YTick = [-1:1];
-    F(i).f.ha(end).XLabel.String = sprintf(['time relative to %s UTC ' ...
-                        '(s)'], datestr(seisdate.B));
-    longticks(F(i).f.ha, 2)
+
+    % The axes have been shifted -- need to adjust the second (AIC) adjust and re-tack2corner the annotations.
+    for l = 1:length(F(i).f.ha)
+        F(i).f.ha2(l).Position = F(i).f.ha(l).Position;
+        
+    end
+
+    for l = 1:length(F(i).f.lgSNR)
+        tack2corner(F(i).f.ha2(l+1), F(i).f.lgSNR(l), 'll');
+
+    end
 
 end
 
