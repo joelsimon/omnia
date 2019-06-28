@@ -206,7 +206,7 @@ if ~isempty(EQ)
     end
 
     % These list the first phase of the largest earthquake.
-    fprintf( '\n     Filename: %s\n', sacname)     
+    fprintf( '\n     Filename: %s\n', sacname)
     fprintf( '\n     *First arrival associated with largest magnitude earthquake [EQ(1)]*')
     fprintf( '\n     *Phase:             %7s',       EQ(1).TaupTimes(1).phaseName)
     fprintf( '\n     *Magnitude:         %7.1f %s',  EQ(1).PreferredMagnitudeValue, EQ(1).PreferredMagnitudeType)
@@ -245,8 +245,8 @@ if ~isempty(EQ)
 
 
         if sum(strcmpi(yn, {'y' 'yes' 'n' 'no' 'm' 'maybe' 'back' 'skip'})) ~= 1
-            fprintf(['\n     Please input either ''Y'' (yes), ''N'' (no), ' ...
-                     '''M'' (maybe), ''back'', or ''skip''.\n'])
+            fprintf(['\n     Bad input: specify one of  ''Y'' (yes), ' ...
+                     '''N'' (no), ''M'' (maybe), ''back'', or ''skip''.\n'])
             
         elseif strcmpi(yn, 'back')
             fprintf(['\n     Paused execution again for repeat inspection.\n', ...
@@ -267,10 +267,11 @@ if ~isempty(EQ)
     end
 else
     yn = 'N';
+    fprintf( '\n     Filename: %s\n\n', sacname)
     fprintf(['     EQ structure is empty and thus this event is unidentified.\n', ...
              '     Execution paused for waveform inspection, though no further action required.\n', ...
-             '     Type ''dbcont'' to continue.\n\n'])
-    fprintf( '     SAC Filename: %s\n\n', sacname)
+             '     An empty .evt file will automatically be sent to the ''unidentified'' directory.\n'])
+    fprintf(['\n     !! Paused execution -- type ''dbcont'' to continue !!\n\n'])
     keyboard
 
 end
@@ -293,7 +294,9 @@ switch lower(yn)
         eq = strtrim(input('     Matched EQ(s) [or restart]: ', 's'));
 
         if strcmpi(eq, 'restart')
-            % !! Recursive !!
+
+            %% Recursive.
+
             system(sprintf('killall %s', close_pdf));
             clc
             reviewevt(sac, redo, diro) 
@@ -311,8 +314,7 @@ switch lower(yn)
 
         eq = str2num(eq);
         if ~all(ismember(eq, [1:length(EQ)])) || isempty(eq)
-            fprintf(['\n     Please specify integer value between ' ...
-                     '[1:%i], inclusive.\n\n'], length(EQ))
+            fprintf('\n     Bad input: specify integer value between [1:%i], inclusive.\n\n', length(EQ))
             continue
 
         end
@@ -327,10 +329,12 @@ switch lower(yn)
             while ~phflag
 
                 ph = input(sprintf(['     Matched TaupTimes(s) for ' ...
-                                    'EQ(%i): '],  eq(i)), 's');
+                                    'EQ(%i) [or restart]: '],  eq(i)), 's');
                 
                 if strcmpi(strtrim(ph), 'restart')
-                    % !! Recursive !!
+
+                    %% Recursive.
+ 
                     system(sprintf('killall %s', close_pdf));
                     clc
                     reviewevt(sac, redo, diro)
@@ -355,8 +359,9 @@ switch lower(yn)
 
                 ph = str2num(ph);
                 if ~all(ismember(ph, [1:length(EQ(eq(i)).TaupTimes)])) || isempty(ph)
-                    fprintf(['\n     Please specify integer value between ' ...
-                             '[1:%i], inclusive.\n\n'], length(EQ(eq(i)).TaupTimes))
+                    fprintf(['\n     Bad input: specify integer value between [1:%i], inclusive,\n' ...
+                             '                or : [colon] to include all phases.\n\n'], ...
+                            length(EQ(eq(i)).TaupTimes))
                     continue
                     
                 end
@@ -442,6 +447,6 @@ if previously_reviewed && git_tracked
 
     end
 else
-    fprintf('\nWrote: %s\n', newfile)
+    fprintf('\nWrote:   %s\n\n', newfile)
 
 end
