@@ -1,16 +1,16 @@
-function [Pa, m] = counts2Pam(counts)
-% [Pa, m] = COUNTS2PAM(counts)
+function [Pa, m] = counts2pressure(counts)
+% [Pa, m] = COUNTS2PRESSURE(counts)
 % 
-% COUNTS2PAM converts raw amplitude counts of the third-generation
-% MERMAID (manufactured by Osean.fr) into their representative
-% pressure [Pa] and equivalent perturbation to sea-water depth [m]. 
-% *(see in-code note at bottom of function)
+% COUNTS2PRESSURE converts raw amplitude counts of the
+% third-generation MERMAID (manufactured by Osean.fr) into their
+% representative pressure [Pa] and equivalent perturbation to
+% sea-water depth [m].  *(see in-code note at bottom of function)
 %
 % According to Sebastien Bonnieux the relevant conversion factor to go
 % from counts to Pa for the third-generation MERMAID floats
 % manufactured by Osean is division by 170176,
 %
-% COUNTS2PAM assumes a pressure-to-water-depth conversion of 
+% COUNTS2PRESSURE assumes a pressure-to-water-depth conversion of
 %
 %       1 m = 0.101 bar (1.01 dbar) = 1.01e4 Pa
 %
@@ -29,7 +29,7 @@ function [Pa, m] = counts2Pam(counts)
 % negative) of about 29 mm.
 % 
 % Ex1: (MERMAID signal -5e7 counts)
-%   [Pa, m] = COUNTS2PAM(-5e7)
+%   [Pa, m] = COUNTS2PRESSURE(-5e7)
 %
 % Before running Ex2 first run the example in writechangepoint.m.
 % CP.outputs.da are the subspace projections of the MERMAID seismogram
@@ -39,7 +39,7 @@ function [Pa, m] = counts2Pam(counts)
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
 %    diro = '~/cpsac2evt_example/changepoints';
 %    [CP, filename] = getcp(sac, diro);
-%    [Pa, m] = COUNTS2PAM(CP.outputs.da)
+%    [Pa, m] = COUNTS2PRESSURE(CP.outputs.da)
 %
 % See also: pressure2depth.m
 %
@@ -50,7 +50,7 @@ function [Pa, m] = counts2Pam(counts)
 %% Recursive.
 if iscell(counts)
     for j = 1:length(counts)
-        [Pa{j}, m{j}] = counts2Pam(counts{j});
+        [Pa{j}, m{j}] = counts2pressure(counts{j});
 
     end
 
