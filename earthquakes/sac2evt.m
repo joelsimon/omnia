@@ -296,8 +296,8 @@ if ~isempty(EQ)
             expp = reid(mbml_type, mbml_val, EQ(i).TaupTimes(j).distance, ...
                         freq, EQ(i).TaupTimes(j).incidentDeg, Vp, Vs);
 
-            % The output of reid.m is a 1x2 array of P and S wave pressure.  Use
-            % the last character of the phase name (not the first)
+            % The output of reid.m is a 1x2 array of P and S wave pressure [Pa].
+            % Use the last character of the phase name (not the first)
             % because this is the incidence (incoming), not takeoff
             % (outgoing), pressure.
 
