@@ -14,8 +14,8 @@ function [tres_time, tres_phase, tres_EQ, tres_TaupTime] = tres(EQ, CP, multi, f
 % Input:
 % EQ            Event structure, EQ, returned from cpsac2evt.m
 % CP            Changepoint structure, from changepoint.m
-% multi         logical true to consider all phases for all earthquakes 
-%               logical false only to consider EQ(1) (def: false)
+% multi         true to consider all phases for all earthquakes
+%               false to consider all phases only for EQ(1) (def: false)
 % fml           For 'time-scale' domain only:
 %               'first': tres w.r.t to start of dabe smear
 %               'middle: tres w.r.t.to middle of dabe smear (def)
