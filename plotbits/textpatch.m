@@ -88,6 +88,9 @@ ha2.Visible = 'off';
 % Add legend for null value using requested string and options.  Note
 % that with two outputs legend acts oddly and varargin doesn't always
 % work as expected.  Hence I edit fontsize and interpreter later.
+%% N.B.: you are just going to have to deal with the warning about
+%% "valid interpreter syntax" and not attempt to add 'Interpreter'
+%% option here.
 [lg, lgobj] = legend(ha2, pl, str, 'Location', loc, varargin{:});
 
 % Delete the marker and (nonexistent) line in the legend box.
