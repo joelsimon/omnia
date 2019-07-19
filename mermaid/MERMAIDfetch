@@ -57,7 +57,6 @@ echo -e '\nMatching to the seismic catalog...\n'
 ## -GUI is opened interactively, unfortunately.
 #/usr/local/MATLAB/R2017b/bin/matlab -nodisplay -r "run ~/github/omnia/mermaid/matchall.m; run exit"
 
-
 # Display current count.
 echo -e '\nHere is the complete list:\n'
 $OMNIA/mermaid/countsac
