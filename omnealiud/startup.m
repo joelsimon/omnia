@@ -34,7 +34,7 @@
 % 
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 18-Jun-2019, Version 2017b
+% Last modified: 24-Jul-2019, Version 2017b
 
 % For my code, and code my code requires.
 addpath(genpath(getenv('OMNIA')))
@@ -48,6 +48,4 @@ javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
 % The rest is specific to JDS -- users who clone $OMNIA, and other
 % repositories it depends on, may delete.
 %____________________________________________________%
-addpath(genpath(fullfile(getenv('MFILES'), 'papers', 'simon2019')))
-addpath(fullfile(getenv('SPR19'), 'SSA', 'poster', 'code'))
 addpath(genpath('~/collab'))
