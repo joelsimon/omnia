@@ -10,7 +10,7 @@ set MERMAID = $MERMAID
 
 # Count Princeton and GeoAzur SAC files.
 set floatnum = (P-06 P-07 P-08 P-09 P-10 P-11 P-12 P-13 P-16 P-17 P-18 \
-		P-19 P-20 P-21 P-22 P-23 P-24 P-25 N-01 N-02 N-03 N-04) #P-0050 P-0052)
+		P-19 P-20 P-21 P-22 P-23 P-24 P-25 N-01 N-02 N-04 N-05) #P-0050 P-0052
 
 set sac_count = 0 
 
