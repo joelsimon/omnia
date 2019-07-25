@@ -1,5 +1,5 @@
-function txt = evt2txt(revdir, geoazur)
-% txt = EVT2TXT(revdir, geoazur)
+function txt = evt2txt(sacdir, revdir, geoazur)
+% txt = EVT2TXT(sacdir, revdir, geoazur)
 %
 % EVT2TXT converts reviewed .evt files (which are really .mat files)
 % to human readable textfiles.
@@ -9,7 +9,7 @@ function txt = evt2txt(revdir, geoazur)
 %    [revdir]/reviewed/unidentified/txt/unidentified.txt
 %    [revdir]/reviewed/all.txt
 % 
-% The paths to which must exist before running.
+% These paths must exist before calling EVT2TXT.
 %
 % Inputs:
 % revdir    Path to directory containing 'reviewed' subdirectory
@@ -38,8 +38,9 @@ function txt = evt2txt(revdir, geoazur)
 %
 % Ex: (write a line to identified.txt and all.txt; 
 %      nothing to write for unidentified)
+%    sacdir = fullfile(getenv('OMNIA'), 'exfiles')
 %    revdir = '~/cpsac2evt_example';
-%    txt = EVT2TXT(revdir)
+%    txt = EVT2TXT(sacdir, revdir, false)
 % 
 % See also: cpsac2evt.m, reviewevt.m, revsac.m, getevt.m
 %
@@ -48,6 +49,7 @@ function txt = evt2txt(revdir, geoazur)
 % Last modified: 21-Mar-2019, Version 2017b
 
 % Defaults.
+defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('revdir', fullfile(getenv('MERMAID'), 'events'))
 defval('geoazur', false)
 
@@ -94,7 +96,7 @@ for i = 1:2
         iup = -1;
 
     end
-    [sac, evt] = revsac(iup, revdir);
+    [sac, evt] = revsac(iup, sacdir, revdir);
 
     if isempty(sac)
         % Possible to have the correct path but no .evt files (see the example
@@ -103,6 +105,9 @@ for i = 1:2
         continue
 
     end
+
+    % Below rely on the filename to get the time, ergo we must strip the path.
+    sac = cellfun(@(xx) strippath(xx), sac, 'UniformOutput', false);
 
     % Sort the events based on the time assigned the first sample in the seismogram.
 
@@ -116,7 +121,6 @@ for i = 1:2
         sactime = cellfun(@(xx) xx(5:19), sac, 'UniformOutput', false);
 
     end
-
     [~, idx] = sort(sactime);
     sac = sac(idx);
     evt = evt(idx);

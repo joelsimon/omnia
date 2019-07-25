@@ -1,22 +1,23 @@
-function [sac, evt] = revsac(iup, diro)
-% [sac, evt] = REVSAC(iup, diro)
+function [sac, evt] = revsac(iup, sacdir, revdir)
+% [sac, evt] = REVSAC(iup, sacdir, revdir)
 %
-% REVSAC returns a list of *.evt (with full path) and *.sac (without
-% full path) filenames associated with SAC files whose event
-% information has been reviewed and sorted with reviewevt.m into
-% either:
+% REVSAC returns a list of fullpath .sac and .evt filenames associated
+% whose event information has been reviewed and sorted with
+% reviewevt.m into either:
 %
-% [diro]/reviewed/identified/evt,
-% [diro]/reviewed/unidentified/evt, or
-% [diro]/reviewed/purgatory/evt.
+% [revdir]/reviewed/identified/evt,
+% [revdir]/reviewed/unidentified/evt, or
+% [revdir]/reviewed/purgatory/evt.
 %
 % Input:
-% iup       [diro]/reviewed/ directory (def: 1)
+% iup       [revdir]/reviewed/ directory (def: 1)
 %           1 identified
 %          -1 unidentified
 %           0 purgatory
-% diro      Path to directory containing 'reviewed' subdirectory
-%               def: fullfile(getenv('MERMAID'), 'events'))
+% sacdir    Directory where .sac files are kept
+%                def($MERMAID/processed)
+% revdir    Directory where .evt files are kept
+%                def($MERMAID/events)
 %
 % Output:
 % sac       Cell array of SAC filenames whose corresponding 
@@ -27,8 +28,9 @@ function [sac, evt] = revsac(iup, diro)
 % Before running the example below run the example in reviewevt.m
 %
 % Ex: (load EQ data from an identified SAC file)
-%    diro = '~/cpsac2evt_example';
-%    [sac, evt] = REVSAC(1, diro);
+%    sacdir = fullfile(getenv('OMNIA'), 'exfiles')
+%    revdir = '~/cpsac2evt_example';
+%    [sac, evt] = REVSAC(1, sacdir, revdir);
 %    load(evt{1}, '-mat')
 %    EQ
 %
@@ -40,7 +42,9 @@ function [sac, evt] = revsac(iup, diro)
 
 % Defaults.
 defval('iup', 1)
-defval('diro', fullfile(getenv('MERMAID'), 'events'))
+defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
+defval('revdir', fullfile(getenv('MERMAID'), 'events'))
+
 sac = [];
 evt = [];
 
@@ -61,16 +65,34 @@ switch iup
 end
 
 % Find the relevant paths. 
-evt_path = fullfile(diro, 'reviewed', status, 'evt');
-diro = dir([evt_path '/*.evt']);
-if isempty(diro)
+evt_path = fullfile(revdir, 'reviewed', status, 'evt');
+revdir = dir([evt_path '/*.evt']);
+if isempty(revdir)
     warning('No .evt files found in %s', evt_path)
 
 end
 
-for i = 1:length(diro)
-    evt{i} = fullfile(diro(i).folder, diro(i).name);
+for i = 1:length(revdir)
+    evt{i} = fullfile(revdir(i).folder, revdir(i).name);
 
 end
-sac = strrep({diro.name}, '.evt', '.sac');
-sac = sac(:);
+
+% Replace the filename extension.
+sac = strrep({revdir.name}, '.evt', '.sac');
+
+% To find the fullpath SAC filenames: start with all SAC fullpath
+% filenames.
+allsac = fullsac([], sacdir);
+if isempty(allsac)
+    sac = []; % No warning necessary here as it will be thrown in fullsac.m
+    return
+
+end
+
+% Find the intersection between all SAC filenames and those in the
+% specified review class.
+allsac_nopath = cellfun(@(xx) strippath(xx), allsac, 'UniformOutput', false);
+[~, ~, idx] = intersect(sac, allsac_nopath);
+sac = allsac(idx);
+
+
