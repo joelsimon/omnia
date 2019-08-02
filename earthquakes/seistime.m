@@ -6,9 +6,16 @@ function [seisdate, seiststr, seisertime, refdate, evtdate] = seistime(h)
 % arbitrary), plus any offset time in seconds of the first/last sample
 % as designated by "B"/"E" field in SAC header.
 %
+%            seconds(seisdate.B - refdate)  == h.B
+%
 % SEISTIME will also returns the reference time in the SAC header, and
 % maybe return the event time (reference time - h.O) if h.O (origin
 % time) is filled.
+%
+% N.B.: Because seisdate.B is the time at the first sample -->
+%
+%   time relative to refdate: xaxis(h.NPTS, h.DELTA, h.B)
+%   time relative to seisdate.B: xaxis(h.NPTS, h.DELTA, 0)
 %
 % First three outputs are same data in three formats: a datetime array
 % via datetime.m, a PDE/ISC-formatted string via datestr.m, and a
@@ -69,6 +76,7 @@ function [seisdate, seiststr, seisertime, refdate, evtdate] = seistime(h)
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 17-Sep-2018, Version 2017b
+% Documented 2017.2 pg. 45
 
 % NOTES ABOUT TIMING IN SAC
 % From https://ds.iris.edu/files/sac-manual/manual/tutorial.html -- 
