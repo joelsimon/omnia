@@ -71,7 +71,7 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 10-May-2019, Version 2017b
+% Last modified: 01-Aug-2019, Version 2017b
 
 % Defaults.
 defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -120,7 +120,7 @@ EQ = sac2evt(sac, model, ph, baseurl, varargin{:});
 % Generate a changepoint (arrival time) structure considering the
 % entire seismogram.
 [x, h] = readsac(sac);
-seisdate = seistime(h);
+[~, ~, ~, refdate] = seistime(h);
 CP(1) = changepoint(domain, x, n, h.DELTA, h.B, 1, inputs, conf, fml);
 
 % Window the seismogram such that it is 100 seconds long centered on
@@ -217,9 +217,16 @@ for i = 1:2
         tack2corner(ax, F(i).f.lgmag, 'NorthWest');
         tack2corner(ax, F(i).f.lgdist, 'SouthWest');
 
-        F(i).f.ha(end).XLabel.String = sprintf(['time relative to %s UTC ' ...
-                            '(s)\n[%s]'], datestr(seisdate.B), ...
-                                               strrep(EQ(1).Filename, '_', '\_'));
+        % This time is w.r.t. the reference time in the SAC header, NOT
+        % seisdate.B. CP.xax has the time of the first sample (input:
+        % pt0) assigned to h.B, meaning it is an offset from some
+        % reference (in this case, the reference time in the SAC
+        % header).  The time would be relative to seisdate.B if I had
+        % input pt0 = 0, because seisdate.B is EXACTLY the time at the
+        % first sample, i.e., we start counting from 0 at that time.
+        F(i).f.ha(end).XLabel.String = sprintf(['time relative to ' ...
+                            '%s UTC (s)\n[%s]'], datestr(refdate), strrep(EQ(1).Filename, ...
+                                                          '_', '\_'));
         
     end
 

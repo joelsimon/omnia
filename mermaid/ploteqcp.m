@@ -3,14 +3,25 @@ function F = ploteqcp(EQ, CP, h)
 %
 % NEEDS HEADER
 %
+% This assumes a single EQ.
+%
 % See also: reviewevt.m, plotchangepoint.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 21-Jun-2019, Version 2017b
-%% This assumes a single EQ. %%
+% Last modified: 02-Aug-2019, Version 2017b
+
+%
 
 defval('diro', fullfile(getenv('MERMAID'), 'processed'))
+
+% First: verify the time assigned to the first sample is equal for all
+% inputs.  If they are not, the x-axis will not be w.r.t. the
+% reference time from the header ('refdate', below).
+if ~isequalpt0(EQ, CP, h)
+    error('Not equal: EQ(*).TaupTimes(*).pt0, CP.inputs.pt0, h.B')
+
+end
 
 % Some plotting defaults.
 LineWidth = 1;
@@ -118,11 +129,17 @@ end
 set(F.f.ha(1:end-1), 'XTickLabel', '')
 F.f.ha(1).YTick = [-1:1];
 
-seisdate = seistime(h);
-
+% This time is w.r.t. the reference time in the SAC header, NOT
+% seisdate.B. CP.xax has the time of the first sample (input: pt0)
+% assigned to h.B, meaning it is an offset from some reference (in
+% this case, the reference time in the SAC header).  The time would be
+% relative to seisdate.B if I had input pt0 = 0, because seisdate.B is
+% EXACTLY the time at the first sample, i.e., we start counting from 0
+% at that time.
+[~, ~, ~, refdate] = seistime(h);
 F.f.ha(end).XLabel.String = sprintf(['time relative to %s UTC ' ...
-                    '(s)\n[%s]'], datestr(seisdate.B), ...
-                                    strrep(EQ(1).Filename, '_', '\_'));
+                    '(s)\n[%s]'], datestr(refdate), strrep(EQ(1).Filename, ...
+                                                  '_', '\_'));
 F.f.ha(end).XLabel.FontSize = 13;
 longticks(F.f.ha, 3)
 
