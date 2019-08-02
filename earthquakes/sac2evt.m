@@ -155,20 +155,21 @@ for i = 1:length(ev)
     evdate = datetime(quake.PreferredTime, 'InputFormat', ...
                      'uuuu-MM-dd HH:mm:ss.SSS', 'TimeZone', 'UTC');
 
-    % Compute travel times and arrival times w.r.t where pt0 (time
-    % assigned to sample 1) is set at h.B seconds
+    % Compute travel times and arrival times on an x-axis where pt0, the
+    % time assigned to the first sample, is set at h.B seconds.
     tt = arrivaltime(h, evdate, [quake.PreferredLatitude ...
                         quake.PreferredLongitude], model, depth, ph, h.B);
 
     if all(arrayfun(@(zz) (isempty(zz.arsecs)), tt))
-        % .arsecs is the arrival time of the seismic phase(s) relative to h.B.
-        % If all are empty for a given event that means no phases
-        % associated with that event arrive in the time window of
-        % seismogram.  Move to next event.
+        % .arsecs is the arrival time of the seismic phase(s) on an x-axis
+        % where the first sample is assigned the time to h.B.  If all
+        % are empty for a given event that means no phases associated
+        % with that event arrive in the time window of seismogram.
+        % Move to next event.
         continue
 
     end    
-    
+
     % irisFetch.m incorrectly returns the <type> subfield ('Flinn-Engdahl
     % region') instead of <text> (e.g. 'CENTRAL ITALY') subfield xml
     % file that is returned from fdsnws query (see url in
