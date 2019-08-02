@@ -21,8 +21,8 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 % diro      Path to directory containing 'raw/' and 'reviewed' 
 %               subdirectories (def: $MERMAID/events/)
 % viewr     Preferred .pdf viewer  -- 
-%           1: xpdf (Linux/Unix) (def)
-%           2: evince (Linux/Unix)
+%           1: xpdf (Linux/Unix)
+%           2: evince (Linux/Unix) (def)
 %           3: Preview (Mac)
 %           4: [currently throws error, but add your favorite here!]
 %
@@ -112,7 +112,7 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 defval('sac', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
 defval('redo', false)
 defval('diro', fullfile(getenv('MERMAID'), 'events'))
-defval('viewr', 1) 
+defval('viewr', 2)
 
 %% Check if SAC already reviewed.
 
