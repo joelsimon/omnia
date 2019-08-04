@@ -12,7 +12,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 28-Jun-2019.
+# Last modified: 04-Aug-2019
 
 # Keep track of starting directory.
 start_dir=`pwd`
@@ -61,6 +61,11 @@ echo -e '\nMatching to the seismic catalog...\n'
 echo -e '\nHere is the complete list:\n'
 $OMNIA/mermaid/countsac
 echo 
+
+# Display date of last SAC file.
+echo -e '\nHere are the dates of the last SAC files:\n'
+$OMNIA/mermaid/lastsac
+echo
 
 # Return from whence you came.
 /usr/bin/cd $start_dir
