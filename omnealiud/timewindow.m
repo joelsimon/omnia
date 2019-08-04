@@ -25,7 +25,9 @@ function [xw, W] = timewindow(x, wlen, pivot, fml, delta, pt0)
 % Output:
 % xw        Windowed time series
 % W         Structure of timing info that relates xw to x
-%           xax: windowed x-axis w.r.t. complete, input time series
+%           lx: length of xw
+%           delta: input delta
+%           xax: x-axis of x observed by window
 %           xlsamp: sample index in x of first sample of xw
 %           xrsamp: sample index in x of last sample of xw
 %           xlsecs: time assigned in x to first sample of xw
@@ -111,7 +113,6 @@ wlensecs = wxax(end) - wxax(1);
 xw = x(xlsamp:xrsamp);
 
 W.lx = length(xw);
-W.pt0 = wxax(1);
 W.delta = delta;
 W.xax = wxax;
 W.xlsamp = xlsamp;
