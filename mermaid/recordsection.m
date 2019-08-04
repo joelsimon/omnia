@@ -134,18 +134,18 @@ for i = 1:length(sac)
     [x{i}, h{i}] = readsac(fullpath_sac{i});
     seisdate{i} = seistime(h{i});
 
+    % First arrival, in seconds offset from first sample of the seismogram.
+    offset = EQ{i}(1).TaupTimes(1).truearsecs - EQ{i}(1).TaupTimes(1).pt0;
+
     switch lower(alignon)
       case 'etime'
         % t = 0 at event rupture time (add travel time to time
         % series and subtract offset from arrival to start of seismogram)
-        offset = EQ{i}(1).TaupTimes(1).truearsecs - EQ{i}(1).TaupTimes(1).pt0;
         pt0 = EQ{i}(1).TaupTimes(1).time  - offset;
-        xlstr  = 'event rupture';
 
       case 'atime'
         % t = 0 at first phase arrival (subtract it from time series).
-        pt0 = -(EQ{i}(1).TaupTimes(1).truearsecs - EQ{i}(1).TaupTimes(1).pt0);
-        xlstr = 'theoretical first arrival';
+        pt0 = -offset;
 
       otherwise
         error('Please specify either ''etime'' or ''atime'' for input ''alignon''.')
@@ -183,7 +183,7 @@ for i = 1:length(x)
         x{i} = norm2max(x{i});
         
     else
-          % Normalize this seismogram with max amplitude of all
+        % Normalize this seismogram with max amplitude of all
         % seismograms, thereby showing distance decay.
         x{i} = x{i} / maxx;
         
@@ -225,7 +225,7 @@ if strcmp(alignon, 'atime')
                    sprintf('M%2.1f %s at %2.1f km depth', ...
                            EQ1.PreferredMagnitudeValue, ...
                            EQ1.PreferredMagnitudeType, EQ1.PreferredDepth));
-    F.xl = xlabel(sprintf('time relative to %s (s)', xlstr));
+    F.xl = xlabel('time relative to theoretical first arrival (s)');
     warning(['Theoretical first arrival may not be the same phase ' ...
              'or phase branch across different seismograms'])
 
@@ -254,6 +254,9 @@ else
     F.xl = xlabel(sprintf('time since %s (s)', timstr));
     F.lg = legend(F.ph, phase_cell, 'AutoUpdate', 'off');
 
+    % Send travel time curves to the bottom.
+    botz(F.ph, F.ax);
+
 end
 hold(F.ax, 'off')
 set(F.ax, 'XLim', current_xlim);
@@ -273,5 +276,3 @@ F.yl = ylabel(F.ax, 'distance ($^{\circ}$)');
 F.tl.FontWeight = 'normal';
 latimes
 
-% Send travel time curves to the bottom.
-botz(F.ph, F.ax);
