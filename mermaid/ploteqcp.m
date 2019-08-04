@@ -51,7 +51,7 @@ unique_res = unique(tres_TT(~isnan(tres_TT)));
 for j = 1:1%length(EQ)
     for k = unique_res
         tp = EQ(j).TaupTimes(k);
-        tparr = tp.arsecs;
+        tparr = tp.truearsecs;
 
         if tparr >= CP.outputs.xax(1) && ...
                     tparr <= CP.outputs.xax(end)

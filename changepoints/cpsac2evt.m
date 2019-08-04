@@ -127,7 +127,7 @@ CP(1) = changepoint(domain, x, n, h.DELTA, h.B, 1, inputs, conf, fml);
 % the first arrival associated with the largest earthquake (or,
 % roughly the center of the seismogram if the EQ structure is empty).
 if ~isempty(EQ)
-    first_arrival = EQ(1).TaupTimes(1).arsecs;
+    first_arrival = EQ(1).TaupTimes(1).truearsecs;
     [xw, W] = timewindow(x, 100, first_arrival, 'middle', h.DELTA, h.B);
 
 else
@@ -166,7 +166,7 @@ for i = 1:2
         for j = 1:length(EQ)
             for k = 1:length(EQ(j).TaupTimes)
                 tp = EQ(j).TaupTimes(k);
-                tparr = tp.arsecs;
+                tparr = tp.truearsecs;
 
                 if tparr >= CP(i).outputs.xax(1) && ...
                             tparr <= CP(i).outputs.xax(end)

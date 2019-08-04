@@ -212,9 +212,9 @@ if ~isempty(EQ)
     fprintf( '\n     *Magnitude:         %7.1f %s',  EQ(1).PreferredMagnitudeValue, EQ(1).PreferredMagnitudeType)
     fprintf( '\n     *Distance (deg):    %7.1f',     EQ(1).TaupTimes(1).distance)
     fprintf( '\n     *Depth (km):        %7.1f',     EQ(1).PreferredDepth)
-    fprintf( '\n     *Arrival time (s):  %7.1f',     EQ(1).TaupTimes(1).arsecs)
+    fprintf( '\n     *Arrival time (s):  %7.1f',     EQ(1).TaupTimes(1).truearsecs)
     fprintf(['\n     *JDS residual (s):  ' sprintf(repmat('%7.1f', ...
-            [1 length(JDSarsecs)]), JDSarsecs - EQ(1).TaupTimes(1).arsecs)])
+            [1 length(JDSarsecs)]), JDSarsecs - EQ(1).TaupTimes(1).truearsecs)])
 
 
     % These list all phases of largest earthquake.
@@ -223,8 +223,8 @@ if ~isempty(EQ)
                                       EQ(1).TaupTimes.phaseName) '\n']);
 
     fprintf([ '     All EQ(1) arrivals (s):' sprintf(repmat('  %5.1f', [1 ...
-                        length([EQ(1).TaupTimes.arsecs])]), ...
-                                      EQ(1).TaupTimes.arsecs) '\n\n']);
+                        length([EQ(1).TaupTimes.truearsecs])]), ...
+                                      EQ(1).TaupTimes.truearsecs) '\n\n']);
 
     % These list the magnitudes and distances of ALL earthquakes.
     fprintf(['\n     All magnitudes:' sprintf(repmat('  %5.1f', [1 ...
