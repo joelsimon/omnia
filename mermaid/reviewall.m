@@ -1,5 +1,5 @@
-function reviewall(writecp)
-% REVIEWALL(writecp)
+function reviewall(writecp, floatnum)
+% REVIEWALL(writecp, floatnum)
 %
 % Review all unreviewed $MERMAID events using reviewevt.m, assuming
 % same system configuration as JDS.
@@ -7,6 +7,8 @@ function reviewall(writecp)
 % Input:
 % writecp   true to run writechangepointall.m after review
 %           false to skip running writechangepointall.m (def)
+% floatnum  Character array of MERMAID float number, to only review
+%               those .evt files associated with it (e.g., '12')
 %
 % Output:
 % N/A       Writes reviewed .evt files, updates .txt files, 
@@ -16,13 +18,26 @@ function reviewall(writecp)
 % Contact: jdsimon@princeton.edu
 % Last modified: 01-Jun-2019, Version 2017b
 
-% Default.
+% Defaults.
 defval('writecp', false)
+defval('floatnum', [])
 
-% Grab directory containing the raw .evt files.  We will loop over
-% each .raw.evt file below and check if there is a corresponding
-% reviewed .evt file; if not, we review.
-d = skipdotdir(dir(fullfile(getenv('MERMAID'), 'events', 'raw', 'evt')));
+% Grab directory containing the raw .evt files.  Loop over each
+% .raw.evt file below and check if there is a corresponding reviewed
+% .evt file; if not, review it.
+if isempty(floatnum)
+    d = skipdotdir(dir(fullfile(getenv('MERMAID'), 'events', 'raw', 'evt')));
+
+else
+    % Review only those .evt files associated with a specific floatnum.
+    if isnumeric(floatnum)
+        floatnum = num2str(floatnum);
+
+    end
+    floats = sprintf('*.%s_*evt', floatnum);
+    d = skipdotdir(dir(fullfile(getenv('MERMAID'), 'events', 'raw', 'evt', floats)));
+
+end
 
 clc
 fprintf('Searching for unreviewed SAC files...\n')
