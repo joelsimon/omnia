@@ -25,13 +25,13 @@ switch nplot
 
   case 2
     [~, ha] = krijetem(subnum(4, 3));
-    shrink(ha, 0.8, 1)
+    shrink(ha, 0.8, 1.25)
     moveh(ha(1:4), -0.05)
     moveh(ha(9:12), 0.05)
     
-    movev(ha([1 5 9]), 0.06)
-    movev(ha([2 6 10]), 0.02)    
-    movev(ha([3 7 11]), -0.02)    
+    movev(ha([1 5 9]), 0.08)
+    movev(ha([2 6 10]), (7/3)*10^-2)
+    movev(ha([3 7 11]), -(7/3)*10^-2)
     movev(ha([4 8 12]), -0.06)    
 
   otherwise
@@ -51,7 +51,6 @@ for i = 1:length(ha)
     % structure and the SAC file header.
     if ~isequal(EQ(1).TaupTimes(1).pt0, h.B)
         ridx
-        keyboard
         error('EQ(1).TaupTimes(1).pt0 ~= h.B')
 
     end
@@ -84,12 +83,12 @@ for i = 1:length(ha)
 
    % IDEA: have ridx be equal to the line number of firstarrival.txt;
    % i.e., you may look up the SAC file with the line number.
-    title(sprintf('%i: tres. = %.2f s', ridx, tres), 'FontSize', ...
-          ax.FontSize, 'FontWeight', 'Normal')
+    title(sprintf('tres. = %.2f s', tres), 'FontSize', ax.FontSize, ...
+          'FontWeight', 'Normal')
     sacname = strippath(strrep(s{ridx}, '_', '\_'));
     ylabel(sprintf('counts [%.1e]', max_counts), 'FontSize', ax.FontSize)
-    xlabel(sprintf('time relative to %s \\textit{%s}-phase (s)', ...
-                   EQ(1).TaupTimes(1).model, EQ(1).TaupTimes(1).phaseName), ...
+    xlabel(sprintf('time relative to %s \\textit{%s}-phase (s)\n[%s]', ...
+                   EQ(1).TaupTimes(1).model, EQ(1).TaupTimes(1).phaseName, sacname), ...
            'FontSize', ax.FontSize)
 
     % Adjust the axes.
@@ -139,8 +138,8 @@ for i = 1:length(ha)
     tack2corner(ax, txll, 'SouthWest')    
 
     % Uncertainty estimate.
-    ci = true; 
-    %ci = false;  
+    %    ci = true; 
+    ci = false;  
     if ci 
         M1 = cpci(xw, 'kw', 1000, [], 'fast', false, true);
 
