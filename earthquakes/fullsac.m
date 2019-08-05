@@ -67,7 +67,7 @@ else
         s = fullfile(d.folder, d.name);     
     else
         s = [];
-        warning('%s was not found in %s or any of it''s subfolders.', ...
+        warning('%s was not found in %s or any of its subfolders.', ...
                 singl, diro)
     end
     
