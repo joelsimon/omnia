@@ -72,7 +72,7 @@ else
     rawCP = [];
 
 end
-clear('tmp')
+clearvars tmp
 
 % Check if the event has been reviewed.  Use dir.m recursive search to
 % look through 'identified/', 'unidentified/, and 'purgatory/'
@@ -86,7 +86,7 @@ else
     rev_evt = fullfile(rev_dir.folder, rev_dir.name);
     tmp = load(rev_evt, '-mat');
     revEQ = tmp.EQ;
-    clear('tmp')
+    clearvars tmp
 
 end
 %% N.B.________________________________________________________________%
