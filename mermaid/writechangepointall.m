@@ -1,4 +1,5 @@
-% Script to run writechangepoint.m on all identified SAC files
+function writechangepointall
+% Function to run writechangepoint.m on all identified SAC files
 % assuming JDS' system configuration.
 %
 % Compute M1 error estimation for every SAC file using 1000
@@ -8,6 +9,7 @@
 % Contact: jdsimon@princeton.edu
 % Last modified: 23-Mar-2019, Version 2017b
 
+pool = gcp;
 diro = fullfile(getenv('MERMAID'), 'events', 'changepoints');
 s = fullsac;
 parfor i = 1:length(s)
@@ -19,7 +21,4 @@ parfor i = 1:length(s)
 
     end        
 end
-    
-    
-    
-    
+delete(pool)
