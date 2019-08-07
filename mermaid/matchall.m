@@ -1,19 +1,31 @@
-% Script to match all unmatched $MERMAID SAC files to the IRIS
+function matchall
+% Matches all unmatched $MERMAID SAC files to the IRIS
 % database using cpsac2evt.m and its defaults, assuming same system
 % configuration as JDS.
 %
 % Also writes .cp files with M1 uncertainty estimates.
 %
+% A list of any files which are unsuccessfully matched using
+% cpsac2evt.m are saved as 'matchall_fail.txt' $MERMAID/events (or
+% empty if all successfully matched).
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 17-May-2019, Version 2017b
+% Last modified: 06-Aug-2019, Version 2017b
 
-clear
-close all
+% Find only those SAC files which have not been preliminary matched.
+allsac = fullsac;
+rawevt = skipdotdir(dir(fullfile(getenv('MERMAID'), 'events', 'raw', 'evt')));
+already_matched = strrep({rawevt.name}, '.raw.evt', '.sac'); % Not necessarily reviewed!
+allsac_nopath = cellfun(@(xx) strippath(xx), allsac, 'UniformOutput', false);
+[~, idx] = setdiff(allsac_nopath, already_matched);
 
-s = fullsac;
+% Loop over the unmatched SAC files.
+fail = [];
+s = allsac(idx);
+fprintf('Searching for unmatched SAC files...\n')
 for i = 1:length(s)
-   [x, h] = readsac(s{i});
+    [x, h] = readsac(s{i});
     switch efes(h)
       case 20
         n = 5;
@@ -25,18 +37,28 @@ for i = 1:length(s)
         error('Unrecognized sampling frequency')
         
     end
+
     % Write raw event (.raw.evt) files).
-    cpsac2evt(s{i}, false, 'time', n);
+    try
+        cpsac2evt(s{i}, false, 'time', n);
+
+    catch
+        fail = [fail i];
+
+    end
     close all
 
 end
 
-% Open parallel pool for writechangepointall.m if none exists.
-pool = gcp;
-
 % Write changepoint (.cp) files.
 fprintf('Writing changepoint files...\n')
 writechangepointall;
-delete(pool)
 
-fprintf('All done.\n')
+% Make note of the SAC files that failed to be properly processed by cpsac2evt.m.
+failsac = s(fail);
+warning(['These SAC files were not matched:\n' repmat('%s\n', 1, length(failsac))], failsac{:})
+fid = fopen(fullfile(getenv('MERMAID'), 'events', 'matchall_fail.txt'), 'w');
+fprintf(fid, '%s\n', failsac{:});
+fclose(fid);
+
+fprintf('\n\nAll done.\n')
