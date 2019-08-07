@@ -1,7 +1,7 @@
 function [sac, evt] = revsac(iup, sacdir, revdir)
 % [sac, evt] = REVSAC(iup, sacdir, revdir)
 %
-% REVSAC returns a list of fullpath .sac and .evt filenames associated
+% REVSAC returns a list of fullpath .sac and .evt filenames 
 % whose event information has been reviewed and sorted with
 % reviewevt.m into either:
 %
