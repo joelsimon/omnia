@@ -38,7 +38,7 @@ function [tres, dat, syn, ph, diffc, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ,
 % Last modified: 05-Aug-2019, Version 2017b
 
 defval('s', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
-defval('ci', false)
+defval('ci', true)
 defval('wlen', 30)
 defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
