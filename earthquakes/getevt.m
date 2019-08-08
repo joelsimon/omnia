@@ -63,16 +63,15 @@ if ~exist(raw_evt, 'file')
 end
 
 % Assign load.m output to variable for use in parfor loop.
-tmp = load(raw_evt, '-mat');
-rawEQ = tmp.EQ;
-if isfield(tmp, 'CP')
-    rawCP = tmp.CP;
+raw_tmp = load(raw_evt, '-mat');
+rawEQ = raw_tmp.EQ;
+if isfield(raw_tmp, 'CP')
+    rawCP = raw_tmp.CP;
     
 else
     rawCP = [];
 
 end
-clearvars tmp
 
 % Check if the event has been reviewed.  Use dir.m recursive search to
 % look through 'identified/', 'unidentified/, and 'purgatory/'
@@ -84,9 +83,8 @@ if isempty(rev_dir)
 
 else
     rev_evt = fullfile(rev_dir.folder, rev_dir.name);
-    tmp = load(rev_evt, '-mat');
-    revEQ = tmp.EQ;
-    clearvars tmp
+    rev_tmp = load(rev_evt, '-mat');
+    revEQ = rev_tmp.EQ;
 
 end
 %% N.B.________________________________________________________________%
