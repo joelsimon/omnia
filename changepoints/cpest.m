@@ -42,6 +42,7 @@ function [kw, km, aicx, weights] = cpest(x, algo, dtrnd, bias)
 %    bias = true: var(k) = 1/length(k)*sum((k-mean(k)).^2)
 %
 % Citations:
+% paper??
 % H. Akaike (1998), doi: 10.1007/978-1-4612-1694-0_15
 % C. Li et al. (2009), doi: 10.1016/j.ultras.2008.05.005
 % N. Maeda (1985), doi: 10.4294/zisin1948.38.3_365
