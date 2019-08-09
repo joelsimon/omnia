@@ -3,9 +3,9 @@ function writefirstarrival(s, redo, filename)
 %
 % WRITEFIRSTARRIVAL writes the output of firstarrival.m a text file.
 %
-% N.B. in the description text file below the "true" arrival time
-% (that found with cpest.m) is labeled "dat", while the theoretical
-% arrival time of the first-arriving phase is labeled "syn".
+% N.B. in describing the text file below the "true" arrival time
+% (found with cpest.m) is labeled "dat", while the theoretical arrival
+% time of the first-arriving phase is labeled "syn".
 %
 % Input:
 % s        List of identified SAC filenames (def: revsac(1))
@@ -107,12 +107,13 @@ else
     fprintf(fid, wlines);
     fclose(fid);
 
-    % Write protect the file.
-    fileattrib(filename, '-w')
-
     % Exit with informative printout.
     fprintf('%s %i lines to:\n%s\n', verb, linecount, filename)
 end
+
+
+% Write protect the file.
+fileattrib(filename, '-w')
 
 %_______________________________________________________________________________%
 function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt)
