@@ -1,13 +1,43 @@
-function writefirstarrivals(s, redo, filename)
+function writefirstarrival(s, redo, filename)
+% WRITEFIRSTARRIVAL(s, redo, filename)
+%
+% WRITEFIRSTARRIVAL writes the output of firstarrival.m a text file.
+%
+% N.B. in the description text file below the "true" arrival time
+% (that found with cpest.m) is labeled "dat", while the theoretical
+% arrival time of the first-arriving phase is labeled "syn".
+%
+% Input:
+% s        List of identified SAC filenames (def: revsac(1))
+% redo     true: delete and remake the text file
+%          false: append new lines to the existing tex file unless
+%              that SAC file name already exists in the text file (def)
+% filename Output text file name (def: $MERMAID/.../firstarrivals.txt)
+%
+% Output:
+% Text file with the following columns (firstarrivals.m outputs in parentheses):
+%    (1) SAC filename
+%    (2) Theoretical 1st-arriving phase name (ph)
+%    (3) Travel time residual: dat - syn (tres)
+%    (4) Time delay between cpest.m arrival time estimate and
+%        maximum absolute amplitude (delay)
+%    (5) 2-standard deviation error estimation per M1 method (twosd)
+%    (6) Signal-to-noise ratio of "dat" in a time window centered on "syn"
+%        (SNR)
+%    (7) Maximum absolute amplitude in counts in the time window starting at 
+%        "dat" and extending 1/2 the length of the input window (maxc_y)
+% 
+% See also: firstarrival.m, readfirstarrivals.m
+%
+% Author: Joel D. Simon
+% Contact: jdsimon@princeton.edu
+% Last modified: 09-Aug-2019, Version 2017b
 
-defval('s', psac)
+% Defaults.
+defval('s', revsac(1))
 defval('redo', false)
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'firstarrivals.txt'))
-defval('wlen', 30)
-defval('lohi', [1 5])
-defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
-defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 
 % Data format.
 fmt = ['%44s    ' , ...
@@ -18,11 +48,8 @@ fmt = ['%44s    ' , ...
        '%9.1f    ' , ...
        '%11i\n'];
 
-
-% logical flag: does the file exist?
-file_exists = (exist(filename,'file') == 2);
-
 % Sort out if deleting, appending to, or creating output file.
+file_exists = (exist(filename,'file') == 2);
 if file_exists 
     % Grant write access to file.
     fileattrib(filename, '+w')
@@ -47,6 +74,9 @@ else
 
 end
 
+% Loop over every SAC file, skipping those that already exist in the
+% output file, and concatenating the lines of all others to be written
+% in one fell-swoop later.
 wline = [];
 wlines = [];
 linecount = 0;
@@ -85,12 +115,14 @@ else
 end
 
 %_______________________________________________________________________________%
-
 function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt)
+% Local call to and formatting of firstarrival.m
 
+% Collect.
 [tres, dat, syn, ph, delay, twosd, ~, ~, ~, maxc_y, SNR] = ...
     firstarrival(sac, true, wlen, lohi, sacdir, evtdir);
 
+% Parse.
 data = {strippath(sac), ...
         ph,             ...
         tres,           ...
@@ -99,4 +131,5 @@ data = {strippath(sac), ...
         SNR,            ...
         round(maxc_y)};
 
+% Format.
 wline = sprintf(fmt, data{:});
