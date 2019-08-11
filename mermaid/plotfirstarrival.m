@@ -1,4 +1,4 @@
-function [f, ax] = plotfirstarrival(s, ax, FontSize)
+function [f, ax, tx] = plotfirstarrival(s, ax, FontSize)
 
 defval('s', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
 defval('ax', [])
@@ -17,7 +17,7 @@ if isempty(ax)
 
 end
 
-[tres, dat, syn, ph, diffc, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, ...
+[tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, ...
  EQ, W1, xw2, W2] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir);
 
 plot(ax, xaxw1, xw1, 'LineWidth', 1)
@@ -28,16 +28,19 @@ ax.FontSize = FontSize(2);
 % use %e for the exponential notation and it makes the 'e' look
 % weird.
 
-title(sprintf('tres. = %.2f s, delay = %.2f s', tres, diffc), ...
-      'FontWeight', 'Normal', 'FontSize', FontSize(1))
+title(sprintf('$\\mathrm{t}_\\mathrm{res}$ = %.2f s, delay = %.2f s', ...
+              tres, delay), 'FontWeight', 'Normal', 'FontSize', FontSize(1))
 sacname = strippath(strrep(s, '_', '\_'));
 ylabel(sprintf('counts [%.1e]', maxc_y), 'FontSize', FontSize(1))
-xlabel(sprintf('time relative to %s \\textit{%s}-phase (s)\n[%s]', ...
-               EQ(1).TaupTimes(1).model, ph, sacname), 'FontSize', FontSize(1))
+xlabel(sprintf('time relative to \\textit{%s}-phase (s)\n[%s]', ph, ...
+               sacname), 'FontSize', FontSize(1))
+
+% xlabel(sprintf('time relative to %s \\textit{%s}-phase (s)\n[%s]', ...
+%                EQ(1).TaupTimes(1).model, ph, sacname), 'FontSize', FontSize(1))
 
 % Adjust the axes.
 xlim([-wlen/2 wlen/2])
-rangey = range(xw1) * 0.95;  % Expand axes by some multiple of the range of the windowed segment.
+rangey = range(xw1) * 1.1;  % Expand axes by some multiple of the range of the windowed segment.
 ylim([-rangey rangey])
 
 % Force 7 ticks on x-axis.
@@ -47,13 +50,13 @@ numticks(ax, 'x', 7);
 if length(ax.YTick) > 3
     % I have already forced symmetry with ylim above so we know the median
     % value is going to be 0.
-    ax.YTick = [ax.YTick(1) median(ax.YTick) ax.YTick(end)]
+    ax.YTick = [ax.YTick(1) median(ax.YTick) ax.YTick(end)];
 
 end
 
 % Vertical lines marking theoretical and actual arrival times.
 hold(ax, 'on')
-plot(ax, repmat(0, 1, 2), ylim, 'k', 'LineStyle', '--');  
+plot(ax, zeros(1, 2), ylim, 'k', 'LineStyle', '--');  
 plot(ax, repmat(tres, 1, 2), ylim, 'r', 'LineStyle', '-');
 
 % Circle the maximum counts if it is within the time window plotted
@@ -71,31 +74,32 @@ longticks(ax, 1.5);
 magtype = lower(EQ(1).PreferredMagnitudeType);
 magtype(1) = upper(magtype(1)); % Capitalize only first letter of magnitude type.
 magstr = sprintf('M%.1f %s', EQ(1).PreferredMagnitudeValue, magtype);
-txul = textpatch(ax, 'NorthWest',  magstr, FontSize(2), 'Times', 'LaTeX');
+tx.ul = textpatch(ax, 'NorthWest',  magstr, FontSize(2), 'Times', 'LaTeX');
 
 
 % Depth & Distance.
 depthstr = sprintf('%.1f km', EQ(1).PreferredDepth);
 diststr = sprintf('%.1f$^{\\circ}$', EQ(1).TaupTimes(1).distance);
-txur = textpatch(ax, 'NorthEast',  [depthstr ', ' diststr], FontSize(1), ...
+tx.ur = textpatch(ax, 'NorthEast',  [depthstr ', ' diststr], FontSize(1), ...
                  'Times', 'LaTeX');
 
 
 % SNR.
-txll = textpatch(ax, 'SouthWest', sprintf('SNR = %.1f', SNR), ...
+tx.ll = textpatch(ax, 'SouthWest', sprintf('SNR = %.1f', SNR), ...
                  FontSize(2), 'Times', 'LaTeX');
 
 
 % Uncertainty estimate.
-txlr = textpatch(ax, 'SouthEast', sprintf('2$\\cdot$SD = %.2f s', ...
+tx.lr = textpatch(ax, 'SouthEast', sprintf('2$\\cdot$SD = %.2f s', ...
                                           twosd), FontSize(2), ...
                  'Times', 'LaTeX');
 
-
 pause(0.01)
-tack2corner(ax, txul, 'NorthWest')    
-tack2corner(ax, txur, 'NorthEast')    
-tack2corner(ax, txll, 'SouthWest')    
-tack2corner(ax, txlr, 'SouthEast')    
+tack2corner(ax, tx.ul, 'NorthWest')
+tack2corner(ax, tx.ur, 'NorthEast')
+tack2corner(ax, tx.ll, 'SouthWest')
+tack2corner(ax, tx.lr, 'SouthEast')
 
 latimes
+
+f = gcf;

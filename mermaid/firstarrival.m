@@ -1,4 +1,5 @@
-function [tres, dat, syn, ph, diffc, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ, W1, xw2, W2] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir)
+function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
+          SNR, EQ, W1, xw2, W2] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir)
 %
 %                  tres = dat - syn
 %
@@ -16,22 +17,27 @@ function [tres, dat, syn, ph, diffc, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ,
 % Output:
 % tres     Travel time residual [s] w.r.t first phase arrival:
 %              estimated (cpest.m) - theoretical (taupTime.m)
-% dat      Actual arrival time computed with cpest.m
-% syn      Theoretical arrival time computed with taupTime.m
+% dat      Actual arrival time computed with cpest.m [s]*
+% syn      Theoretical arrival time computed with taupTime.m [s]*
 % ph       Phase name associated with tres
-% xw1       Windowed segment of x, after bandpass filtering,
-%              centered on first theoretical arrival time
-% xaxw1     x-axis centered on syn at 0 seconds
-% maxc_x   
-% maxc     Maximum (or minimum) amplitude of bandpassed signal within
-%              window beginning at dat and ending wlen/2 seconds later
-% twosd    2-standard deviation error estimation per M1 method [s]*
+% xw1      Windowed segment of x, after bandpass filtering,
+%              centered on first theoretical arrival time 
+% xaxw1    x-axis centered on syn at 0 seconds, i.e., compliment to xw1
+% maxc_x   Time at of maximum (or minimum) amplitude of bandpassed signal [s]*
+% maxc_y   Amplitude (counts) of maximum (or minimum) amplitude of bandpassed 
+%              signal within window beginning at dat and ending wlen/2 later
+% twosd    2-standard deviation error estimation per M1 method [s]**
 %              (def NaN)
 % EQ       Earthquake structure associated with SAC file
 %% W1
-%% W2
+%% xw2
+%% W2     
 %
-% * See cpci.m and paper??
+% *The x-axis here is w.r.t to original, NOT windowed, seismogram,
+% i.e. xaxis(h.NPTS, h.DELTA, h.B), where h is the SAC header
+% structure from readsac.m
+%
+% **See cpci.m and paper??
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
@@ -87,7 +93,8 @@ xaxw1 = W1.xax - syn;
 % Changepoint estimate sample considering only the windowed portion centered on the theoretical first arrival.
 cp = cpest(xw1, 'fast', false, true);  
 
-% Signal-to-noise ratio.
+% Signal-to-noise ratio considering window 1 (W1: centered on syn,
+% length wlen), not window 2 (W2: starting at dat, length wlen/2).
 SNR = wtsnr({xw1}, cp, 1);
 
 % The data ('dat') arrival sample is 1 sample after the changepoint
@@ -109,20 +116,26 @@ if SNR > 1
     % complete time segment.
     tres = dat - syn;
 
-    % Maximum amplitude (counts) considering a window of length wlen/2
-    % starting at the actual phase arrival.
+    % Maximum absolute amplitude (counts) considering a window of length
+    % wlen/2 starting at the actual phase arrival.
     [xw2, W2] = timewindow(xf, wlen/2, dat, 'first', h.DELTA, h.B);
-    mmx = minmax(xw2');
-    [~, mmx_idx] = max(abs(mmx));
-    maxc_y = mmx(1);
+    maxy = max(xw2);
+    miny = min(xw2);
+    if maxy > abs(miny)
+        maxc_y = maxy;
+
+    else
+        maxc_y = miny;
+
+    end
 
     % Find the time on the original x-axis of the (first occurrence of)
     % the maximum counts value.
     maxc_x = W2.xax(find(xw2 == maxc_y));
 
-    % diffc is then the dif between the arrival time and the time of the
+    % delay is then the dif between the arrival time and the time of the
     % largest amplitude within the signal segment.
-    diffc = maxc_x - dat;
+    delay = maxc_x - dat;
 
     % Uncertainty estimate.
     if ci 
@@ -145,7 +158,7 @@ else
     W2 = NaN;
     maxc_y = NaN;
     maxc_x = NaN;
-    diffc = NaN;
+    delay = NaN;
     twosd = NaN;
 
 end
