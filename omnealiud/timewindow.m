@@ -24,16 +24,15 @@ function [xw, W] = timewindow(x, wlen, pivot, fml, delta, pt0)
 %
 % Output:
 % xw        Windowed time series
-% W         Structure of timing info that relates xw to x
-%           lx: length of xw
-%           delta: input delta
-%           xax: x-axis of x observed by window
-%           xlsamp: sample index in x of first sample of xw
-%           xrsamp: sample index in x of last sample of xw
-%           xlsecs: time assigned in x to first sample of xw
-%           xrsecs: time assigned in x to last sample of xw
-%           wlensamp: true window length in samples
-%           wlensecs: true window length in seconds
+% W         Structure of timing info that relates xw to x:
+%           .delta: input delta
+%           .xax: x-axis of x observed by window
+%           .xlsamp: sample index in x of first sample of xw
+%           .xrsamp: sample index in x of last sample of xw
+%           .xlsecs: time assigned in x to first sample of xw
+%           .xrsecs: time assigned in x to last sample of xw
+%           .wlensamp: true window length in samples
+%           .wlensecs: true window length in seconds
 %
 % Ex: (Seismogram in blue, windowed portions in red and magenta.)
 %     (Note that 0 seconds here is the event origin time (h.O).)
@@ -112,7 +111,6 @@ wlensecs = wxax(end) - wxax(1);
 % Organized the output structure.
 xw = x(xlsamp:xrsamp);
 
-W.lx = length(xw);
 W.delta = delta;
 W.xax = wxax;
 W.xlsamp = xlsamp;
