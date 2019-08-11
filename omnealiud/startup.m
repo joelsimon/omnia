@@ -49,3 +49,4 @@ javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
 % repositories it depends on, may delete.
 %____________________________________________________%
 addpath(genpath('~/collab'))
+addpath(genpath('~/offline'))
