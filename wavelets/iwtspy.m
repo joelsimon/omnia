@@ -75,8 +75,7 @@ if exist(spyfile, 'file')
 
     end
 end
-
-disp('Generating new iwtspy experiment...')
+fprintf('Generating new iwtspy experiment...\n')
 
 % Transform a time series of zeros to get the output cell sizes.
 [a, d, an, dn] = wt(zeros(1,lx), tipe, nvm, n, pph, intel);
@@ -94,6 +93,7 @@ end
 % What is physically means: energy at that scale at that coefficient
 % is not seen in the original time series.
 iabe(~isfinite(iabe)) = NaN;
+fprintf('...completed approximations...\n')
 
 % Do n times for details.
 idbe = celldeal(d, NaN);
@@ -108,6 +108,7 @@ for j = 1:length(d)
 
     end
     idbe{j}(~isfinite(idbe{j})) = NaN;
+    fprintf('...completed details scale %i of %i...\n', j, n)
 
 end
 
@@ -123,7 +124,6 @@ fprintf('\nSaved new iwtspy experiment to %s.\n', spyfile)
 % reconstructions are all empty except for the relevant scale I'm
 % testing; i.e. the partial reconstruction and the summed inverse are
 % the same.
-
 
 %_________________________________________________________________%
 
