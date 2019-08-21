@@ -4,7 +4,7 @@
 # and .pdf files, and changepoint (.cp) files.
 #
 # Last modified by fjsimons-at-alum.mit.edu, 02/12/2019
-# Last modified by jdsimon-at-printceton.edu, 07/16/2019
+# Last modified by jdsimon-at-printceton.edu, 08/11/2019
 
 set MERMAID = $MERMAID
 
@@ -41,8 +41,13 @@ set rawpdf_count = `find $MERMAID/events/raw -iname '*.pdf' | wc -l`
 set cp_count = 0 
 set cp_count = `find $MERMAID/events/changepoints/ -iname '*.cp' | wc -l`
 
+# Count number of SAC files that failed to be properly processed by cpsac2evt.m
+set failed_count = 0
+set failed_count = `grep .sac $MERMAID/events/matchall_fail.txt | wc -l`
+
 echo ------------------
-printf "Total raw .evt : %4i\n" $rawevt_count
-printf "Total      .cp : %4i\n" $cp_count
-printf "Total raw .pdf : %4i [2 * raw .evt = %4i]\n" $rawpdf_count $double_rawevt_count
-printf "Total rev .evt : %4i\n" $revevt_count
+printf "Total raw  .evt : %4i\n" $rawevt_count
+printf "Total fail .evt : %4i\n" $failed_count
+printf "Total      .cp  : %4i\n" $cp_count
+printf "Total raw  .pdf : %4i [2 * raw .evt = %4i]\n" $rawpdf_count $double_rawevt_count
+printf "Total rev  .evt : %4i\n" $revevt_count
