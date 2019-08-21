@@ -12,9 +12,10 @@ set floatnum = (P-06 P-07 P-08 P-09 P-10 P-11 P-12 P-13 P-16 P-17 P-18 \
 		P-19 P-20 P-21 P-22 P-23 P-24 P-25 N-01 N-02 N-04 N-05) #P-0050 P-0052
 
 # OSX does not have the standard date formatting commands.  Must use a
-# psuedo-swtich statment.  Redirect any error to the /dev/null/ to suppress
-# output to stdout and check if it failed.
-date -d >& /dev/null
+# psuedo-swtich statment.  Redirect any error to the /dev/null/ to
+# suppress output to stdout and check if it failed. On a proper Linux
+# machine ths will display as '01-Jan-0001'; in Mac terminal it breaks.
+date -d 00010101 +'%d-%b-%Y' >& /dev/null
 if ( $? == 0 ) then
     set osx = 0
 else
