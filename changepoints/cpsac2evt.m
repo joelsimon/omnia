@@ -1,6 +1,6 @@
 function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
                                ph, conf, fml, diro, baseurl, varargin)
-% [EQ, CP, rawevt, rawpdfc, rawpdfw] = ...
+% [EQ, CP, rawevt, rawpdfc, rawpdfw, F] = ...
 %    CPSAC2EVT(sac, redo, domain, n, inputs, model, ph, ...
 %              conf, fml, diro, baseurl, [param, value])
 %
@@ -38,6 +38,8 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
 % CP            Changepoint structure, from changepoint.m (see there)
 % rawevt        Output raw .evt filename 
 % rawpdfc/w     Output .pdf filenames for *complete* and *windowed* 
+% F             Structure containing both figure handles and other bits
+%                  (def: [], if event already matched)
 %
 % CPSAC2EVT requires the following folders exist with write permission:
 %    (1) [diro]/raw/evt/
@@ -85,6 +87,7 @@ defval('conf', -1)
 defval('fml', [])
 defval('diro', fullfile(getenv('MERMAID'), 'events'))
 defval('baseurl', 1)
+F = [];
 
 % Separate filename from extension and determine if output files
 % already exist.
@@ -105,7 +108,7 @@ if ~redo && all([exist(rawevt, 'file') exist(rawpdfc, 'file') ...
     CP = tmp.CP;
     clear tmp;
 
-    outargs = {EQ, CP, rawevt, rawpdfc, rawpdfw};
+    outargs = {EQ, CP, rawevt, rawpdfc, rawpdfw, F};
     varargout = outargs(1:nargout);
     fprintf(['\n%s.sac already processed by cpsac2evt:\n%s\nSet ''redo''= ' ...
              'true to run cpsac2evt again.\n\n'],  sans_sac, rawevt)
@@ -214,9 +217,6 @@ for i = 1:2
         [F(i).f.lgmag, F(i).f.lgmagtx] = textpatch(ax, 'NorthWest', magstr);
         [F(i).f.lgdist, F(i).lgdisttx] = textpatch(ax, 'SouthWest', [diststr ', ' depthstr]);
 
-        tack2corner(ax, F(i).f.lgmag, 'NorthWest');
-        tack2corner(ax, F(i).f.lgdist, 'SouthWest');
-
         % This time is w.r.t. the reference time in the SAC header, NOT
         % seisdate.B. CP.xax has the time of the first sample (input:
         % pt0) assigned to h.B, meaning it is an offset from some
@@ -229,24 +229,30 @@ for i = 1:2
                                                           '_', '\_'));
         
     end
+end
 
-    % The axes have been shifted -- need to adjust the second (AIC) adjust and re-tack2corner the annotations.
+% Set interpreter to LaTeX and fonts to Times.
+latimes
+
+% Save the complete and windowed pdf.
+corw = {'complete', 'windowed'};
+for i = 1:length(F)
+    % The axes have been shifted -- need to adjust the second (AIC) adjust
+    % and re-tack2corner the annotations.
     for l = 1:length(F(i).f.ha)
         F(i).f.ha2(l).Position = F(i).f.ha(l).Position;
         
     end
 
+    tack2corner(F(i).f.ha(1), F(i).f.lgmag, 'NorthWest');
+    tack2corner(F(i).f.ha(1), F(i).f.lgdist, 'SouthWest');
+
     for l = 1:length(F(i).f.lgSNR)
-        tack2corner(F(i).f.ha2(l+1), F(i).f.lgSNR(l), 'll');
+        tack2corner(F(i).f.ha(l+1), F(i).f.lgSNR(l), 'SouthWest');
 
     end
 
-end
-
-latimes    
-
-corw = {'complete', 'windowed'};
-for i = 1:2
+    % Save em.
     pdfname = sprintf([strrep(strippath(sac), 'sac', '') '%s'], ...
                       [corw{i} '.raw']);
     rawpdf{i} = savepdf(pdfname, F(i).fig, fullfile(diro, 'raw', 'pdf'));
@@ -254,7 +260,8 @@ for i = 1:2
     
 end
 
+% Save the .evt file with the EQ structure(s).
 save(rawevt, 'EQ', 'CP', '-mat')
 fprintf('Saved %s\n\n', rawevt);
-outargs = {EQ, CP, rawevt, rawpdfc, rawpdfw};
+outargs = {EQ, CP, rawevt, rawpdfc, rawpdfw, F};
 varargout = outargs(1:nargout);
