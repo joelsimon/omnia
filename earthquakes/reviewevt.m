@@ -218,16 +218,21 @@ if ~isempty(EQ)
 
 
     % These list all phases of largest earthquake.
-    fprintf(['\n\n\n     All EQ(1) phases:      ' sprintf(repmat('  %5s', [1 ...
+    fprintf(['\n\n\n     EQ(1) phases:      ' sprintf(repmat('  %5s', [1 ...
                         length([EQ(1).TaupTimes.phaseName])]), ...
                                       EQ(1).TaupTimes.phaseName) '\n']);
 
-    fprintf([ '     All EQ(1) arrivals (s):' sprintf(repmat('  %5.1f', [1 ...
+    fprintf([ '     EQ(1) arrivals (s):' sprintf(repmat('  %5.1f', [1 ...
                         length([EQ(1).TaupTimes.truearsecs])]), ...
                                       EQ(1).TaupTimes.truearsecs) '\n\n']);
 
     % These list the magnitudes and distances of ALL earthquakes.
-    fprintf(['\n     All magnitudes:' sprintf(repmat('  %5.1f', [1 ...
+    fprintf(['\n     EQ(#):     ' sprintf(repmat('  %5i', [1 ...
+                        length([EQ.PreferredMagnitudeValue])]), ...
+                                              1:length([EQ.PreferredMagnitude])) '\n'])
+
+
+    fprintf([  '     Magnitude: ' sprintf(repmat('  %5.1f', [1 ...
                         length([EQ.PreferredMagnitudeValue])]), ...
                                       EQ.PreferredMagnitudeValue) '\n']);
 
@@ -236,7 +241,7 @@ if ~isempty(EQ)
 
     end
 
-    fprintf([ '     All distances: ' sprintf(repmat('  %5.1f', [1 length(dists)]), dists) '\n\n']);
+    fprintf([  '     Distance:  ' sprintf(repmat('  %5.1f', [1 length(dists)]), dists) '\n\n']);
     fprintf(['\n     !! Paused execution -- type ''dbcont'' to continue !!\n\n'])
     keyboard
 
@@ -280,8 +285,7 @@ end
 
 switch lower(yn)
   case {'y', 'yes', 'm', 'maybe'}
-   
-    if any(strcmp(yn, {'y' 'yes'}))
+    if any(strcmpi(yn, {'y' 'yes'}))
         status = 'identified';
         
     else
@@ -438,7 +442,7 @@ if previously_reviewed && git_tracked
     new_review.name = [name ext];
     cd(new_review.folder)
     [~, ~] = system(sprintf('git add -- %s', new_review.name));
-    fprintf('\n\nRan "git add -- %s" in %s', new_review.name, ...
+    fprintf('\n\nRan "git add -- %s" in %s\n', new_review.name, ...
             new_review.folder)
     
     try
@@ -447,6 +451,6 @@ if previously_reviewed && git_tracked
 
     end
 else
-    fprintf('\nWrote:   %s\n\n', newfile)
+    fprintf('\nWrote:\n%s\n\n', newfile)
 
 end
