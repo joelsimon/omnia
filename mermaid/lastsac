@@ -6,15 +6,28 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 22-Jul-2019
+# Last modified: 21-Aug-2019
 
 set floatnum = (P-06 P-07 P-08 P-09 P-10 P-11 P-12 P-13 P-16 P-17 P-18 \
 		P-19 P-20 P-21 P-22 P-23 P-24 P-25 N-01 N-02 N-04 N-05) #P-0050 P-0052
 
+# OSX does not have the standard date formatting commands.  Must use a
+# psuedo-swtich statment.  Redirect any error to the /dev/null/ to suppress
+# output to stdout and check if it failed.
+date -d >& /dev/null
+if ( $? == 0 ) then
+    set osx = 0
+else
+    set osx = 1
+endif
+
 foreach float ($floatnum[*])
     set perfloat = `ls -1 $MERMAID/processed/*$float*/*/*.sac | tail -1`
     set lasttime = `basename $perfloat | awk '{print substr($0,1,8)}'` 
-    set lastdate = `date -d $lasttime +'%d-%b-%Y'`
+    if ( $osx == 0) then
+        set lastdate = `date -d $lasttime +'%d-%b-%Y'`
+    else
+	set lastdate = `date -jf "%Y%m%d" $lasttime +"%d-%b-%Y"`
+    endif
     printf "Float %s : %s\n" $float $lastdate
-
 end
