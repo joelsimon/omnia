@@ -22,6 +22,15 @@ function reviewall(writecp, floatnum)
 defval('writecp', false)
 defval('floatnum', [])
 
+% Swtich the .pdf viewer depending on the platform.
+switch computer
+  case 'MACI64'
+    viewr = 3;
+otherwise
+  viewr = 2;
+
+end
+
 % Grab directory containing the raw .evt files.  Loop over each
 % .raw.evt file below and check if there is a corresponding reviewed
 % .evt file; if not, review it.
@@ -52,7 +61,7 @@ for i = 1:length(d)
 
     else
         clc
-        reviewevt(sac, [], [], 2);
+        reviewevt(sac, [], [], viewr);
 
     end
     clc
