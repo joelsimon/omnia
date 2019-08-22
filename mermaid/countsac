@@ -43,7 +43,7 @@ set cp_count = `find $MERMAID/events/changepoints/ -iname '*.cp' | wc -l`
 
 # Count number of SAC files that failed to be properly processed by cpsac2evt.m
 set failed_count = 0
-set failed_count = `grep .sac $MERMAID/events/matchall_fail.txt | wc -l`
+set failed_count = `grep .sac $MERMAID/events/raw/matchall_fail.txt | wc -l`
 
 echo ------------------
 printf "Total raw  .evt : %4i\n" $rawevt_count
