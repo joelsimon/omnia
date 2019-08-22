@@ -3,10 +3,14 @@ function pdfout = savepdf(fname, figs, diro, transdpi)
 %
 % Save(s) figure(s) as PDF(s).
 %
+% SAVEPDF requires:
+%     [1] $PDF exists (as a path) and is known to MATLAB
+%     [2] epstopdf exists on the system
+%
 % SAVEPDF appends a number to end the end of 'fname' for each figure
 % if multiple figures are input
 % 
-% Inputs:
+% Input:
 % fname          Name of PDF to be saved (def: 'test')
 % figs           Array of figure handles (def: gcf)
 % diro           Output directory to save file (def: $PDF)
