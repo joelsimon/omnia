@@ -22,6 +22,7 @@ allsac_nopath = cellfun(@(xx) strippath(xx), allsac, 'UniformOutput', false);
 
 % Loop over the unmatched SAC files.
 fail = [];
+new = [];
 s = allsac(idx);
 fprintf('Searching for unmatched SAC files...\n')
 for i = 1:length(s)
@@ -41,6 +42,7 @@ for i = 1:length(s)
     % Write raw event (.raw.evt) files).
     try
         cpsac2evt(s{i}, false, 'time', n);
+        new = [new + 1];
 
     catch
         fail = [fail i];
@@ -51,13 +53,25 @@ for i = 1:length(s)
 end
 
 % Write changepoint (.cp) files.
-fprintf('Writing changepoint files...\n')
-writechangepointall;
+if new > 0
+    fprintf('Writing changepoint files...\n')
+    writechangepointall;
+
+end
 
 % Make note of the SAC files that failed to be properly processed by cpsac2evt.m.
-failsac = s(fail);
-warning(['These SAC files were not matched:\n' repmat('%s\n', 1, length(failsac))], failsac{:})
-fid = fopen(fullfile(getenv('MERMAID'), 'events', 'matchall_fail.txt'), 'w');
+if ~isempty(fail)
+    failsac = s(fail);
+    failsac = cellfun(@(xx) strippath(xx), failsac, 'UniformOutput', ...
+                      false)
+    warning(['These SAC files were not matched:\n' ...
+             repmat('%s\n', 1, length(failsac))], failsac{:})
+
+else
+    failsac = {};
+
+end
+fid = fopen(fullfile(getenv('MERMAID'), 'events', 'raw', 'matchall_fail.txt'), 'w');
 fprintf(fid, '%s\n', failsac{:});
 fclose(fid);
 
