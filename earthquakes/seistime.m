@@ -75,7 +75,7 @@ function [seisdate, seiststr, seisertime, refdate, evtdate] = seistime(h)
 % 
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 17-Sep-2018, Version 2017b
+% Last modified: 26-Aug-2019, Version 2017b
 % Documented 2017.2 pg. 45
 
 % NOTES ABOUT TIMING IN SAC
@@ -97,9 +97,11 @@ function [seisdate, seiststr, seisertime, refdate, evtdate] = seistime(h)
 % for the offset from reference time.
 
 % Generate date formats, pull times from SAC header, feed to datetime.m
+nullval = -12345;
 tims = [h.NZYEAR h.NZJDAY h.NZHOUR h.NZMIN h.NZSEC h.NZMSEC];
-if any(tims == -12345)
-    error('Null value (-12345) in header time.')
+if any(tims == nullval)
+    error('Null value (-12345): h.NZ*')
+
 end
 headertimes = num2str(tims);
 
@@ -110,7 +112,25 @@ refdate = datetime(headertimes, 'InputFormat', datefmt, 'TimeZone', 'UTC');
 % From SAC manual -- "All other times are offsets in seconds from this
 % reference time and are stored as floating point values in the
 % header."
+if h.B == nullval;
+    error('Null value (-12345): h.B')
+
+end
 seisdate.B = refdate + seconds(h.B);
+
+if h.E == nullval
+    if h.NPTS == nullval
+        error('Null value (-12345): h.NPTS')    
+        
+    end
+    if h.DELTA == nullval
+        error('Null value (-12345): h.DELTA')    
+
+    end
+    xax = xaxis(h.NPTS, h.DELTA, h.B);
+    h.E = xax(end);
+
+end
 seisdate.E = refdate + seconds(h.E);
 
 % Put into serial time.
