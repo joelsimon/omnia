@@ -31,7 +31,7 @@ function varargout = wtspy(lx, tipe, nvm, n, pph, intel)
 % would need to iterate every scale individually and use minmax to set
 % up an [2 x lx] array which could then be read horizontally to find
 % abe, dbe.  This would be slower but more robust.  Alternatively, it
-% could be refactoring to run in parallel.
+% could be refactored to run in parallel.
 %
 % Input:  
 % lx          The length of the time series to be analyzed
@@ -79,11 +79,12 @@ function varargout = wtspy(lx, tipe, nvm, n, pph, intel)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 28-Dec-2018, Version 2017b
+% Last modified: 16-Aug-2019, Version 2017b
 
 % Defaults.
 defval('tipe', 'CDF')
 defval('nvm', [2 4])
+defval('n', 5)
 defval('pph', 4)
 defval('intel', 0)
 
@@ -100,30 +101,21 @@ spyfile = strrep(mfile, [mfilename '.m'], [mfilename '.mat']);
 [pstr, lstr] = wtstr(lx, tipe, nvm, n, pph, intel);
 expstr = [pstr '_' lstr];
 
-% Sentinel value: precomputed results file exists.
-if exist(spyfile, 'file')
-    spyexists = true;
-
-else
-    spyexists = false;
-
-end
-
-% Sentinel value: this specific experiment exists in the precomputed results.
+% Determine if file of precomputed time smears exists, and if this
+% experiment has been performed before and thus can be directly
+% loaded.
+spyexists = [exist(spyfile, 'file') == 2];
 if spyexists
-    % Must load data in this way and reassign WTSPY to data.WTSPY so this
-    % function may be used in a parfor loop.
     data = load(spyfile);
-    WTSPY = data.WTSPY;
-    clear('data')
-
-    if isfield(WTSPY, expstr)
+    if isfield(data.WTSPY, expstr)
         expexists = true;
 
     else
         expexists = false;
 
     end
+else
+    expexists = false;
 
 end
 
@@ -139,8 +131,8 @@ end
 if expexists && ~sprequested
     % Requested experiment exists in precomputed results and full sparsity
     % matrix ('sp') is not requested as output.  Load output and exit.
-    abe = WTSPY.(expstr).abe;
-    dbe = WTSPY.(expstr).dbe;
+    abe = data.WTSPY.(expstr).abe;
+    dbe = data.WTSPY.(expstr).dbe;
     outargs = {abe, dbe};
 
 else
@@ -184,18 +176,19 @@ else
     % Put scaling coeffs ('a') at end.
     abe = cbce(cdn(end):length(cbce), :);
     
-    % If the savefile doesn't exist, there is nothing to append, so
-    % you're done. Exit if statement and collect vars.
-    % Else, if this field doesn't exist in master structure, add it.
-    if ~expexists
-        % Need to save this specific experiment.
-        WTSPY.(expstr).abe = abe;
-        WTSPY.(expstr).dbe = dbe;
-        WTSPY = orderfields(WTSPY);
-        save(spyfile, 'WTSPY', '-mat')
-        fprintf('\nSaved new wtspy experiment to %s.\n', spyfile)
+    % Save this specific experiment.
+    if spyexists & ~expexists
+        % Append if savefile already exists.
+        data = load(spyfile);
+        WTSPY = data.WTSPY;
+        clearvars data
 
     end
+    WTSPY.(expstr).abe = abe;
+    WTSPY.(expstr).dbe = dbe;
+    WTSPY = orderfields(WTSPY);
+    save(spyfile, 'WTSPY', '-mat')
+    fprintf('\nSaved new wtspy experiment to %s.\n', spyfile)
 
     % Collect output arguments.
     outargs = {abe, dbe, sp, cdn};
@@ -204,19 +197,8 @@ end
 % Collect outputs.
 varargout = outargs(1:nargout);
 
-
 % *(1) 10-Aug-2018: Verified that the nonzero value of the spike doesn't
 % affect output 'dbe', or the nonzero components of 'sp'.  E.g.,
 % full(sparse(1,index,1e9,1,lx)) gives the same outputs as
 % full(sparse(1,index,1.0,1,lx)) (though the actual values of 'sp' are
 % different).
-
-% *(2) 14-Aug-2018: There is some weirdness sometimes with lifting
-% where the second to last index will see the edge but not the last
-% index.  Therefore, in wtedge.m set all indices before the LAST
-% detail you see the start of time series (e1), and after the FIRST
-% detail at which you see the end of the time series, to nan.  Also,
-% I'm checking both columns just to be sure safe; I don't know if
-% maybe the wavelet flips in some algorithms so it would see the end
-% of the signal in the first column but not the last (e.g.,
-% dbe{1}(end,:) = [1000 999]).

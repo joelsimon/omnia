@@ -29,7 +29,7 @@ function [iabe, idbe] = iwtspy(lx, tipe, nvm, n, pph, intel)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 18-Jan-2019, Version 2017b
+% Last modified: 16-Aug-2019, Version 2017b
 
 % Defaults and sanity.
 defval('tipe', 'CDF')
@@ -63,19 +63,22 @@ spyfile = strrep(mfile, [mfilename '.m'], [mfilename '.mat']);
 expstr = [pstr '_' lstr];
 
 % Check if precomputed result already exists.
-if exist(spyfile, 'file')
+spyexists = [exist(spyfile, 'file') == 2];
+if spyexists
     data = load(spyfile);
-    IWTSPY = data.IWTSPY;
-    clear('data')
-
-    if isfield(IWTSPY, expstr)
-        iabe = IWTSPY.(expstr).iabe;
-        idbe = IWTSPY.(expstr).idbe;
+    if isfield(data.IWTSPY, expstr)
+        iabe = data.IWTSPY.(expstr).iabe;
+        idbe = data.IWTSPY.(expstr).idbe;
         return
+
+    else
+        fprintf('Generating new iwtspy experiment...\n')
 
     end
 end
-fprintf('Generating new iwtspy experiment...\n')
+
+% Clear the large structure to free up memory.
+clearvars data
 
 % Transform a time series of zeros to get the output cell sizes.
 [a, d, an, dn] = wt(zeros(1,lx), tipe, nvm, n, pph, intel);
@@ -113,6 +116,12 @@ for j = 1:length(d)
 end
 
 % Save the new experiment.
+if exist(spyfile, 'file')
+    data = load(spyfile);
+    IWTSPY = data.IWTSPY;
+    clearvars data
+
+end
 IWTSPY.(expstr).iabe = iabe;
 IWTSPY.(expstr).idbe = idbe;
 IWTSPY = orderfields(IWTSPY);
