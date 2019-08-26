@@ -1,7 +1,7 @@
 function tstr = irisdate2str(tdate, precision)
-% tstr = IRISDATE2STR(tdate)
+% tstr = IRISDATE2STR(tdate, precision)
 %
-% FDSNDATE2STR converts a datetime to a character array formatted such
+% IRISDATE2STR converts a datetime to a character array formatted such
 % that it is a valid input to irisFetch.
 %
 % Input:
@@ -13,7 +13,7 @@ function tstr = irisdate2str(tdate, precision)
 % Output:
 % tstr      Datestr formatted for irisFetch
 %
-% See also: irisFetch
+% See also: irisstr2date, fdsndate2str.m, fdsnstr2date.m
 %
 % Ex:
 %    tdate = datetime('now');
