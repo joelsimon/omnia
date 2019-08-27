@@ -1,6 +1,6 @@
 function [xf,co,npol,npas,tipe,HABS2,F,EPB]=...
     bandpass(x,Fs,colo,cohi,npol,npas,tipe)
-% [xf,HABS2,F,EPB]=BANDPASS(x,Fs,colo,cohi,npol,npas,tipe)
+% [xf,co,npol,npas,tipe,HABS2,F,EPB]=BANDPASS(x,Fs,colo,cohi,npol,npas,tipe)
 %
 % Filters signal 'x' with filter 'tipe' and corner
 % frequencies 'cohi' and 'cohi' in Hz with 'npol' the 
@@ -31,12 +31,15 @@ function [xf,co,npol,npas,tipe,HABS2,F,EPB]=...
 %
 % Last modified by fjsimons-at-alum.mit.edu, Nov 21th, 2004
 %
-% Last modified in Ver. 2017a by jdsimon@princeton.edu, 13-Apr-2018,
-% to note that EPB output (via bpmin.m, decibel.m) is broken.  Also,
-% did FJS ever have his own detrend.m or has this always called
-% MATLAB's builtin (to remove the linear best fit?).  My old notes
-% here seem to imply a previous version failed because FJS had a
-% conflicting detrend.m.
+% Last modified in Ver. 2017b by jdsimon@princeton.edu, 27-Aug-2019 to
+% correct function help output argument list.
+%
+% Modified in Ver. 2017a by jdsimon@princeton.edu, 13-Apr-2018, to
+% note that EPB output (via bpmin.m, decibel.m) is broken.  Also, did
+% FJS ever have his own detrend.m or has this always called MATLAB's
+% builtin (to remove the linear best fit?).  My old notes here seem to
+% imply a previous version failed because FJS had a conflicting
+% detrend.m.
 
 defval('npol',2)
 defval('npas',1)
@@ -73,12 +76,11 @@ HABS2=abs(H).^2;
 xf=filter(B,A,detrend(x(:)));
 
 if npas==2
-  xf=flipud(filter(B,A,detrend(flipud(xf(:)))));  
-  HABS2=HABS2.^2;
+    xf=flipud(filter(B,A,detrend(flipud(xf(:)))));  
+    HABS2=HABS2.^2;
 end
 
 warning off
-%% Joel note: the following is broken.
 %EPB=bpmin(decibel(HABS2),F,3);
 warning on
 
