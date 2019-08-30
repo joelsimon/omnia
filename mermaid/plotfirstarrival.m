@@ -1,15 +1,15 @@
-function [f, ax, tx] = plotfirstarrival(s, ax, FontSize)
+function [f, ax, tx] = plotfirstarrival(s, ax, FontSize, EQ)
+% NEEDS HEADER
 
 defval('s', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
 defval('ax', [])
 defval('FontSize', [14 12])
+defval('EQ', [])
 defval('ci', true)
 defval('wlen', 30)
 defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
-defval('nplot', 2)
-
 
 if isempty(ax)
     f = figure;
@@ -18,9 +18,9 @@ if isempty(ax)
 end
 
 [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, ...
- EQ, W1, xw2, W2] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir);
+ EQ, W1, xw2, W2] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ);
 
-plot(ax, xaxw1, xw1, 'LineWidth', 1)
+plot(ax, xaxw1, xw1, 'LineWidth', 1.5, 'Color', 'Blue')
 ax.FontSize = FontSize(2);
 
 
@@ -31,6 +31,7 @@ ax.FontSize = FontSize(2);
 title(sprintf('$\\mathrm{t}_\\mathrm{res}$ = %.2f s, delay = %.2f s', ...
               tres, delay), 'FontWeight', 'Normal', 'FontSize', FontSize(1))
 sacname = strippath(strrep(s, '_', '\_'));
+
 ylabel(sprintf('counts [%.1e]', maxc_y), 'FontSize', FontSize(1))
 xlabel(sprintf('time relative to \\textit{%s}-phase (s)\n[%s]', ph, ...
                sacname), 'FontSize', FontSize(1))
