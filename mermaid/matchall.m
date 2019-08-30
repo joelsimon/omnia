@@ -22,7 +22,7 @@ allsac_nopath = cellfun(@(xx) strippath(xx), allsac, 'UniformOutput', false);
 
 % Loop over the unmatched SAC files.
 fail = [];
-new = [];
+new = 0;
 s = allsac(idx);
 fprintf('Searching for unmatched SAC files...\n')
 for i = 1:length(s)
