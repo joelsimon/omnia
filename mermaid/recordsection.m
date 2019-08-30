@@ -47,7 +47,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Mar-2019, Version 2017b
+% Last modified: 30-Aug-2019, Version 2017b
 
 % Wish list:
 %
