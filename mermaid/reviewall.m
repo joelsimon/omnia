@@ -70,8 +70,12 @@ for i = 1:length(d)
 end
 clc
 fprintf('Manual review complete...\n')
+
 fprintf('Updating event text files...\n')
 evt2txt;
+
+fprintf('Updating first arrival text files...\n')
+writefirstarrival;
 
 if writecp
     try
