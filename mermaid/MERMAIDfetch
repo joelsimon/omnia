@@ -25,10 +25,10 @@ echo -e '\n...completed server copy\n'
 # Exit if no new data.
 nosac=$(grep 'nothing to commit' server_out | wc -l)
 rm -f server_out
-if [ $nosac -eq 1 ]; then
-    echo -e '\nNo new files. Exiting MERMAIDfetch.'
-    exit;
-fi
+# if [ $nosac -eq 1 ]; then
+#     echo -e '\nNo new files. Exiting MERMAIDfetch.'
+#     exit;
+# fi
 
 # Generate SAC files.
 echo -e 'Writing SAC files...\n'
