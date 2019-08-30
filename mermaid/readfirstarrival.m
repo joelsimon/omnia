@@ -32,7 +32,7 @@ tres = lynes{3};
 delay = lynes{4};
 twosd = lynes{5};
 SNR = lynes{6};
-maxc_y = lynes{7};
+maxc_y = double(lynes{7});
 
 % Collect.
 outargs = {s, ph, tres, delay, twosd, SNR, maxc_y};
