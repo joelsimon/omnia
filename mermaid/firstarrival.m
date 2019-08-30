@@ -1,6 +1,6 @@
 function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
-          SNR, EQ, W1, xw2, W2] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir)
-%
+          SNR, EQ, W1, xw2, W2] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ)
+% NEEDS HEADER
 %                  tres = dat - syn
 %
 % Input:   
@@ -13,6 +13,9 @@ function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 %              of .sac files (def: $MERMAID/processed)
 % evtdir   Directory containing (possibly subdirectories)
 %              of .evt files (def: $MERMAID/events)
+% EQ       EQ structure if event not reviewed, or [] if
+%              event reviewed and to be retrieved with
+%              getevt.m (def: [])
 %
 % Output:
 % tres     Travel time residual [s] w.r.t first phase arrival:
@@ -28,7 +31,8 @@ function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 %              signal within window beginning at dat and ending wlen/2 later
 % twosd    2-standard deviation error estimation per M1 method [s]**
 %              (def NaN)
-% EQ       Earthquake structure associated with SAC file
+% EQ       Input EQ structure or reviewed EQ struct associated with SAC file
+%              via getevt.m
 %% W1
 %% xw2
 %% W2     
@@ -49,13 +53,17 @@ defval('wlen', 30)
 defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
+defval('EQ', [])
 
 % Read data and retrieve event structure.  EQ contains the theoretical
 % arrival times of all phases included in the time window, computed
 % with arrivaltime.m (which calls taupTimes.m).
 s = fullsac(s, sacdir);
 [x, h] = readsac(s);
-EQ = getevt(s, evtdir);
+if isempty(EQ)
+    EQ = getevt(s, evtdir);
+
+end
 
 % Sanity.
 if ~isstruct(EQ)
