@@ -7,8 +7,8 @@ function varargout = readidentified(filename)
 % of length 44).
 %
 % Input: 
-% filename   (def: $MERMAID/events/reviewed/identified/txt/identified.txt)
-%
+% filename   Textfile name
+%            (def: $MERMAID/events/reviewed/identified/txt/identified.txt)
 % Output:
 % sac        SAC filename
 % eqtime     Event rupture time ['yyyy-mm-dd HH:MM:SS']
@@ -16,7 +16,7 @@ function varargout = readidentified(filename)
 % eqlat      Event latitude [decimal degrees]
 % eqlon      Event longitude [decimal degrees]
 % eqregion   Flinn-Engdahl region name at event location
-% eqdepth,   Event depth [km]
+% eqdepth    Event depth [km]
 % eqdist     Distance from event to station [degrees]
 % eqmag      Event magnitude
 % eqphase1   Name of theoretical 1st-arriving phase
@@ -29,7 +29,6 @@ function varargout = readidentified(filename)
 % Default.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'identified.txt'))
-
 
 %% N.B.: Do not swap for textscan.m, fscanf.m etc (*see note below).
 lynes = readtext(filename);
@@ -48,7 +47,7 @@ eqid = strtrim(cellfun(@(xx) xx(172:184), lynes, 'UniformOutput', false));
 
 % Collect outputs.
 outargs = {sac, eqtime, eqlat, eqlon, eqregion, eqdepth, eqdist, eqmag, eqphase1, eqid};
-varargout  = outargs(1:nargout)
+varargout  = outargs(1:nargout);
 
 % *I battled textscan.m using the format from evt2txt.m with no luck;
 % the problem seems to be the use of whitespace both as a delimiter
