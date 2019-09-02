@@ -83,6 +83,10 @@ if isempty(rev_dir)
 
 else
     rev_evt = fullfile(rev_dir.folder, rev_dir.name);
+    if contains(rev_evt, 'purgatory')
+        warning('\n%s in purgatory...perhaps not reviewed', strippath(sac))
+
+    end
     rev_tmp = load(rev_evt, '-mat');
     revEQ = rev_tmp.EQ;
 
