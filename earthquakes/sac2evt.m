@@ -57,7 +57,7 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 10-May-2019, Version 2017b
+% Last modified: 02-Sep-2019, Version 2017b
 
 % Default I/O.
 defval('sac', 'centcal.1.BHZ.SAC')
@@ -128,17 +128,13 @@ end
 % Keep track of the date this query was made.
 querytime = irisdate2str(datetime('now', 'TimeZone', 'UTC'), 1);
 
-% Loop over every phase for every event.
-evtidx = [];
-nevt = 0;
-
 %  for all events...
+nevt = 0;
 for i = 1:length(ev)  
     quake = ev(i);
 
-    % Move to next event if structure is empty (which is signaled by no
-    % event time attribute), as is often the case when alternate
-    % baseurls other than the IRIS default are specified.
+    % Skip this event is the timing is NaN, as is often the case when
+    % alternate baseurls other than the IRIS default are specified.
     if isnan(quake.PreferredTime)
         continue
 
@@ -159,20 +155,14 @@ for i = 1:length(ev)
     % time assigned to the first sample, is set at h.B seconds.
     tt = arrivaltime(h, evdate, [quake.PreferredLatitude ...
                         quake.PreferredLongitude], model, depth, ph, h.B);
-
-    if all(arrayfun(@(zz) (isempty(zz.arsecs)), tt))
-        % .arsecs is the arrival time of the seismic phase(s) on an x-axis
-        % where the first sample is assigned the time to h.B.  If all
-        % are empty for a given event that means no phases associated
-        % with that event arrive in the time window of seismogram.
-        % Move to next event.
+    if isempty(tt)
         continue
 
-    end    
+    end
 
     % irisFetch.m incorrectly returns the <type> subfield ('Flinn-Engdahl
-    % region') instead of <text> (e.g. 'CENTRAL ITALY') subfield xml
-    % file that is returned from fdsnws query (see url in
+    % region') instead of <text> (e.g. 'CENTRAL ITALY') subfield in
+    % the xml file that is returned from fdsnws query (see url in
     % EQ(*).PublicID).  Use another web query to get the region name
     % from the preferred latitude and longitude.
     if strcmpi(quake.FlinnEngdahlRegionName, 'Flinn-Engdahl region') ...
@@ -184,49 +174,19 @@ for i = 1:length(ev)
             = feregion(quake.PreferredLatitude, quake.PreferredLongitude); 
 
     end
+    quake.Filename = sac;
+    quake.Params = params;
+    quake.QueryTime = querytime;
+    quake.PhasesConsidered = ph;
+    quake.TaupTimes = tt;
 
-    % For every event, loop over phase and keep the ones that arrive
-    % within the seismogram's time window.  Compute the approximate
-    % pressure of that phase and log this information in .TaupTime
-    % structure, tacked to larger EQ structure.
-    evtidx = [evtidx i];
-    nphase = 0;
+    nevt = nevt + 1;
+    if nevt == 1
+        EQ = quake; % Overwrite empty (double); cannot yet index.
 
-    % for all phases...
-    for j = 1:length(tt) 
-        tp = tt(j);
-        tpSamp = tp.arsamp;
-        tpSecs = tp.arsecs;
-        if isempty(tpSamp)
-            continue
+    else
+        EQ(nevt) = quake;
 
-        end
-
-        % Generate a fresh instance of the EQ struct if first phase match of
-        % this event.
-        nphase = nphase + 1;
-        if nphase == 1
-            nevt = nevt  + 1;
-            EQ(nevt).Filename = sac;
-            evfields = fieldnames(quake);
-
-            for k = 1:length(evfields)
-                EQ(nevt).(evfields{k}) = quake.(evfields{k});
-
-            end
-
-            % Tack the query time and query parameters to the output structure.
-            EQ(nevt).Params = params;
-            EQ(nevt).QueryTime = querytime;
-            EQ(nevt).PhasesConsidered = ph;
-
-        end
-
-        tpfields = fieldnames(tp);
-        for l = 1:length(tpfields)
-            EQ(nevt).TaupTimes(nphase).(tpfields{l}) = tp.(tpfields{l});
-
-        end       
     end
 end
 
@@ -266,8 +226,6 @@ if ~isempty(EQ)
         end
 
         for j = 1:length(EQ(i).TaupTimes)
-            % Input switches for reid.m
-
             % Use the default frequencies based on magnitude type in reid.m.
             switch mbml_type
               case 'Mb'
@@ -361,6 +319,10 @@ if ~isempty(EQ)
     fprintf(['\n%i %s found with phase arrivals in %s ************' ...
              '*\n**************************\n\n'], length(EQ), ...
             plurals('event', length(EQ)), strippath(sac))
+    
+else
+    fprintf(['\nNo matching phase arrivals in %s ************' ...
+             '*\n**************************\n\n'], strippath(sac))
     
 end
     
