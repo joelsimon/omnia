@@ -2,27 +2,49 @@
 #
 # Merges an input list of SAC files into a single SAC file using the
 # 'gap zero' and 'overlap average' strategies via the SAC command:
-# 'merge'
+# 'merge'. Do not supply full path SAC or output filenames.
 #
-# Input 1: File list using double quotes to wildcard,
-#           e.g. "IU.RAO.00.BHZ*"
+# Input 1: Directory where SAC files are saved and merger to occur
 #
-# Input 2: Merged filename, e.g. IU.RAO.BHZ.merge.sac
+# Input 2: File list using double quotes to wildcard,
 #
+# Input 3: Merged filename, e.g. IU.RAO.BHZ.merge.sac
 #
 # After merger all input SAC are sent to the subdirectory: unmerged/
 #
 # Ex:
-#    cd $EXAMPLES/merge_sac
-#    mergesac "IU.RAO.00.BHZ*" IU.RAO.BHZ.merge.sac
+#    mergesac $EXAMPLES/mergesac/ "IU.RAO.00.BHZ.*" IU.RAO.00.BHZ.merge.sac
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
 # Last modified: 02-Sep-2019
 
 # Collect input variables.
-filelist=$1
-outfname=$2
+sacdir=$1
+filelist=$2
+outfname=$3
+
+# Note starting directory and move to relevant directory.
+startdir=`pwd`
+cd $sacdir
+
+# First ensure there are actually files to merge...
+ls $filelist >& /dev/null
+if [ $? != 0 ]; then
+    printf "\nIn %s no files match pattern: '%s'\n" $sacdir "$filelist"
+    printf "Nothing to merge...exiting\n\n"
+    exit 1
+
+fi
+
+# ...and at least two with same glob pattern.
+numfiles=`ls $filelist | wc -l`
+if [ $numfiles == 1 ]; then
+    printf "\nIn %s only 1 file matches pattern: '%s'\n" $sacdir "$filelist"
+    printf "Nothing to merge...exiting\n\n"
+    exit 1
+
+fi
 
 # Merge input file list and write output SAC file.
 sac << !
@@ -38,6 +60,19 @@ quit
 mkdir unmerged  >& /dev/null
 mv $filelist unmerged
 
+# But, as in the example, the merged out filename has the same glob as
+# the input file list, so we need to move it back up one level.
+cd unmerged
+if [ -f $outfname ]; then
+    mv $outfname ..
+
+fi
+
 # Print exit statement.
-printf "\nMoved input files to unmerged/\n"
+printf "\nIn %s:\n" $sacdir
+printf "Moved '%s' to unmerged/\n" "$filelist"
 printf "Wrote %s\n\n" $outfname
+
+# Return from whence you came
+cd $startdir
+exit 0
