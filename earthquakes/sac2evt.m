@@ -207,7 +207,7 @@ for i = 1:length(ev)
         nphase = nphase + 1;
         if nphase == 1
             nevt = nevt  + 1;
-            EQ(nevt).Filename = strippath(sac);
+            EQ(nevt).Filename = sac;
             evfields = fieldnames(quake);
 
             for k = 1:length(evfields)
