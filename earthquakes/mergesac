@@ -1,0 +1,43 @@
+#! /bin/sh
+#
+# Merges an input list of SAC files into a single SAC file using the
+# 'gap zero' and 'overlap average' strategies via the SAC command:
+# 'merge'
+#
+# Input 1: File list using double quotes to wildcard,
+#           e.g. "IU.RAO.00.BHZ*"
+#
+# Input 2: Merged filename, e.g. IU.RAO.BHZ.merge.sac
+#
+#
+# After merger all input SAC are sent to the subdirectory: unmerged/
+#
+# Ex:
+#    cd $EXAMPLES/merge_sac
+#    mergesac "IU.RAO.00.BHZ*" IU.RAO.BHZ.merge.sac
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@princeton.edu
+# Last modified: 02-Sep-2019
+
+# Collect input variables.
+filelist=$1
+outfname=$2
+
+# Merge input file list and write output SAC file.
+sac << !
+read "$filelist"
+merge verbose gap zero overlap average
+write $outfname
+quit
+!
+
+# Move input file list to 'unmerged/'
+# /dev/null redirect is to suppress warning:
+# 'mkdir: cannot create directory ‘unmerged’: File exists'
+mkdir unmerged  >& /dev/null
+mv $filelist unmerged
+
+# Print exit statement.
+printf "\nMoved input files to unmerged/\n"
+printf "Wrote %s\n\n" $outfname
