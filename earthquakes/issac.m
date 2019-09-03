@@ -11,7 +11,6 @@ function TF = issac(filename)
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 10-Oct-2018, Version 2017b
-% Last modified in Ver. 2017b by jdsimon@princeton.edu, 10-Oct-2018.
 
 TF = false;
 if ~ischar(filename)
