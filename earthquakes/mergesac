@@ -1,14 +1,15 @@
 #! /bin/sh
 #
+# $ mergesac {SAC directory} {file glob} {merge filename}
+#
 # Merges an input list of SAC files into a single SAC file using the
 # 'gap zero' and 'overlap average' strategies via the SAC command:
-# 'merge'. Do not supply full path SAC or output filenames.
+# 'merge'.
 #
-# Input 1: Directory where SAC files are saved and merger to occur
-#
-# Input 2: File list using double quotes to wildcard,
-#
-# Input 3: Merged filename, e.g. IU.RAO.BHZ.merge.sac
+# Input:
+# 1: Directory where SAC files are saved and merger to occur
+# 2: File list or glob pattern using double quotes to wildcard
+# 3: Merged filename
 #
 # After merger all input SAC are sent to the subdirectory: unmerged/
 #
@@ -54,14 +55,13 @@ write $outfname
 quit
 !
 
-# Move input file list to 'unmerged/'
-# /dev/null redirect is to suppress warning:
-# 'mkdir: cannot create directory ‘unmerged’: File exists'
+# Move input file list to 'unmerged/'.
 mkdir unmerged  >& /dev/null
 mv $filelist unmerged
 
-# But, as in the example, the merged out filename has the same glob as
-# the input file list, so we need to move it back up one level.
+# But, as in the example, the merged output filename may have the same
+# glob as the input file list, so we need to move it back up one
+# level.
 cd unmerged
 if [ -f $outfname ]; then
     mv $outfname ..
@@ -73,6 +73,6 @@ printf "\nIn %s:\n" $sacdir
 printf "Moved '%s' to unmerged/\n" "$filelist"
 printf "Wrote %s\n\n" $outfname
 
-# Return from whence you came
+# Return from whence you came.
 cd $startdir
 exit 0
