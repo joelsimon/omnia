@@ -48,5 +48,6 @@ javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
 % The rest is specific to JDS -- users who clone $OMNIA, and other
 % repositories it depends on, may delete.
 %____________________________________________________%
-addpath(genpath('~/collab'))
-addpath(genpath('~/offline'))
+addpath(genpath(getenv('collab')))
+addpath(genpath(getenv('offline')))
+addpath(genpath(getenv('examples')))
