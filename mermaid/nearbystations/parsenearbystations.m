@@ -18,7 +18,7 @@ function [network, station, latitude, longitude, datacenter, url] = parsenearbys
 % 
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 30-Aug-2019, Version 2017b
+% Last modified: 05-Sep-2019, Version 2017b
 
 % Default.
 defval('txtfile', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystations.txt'))
@@ -72,8 +72,10 @@ for i = 1:length(tx)
     end
 end
 
-% Remove duplicate stations.
+% Remove duplicate stations and reorder outputs accordingly.
 [station, uniq_idx] = unique(station);
 network = network(uniq_idx);
+latitude = latitude(uniq_idx);
+longitude = longitude(uniq_idx);
 datacenter = datacenter(uniq_idx);
 url = url(uniq_idx);
