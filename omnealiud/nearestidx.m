@@ -7,8 +7,9 @@ function [idx, inbounds] = nearestidx(data, gofish)
 % range of 'data'. Returns idx = 0 in out-of-range case. Only tested
 % for 1D, real number arrays.
 %
-% Returns the first index if multiple values in 'data' are the same
-% distance from a 'gofish' value (see Ex2).
+% Barring numerical error (see Ex3), NEARESTIDX returns the first
+% index if multiple values in 'data' are the same distance from a
+% 'gofish' value (see Ex2).
 % 
 % Input:
 % data        Data array
