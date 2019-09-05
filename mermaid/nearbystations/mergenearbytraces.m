@@ -6,7 +6,7 @@ function merged = mergenearbytraces(tr, id, writedir)
 %
 % Output merged files are named:
 %
-% {NETWORK}.{STATION}.{LOCATION}.{CHANNEL}.merged.sac,
+% {NETWORK}.{STATION}.{LOCATION}.{CHANNEL}.merged.SAC,
 %
 % whose individual files share the common glob:
 %
@@ -18,7 +18,7 @@ function merged = mergenearbytraces(tr, id, writedir)
 % tr        Trace structures from fetchnearbytraces.m
 % id        Event ID [last column of 'identified.txt']
 %               defval('11052554')
-% writedir  Directory where [id]/*.sac written
+% writedir  Directory where [id]/*.SAC written
 %               (def: $MERMAID/events/nearbystations/sac/)
 %
 % Output:
@@ -63,7 +63,7 @@ for i = 1:length(glob)
     d = dir(fullfile(sac_dir, filelist));
 
     if length(d) > 1
-        outfname = [glob{i} 'merged.sac'];
+        outfname = [glob{i} 'merged.SAC'];
         [status, result] = ...
             system(sprintf('mergesac %s "%s" %s', sac_dir, filelist, outfname));
 
