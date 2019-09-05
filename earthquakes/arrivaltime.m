@@ -4,11 +4,15 @@ function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 % ARRIVALTIME returns the arrival time(s) of seismic phase(s) in a
 % seismogram.
 %
+% All travel times (that exist) are computed for every phase
+% requested, though only those phase arrivals which fall within the
+% time window of the seismogram are returned.
+%
 % Dependency: ARRIVALTIME requires the MatTaup package, 
 %             specifically the function taupTime.m,
 %             written by Qin Li, dated November 2002.
 %
-% Inputs:
+% Input:
 % h             SAC header from readsac.m (FJS function)
 % evtdate       Earthquake rupture time in datetime format in UTC timezone
 % [evla evlo]*  Event location as [latitude longitude] (def: [h.EVLA h.EVLO])
@@ -30,11 +34,6 @@ function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 %   .arsamp: sample index whose corresponding time is nearest .truearsecs
 %   .model: velocity model use
 %   .pt0: time in seconds assigned to first sample 
-%
-% The datetime and datenum fields are filled for every travel time.
-% The offset fields are filled only if the theoretical arrival's
-% datetime falls within datetime time window of seismogram, otherwise
-% they are left empty.
 %
 % Ex1: (load example MERMAID12 seismogram and calculate arrival time)
 %    sacf = 'm12.20130416T105310.sac';
