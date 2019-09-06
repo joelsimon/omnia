@@ -1,15 +1,15 @@
 function  status = isgitfile(filename)
 % ISGITFILE(filename)
 %
-% ISGITFILE(filename) returns true if a FULL PATH filename is under
-% git version control.  Assumes user has git installed.
+% ISGITFILE(filename) returns true if the input filename is under git
+% version control.  Assumes user has git installed.
 %
 % Tested in: git version 1.8.3.1
 %            git version 2.6.4 (Apple Git-63)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 06-Dec-2018, Version 2017b
+% Last modified: 06-Sep-2019, Version 2017b
 
 % Sanity.
 if exist(filename, 'file') ~= 2
@@ -19,6 +19,12 @@ end
 
 %  Parse filename info.
 [pathstr, name, ext] = fileparts(filename);
+
+% Assume pwd if passing local filename.
+if isempty(pathstr)
+    pathstr = pwd;
+
+end
 
 % Note the version of git; slightly different commands.  Wrap in try
 % command; if it fails likely don't have git installed.
@@ -42,8 +48,12 @@ else
     startdir = pwd;
     cd(pathstr)
     [result, ~] = system(sprintf('git ls-files --error-unmatch -- %s', [name ext]));
-    cd(startdir)
+    try
+        % Try to cd back to startdir, which is not possible if you have just
+        % cleared the directory.
+        cd(startdir)
 
+    end
 end
 
 % Exit code of 0 means the file is tracked by git.
