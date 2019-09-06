@@ -1,10 +1,10 @@
-function [tr, merged] = fetchnearbytraces(id, txtfile, evtdir, writedir)
-% [tr, merged] = FETCHNEARBYTRACES(id, txtfile, evtdir, writedir)
+function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir)
+% [tr, merged] = FETCHNEARBYTRACES(id, redo, txtfile, evtdir, sacdir)
 %
 % Fetches hour long traces from 'nearby stations' that begin five
 % minutes before the theoretical first-arriving phase of the
 % corresponding to event ID and saves the returned SAC files to
-% [writedir]/[id]/*.sac.
+% [sacdir]/[id]/*.SAC.
 %
 % If the traces are split (and thus saved as separate SAC files) due
 % to missing data they are merged into a single SAC file using
@@ -13,36 +13,53 @@ function [tr, merged] = fetchnearbytraces(id, txtfile, evtdir, writedir)
 % Input:
 % id        Event ID [last column of 'identified.txt']
 %               defval('11052554')
+% redo      true to delete* existing [sacdir]/[id]/*.SAC. and
+%               refetch SAC files (def: false)
 % txtfile   Textfile of station metadata from http://ds.iris.edu/gmap/
 %               (def: $MERMAID/events/nearbystations/nearbystations.txt)
 % evtdir    Path to directory containing 'raw/' and 'reviewed'
 %               subdirectories (def: $MERMAID/events/)
-% writedir  Directory to write [id]/*.sac
+% sacdir    Directory to write [id]/*.SAC
 %               (def: $MERMAID/events/nearbystations/sac/)
+%
+% *git history, if it exists, is respected with gitrmdir.m.
 %
 % Output:
 % tr        Cell of trace(s) returned by irisFetch.Traces
-% merged    Merged filenames, if any (def: []) 
+% merged    Cell of merged filenames, if any (def: {})
 %
 % Ex:
 %    [tr, merged] = FETCHNEARBYTRACES('11052554')
 %
-% See also: evt2txt.m, readidentified.m, mergenearbytraces.m, mergesac
-% 
+% See also: evt2txt.m, readidentified.m, mergenearbytraces.m, gitrmdir.m, mergesac
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Sep-2019, Version 2017b
+% Last modified: 03-Sep-2019, Version 2017b
 
 % Wish list:
 %
-% [1] sac2evt.m: Do it once for first in list, then copy event details to all.
+% [*] sac2evt.m: Do it once for first in list, then copy event details to all.
 %                --pull TaupTimes struct creation out of sac2evt.m
 
 % Defaults.
 defval('id', '11052554')
+defval('redo', false)
 defval('txtfile', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystations.txt'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
-defval('writedir', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'sac'))
+defval('sacdir', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'sac'))
+tr = {};
+merged = {};
+
+% Determine if execution of main should proceed based on the 'redo'
+% flag and the existence (or not) of SAC files.
+iddir = fullfile(sacdir, num2str(id));
+if ~need2continue(id, redo, sacdir, iddir)
+    fprintf(['\nAlready fetched: %s/\nSet ''redo'' = true to ' ...
+             'refetch\n\n'], iddir)
+    return
+
+end
 
 % Get the EQ structures associated with this event.
 [~, EQ] = getsacevt(id, evtdir);
@@ -90,7 +107,7 @@ for i = 1:length(station)
         DATASELECTSERVICE = 'http://ws.ipgp.fr/fdsnws/dataselect/1/';
         STATIONSERVICE = 'http://ws.ipgp.fr/fdsnws/station/1/';
         CHANNEL = 'BHZ';
-        includePZ  = true
+        includePZ  = true;
 
       case 'IRISDMC'
         DATASELECTSERVICE = 'http://service.iris.edu/fdsnws/dataselect/1/';
@@ -102,13 +119,13 @@ for i = 1:length(station)
         DATASELECTSERVICE = 'https://fdsnws.raspberryshakedata.com/fdsnws/dataselect/1/';
         STATIONSERVICE = 'https://fdsnws.raspberryshakedata.com/fdsnws/station/1/';
         CHANNEL = '*Z';
-        includePZ  = false;
+        includePZ  = false; % true breaks the call to irisFetch.Traces...
 
       otherwise
         % Add more cases as issues arise.
         error('Unexpected datacenter: %s', datacenter)
 
-    end  
+    end
 
     % Fetch it.
     if includePZ
@@ -123,15 +140,53 @@ for i = 1:length(station)
                                  ['STATIONURL:' STATIONSERVICE]);
 
     end
-    
+
     % Keep only nonempty traces.
     if ~isempty(traces)
         tr_idx = tr_idx + 1;
         tr{tr_idx} = traces;
-        irisFetch.Trace2SAC(tr{tr_idx}, fullfile(writedir, num2str(id)))
+        irisFetch.Trace2SAC(tr{tr_idx}, iddir);
 
     end
 end
 
 % Merge split SAC files if necessary.
-merged = mergenearbytraces(tr, id, writedir);
+merged = mergenearbytraces(tr, id, sacdir);
+
+%______________________________________________________________%
+function cont = need2continue(id, redo, sacdir, iddir)
+
+% By default redo is false. However, if no SAC files exist main needs
+% to continue execution.  Therefore, determine if SAC files exist and
+% base continuation flag on the combination of the user-requested redo
+% flag and the existence or lack thereof of SAC files.
+
+sac_files_exist = false;
+if exist(iddir, 'dir') == 7
+    lower_dsac = skipdotdir(dir(fullfile(iddir, '**/*sac')));
+    upper_dSAC = skipdotdir(dir(fullfile(iddir, '**/*SAC')));
+
+    dsac = [lower_dsac ; upper_dSAC];
+    if ~isempty(dsac)
+        sac_files_exist = true;
+
+    end
+end
+
+if redo
+    cont = true;
+    if sac_files_exist
+        % Delete all current SAC files before the requested redo.
+        gitrmdir(dsac);
+
+    end
+
+else
+    if sac_files_exist
+        cont = false;
+
+    else
+        cont = true
+
+    end
+end
