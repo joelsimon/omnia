@@ -227,6 +227,9 @@ for i = 1:2
         F(i).f.ha(end).XLabel.String = sprintf('time relative to %s UTC (s)\n[%s]', ...
                                                datestr(refdate), ...
                                                strippath(strrep(EQ(1).Filename, '_', '\_')));
+    else
+        F(i).f.ha(end).XLabel.String = sprintf(['time relative to ' ...
+                            '%s UTC (s)\n[no matching event]'], datestr(refdate));
         
     end
 end
@@ -244,12 +247,14 @@ for i = 1:length(F)
         
     end
 
-    tack2corner(F(i).f.ha(1), F(i).f.lgmag, 'NorthWest');
-    tack2corner(F(i).f.ha(1), F(i).f.lgdist, 'SouthWest');
+    if ~isempty(EQ)
+        tack2corner(F(i).f.ha(1), F(i).f.lgmag, 'NorthWest');
+        tack2corner(F(i).f.ha(1), F(i).f.lgdist, 'SouthWest');
 
-    for l = 1:length(F(i).f.lgSNR)
-        tack2corner(F(i).f.ha(l+1), F(i).f.lgSNR(l), 'SouthWest');
+        for l = 1:length(F(i).f.lgSNR)
+            tack2corner(F(i).f.ha(l+1), F(i).f.lgSNR(l), 'SouthWest');
 
+        end
     end
 
     % Save em.
