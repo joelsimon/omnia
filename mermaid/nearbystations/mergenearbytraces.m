@@ -22,7 +22,7 @@ function merged = mergenearbytraces(tr, id, writedir)
 %               (def: $MERMAID/events/nearbystations/sac/)
 %
 % Output:
-% merged    Merged filenames, if any (def: [])
+% merged    Cell of merged filenames, if any (def: {})
 %
 % See also: fetchnearbytraces.m, irisFetch.Traces
 %
@@ -33,7 +33,7 @@ function merged = mergenearbytraces(tr, id, writedir)
 % Defaults.
 defval('id', '11052554')
 defval('writedir', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'sac'))
-merged = [];
+merged = {};
 if isempty(tr)
     return
 
@@ -55,7 +55,6 @@ glob = unique(glob);
 
 % Pass each unique glob to mergesac, which will handle the rest:
 % $ mergesac {SAC directory} {file glob} {merge filename}
-merged = [];
 m_idx = 0;
 sac_dir = fullfile(writedir, num2str(id));
 for i = 1:length(glob)
