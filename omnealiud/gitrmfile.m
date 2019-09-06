@@ -15,8 +15,8 @@ function [git_removed, deleted] = gitrmfile(filename)
 % filename      File name(s), either as char or cell array
 %
 % Output:
-% git_removed   Cell array of files deleted system call to 'git rm'
-%                   (def: {})
+% git_removed   Cell array of files deleted with a system call to 
+%                   'git rm' (def: {})
 % deleted       Cell array of files deleted with MATLAB's delete.m
 %                   (def: {})
 %
