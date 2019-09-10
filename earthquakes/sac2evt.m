@@ -57,7 +57,7 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Sep-2019, Version 2017b
+% Last modified: 10-Sep-2019, Version 2017b on GLNXA64
 
 % Default I/O.
 defval('sac', 'centcal.1.BHZ.SAC')
@@ -192,114 +192,19 @@ end
 
 if ~isempty(EQ)
     % The following loop computes a rough approximation of the expected
-    % pressure of each specific phase.  We would prefer to use magnitude
-    % type 'Mb' (at 1 Hz) for this approximation, though magnitude type
-    % 'Ml' (at 5 Hz) will suffice.  Look first for 'Mb.' We only have to
-    % do this once for this specific quake.
+    % pressure of each specific phase.  We would prefer to use
+    % magnitude type 'Mb' (at 1 Hz) for this approximation, though
+    % magnitude type 'Ml' (at 5 Hz) will suffice.
     for i = 1:length(EQ)
         [mbml_author, mbml_type, mbml_val] = getmbml(EQ(i));
         EQ(i).MbMlAuthor = mbml_author;
         EQ(i).MbMlType = mbml_type;
         EQ(i).MbMlMagnitudeValue = mbml_val;
 
-        if isempty(mbml_author)
-            [EQ(i).TaupTimes(:).pressure] = deal([]);
-            continue
+        % Attach .pressure field to every phase (index j) of
+        % EQ(i).TaupTimes(j).
+        EQ(i) = reidpressure(EQ(i));
 
-        end
-
-        % Distance is the same for all TaupTimes phases (the distance
-        % corresponds to the EQ, not the phase).  Skip this event if its
-        % too distant to use Ml magnitude type per warning thrown in
-        % woodanderson.m, or too close to use Mb magnitude type per
-        % warning thrown in gutenbergrichter.m (both called via reid.m).
-        if deg2km(EQ(i).TaupTimes(1).distance) >= 600 && strcmpi(mbml_type, 'Ml')
-            [EQ(i).TaupTimes(:).pressure] = deal([]);
-            continue
-            
-        end
-
-        if deg2km(EQ(i).TaupTimes(1).distance) <= 600 && strcmpi(mbml_type, 'Mb')
-            [EQ(i).TaupTimes(:).pressure] = deal([]);
-            continue
-            
-        end
-
-        for j = 1:length(EQ(i).TaupTimes)
-            % Use the default frequencies based on magnitude type in reid.m.
-            switch mbml_type
-              case 'Mb'
-                freq = 1;
-
-              case 'Ml'
-                freq = 5;
-
-            end
-            
-            switch model
-              case 'ak135'
-                Vp = 5800; 
-                Vs = 3640; 
-                
-              case 'iasp91'
-                Vp = 5800;
-                Vs = 3360;
-                
-              case 'prem'
-                Vp = 5800; % Ignoring "Ocean" layer (Vs = 0).
-                Vs = 3200;
-
-            end
-
-            % Main routine to compute pressure.
-            expp = reid(mbml_type, mbml_val, EQ(i).TaupTimes(j).distance, ...
-                        freq, EQ(i).TaupTimes(j).incidentDeg, Vp, Vs);
-
-            % The output of reid.m is a 1x2 array of P and S wave pressure [Pa].
-            % Use the last character of the phase name (not the first)
-            % because this is the incidence (incoming), not takeoff
-            % (outgoing), pressure.
-
-            % Remove 'diff', 'g', or 'n', suffix, if it exists.  Other prefixes
-            % ('ab', etc.), are handled by purist.m, (nested in
-            % taupTime.m, itself nested in arrivaltime.m, above).
-            %
-            % N.B.: Other phase IASPEI-approved suffixes also exist (e.g., 'dif'
-            % in favor of 'diff'; 'pre'; 'PcP2' to mean multiple reflections; 'P''
-            % (prime); 'Sb', 'S*', etc.  Being that phangle.m is designed to be
-            % called most often as a subfunction of MatTaup I am only coding for
-            % phase names acceptable there (e.g., 'PcP2' throws an error and thus
-            % I am not coding a rule to remove suffixes that are numbers).
-            %
-            % See TauP_Instructions.pdf pg. 15 for the relevant suffixes.
-            ph_no_suffix = upper(EQ(i).TaupTimes(j).phaseName);
-            
-            if endsWith(ph_no_suffix, 'diff', 'IgnoreCase', true)
-                ph_no_suffix = ph_no_suffix(1:end-4);
-
-            end
-
-            if endsWith(ph_no_suffix, {'g' 'n'}, 'IgnoreCase', true)
-                ph_no_suffix = ph_no_suffix(1:end-1);
-
-            end
-
-            switch lower(ph_no_suffix(end))
-              case 'p'
-                expp = expp(1);
-                
-              case 's'
-                expp = expp(2);
-
-              otherwise
-                error(['Phase name must end with either ''P'' or ' ...
-                       '''S'' (case-insensitive, and ignoring any ' ...
-                       '''diff'', ''n'', or ''g'' suffix) .'])
-
-            end
-            EQ(i).TaupTimes(j).pressure = expp;
-
-        end
     end    
 
     % Sort events by maximum magnitude.
