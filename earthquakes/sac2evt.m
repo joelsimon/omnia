@@ -174,7 +174,7 @@ for i = 1:length(ev)
             = feregion(quake.PreferredLatitude, quake.PreferredLongitude); 
 
     end
-    quake.Filename = sac;
+    quake.Filename = strippath(sac);
     quake.Params = params;
     quake.QueryTime = querytime;
     quake.PhasesConsidered = ph;
