@@ -1,5 +1,5 @@
-function merged = mergenearbytraces(tr, id, writedir)
-% merged = MERGENEARBYTRACES(tr, id, writedir)
+function merged = mergenearbytraces(tr, id, sacdir)
+% merged = MERGENEARBYTRACES(tr, id, sacdir)
 %
 % Wrapper to shell script 'mergesac' to merge split SAC files into a
 % single SAC file.
@@ -12,13 +12,13 @@ function merged = mergenearbytraces(tr, id, writedir)
 %
 % {NETWORK}.{STATION}.{LOCATION}.{CHANNEL}*,
 %
-% the latter of which are moved to [writedir]/unmerged.
+% the latter of which are moved to [sacdir]/unmerged.
 %
 % Input:
 % tr        Trace structures from fetchnearbytraces.m
 % id        Event ID [last column of 'identified.txt']
 %               defval('11052554')
-% writedir  Directory where [id]/*.SAC written
+% sacdir    Directory where [id]/*.SAC written
 %               (def: $MERMAID/events/nearbystations/sac/)
 %
 % Output:
@@ -32,7 +32,7 @@ function merged = mergenearbytraces(tr, id, writedir)
 
 % Defaults.
 defval('id', '11052554')
-defval('writedir', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'sac'))
+defval('sacdir', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'sac'))
 merged = {};
 if isempty(tr)
     return
@@ -56,19 +56,19 @@ glob = unique(glob);
 % Pass each unique glob to mergesac, which will handle the rest:
 % $ mergesac {SAC directory} {file glob} {merge filename}
 m_idx = 0;
-sac_dir = fullfile(writedir, num2str(id));
+iddir = fullfile(sacdir, num2str(id));
 for i = 1:length(glob)
     filelist =  [glob{i} '*'];
-    d = dir(fullfile(sac_dir, filelist));
+    d = dir(fullfile(iddir, filelist));
 
     if length(d) > 1
         outfname = [glob{i} 'merged.SAC'];
         [status, result] = ...
-            system(sprintf('mergesac %s "%s" %s', sac_dir, filelist, outfname));
+            system(sprintf('mergesac %s "%s" %s', iddir, filelist, outfname));
 
         if status == 0
             m_idx = m_idx + 1;
-            merged{m_idx} = fullfile(sac_dir, outfname);
+            merged{m_idx} = fullfile(iddir, outfname);
 
         else
             warning('No merge: mergesac exited with the following\n%s', result)
