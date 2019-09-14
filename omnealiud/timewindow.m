@@ -7,7 +7,8 @@ function [xw, W] = timewindow(x, wlen, pivot, fml, delta, pt0)
 %
 % Input:
 % x         The time series to be windowed
-% wlen      Window length in seconds
+% wlen      Window length in seconds, or NaN to return
+%           the entire segment before/after 'pivot' (see Ex2)
 % pivot     Time on x-axis around which window is constructed
 %               Note: not seconds offset from pt0, but rather
 %               the absolute time on the x-axis when
@@ -34,8 +35,8 @@ function [xw, W] = timewindow(x, wlen, pivot, fml, delta, pt0)
 %           .wlensamp: true window length in samples
 %           .wlensecs: true window length in seconds
 %
-% Ex: (Seismogram in blue, windowed portions in red and magenta.)
-%     (Note that 0 seconds here is the event origin time (h.O).)
+% Ex1: (Seismogram in blue, windowed portions in red and magenta.)
+%      (Note that 0 seconds here is the event origin time (h.O).)
 %    [x, h] = readsac('centcal.1.BHZ.SAC');
 %    xax = xaxis(length(x), h.DELTA, h.B);
 %    % 300 s window starting at -100 s and looking to right
@@ -46,9 +47,22 @@ function [xw, W] = timewindow(x, wlen, pivot, fml, delta, pt0)
 %    plot(W300.xax, x300, 'r')
 %    plot(W80.xax, x80, 'm'); shg
 %
+% Ex2: (if wlen = NaN the entire segment before / after pivot is returned)
+%    [x, h] = readsac('centcal.1.BHZ.SAC');
+%    % Assign first sample of seismogram t = 0 s.
+%    xax = xaxis(length(x), h.DELTA, 0);
+%    % All data from 400 seconds after first sample.
+%    [x400, W400] = TIMEWINDOW(x, NaN, 400, 'first', h.DELTA, 0);
+%    % All data up to  200 seconds after first sample.
+%    [x200, W200] = TIMEWINDOW(x, NaN, 200, 'last', h.DELTA, 0);
+%    plot(xax, x); hold on
+%    plot(W400.xax, x400, 'r')
+%    plot(W200.xax, x200, 'm'); shg
+%
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 21-Nov-2018, Version 2017b
+% Last modified: 12-Sep-2019, Version 2017b on GLNXA64
 
 % Set up x-axis of complete time series and perform some error
 % catching.
@@ -65,15 +79,31 @@ end
 switch lower(fml)
   case 'first'
     requested_xlsecs = pivot;
-    requested_xrsecs = requested_xlsecs + wlen;
+    if ~isnan(wlen)
+        requested_xrsecs = requested_xlsecs + wlen;
+
+    else
+        requested_xrsecs = xax(end);
+
+    end
 
   case 'middle'
-    requested_xlsecs = pivot - 1/2*wlen;
-    requested_xrsecs = pivot + 1/2*wlen;
+    if isnan(wlen)
+        error('wlen = NaN only allowed for fml = ''first'' or ''last''')
+
+    end
+    requested_xlsecs = pivot - (1/2 * wlen);
+    requested_xrsecs = pivot + (1/2 *wlen);
 
   case 'last'
     requested_xrsecs = pivot;
-    requested_xlsecs = requested_xrsecs - wlen;
+    if ~isnan(wlen)
+        requested_xlsecs = requested_xrsecs - wlen;
+
+    else
+        requested_xlsecs = xax(1);
+
+    end
 
   otherwise
     error(['Please specify ''first'', ''middle'' or ''last'' for ' ...
@@ -81,7 +111,9 @@ switch lower(fml)
 
 end
 
+hit_edge = false;
 if requested_xlsecs < xax(1)
+    hit_edge = true;
     requested_xlsecs = xax(1);
     warning(sprintf(['Requested window extends beyond first sample ' ...
                      'of x.\nUsing first sample of x as first sample ' ...
@@ -90,6 +122,7 @@ if requested_xlsecs < xax(1)
 end
 
 if requested_xrsecs > xax(end);
+    hit_edge = true;
     requested_xrsecs = xax(end);
     warning(sprintf(['Requested window extends beyond last sample ' ...
                      'of x.\nUsing last sample of x as last sample ' ...
@@ -119,3 +152,11 @@ W.xlsecs = xlsecs;
 W.xrsecs = xrsecs;
 W.wlensamp = wlensamp;
 W.wlensecs = wlensecs;
+
+% Final check to see if rounding on left and right increased the
+% difference in the actual window length beyond one sampling interval.
+if abs(W.wlensecs - wlen) > delta && ~hit_edge
+    error(['Difference between actual and requested window length ' ...
+           'greater than one sampling interval'])
+
+end
