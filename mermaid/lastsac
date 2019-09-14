@@ -8,8 +8,7 @@
 # Contact: jdsimon@princeton.edu
 # Last modified: 21-Aug-2019
 
-set floatnum = (P-06 P-07 P-08 P-09 P-10 P-11 P-12 P-13 P-16 P-17 P-18 \
-		P-19 P-20 P-21 P-22 P-23 P-24 P-25 N-01 N-02 N-04 N-05) #P-0050 P-0052
+set floatnum = (08 09 10 11 12 13 16 17 18 19 20 21 22 23 24 25)
 
 # OSX does not have the standard date formatting commands.  Must use a
 # psuedo-swtich statment.  Redirect any error to the /dev/null/ to
@@ -23,7 +22,7 @@ else
 endif
 
 foreach float ($floatnum[*])
-    set perfloat = `ls -1 $MERMAID/processed/*$float*/*/*.sac | tail -1`
+    set perfloat = `ls -1 $MERMAID/processed/*P-$float*/*/*.sac | tail -1`
     set lasttime = `basename $perfloat | awk '{print substr($0,1,8)}'` 
     if ( $osx == 0) then
         set lastdate = `date -d $lasttime +'%d-%b-%Y'`
