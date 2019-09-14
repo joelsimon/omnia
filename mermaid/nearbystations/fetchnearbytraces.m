@@ -11,7 +11,7 @@ function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, mod
 % mergenearbytraces.m.
 %
 % Any existing SAC files removed, e.g., in the case of redo = true,
-% are printed to the screen.
+% are printed to the screen.*
 %
 % Input:
 % id        Event ID [last column of 'identified.txt']
@@ -30,6 +30,8 @@ function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, mod
 % Output:
 % tr        Cell of trace(s) returned by irisFetch.Traces
 % merged    Cell of merged filenames, if any (def: {})
+%
+% *git history, if it exists, is respected with gitrmdir.m.
 %
 % Ex:
 %    [tr, merged] = FETCHNEARBYTRACES('11052554')
