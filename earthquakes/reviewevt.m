@@ -27,7 +27,7 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 %           4: [currently throws error, but add your favorite here!]
 %
 % Output:   
-% *N/A*     (writes reviewed .evt file)
+% *N/A*    (writes reviewed .evt file)
 % EQ       EQ earthquake structure after review 
 %
 % REVIEWEVT loads earthquake and CP arrival-time data (.evt) and their
