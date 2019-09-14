@@ -32,7 +32,7 @@ function [git_removed, deleted] = gitrmfile(filename)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 05-Sep-2019, Version 2017b
+% Last modified: 09-Sep-2019, Version 2017b on GLNXA64
 
 if ~iscell(filename)
     filename = {filename};
@@ -44,8 +44,8 @@ d_count = 0;
 
 deleted = {};
 git_removed = {};
-
 for i = 1:length(filename)
+
     if exist(filename{i}, 'file') ~= 2
         error('%s does not exist or is not a filename\n', filename{i})
 
@@ -98,3 +98,5 @@ for i = 1:length(filename)
 
     end
 end
+deleted = deleted';
+git_removed = git_removed';
