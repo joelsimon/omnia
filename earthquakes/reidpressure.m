@@ -3,19 +3,24 @@ function EQ = reidpressure(EQ)
 %
 % REIDPRESSURE attaches the expected pressure from reid.m as an extra
 % field, '.pressure', to every index (phase) of EQ.TaupTimes.  It is
-% called internally, e.g., in sac2evt.m and equpdate.m
+% called internally, e.g., in sac2evt.m.
 %
 % Input:
-% EQ    EQ without EQ.TaupTimes(:).pressure fields
+% EQ    EQ without EQ.TaupTimes(:).pressure field
 %
 % Output
 % EQ    EQ with EQ.TaupTimes(:).pressure field
 %
-% See also: sac2evt.m, equpdate.m
+% See also: sac2evt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 10-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 11-Sep-2019, Version 2017b on GLNXA64
+
+if isempty(EQ.TaupTimes)
+    return
+
+end
 
 if isempty(EQ.MbMlAuthor)
     [EQ.TaupTimes(:).pressure] = deal([]);
