@@ -1,6 +1,6 @@
 % STARTUP ---> executes at launch
 %
-% Joel D Simon's startup parameters.  In order for MATLAB to execute
+% Joel D. Simon's startup parameters.  In order for MATLAB to execute
 % this file at launch you must place it MATLAB's native search path.
 % This may be found with the command "userpath".  For me:
 %
@@ -48,6 +48,6 @@ javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
 % The rest is specific to JDS -- users who clone $OMNIA, and other
 % repositories it depends on, may delete.
 %____________________________________________________%
-addpath(genpath(getenv('collab')))
-addpath(genpath(getenv('offline')))
-addpath(genpath(getenv('examples')))
+addpath(genpath(getenv('COLLAB')))
+addpath(genpath(getenv('OFFLINE')))
+addpath(genpath(getenv('EXAMPLES')))
