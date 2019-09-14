@@ -23,10 +23,12 @@ function [git_removed, deleted] = gitrmfile(filename)
 % Before running the example generate two files in the terminal and
 % track and commit one.
 %
+%    $ mkdir ~/examples/gitrmfile; cd ~/examples/gitrmfile
 %    $ touch is_git_tracked not_git_tracked
 %    $ git init; git add is_git_tracked; git commit -m "a test"
 %
 % Ex: (ensure MATLAB in same directory where you just made those files)
+%    cd ~/examples/gitrmfile
 %    filename = {'is_git_tracked' 'not_git_tracked'};
 %    [git_removed, deleted] = GITRMFILE(filename)
 %
