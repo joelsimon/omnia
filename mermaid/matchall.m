@@ -63,7 +63,7 @@ end
 if ~isempty(fail)
     failsac = s(fail);
     failsac = cellfun(@(xx) strippath(xx), failsac, 'UniformOutput', ...
-                      false)
+                      false);
     warning(['These SAC files were not matched:\n' ...
              repmat('%s\n', 1, length(failsac))], failsac{:})
 
@@ -75,4 +75,4 @@ fid = fopen(fullfile(getenv('MERMAID'), 'events', 'raw', 'matchall_fail.txt'), '
 fprintf(fid, '%s\n', failsac{:});
 fclose(fid);
 
-fprintf('\n\nAll done.\n')
+fprintf('\nAll done.\n')
