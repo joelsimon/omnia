@@ -1,5 +1,5 @@
-function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir)
-% [tr, merged] = FETCHNEARBYTRACES(id, redo, txtfile, evtdir, sacdir)
+function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, model, ph)
+% [tr, merged] = FETCHNEARBYTRACES(id, redo, txtfile, evtdir, sacdir, model, ph)
 %
 % Fetches hour long traces from 'nearby stations' that begin five
 % minutes before the theoretical first-arriving phase of the
@@ -10,19 +10,22 @@ function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir)
 % to missing data they are merged into a single SAC file using
 % mergenearbytraces.m.
 %
+% Any existing SAC files removed, e.g., in the case of redo = true,
+% are printed to the screen.
+%
 % Input:
 % id        Event ID [last column of 'identified.txt']
 %               defval('11052554')
 % redo      true to delete* existing [sacdir]/[id]/*.SAC. and
 %               refetch SAC files (def: false)
-% txtfile   Textfile of station metadata from http://ds.iris.edu/gmap/
+% txtfile   Filename of textfile of station metadata from http://ds.iris.edu/gmap/
 %               (def: $MERMAID/events/nearbystations/nearbystations.txt)
 % evtdir    Path to directory containing 'raw/' and 'reviewed'
 %               subdirectories (def: $MERMAID/events/)
 % sacdir    Directory to write [id]/*.SAC
 %               (def: $MERMAID/events/nearbystations/sac/)
-%
-% *git history, if it exists, is respected with gitrmdir.m.
+% model         Taup model (def: 'ak135')
+% ph            Taup phases (def: defphases)
 %
 % Output:
 % tr        Cell of trace(s) returned by irisFetch.Traces
@@ -35,12 +38,7 @@ function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 03-Sep-2019, Version 2017b
-
-% Wish list:
-%
-% [*] sac2evt.m: Do it once for first in list, then copy event details to all.
-%                --pull TaupTimes struct creation out of sac2evt.m
+% Last modified: 14-Sep-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '11052554')
@@ -48,13 +46,17 @@ defval('redo', false)
 defval('txtfile', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystations.txt'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('sacdir', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'sac'))
+defval('model', 'ak135')
+defval('ph', defphases)
+
 tr = {};
 merged = {};
 
 % Determine if execution of main should proceed based on the 'redo'
 % flag and the existence (or not) of SAC files.
-iddir = fullfile(sacdir, num2str(id));
-if ~need2continue(id, redo, sacdir, iddir)
+id = strtrim(num2str(id));
+iddir = fullfile(sacdir, id);
+if ~need2continue(redo, iddir)
     fprintf(['\nAlready fetched: %s/\nSet ''redo'' = true to ' ...
              'refetch\n\n'], iddir)
     return
@@ -62,7 +64,7 @@ if ~need2continue(id, redo, sacdir, iddir)
 end
 
 % Get the EQ structures associated with this event.
-[~, EQ] = getsacevt(id, evtdir);
+[sac, EQ] = getsacevt(id, evtdir);
 
 % Keep only the first: they may differ in origin time slightly
 % depending on catalog and when they were last queried, but they
@@ -77,16 +79,10 @@ evtdate = datetime(irisstr2date(EQ.PreferredTime));
 tr_idx = 0;
 for i = 1:length(station)
     % Compute theoretical arrival times.
-    tt = taupTime(EQ.TaupTimes(1).model, EQ.PreferredDepth, EQ.PhasesConsidered, ...
-                  'station', [station_latitude{i} station_longitude{i}], ...
-                  'event', [EQ.PreferredLatitude EQ.PreferredLongitude]);
-
-    % They should already be sorted but in the off chance they are not...
-    if ~isempty(tt)
-        [~, idx] = sort([tt.time], 'ascend');
-        tt = tt(idx);
-
-    else
+    tt = taupTime(model, EQ.PreferredDepth, ph, 'station', ...
+                  [station_latitude{i} station_longitude{i}], 'event', ...
+                  [EQ.PreferredLatitude EQ.PreferredLongitude]);
+    if isempty(tt)
         continue
 
     end
@@ -154,7 +150,8 @@ end
 merged = mergenearbytraces(tr, id, sacdir);
 
 %______________________________________________________________%
-function cont = need2continue(id, redo, sacdir, iddir)
+function cont = need2continue(redo, iddir)
+% Output: cont --> logical continuation flag
 
 % By default redo is false. However, if no SAC files exist main needs
 % to continue execution.  Therefore, determine if SAC files exist and
@@ -177,7 +174,7 @@ if redo
     cont = true;
     if sac_files_exist
         % Delete all current SAC files before the requested redo.
-        gitrmdir(dsac);
+        [git_removed, deleted] = gitrmdir(dsac)
 
     end
 
@@ -186,7 +183,7 @@ else
         cont = false;
 
     else
-        cont = true
+        cont = true;
 
     end
 end
