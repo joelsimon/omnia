@@ -1,5 +1,5 @@
 function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
-                                      revdir, procdir, normlize)
+                                      evtdir, procdir, normlize)
 % [F, EQ, sac] = RECORDSECTION(id, lohi, alignon, ampfac, evtdir, procdir, normlize)
 %
 % Plots a record section of all MERMAID seismograms that recorded the
@@ -8,7 +8,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 % Input:
 % id        Event identification number (def: 10948555)
 % lohi      Bandpass corner frequencies in Hz, or
-%               NaN to plot raw seismograms  (def: [1 2])
+%               NaN to plot raw seismograms  (def: [1 5])
 % aligon    'etime': t=0 at event rupture time (def: etime)
 %           'atime': t=0 at theoretical first arrival
 %                    for every seismogram*
@@ -47,7 +47,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 30-Aug-2019, Version 2017b
+% Last modified: 11-Sep-2019, Version 2017b on GLNXA64
 
 % Wish list:
 %
@@ -66,7 +66,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 
 % Defaults.
 defval('id', 10948555)
-defval('lohi', [1 2]);
+defval('lohi', [1 5]);
 defval('alignon', 'etime')
 defval('ampfac', 3)
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
@@ -74,28 +74,25 @@ defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('normlize', true)
 
 % Find all the SAC files that match this event ID.
-sac = getsac(id, evtdir);
+sac = getsac(id, evtdir, procdir);
 
 % Generate figure window.
 F.f = figure;
+fig2print(F.f, 'flandscape')
 F.ax = axes(F.f);
-hold(F.ax, 'on');
 
 phase_cell = {};
 for i = 1:length(sac)
-    % Retrieve the full path to the SAC file/
-    fullpath_sac{i} = fullsac(sac{i}, procdir);
-
     % Retrieve the event data associated with that SAC file, as
     % found through sac2evt.m
-    EQ{i} = getevt(fullpath_sac{i}, evtdir);
+    EQ{i} = getevt(sac{i}, evtdir);
 
     % Parse the event info.
     dist(i) = EQ{i}(1).TaupTimes(1).distance;
     phase_cell = [phase_cell {EQ{i}(1).TaupTimes.phaseName}];
 
     % Read the SAC data.
-    [x{i}, h{i}] = readsac(fullpath_sac{i});
+    [x{i}, h{i}] = readsac(sac{i});
     seisdate{i} = seistime(h{i});
 
     % First arrival, in seconds offset from first sample of the seismogram.
@@ -133,6 +130,7 @@ end
 % distance decay.
 maxx = max(cellfun(@(xx) max(abs(xx)), x));
 
+hold(F.ax, 'on');
 % Normalize the traces and annotate with float numbers.
 for i = 1:length(x)
     if normlize
@@ -150,11 +148,11 @@ for i = 1:length(x)
     % Assumes Princeton MERMAID float naming convention, where the float
     % number is the two digits immediately following the first period
     % in the SAC filename.
-    floatnum = fx(strsplit(sac{i}, '.'), 2);
+    floatnum = fx(strsplit(strippath(sac{i}), '.'), 2);
     floatnum = floatnum(1:2);
 
-    F.pltr(i) = plot(xax{i}, ampfac * x{i} + dist(i));
-    F.pltx(i) = text(0, dist(i), num2str(floatnum));
+    F.pltr(i) = plot(F.ax, xax{i}, ampfac * x{i} + dist(i));
+    F.pltx(i) = text(F.ax, 0, dist(i), num2str(floatnum));
     F.pltx(i).Color = F.pltr(i).Color;
 
 end
@@ -174,15 +172,12 @@ locstr = sprintf('%s', EQ1.FlinnEngdahlRegionName);
 F.tl = title([magstr ' ' locstr ' at ' depthstr]);
 
 % Add labels.
-hold(F.ax, 'on')
 current_xlim = get(F.ax, 'XLim');
 current_ylim = get(F.ax, 'YLim');
-if strcmp(alignon, 'atime')
+if strcmpi(alignon, 'atime')
     % XLabel specific to aligning on first-arrival.
-    ph = EQ1.TaupTimes(1).phaseName;
-    
-    F.xl = xlabel(sprintf(['time relative to \\textit{%s}-phase ' ...
-                        '(s)\n[origin: %s UTC]'], ph, evttime));
+    F.xl = xlabel(sprintf(['time relative to first arrival(s)\n[origin: ' ...
+                        '%s UTC]'], evttime));
 
     warning(['Theoretical first arrival may not be the same phase ' ...
              'or phase branch across different seismograms'])
@@ -194,7 +189,7 @@ if strcmp(alignon, 'atime')
 else
     % Compute travel time curves for the phases present.
     phase_cell = unique(phase_cell);
-    phase_str = strrep(strjoin(phase_cell), ' ', ',');
+    phase_str = cell2commasepstr(phase_cell, ', ');
     tt = taupCurve('ak135', EQ1.PreferredDepth, phase_str);
 
     % Overlay travel time curves.
@@ -205,9 +200,11 @@ else
     end
     
     % XLabel specific to aligning on event-rupture time.
-    F.xl = xlabel(sprintf('time relative to %s UTC (s)', evttime));
+    % F.xl = xlabel(sprintf('time relative to %s UTC (s)', evttime));
+    F.xl = xlabel(sprintf('time relative to %s UTC (s)\n[%s]', evttime, id));
     F.lg = legend(F.ph, phase_cell, 'AutoUpdate', 'off', 'Location', ...
                   'NorthWest', 'FontSize', F.xl.FontSize);
+
 
     % Send travel time curves to the bottom.
     botz(F.ph, F.ax);
