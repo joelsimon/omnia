@@ -1,16 +1,15 @@
 function d = skipdotdir(d)
 % d = SKIPDOTDIR(d)
 %
-% Skip Dot ('.') Directory Files.
-%
-% Removes dot '.*' files from a directory structure.
+% SKIPDOTDIR removes dot '.*' directories and filenames from a
+% directory structure.
 %
 % Input:
 % d      Directory struct output from dir.m
 %
 % Output:
 % d      Directory struct output from dir.m with
-%            dot files removed
+%            dot folders and names removed
 %
 % Ex:
 %    d1 = dir('~')
@@ -21,7 +20,7 @@ function d = skipdotdir(d)
 % Last modified: 28-Jan-2018, Version 2017b
 
 % Sanity.
-if isa(d, 'struct') == false
+if ~isa(d, 'struct')
     error('Input argument ''d'' must be a directory structure.')
 
 end
