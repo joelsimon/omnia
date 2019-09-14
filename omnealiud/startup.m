@@ -50,4 +50,3 @@ javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
 %____________________________________________________%
 addpath(genpath(getenv('COLLAB')))
 addpath(genpath(getenv('OFFLINE')))
-addpath(genpath(getenv('EXAMPLES')))
