@@ -57,7 +57,7 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 10-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 16-Sep-2019, Version 2017b on GLNXA64
 
 % Default I/O.
 defval('sac', 'centcal.1.BHZ.SAC')
@@ -238,13 +238,15 @@ function [magauthor, magtype, magval] = getmbml(quake)
 % Returns the value, and author associated with an 'Mb' or 'Ml'
 % magnitude, or [] for all if no 'Mb' or 'Ml' magnitude type found.
 %
-% Prefers Mb, then Ml for magnitude type.
-% Prefers GCMT, then ISC then, IDC, then NEIC/PDE (the same) for author.
+% Prefers Mb over Ml for magnitude type.
+% Prefers (in order): GCMT; ISC; IDC; then NEIC/US/PDE (the same?) for author.
 %
 % Ergo, any Mb from a "non"-preferred author is returned before any Ml
 % magnitude types.
 %
-% Last modified in Ver. 2017b by jdsimon@princeton.edu, 26-Sep-2018.
+% Author: Joel D. Simon
+% Contact: jdsimon@princeton.edu
+% Last modified: 16-Sep-2019, Version 2017b on GLNXA64
 
 magauthor = [];
 magtype = [];
@@ -262,9 +264,9 @@ magvals = [quake.Magnitudes.Value];
 % (to inspect all these values) -- 
 % [num2cell(1:length(authors))' authors' magtypes' num2cell(magvals)']
 
-% I Prefer IDC over PDE/NEIC because it has a slightly lower magnitude
-% threshold according to this (possibly outdated) article, "SUMMARY OF
-% THE ISC BULLETIN OF EVENTS OF 2003", from
+% I Prefer IDC over NEIC/US/PDE because it has a slightly lower
+% magnitude threshold according to this (possibly outdated) article,
+% "SUMMARY OF THE ISC BULLETIN OF EVENTS OF 2003", from
 % http://www.isc.ac.uk/docs/papers/download/2006p02/.  Also, note that
 % NEIC and PDE are used interchangeable as "Author".  I believe
 % technically NEIC (National Earthquake Information Center, USA) is
@@ -275,13 +277,13 @@ for M = {'MB', 'ML'}
     magidx = find(ismember(magtypes, M));
 
     if ~isempty(magidx)
-        for A = {'GCMT', 'ISC', 'IDC', 'NEIC', 'PDE'}
+        for A = {'GCMT', 'ISC', 'IDC', 'NEIC', 'US', 'PDE'}
             authidx = find(ismember(authors, A));
             matchidx = intersect(magidx, authidx);
 
             if ~isempty(matchidx)
                 magauthor = A{:};
-                magtype = [upper(M{:}(1)) lower(M{:}(2))]; 
+                magtype = [upper(M{:}(1)) lower(M{:}(2))];
                 magval = magvals(matchidx(1));
                 return
 
@@ -295,10 +297,10 @@ for M = {'MB', 'ML'}
         % correct magnitude type from the list of remaining authors
         % (who aren't in my preferred list above).
         [max_mag, max_idx] = max(magvals(magidx));
-        magauthor = authors{max_idx(1)};
+        magauthor = authors{magidx(max_idx)};
         magtype = [upper(M{:}(1)) lower(M{:}(2))]; 
         magval = max_mag;
         return
-        
+
     end
 end
