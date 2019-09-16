@@ -1,21 +1,23 @@
 function [mer_sac, mer_EQ, nearby_sac, nearby_EQ] = ...
-    getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir)
+    getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir, check4update)
 % [mer_sac, mer_EQ, nearby_sac, nearby_EQ] = ...
-%      GETNEARBYSACEVT(id, mer_evtdir, mer_sacdir, nearbydir)
+%      GETNEARBYSACEVT(id, mer_evtdir, mer_sacdir, nearbydir, check4update)
 %
 % GETNEARBYSACEVT returns SAC filenames and EQ structures corresponding
 % to an input event ID for MERMAID data and their nearby stations.
 %
 % Input:
-% id            Event identification number in last 
+% id            Event identification number in last
 %                   column of identified.txt(def: 10948555)
-% mer_evtdir    Path to directory containing MERMAID 'raw/' and 'reviewed' 
+% mer_evtdir    Path to directory containing MERMAID 'raw/' and 'reviewed'
 %                   subdirectories (def: $MERMAID/events/)
 % mer_sacdir    Path to directory to be (recursively) searched for
 %                   MERMAID SAC files (def: $MERMAID/processed/)
 % nearbydir     Path to directory containing nearby stations
 %                   'sac/' and 'evt/' subdirectories
 %                   (def: $MERMAID/events/nearbystations/)
+% check4update  true to determine if resultant EQs need updating
+%                   (def: true)
 %
 % Output:
 % mer_sac       Cell array of MERMAID SAC files
@@ -38,13 +40,14 @@ defval('id', '10948555')
 defval('mer_evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('mer_sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
+defval('check4update', true)
 
 %% MERMAID data -- 
 
 % Can use getsacevt.m because dir structure organized as getsacevt.m
 % expects.
 id = strtrim(num2str(id));
-[mer_sac, mer_EQ] = getsacevt(id, mer_evtdir, mer_sacdir);
+[mer_sac, mer_EQ] = getsacevt(id, mer_evtdir, mer_sacdir, false);
 
 %% Nearby station data --
 
@@ -87,5 +90,12 @@ if ~isempty(nearby_evtdir)
 else
     warning('Empty: %s', fullfile(nearbydir, 'evt', id))
     nearby_EQ = {};
+
+end
+
+% Test if we need to update the files associated with this event ID.
+if check4update && need2updateid([mer_EQ nearby_EQ], id)
+    warning(['Event metadata differs between EQ structures.\nTo ' ...
+             'update run updateid(''%s'')'], id)
 
 end
