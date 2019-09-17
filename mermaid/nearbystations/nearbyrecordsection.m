@@ -29,20 +29,13 @@ end
 % always the first EQ in the list.
 evtdate = datetime(irisstr2date(mer_EQ{1}(1).PreferredTime));
 
-% Use the x-axis limits to bracket the start and end dates.
-axstart = evtdate + seconds(F.ax.XLim(1));
-axend = evtdate + seconds(F.ax.XLim(2));
-
-% Convert start and end dates (datetimes) to strings.
-starttime = irisdate2str(axstart);
-endtime = irisdate2str(axend);
-
+% Get the nearby SAC files and EQ structures.
 [~, ~, nearby_sac, nearby_EQ] = getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir);
 
-% Remove nearby EQ structures with no phase arrivals (empty TaupTimes,
-% e.g., in the case of incomplete or merged data).
+% Remove nearby EQ structures with no phase arrivals (empty
+% .TaupTimes, e.g., in the case of incomplete or merged data).
 rm_idx = [];
-for i = 1:length(nearby_EQ);
+for i = 1:length(nearby_EQ)
     if isempty(nearby_EQ{i}(1).TaupTimes)
         rm_idx = [rm_idx i];
 
@@ -52,21 +45,9 @@ nearby_EQ(rm_idx) = [];
 nearby_sac(rm_idx) = [];
 
 if strcmpi(alignon, 'etime')
-    % Expand the x-axis (to the left) by starting 100 s before the first arrival.
+    % Expand the x-axis (to the left) by starting 100 s (ish) before the first arrival.
     mer_first = cellfun(@(xx) xx(1).TaupTimes(1).arrivaldatetime, mer_EQ);
-
-    % Cannot do:
-     nearby_first = cellfun(@(xx) xx(1).TaupTimes(1).arrivaldatetime, nearby_EQ);
-    % because .TaupTimes may be empty (e.g., merged or incomplete SAC files)
-    % Can do it for mer_first because they are reviewed and always have .TaupTimes.
-    % for i = 1:length(nearby_EQ)
-    %     tt = nearby_EQ{i}(1).TaupTimes;
-    %     if ~isempty(tt)
-    %         nearby_first(i) = tt(1).arrivaldatetime;
-    %         nearby_dists(i) = tt(1).distance;
-
-    %     end
-    % end
+    nearby_first = cellfun(@(xx) xx(1).TaupTimes(1).arrivaldatetime, nearby_EQ);
     all_first = [mer_first nearby_first];
     min_first = min(all_first);
     F.ax.XLim(1) = round(seconds(min_first - evtdate) -  100, -2);
@@ -113,9 +94,10 @@ for i = 1:length(nearby_EQ)
         R = floor(fs / 20);
         x{i} = decimate(x{i}, R);
         h{i}.DELTA = h{i}.DELTA * R;
+        fprintf('\nDecimated %s from %i to %i [Hz]', nearby_EQ{i}(1).Filename, fs, round(1 / h{i}.DELTA))
 
     end
-     
+
     % This is the current "time" (NOT ABSOLUTE IN UTC) in seconds assigned
     % the first sample; all times in tt are in reference to this time.
     full_pt0(i) = tt(1).pt0;
@@ -155,7 +137,7 @@ for i = 1:length(nearby_EQ)
         abbrev_x{i} = bandpass(taper .* abbrev_x{i}, 1/h{i}.DELTA, lohi(1), lohi(2));
 
     end
-    
+
     % % This is the arrival time (s) still in the timing-reference of the
     % % full trace.
     % abbrev_first_arrival = abbrev_pt0 + abbrev_offset;
@@ -165,13 +147,13 @@ for i = 1:length(nearby_EQ)
     % [abbrev_x_first{i}, abbrev_W_first(i)] = ...
     %     timewindow(abbrev_x{i}, 30, abbrev_first_arrival, 'middle', h{i}.DELTA, abbrev_pt0);
     % abbrev_xax_first{i} = abbrev_W_first(i).xax;
-    
+
     % Identify the phases in the abbreviated segments only.
     arrival_times = [tt.truearsecs];
     xlims = minmax((abbrev_xax{1}'));
     arrival_idx = arrival_times >= xlims(1) & arrival_times <= xlims(2);
     phase_cell = [phase_cell {tt(arrival_idx).phaseName}];
-    
+
 
 end
 
