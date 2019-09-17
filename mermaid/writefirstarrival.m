@@ -81,16 +81,18 @@ wline = [];
 wlines = [];
 linecount = 0;
 for i = 1:length(s)
-   sac = s{i};
+    i
+    sac = s{i};
    
    % Skip SAC files that are already written.
-   if ~isempty(mgrep(filename, strippath(sac)))
+   if ~redo && ~isempty(mgrep(filename, strippath(sac)))
        continue
        
    end
 
    % Concatenate the write lines.
-   wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, fmt);
+   %   wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, fmt);
+   wline = single_wline(sac, true, [], [], [], [], fmt);
    wlines = [wlines wline];
 
    % Keep track of number of lines (over)written.
@@ -108,7 +110,8 @@ else
     fclose(fid);
 
     % Exit with informative printout.
-    fprintf('%s %i lines to:\n%s\n', verb, linecount, filename)
+    fprintf('%s %i %s to:\n%s\n', verb, linecount, plurals('line', ...
+                                                      linecount), filename)
 end
 
 
