@@ -18,7 +18,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 02-Sep-2019
+# Last modified: 17-Sep-2019
 
 # Collect input variables.
 sacdir=$1
@@ -29,7 +29,15 @@ outfname=$3
 startdir=`pwd`
 cd $sacdir
 
-# First ensure there are actually files to merge...
+# First verify SAC is installed and in $PATH.
+which sac > /dev/null
+if [ $? != 0 ]; then
+    printf "\nError: cannot locate SAC program.\nVerify it is installed and in \$PATH.\n\n"
+    exit 1
+
+fi
+
+# Next ensure there are actually files to merge...
 ls $filelist >& /dev/null
 if [ $? != 0 ]; then
     printf "\nIn %s no files match pattern: '%s'\n" $sacdir "$filelist"
