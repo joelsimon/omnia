@@ -4,7 +4,7 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 % SAC2EVT is the stupid SAC file to event matching tool.
 %
 % Input:
-% sac             SAC filename 
+% sac             SAC filename
 % model           Taup model (def: 'ak135')
 % ph              Taup phases (def: taup_defaultphases)
 % baseurl         1: 'http://service.iris.edu/fdsnws/event/1/' (def)
@@ -16,8 +16,8 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 % N.B.: baseurls 2-4 either are buggy and/or straight up do not
 % work. Left here for future fixes (hopefully).
 %
-% Output: 
-% EQ              Event structure that concatenates output structures 
+% Output:
+% EQ              Event structure that concatenates output structures
 %                     from irisFetch.Events and taupTime.m
 %
 % By default SAC2EVT queries event information from the IRIS DMC for
@@ -37,6 +37,10 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 % effect may be found at the default baseurl:
 % http://service.iris.edu/fdsnws/event/1/
 %
+% N.B: negative event depths are overwritten to 0 km in the
+% EQ.PreferredDepth field, whose value used for subsequent (e.g.
+% arrival times) computations.
+%
 % SAC2EVT has external dependencies -
 % *taupTime.m: last tested with Nov. 2002 version written by Qin Li
 % *irisFetch.m: last tested with version = 2.0.10 and IRIS-WS-2.0.18.jar
@@ -45,7 +49,7 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 %    EQ = SAC2EVT('centcal.1.BHZ.SAC')
 %
 % *Ex2: Look for M5+ events in a two minute time window;
-%       and overwrite default to not includeallmagnitudes 
+%       and overwrite default to not includeallmagnitudes
 %    sac = 'm35.20140915T080858.sac';
 %    stime = '2014-09-15T08:04:00';
 %    etime = '2014-09-15T08:06:00';
@@ -73,7 +77,7 @@ EQ = [];
 % the seismogram to the end of the seismogram.  These times are
 % overwritten if 'start' and 'end' are specified as inputs.
 seisdate = seistime(h);
-stime =  fdsndate2str(seisdate.B - hours(1)); 
+stime =  fdsndate2str(seisdate.B - hours(1));
 etime = fdsndate2str(seisdate.E);
 
 % Cases 2--4 are not suggested / don't work at the moment.
@@ -81,7 +85,7 @@ switch baseurl
   case 1
     baseurl = 'http://service.iris.edu/fdsnws/event/1/';
 
-  case 2 
+  case 2
     baseurl  = 'https://earthquake.usgs.gov/fdsnws/event/1/';
 
   case 3
@@ -95,7 +99,7 @@ switch baseurl
 
 end
 
-% Fetch event data.  
+% Fetch event data.
 fprintf('\n**************************\n')
 
 % The following 'if' statement allows updating of the EQ structure
@@ -122,7 +126,7 @@ else
     [ev, params] = irisFetch.Events('includeallmagnitudes', true, ...
                                     'includeallorigins', true, 'baseurl', ...
                                     baseurl, varargin{:});
-    
+
 end
 
 % Keep track of the date this query was made.
@@ -130,7 +134,7 @@ querytime = irisdate2str(datetime('now', 'TimeZone', 'UTC'), 1);
 
 %  for all events...
 nevt = 0;
-for i = 1:length(ev)  
+for i = 1:length(ev)
     quake = ev(i);
 
     % Skip this event is the timing is NaN, as is often the case when
@@ -142,7 +146,7 @@ for i = 1:length(ev)
 
     % Set negative depths to 0 for taupTime.
     depth = quake.PreferredDepth;
-    if depth < 0 
+    if depth < 0
         depth = 0;
 
     end
@@ -171,7 +175,7 @@ for i = 1:length(ev)
         % Do not input baseurl as input to feregion.m: feregion.m and
         % sac2evt.m have different baseurls.
         [quake.FlinnEngdahlRegionName, quake.FlinnEngdahlRegionCode] ...
-            = feregion(quake.PreferredLatitude, quake.PreferredLongitude); 
+            = feregion(quake.PreferredLatitude, quake.PreferredLongitude);
 
     end
     quake.Filename = strippath(sac);
@@ -205,13 +209,13 @@ if ~isempty(EQ)
         % EQ(i).TaupTimes(j).
         EQ(i) = reidpressure(EQ(i));
 
-    end    
+    end
 
     % Sort events by maximum magnitude.
     maxmag = [EQ.PreferredMagnitudeValue];
     [~, pidx] = sort(maxmag, 'descend');
     EQ = EQ(pidx);
-    
+
     % Move NaN magnitude values to end ('sort' omits NaN values).
     prefmagvals = [EQ.PreferredMagnitudeValue];
     [~, nanidx]  = unzipnan(prefmagvals);
@@ -224,13 +228,13 @@ if ~isempty(EQ)
     fprintf(['\n%i %s found with phase arrivals in %s ************' ...
              '*\n**************************\n\n'], length(EQ), ...
             plurals('event', length(EQ)), strippath(sac))
-    
+
 else
     fprintf(['\nNo matching phase arrivals in %s ************' ...
              '*\n**************************\n\n'], strippath(sac))
-    
+
 end
-    
+
 % End main.
 %________________________________________________________________________%
 
@@ -261,7 +265,7 @@ authors = upper({quake.Magnitudes.Author});
 magtypes = upper({quake.Magnitudes.Type});
 magvals = [quake.Magnitudes.Value];
 
-% (to inspect all these values) -- 
+% (to inspect all these values) --
 % [num2cell(1:length(authors))' authors' magtypes' num2cell(magvals)']
 
 % I Prefer IDC over NEIC/US/PDE because it has a slightly lower
@@ -298,7 +302,7 @@ for M = {'MB', 'ML'}
         % (who aren't in my preferred list above).
         [max_mag, max_idx] = max(magvals(magidx));
         magauthor = authors{magidx(max_idx)};
-        magtype = [upper(M{:}(1)) lower(M{:}(2))]; 
+        magtype = [upper(M{:}(1)) lower(M{:}(2))];
         magval = max_mag;
         return
 
