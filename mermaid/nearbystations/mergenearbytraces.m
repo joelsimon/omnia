@@ -1,8 +1,9 @@
 function merged = mergenearbytraces(tr, id, sacdir)
 % merged = MERGENEARBYTRACES(tr, id, sacdir)
 %
-% Wrapper to shell script 'mergesac' to merge split SAC files into a
-% single SAC file.
+% MERGENEARBYTRACES is a wrapper to the shell script 'mergesac' to
+% merge split SAC files, specifically returned by fetchnearbytraces.m,
+% into a single SAC file.  Requires SAC program.
 %
 % Output merged files are named:
 %
@@ -24,11 +25,11 @@ function merged = mergenearbytraces(tr, id, sacdir)
 % Output:
 % merged    Cell of merged filenames, if any (def: {})
 %
-% See also: fetchnearbytraces.m, irisFetch.Traces
+% See also: mersac, fetchnearbytraces.m, irisFetch.Traces
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Sep-2019, Version 2017b
+% Last modified: 19-Sep-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '11052554')
@@ -71,8 +72,8 @@ for i = 1:length(glob)
             merged{m_idx} = fullfile(iddir, outfname);
 
         else
-            warning('No merge: mergesac exited with the following\n%s', result)
+            error('mergesac failed with the following message --\n%s', result)
 
         end
     end
-end        
+end
