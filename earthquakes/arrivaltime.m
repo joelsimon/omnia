@@ -1,6 +1,6 @@
 function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 % tt = ARRIVALTIME(h, evtdate, [evla evlo], mod, evdp, phases, pt0)
-% 
+%
 % ARRIVALTIME returns the arrival time(s) of seismic phase(s) in a
 % seismogram.
 %
@@ -8,7 +8,7 @@ function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 % requested, though only those phase arrivals which fall within the
 % time window of the seismogram are returned.
 %
-% Dependency: ARRIVALTIME requires the MatTaup package, 
+% Dependency: ARRIVALTIME requires the MatTaup package,
 %             specifically the function taupTime.m,
 %             written by Qin Li, dated November 2002.
 %
@@ -16,14 +16,14 @@ function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 % h             SAC header from readsac.m (FJS function)
 % evtdate       Earthquake rupture time in datetime format in UTC timezone
 % [evla evlo]*  Event location as [latitude longitude] (def: [h.EVLA h.EVLO])
-% mod           TauP velocity model (def: 'ak135') 
+% mod           TauP velocity model (def: 'ak135')
 % evdp*         Event depth in km (def: h.EVDP)
 % phases        Comma separated phase list (def: 'P')
 % pt0           Time in seconds assigned to first sample (def: 0 s)
 %                  (another good choice: h.B, see example 2)
 %
 % * may be left empty if SAC header is populated with event info
-% 
+%
 % Output: (def: [])
 % tt            Extended output struct from taupTime with extra fields:
 %   .arrivaldatetime: absolute arrival time in datetime format
@@ -33,7 +33,7 @@ function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 %   .arsecs: time in seconds at sample nearest to the .truearsecs
 %   .arsamp: sample index whose corresponding time is nearest .truearsecs
 %   .model: velocity model use
-%   .pt0: time in seconds assigned to first sample 
+%   .pt0: time in seconds assigned to first sample
 %
 % Ex1: (load example MERMAID12 seismogram and calculate arrival time)
 %    sacf = 'm12.20130416T105310.sac';
@@ -41,8 +41,8 @@ function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 %    datefmt = ['uuuu/MM/dd HH:mm:ss.SS'];
 %    evtdate = datetime('2013/04/16 10:44:20.70', 'Format', datefmt, 'TimeZone', 'UTC');
 %    % SAC header includes event information; leave optional inputs empty
-%    tt = ARRIVALTIME(h, evtdate, [],'ak135', [], 'P') 
-%    figure; ha = gca; plot(x); hold(ha, 'on'); 
+%    tt = ARRIVALTIME(h, evtdate, [],'ak135', [], 'P')
+%    figure; ha = gca; plot(x); hold(ha, 'on');
 %    % Plot the arrival time (in samples)
 %    plot([tt.arsamp tt.arsamp], ha.YLim, 'r'); shg
 %
@@ -69,7 +69,7 @@ function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 08-Feb-2019, Version 2017b
+% Last modified: 19-Sep-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('evtloc', [h.EVLA h.EVLO])
@@ -87,6 +87,10 @@ if any(staloc == -12345)
 end
 if ~strcmp(evtdate.TimeZone, 'UTC') || isempty(evtdate.TimeZone)
     error('Input argument evtdate must be datetime format with ''UTC'' timezone.')
+
+end
+if evdp < 0
+    error('Event depth (evdp) must be positive')
 
 end
 
@@ -116,7 +120,7 @@ xax = xaxis(h.NPTS, h.DELTA, pt0);
 % within the time window of the seismogram, mark the offset.
 len_tt = length(tt);
 no_arr = [];
-for i = 1:len_tt  
+for i = 1:len_tt
     % The absolute theoretical arrival time is the estimated event
     % (origin) time plus theoretical travel time.
     tt(i).arrivaldatetime = evtdate + seconds(tt(i).time);
@@ -137,7 +141,7 @@ for i = 1:len_tt
     else
         % Index to be removed (arrival time outside seismogram's time window).
         no_arr = [no_arr  i];
-        
+
    end
 end
 tt = orderfields(tt);
