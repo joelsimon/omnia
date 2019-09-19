@@ -15,7 +15,7 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
 %               logical false to skip redundant sac2evt.m execution (def: false)
 % domain        'time' or 'time-scale', for changepoint.m (def: 'time')
 % n             Number of scales of wavelet decomposition (def: 5)
-% inputs        Structure of other, less commonly adjusted inputs, 
+% inputs        Structure of other, less commonly adjusted inputs,
 %                   e.g., wavelet type (def:  cpinputs, see there)
 % model         TauP model (def: 'ak135')
 % ph            TauP phases (def: defphases)
@@ -32,12 +32,12 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
 % baseurl       Default URL of data center, see sac2evt.m (def: 1)
 % [param, value]  Comma separated parameter, value pair list for irisFetch.Events
 %                   (def: see sac2evt.m)
-% 
+%
 % Output:
 % EQ            EQ structure, from sac2evt.m (see there).
 % CP            Changepoint structure, from changepoint.m (see there)
-% rawevt        Output raw .evt filename 
-% rawpdfc/w     Output .pdf filenames for *complete* and *windowed* 
+% rawevt        Output raw .evt filename
+% rawpdfc/w     Output .pdf filenames for *complete* and *windowed*
 % F             Structure containing both figure handles and other bits
 %                  (def: [], if event already matched)
 %
@@ -52,7 +52,7 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
 %
 % For the following example first make the required directories:
 %
-%    mkdir ~/cpsac2evt_example/raw/pdf 
+%    mkdir ~/cpsac2evt_example/raw/pdf
 %    mkdir ~/cpsac2evt_example/raw/evt
 %
 % And for both examples, use these inputs:
@@ -93,9 +93,9 @@ F = [];
 % already exist.
 [~, sans_sac] = fileparts(strtrim(sac));
 rawdiro = fullfile(diro, 'raw');
-rawevt  = fullfile(rawdiro, 'evt', [sans_sac '.raw.evt']); 
-rawpdfc = fullfile(rawdiro, 'pdf', [sans_sac '.complete.raw.pdf']); 
-rawpdfw = fullfile(rawdiro, 'pdf', [sans_sac '.windowed.raw.pdf']); 
+rawevt  = fullfile(rawdiro, 'evt', [sans_sac '.raw.evt']);
+rawpdfc = fullfile(rawdiro, 'pdf', [sans_sac '.complete.raw.pdf']);
+rawpdfw = fullfile(rawdiro, 'pdf', [sans_sac '.windowed.raw.pdf']);
 
 % Check if this SAC file has already been processed by cpsac2evt.m,
 % and return outputs if so.
@@ -114,7 +114,7 @@ if ~redo && all([exist(rawevt, 'file') exist(rawpdfc, 'file') ...
              'true to run cpsac2evt again.\n\n'],  sans_sac, rawevt)
 
     return
-    
+
 end
 
 % Match SAC file to cataloged events.
@@ -148,7 +148,7 @@ CP(2) = changepoint(domain, xw, n, h.DELTA, W.xlsecs, 1, inputs, conf, fml);
 % Plot the arrivals theoretical arrivals on top of the seismogram and
 % the wavelet-AIC arrivals at every scale.
 for i = 1:2
-    
+
     % Some plotting defaults.
     LineWidth = 1;
 
@@ -180,12 +180,12 @@ for i = 1:2
                                          'HorizontalAlignment', 'Center');
                     F(i).tx{j}{k}.Position(2) = ax.YLim(2) + 0.2*range(ax.YLim);
 
-                else        
+                else
                     F(i).tp{j}{k} = [];
                     F(i).tx{j}{k} = [];
-                    
+
                 end
-            end                            
+            end
         end
         hold(ax, 'off')
 
@@ -196,7 +196,7 @@ for i = 1:2
             F(i).tp{1}{1}.LineWidth = 2*LineWidth;
             F(i).tx{1}{1}.Position(2) = ax.YLim(2) + 0.3*range(ax.YLim);
             F(i).tx{1}{1}.FontSize = 25;
-            F(i).tx{1}{1}.FontWeight = 'bold';            
+            F(i).tx{1}{1}.FontWeight = 'bold';
 
         end
 
@@ -216,22 +216,17 @@ for i = 1:2
 
         [F(i).f.lgmag, F(i).f.lgmagtx] = textpatch(ax, 'NorthWest', magstr);
         [F(i).f.lgdist, F(i).lgdisttx] = textpatch(ax, 'SouthWest', [diststr ', ' depthstr]);
-
-        % This time is w.r.t. the reference time in the SAC header, NOT
-        % seisdate.B. CP.xax has the time of the first sample (input:
-        % pt0) assigned to h.B, meaning it is an offset from some
-        % reference (in this case, the reference time in the SAC
-        % header).  The time would be relative to seisdate.B if I had
-        % input pt0 = 0, because seisdate.B is EXACTLY the time at the
-        % first sample, i.e., we start counting from 0 at that time.
-        F(i).f.ha(end).XLabel.String = sprintf('time relative to %s UTC (s)\n[%s]', ...
-                                               datestr(refdate), ...
-                                               strippath(strrep(EQ(1).Filename, '_', '\_')));
-    else
-        F(i).f.ha(end).XLabel.String = sprintf(['time relative to ' ...
-                            '%s UTC (s)\n[no matching event]'], datestr(refdate));
-        
     end
+    % This time is w.r.t. the reference time in the SAC header, NOT
+    % seisdate.B. CP.xax has the time of the first sample (input:
+    % pt0) assigned to h.B, meaning it is an offset from some
+    % reference (in this case, the reference time in the SAC
+    % header).  The time would be relative to seisdate.B if I had
+    % input pt0 = 0, because seisdate.B is EXACTLY the time at the
+    % first sample, i.e., we start counting from 0 at that time.
+    F(i).f.ha(end).XLabel.String = sprintf('time relative to %s UTC (s)\n[%s]', ...
+                                           datestr(refdate), ...
+                                           strippath(strrep(sac, '_', '\_')));
 end
 
 % Set interpreter to LaTeX and fonts to Times.
@@ -244,7 +239,7 @@ for i = 1:length(F)
     % and re-tack2corner the annotations.
     for l = 1:length(F(i).f.ha)
         F(i).f.ha2(l).Position = F(i).f.ha(l).Position;
-        
+
     end
 
     if ~isempty(EQ)
@@ -262,7 +257,7 @@ for i = 1:length(F)
                       [corw{i} '.raw']);
     rawpdf{i} = savepdf(pdfname, F(i).fig, fullfile(diro, 'raw', 'pdf'));
     fprintf('Saved %s\n\n', rawpdf{i}{:});
-    
+
 end
 
 % Save the .evt file with the EQ structure(s).
