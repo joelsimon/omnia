@@ -30,9 +30,9 @@ startdir=`pwd`
 cd $sacdir
 
 # First verify SAC is installed and in $PATH.
-which sac > /dev/null
+which sac >& /dev/null
 if [ $? != 0 ]; then
-    printf "\nError: cannot locate SAC program.\nVerify it is installed and in \$PATH.\n\n"
+    printf "\nError: cannot locate SAC program.\nVerify it is installed and in \$PATH.\n"
     exit 1
 
 fi
