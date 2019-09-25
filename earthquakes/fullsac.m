@@ -19,7 +19,7 @@ function s = fullsac(singl, diro, returntype)
 % returntype   For third-generation+ MERMAID only:
 %              'ALL': both triggered and user-requested SAC files (def)
 %              'DET': triggered SAC files as determined by onboard algorithm
-%              'REQ': user-requested SAC files%
+%              'REQ': user-requested SAC files
 %
 % Output:
 % s            Full-path SAC file(s) names, either:
