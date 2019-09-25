@@ -1,5 +1,5 @@
-function sac = getsac(id, evtdir, sacdir)
-% sac = GETSAC(id, evtdir, sacdir)
+function sac = getsac(id, evtdir, sacdir, returntype)
+% sac = GETSAC(id, evtdir, sacdir, returntype)
 %
 % GETSAC returns the SAC file(s) that match the input event ID in
 % [evtdir]/reviewed/identified/txt/identified.txt, written with
@@ -8,26 +8,31 @@ function sac = getsac(id, evtdir, sacdir)
 % Only returns the first (primary) event specified with reviewevt.m
 %
 % Input:
-% id        Event identification number in last
-%               column of identified.txt(def: '10948555')
-% evtdir    Path to directory containing 'raw/' and 'reviewed' 
-%               subdirectories (def: $MERMAID/events/)
-% sacdir    Path to directory to be (recursively) searched for
-%               SAC files (def: $MERMAID/processed/)
+% id           Event identification number in last
+%                  column of identified.txt(def: '10948555')
+% evtdir       Path to directory containing 'raw/' and 'reviewed'
+%                  subdirectories (def: $MERMAID/events/)
+% sacdir       Path to directory to be (recursively) searched for
+%                 SAC files (def: $MERMAID/processed/)
+% returntype   For third-generation+ MERMAID only:
+%              'ALL': both triggered and user-requested SAC files (def)
+%              'DET': triggered SAC files as determined by onboard algorithm
+%              'REQ': user-requested SAC files%
 %
 % Output:
-% sac       Cell array of SAC files
+% sac          Cell array of SAC files
 %
 % See also: evt2txt.m, getsacevt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 14-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 25-Sep-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '10948555')
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
+defval('returntype', 'ALL')
 
 % Assumes Princeton-owned, third-generation MERMAID float SAC file
 % naming convention (NOT older, GeoAzur SAC files).  Assuming
@@ -66,7 +71,7 @@ end
 % Query that column for the input event id.
 this_event_idx = find(strcmp(all_event_ids, id));
 if isempty(this_event_idx)
-    error('Event ID: %s not found', id)
+    error('Event ID: %s not found in %s', id, textfile)
 
 end
 
@@ -74,7 +79,36 @@ end
 sac = cellfun(@(xx) strtrim(xx(1:columnsep(1))), textlines(this_event_idx), ...
               'UniformOutput', false);
 
-% And retrieve their full path.
+% Separate 'DET' (triggered) and 'REQ' (requested) data for MERMAID.
+switch upper(returntype)
+  case 'DET'
+    idx = cellstrfind(sac, 'MER.DET.*.sac');
+    if isempty(idx)
+        warning('No tiggered (''DET'') SAC files found')
+        sac = [];
+        return
+
+    end
+
+  case 'REQ'
+    idx = cellstrfind(sac, 'MER.REQ.*.sac');
+    if isempty(idx)
+        warning('No requested (''REQ'') SAC files found')
+        sac = [];
+        return
+
+    end
+
+  case 'ALL'
+    idx = [1:length(sac)];
+
+  otherwise
+    error('Specify one of ''ALL'', ''DET'', or ''REQ'' for input: returntype')
+
+end
+sac = sac(idx);
+
+% And retrieve the full path to each SAC file.
 for i = 1:length(sac)
     sac{i} = fullsac(sac{i}, sacdir);
 
