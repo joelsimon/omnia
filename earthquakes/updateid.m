@@ -7,11 +7,11 @@ function rev_evt = updateid(id, force, mer_evtdir, mer_sacdir, nearbydir, model,
 % This function requires irisFetch.Events and an internet connection.
 %
 % Input:
-% id            Event identification number in last 
+% id            Event identification number in last
 %                   column of identified.txt(def: 10948555)
-% force         true to force update (refetch) even when not required 
+% force         true to force update (refetch) even when not required
 %                   (def: false)
-% mer_evtdir    Path to directory containing MERMAID 'raw/' and 'reviewed' 
+% mer_evtdir    Path to directory containing MERMAID 'raw/' and 'reviewed'
 %                   subdirectories (def: $MERMAID/events/)
 % mer_sacdir    Path to directory to be (recursively) searched for
 %                   MERMAID SAC files (def: $MERMAID/processed/)
@@ -37,7 +37,7 @@ function rev_evt = updateid(id, force, mer_evtdir, mer_sacdir, nearbydir, model,
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 14-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 26-Sep-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '10937574')
@@ -53,7 +53,7 @@ defval('baseurl', 1);
 [mer_sac, mer_EQ, nearby_sac, nearby_EQ] = getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir);
 
 % Determine if the EQ structures differ and exit if they do not.
-if ~force && ~need2updateid([mer_EQ nearby_EQ], id)
+if ~force && ~need2updateid([mer_EQ ; nearby_EQ], id)
     fprintf('ID %s: update not required, all metadata match\n', id)
     rev_evt = [];
     return
@@ -71,7 +71,7 @@ for i = 1:length(mer_EQ)
 
     % .Filename is the same for all EQ indices.
     rev_evt{idx} = fullfile(mer_evtdir, 'reviewed', 'identified', 'evt', ...
-                        strippath(EQ(1).Filename)); 
+                        strippath(EQ(1).Filename));
     sac_suffix = suf(rev_evt{idx});
     rev_evt{idx}(end-length(sac_suffix):end) = '.evt';
 
@@ -95,7 +95,6 @@ if ~isempty(nearby_EQ)
 
         nearby_EQ{i} = EQ;
         clearvars('EQ')
-
 
     end
 end
