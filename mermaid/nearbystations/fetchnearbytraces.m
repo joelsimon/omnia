@@ -28,7 +28,8 @@ function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, mod
 % ph            Taup phases (def: defphases)
 %
 % Output:
-% tr        Cell of trace(s) returned by irisFetch.Traces
+% tr        Cell of trace(s) returned by irisFetch.Traces,
+%               if any (def: {})
 % merged    Cell of merged filenames, if any (def: {})
 %
 % *git history, if it exists, is respected with gitrmdir.m.
@@ -90,8 +91,8 @@ for i = 1:length(station)
     end
 
     % Base the query time off the first arriving phase.
-    tt = tt(1);
-    firstarrival_date = evtdate + seconds(tt.time);
+    first_TaupTime = tt(1);
+    firstarrival_date = evtdate + seconds(first_TaupTime.time);
 
     starttime_date = firstarrival_date - minutes(5);
     starttime = irisdate2str(starttime_date);
