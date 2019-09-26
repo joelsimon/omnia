@@ -1,6 +1,7 @@
 function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
-                                      evtdir, procdir, normlize)
-% [F, EQ, sac] = RECORDSECTION(id, lohi, alignon, ampfac, evtdir, procdir, normlize)
+                                      evtdir, procdir, normlize, returntype)
+% [F, EQ, sac] = ...
+%     RECORDSECTION(id, lohi, alignon, ampfac, evtdir, procdir, normlize, returntype)
 %
 % Plots a record section of all MERMAID seismograms that recorded the
 % same event, according to 'identified.txt' (output of evt2txt.m)
@@ -21,33 +22,38 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 %                 (removes 1/sqrt(dist) amplitude decay)
 %           false: normalize each seismogram against ensemble
 %                 (preserves 1/sqrt(dist) amplitude decay)
+% returntype   For third-generation+ MERMAID only:
+%              'ALL': both triggered and user-requested SAC files
+%              'DET': triggered SAC files as determined by onboard algorithm (def)
+%              'REQ': user-requested SAC files
 %
 % Output:
 % F        Structure with figure handles and bits
 % EQ       EQ structure returned by cpsac2evt.m
 % sac      SAC files whose traces are plotted
 %
-% *Travel time are not plotted if alignon = 'atime'. Also note that a
-% vertical line at 0 seconds does not necessarily correspond to the
-% same phase / phase branch across different seismograms.  I.e., the 0
-% time for each seismogram is individually set to its first arrival,
-% even if that first-arriving phase is different from the
-% first-arriving phase of other seismograms plotted.  In the vast
-% majority of cases the first-arriving phase be the same across all
-% seismograms, but this is something to be aware of. Overlaid travel
-% time curves for 'atime' option are on the wish list.
+% *Theoretical travel time curves are not plotted if alignon =
+% 'atime'.  Also note that a vertical line at 0 seconds does not
+% necessarily correspond to the same phase / phase branch across
+% different seismograms.  I.e., the 0 time for each seismogram is
+% individually set to its first arrival, even if that first-arriving
+% phase is different from the first-arriving phase of other
+% seismograms plotted.  In the vast majority of cases the
+% first-arriving phase be the same across all seismograms, but this is
+% something to be aware of. Overlaid travel time curves for 'atime'
+% option are on the wish list.
 %
 % Ex:
 % RECORDSECTION(10948555, [], 'etime');
 % RECORDSECTION(10948555, [], 'atime');
 % RECORDSECTION(10937540, [1/10 1/2], 'etime', 3, [], [], true);
 % RECORDSECTION(10937540, [1/10 1/2], 'etime', 3, [], [], false);
-% 
+%
 % See also: evt2txt.m, getevt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 11-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 25-Sep-2019, Version 2017b on GLNXA64
 
 % Wish list:
 %
@@ -65,16 +71,24 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 % times at the same distances. This would be inefficient.
 
 % Defaults.
-defval('id', 10948555)
+defval('id', '10948555')
 defval('lohi', [1 5]);
 defval('alignon', 'etime')
 defval('ampfac', 3)
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('normlize', true)
+defval('returntype', 'DET')
 
 % Find all the SAC files that match this event ID.
-sac = getsac(id, evtdir, procdir);
+id = num2str(id);
+sac = getsac(id, evtdir, procdir, returntype);
+if isempty(sac)
+    F = [];
+    EQ = [];
+    return
+
+end
 
 % Generate figure window.
 F.f = figure;
@@ -123,6 +137,7 @@ for i = 1:length(sac)
     end
 
 end
+EQ = EQ(:);
 
 % This is the max amplitude across all seismograms (i.e., likely the
 % one with the shortest epicentral distance, ignoring propagation
@@ -137,14 +152,14 @@ for i = 1:length(x)
         % Normalize this seismogram with itself, thereby removing distance
         % decay.
         x{i} = norm2max(x{i});
-        
+
     else
         % Normalize this seismogram with max amplitude of all
         % seismograms, thereby showing distance decay.
         x{i} = x{i} / maxx;
-        
+
     end
-    
+
     % Assumes Princeton MERMAID float naming convention, where the float
     % number is the two digits immediately following the first period
     % in the SAC filename.
@@ -196,9 +211,9 @@ else
     for i = 1:length(tt)
         F.ph(i) = plot(F.ax, tt(i).time, tt(i).distance, 'LineWidth', ...
                        1.5, 'LineStyle', '-');
-        
+
     end
-    
+
     % XLabel specific to aligning on event-rupture time.
     % F.xl = xlabel(sprintf('time relative to %s UTC (s)', evttime));
     F.xl = xlabel(sprintf('time relative to %s UTC (s)\n[%s]', evttime, id));
