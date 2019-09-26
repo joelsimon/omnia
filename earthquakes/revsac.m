@@ -88,7 +88,7 @@ switch upper(returntype)
   case 'DET'
     idx = cellstrfind(evt, 'MER.DET.*.evt');
     if isempty(idx)
-        warning('No tiggered (''DET'') .evt files found')
+        warning('No triggered (''DET'') .evt files found')
         evt = [];
         return
 

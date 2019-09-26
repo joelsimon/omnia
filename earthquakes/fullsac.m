@@ -87,7 +87,7 @@ switch upper(returntype)
   case 'DET'
     idx = cellstrfind(s, 'MER.DET.*.sac');
     if isempty(idx)
-        warning('No tiggered (''DET'') SAC files found')
+        warning('No triggered (''DET'') SAC files found')
         s = [];
         return
 
