@@ -1,5 +1,5 @@
-function writefirstarrival(s, redo, filename)
-% WRITEFIRSTARRIVAL(s, redo, filename)
+function writefirstarrival(s, redo, filename, fmt)
+% WRITEFIRSTARRIVAL(s, redo, filename, fmt)
 %
 % WRITEFIRSTARRIVAL writes the output of firstarrival.m a text file.
 %
@@ -13,6 +13,8 @@ function writefirstarrival(s, redo, filename)
 %          false: append new lines to the existing tex file unless
 %              that SAC file name already exists in the text file (def)
 % filename Output text file name (def: $MERMAID/.../firstarrivals.txt)
+% fmt      Line format (e.g., to set if using SAC files with names
+%              longer than 44 chars (see default internally)
 %
 % Output:
 % Text file with the following columns (firstarrivals.m outputs in parentheses):
@@ -24,33 +26,31 @@ function writefirstarrival(s, redo, filename)
 %    (5) 2-standard deviation error estimation per M1 method (twosd)
 %    (6) Signal-to-noise ratio of "dat" in a time window centered on "syn"
 %        (SNR)
-%    (7) Maximum absolute amplitude in counts in the time window starting at 
+%    (7) Maximum absolute amplitude in counts in the time window starting at
 %        "dat" and extending 1/2 the length of the input window (maxc_y)
-% 
+%
 % See also: firstarrival.m, readfirstarrival.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 09-Aug-2019, Version 2017b
+% Last modified: 26-Sep-2019, Version 2017b on MACI64
 
 % Defaults.
 defval('s', revsac(1))
 defval('redo', false)
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'firstarrivals.txt'))
-
-% Data format.
-fmt = ['%44s    ' , ...
-       '%5s    '  , ...
-       '%6.2f    ', ...
-       '%6.2f    ', ...
-       '%5.2f    ', ...
-       '%9.1f    ' , ...
-       '%11i\n'];
+defval('fmt', ['%44s    '  , ...
+               '%5s    '   , ...
+               '%6.2f    ' , ...
+               '%6.2f    ' , ...
+               '%5.2f    ' , ...
+               '%9.1f    ' , ...
+               '%11i\n'])
 
 % Sort out if deleting, appending to, or creating output file.
 file_exists = (exist(filename,'file') == 2);
-if file_exists 
+if file_exists
     % Grant write access to file.
     fileattrib(filename, '+w')
 
@@ -79,15 +79,13 @@ end
 % in one fell-swoop later.
 wline = [];
 wlines = [];
-linecount = 0;
-for i = 1:length(s)
-    i
+parfor i = 1:length(s)
     sac = s{i};
-   
+
    % Skip SAC files that are already written.
    if ~redo && ~isempty(mgrep(filename, strippath(sac)))
        continue
-       
+
    end
 
    % Concatenate the write lines.
@@ -95,12 +93,9 @@ for i = 1:length(s)
    wline = single_wline(sac, true, [], [], [], [], fmt);
    wlines = [wlines wline];
 
-   % Keep track of number of lines (over)written.
-   linecount = [linecount + 1];
-
 end
 
-if isempty(wline)
+if isempty(wlines)
     % Nothing to do if there are no new lines to write.
     fprintf('No new lines written to:\n%s\n', filename)
 
@@ -110,8 +105,9 @@ else
     fclose(fid);
 
     % Exit with informative printout.
-    fprintf('%s %i %s to:\n%s\n', verb, linecount, plurals('line', ...
-                                                      linecount), filename)
+    numlines = length(regexp(wlines, '\n'));
+    fprintf('%s %i %s to:\n%s\n', verb, numlines, plurals('line', ...
+                                                      numlines), filename)
 end
 
 
