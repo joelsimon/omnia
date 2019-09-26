@@ -31,11 +31,12 @@ function EQ = nearbysac2evt(id, redo, mer_evtdir, mer_sacdir, nearbydir)
 %
 % Output:
 % *N/A*    (writes reviewed .evt file)
-% EQ       EQ structures for each 'nearby' SAC file
+% EQ       EQ structures for each 'nearby' SAC file, 
+%             or [] if already fetched and redo not required
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 11-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 26-Sep-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '10948555')
@@ -67,7 +68,7 @@ evt_path = fullfile(nearbydir, 'evt', id);
 if ~need2continue(id, redo, nearby_sac, nearbydir, evt_path)
     fprintf(['\nID %s already run: %s/\nSet ''redo'' = true to rerun ' ...
              '%s\n\n'], id, evt_path, mfilename)
-    [~, ~, ~, EQ] = getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir);
+    EQ = [];
     return
 
 end
