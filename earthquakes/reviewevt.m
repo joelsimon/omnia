@@ -13,22 +13,22 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 % does it rm staged files already added but not committed).
 %
 % Input:
-% sac       SAC filename 
+% sac       SAC filename
 %               (def: '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
 % redo      logical true to delete any existing reviewed .evt and
-%               rerun REVIEWEVT on the input 
+%               rerun REVIEWEVT on the input
 %           logical false to skip redundant review (def: false)
-% diro      Path to directory containing 'raw/' and 'reviewed' 
+% diro      Path to directory containing 'raw/' and 'reviewed'
 %               subdirectories (def: $MERMAID/events/)
-% viewr     Preferred .pdf viewer  -- 
+% viewr     Preferred .pdf viewer  --
 %           1: xpdf (Linux/Unix)
 %           2: evince (Linux/Unix) (def)
 %           3: Preview (Mac)
 %           4: [currently throws error, but add your favorite here!]
 %
-% Output:   
+% Output:
 % *N/A*    (writes reviewed .evt file)
-% EQ       EQ earthquake structure after review 
+% EQ       EQ earthquake structure after review
 %
 % REVIEWEVT loads earthquake and CP arrival-time data (.evt) and their
 % associated plots (.raw.pdf) output by cpsac2evt.m and guides the
@@ -38,7 +38,7 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 %
 % REVIEWEVT requires the following folders exist with write permission:
 %    (1) [diro]/reviewed/identified/evt/
-%    (2) [diro]/reviewed/unidentified/evt/ 
+%    (2) [diro]/reviewed/unidentified/evt/
 %    (3) [diro]/reviewed/purgatory/evt/
 %
 % In the example below the EQ and CP structure, as well as both pdfs
@@ -69,7 +69,7 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 %    [diro]/reviewed/unidentified/evt/
 %
 % If the user types 'm' (undecided) a winnowed .evt file is written to
-%    [diro]/reviewed/purgatory/evt/   
+%    [diro]/reviewed/purgatory/evt/
 %
 % After prompt 1 the user may type 'back' to return to a paused state
 % of execution to reexamine the EQ/AIC structures.
@@ -77,7 +77,7 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 % After prompt 2 the user may type 'restart' to relaunch a fresh
 % instance of REVIEWEVT, useful if input error was made.
 %
-% For the following example run the first Ex1 in cpsac2evt.m, 
+% For the following example run the first Ex1 in cpsac2evt.m,
 % then make these required directories:
 %
 %    mkdir ~/cpsac2evt_example/reviewed/identified/evt/
@@ -86,13 +86,13 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 % Ex: (winnow EQ structure by selecting first-arriving P wave assoc. w/ first event)
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
 %    diro = '~/cpsac2evt_example';
-%    EQ  = REVIEWEVT(sac, true, diro)    
-%    
+%    EQ  = REVIEWEVT(sac, true, diro)
+%
 % See also: cpsac2evt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 17-Jun-2019, Version 2017b
+% Last modified: 26-Sep-2019, Version 2017b on GLNXA64
 
 % If using viewr = 3 (Preview) on Mac:
 %
@@ -138,16 +138,16 @@ if ~redo && previously_reviewed
              '''redo'' = true to run reviewevt again.\n\n'], ...
             sacname, fullfile(old_review.folder, old_review.name))
     return
-    
+
 end
 
-raw_evt = fullfile(raw_diro, 'evt', [sans_sac '.raw.evt']); 
+raw_evt = fullfile(raw_diro, 'evt', [sans_sac '.raw.evt']);
 temp = load(raw_evt, '-mat');
 EQ = temp.EQ;
 CP = temp.CP;
 clear('temp')
 
-raw_pdf = fullfile(raw_diro, 'pdf', [sans_sac '*.raw.pdf']); 
+raw_pdf = fullfile(raw_diro, 'pdf', [sans_sac '*.raw.pdf']);
 pdfdir = dir(raw_pdf);
 if isempty(pdfdir)
     error('No .pdfs matching %s found.', raw_pdf)
@@ -164,7 +164,7 @@ switch viewr
   case 2
     open_pdf = 'evince %s &';
     close_pdf = 'evince';
-    
+
   case 3
     % Must use '-F' option to not reopen every previous .pdf (killall on
     % Mac with Preview reopens all previous windows).  This does not
@@ -188,7 +188,7 @@ ynflag = false;
 if ~isempty(EQ)
     % If domain = 'time-scale' and no smoothing was used (input 'fml'),
     % take the rough center of the time smear as the reference time
-    % for the travel time residual printed to the screen.  
+    % for the travel time residual printed to the screen.
     %
     % In either case, print residuals w.r.t. to CP(1); the changepoint
     % estimates for the complete, and not the windowed, seismogram.
@@ -198,7 +198,7 @@ if ~isempty(EQ)
             end_samp  = CP(1).arsamp{i}(2);
             mid_samp = round(mean([beg_samp end_samp]));
             JDSarsecs(i) = CP(1).outputs.xax(mid_samp);
-            
+
         end
     else
         JDSarsecs = cell2mat(CP(1).arsecs);
@@ -210,10 +210,10 @@ if ~isempty(EQ)
     fprintf( '\n     *First arrival associated with largest magnitude earthquake [EQ(1)]*')
     fprintf( '\n     *Phase:             %7s',       EQ(1).TaupTimes(1).phaseName)
     fprintf( '\n     *Magnitude:         %7.1f %s',  EQ(1).PreferredMagnitudeValue, EQ(1).PreferredMagnitudeType)
-    fprintf( '\n     *Distance (deg):    %7.1f',     EQ(1).TaupTimes(1).distance)
-    fprintf( '\n     *Depth (km):        %7.1f',     EQ(1).PreferredDepth)
-    fprintf( '\n     *Arrival time (s):  %7.1f',     EQ(1).TaupTimes(1).truearsecs)
-    fprintf(['\n     *JDS residual (s):  ' sprintf(repmat('%7.1f', ...
+    fprintf( '\n     *Distance [deg]:    %7.1f',     EQ(1).TaupTimes(1).distance)
+    fprintf( '\n     *Depth [km]:        %7.1f',     EQ(1).PreferredDepth)
+    fprintf( '\n     *Arrival time [s]:  %7.1f',     EQ(1).TaupTimes(1).truearsecs)
+    fprintf(['\n     *JDS residual [s]:  ' sprintf(repmat('%7.1f', ...
             [1 length(JDSarsecs)]), JDSarsecs - EQ(1).TaupTimes(1).truearsecs)])
 
 
@@ -252,13 +252,13 @@ if ~isempty(EQ)
         if sum(strcmpi(yn, {'y' 'yes' 'n' 'no' 'm' 'maybe' 'back' 'skip'})) ~= 1
             fprintf(['\n     Bad input: specify one of  ''Y'' (yes), ' ...
                      '''N'' (no), ''M'' (maybe), ''back'', or ''skip''.\n'])
-            
+
         elseif strcmpi(yn, 'back')
             fprintf(['\n     Paused execution again for repeat inspection.\n', ...
                      '     Type ''dbcont'' to continue.\n\n'])
             keyboard
             continue
-                
+
         elseif strcmpi(yn, 'skip')
             % Close .pdfs, return NaN.
             system(sprintf('killall %s', close_pdf));
@@ -274,20 +274,20 @@ else
     yn = 'N';
     fprintf( '\n     Filename: %s\n\n', sacname)
     fprintf(['     EQ structure is empty and thus this event is unidentified.\n', ...
-             '     Execution paused for waveform inspection, though no further action required.\n', ...
+             '     Execution paused for waveform inspection, though no further action is required.\n', ...
              '     An empty .evt file will automatically be sent to the ''unidentified'' directory.\n'])
     fprintf(['\n     !! Paused execution -- type ''dbcont'' to continue !!\n\n'])
     keyboard
 
 end
-    
+
 %% Pick phases for every matched event.
 
 switch lower(yn)
   case {'y', 'yes', 'm', 'maybe'}
     if any(strcmpi(yn, {'y' 'yes'}))
         status = 'identified';
-        
+
     else
         status = 'purgatory';
 
@@ -295,7 +295,7 @@ switch lower(yn)
 
     eqflag = false;
     while ~eqflag
-        eq = strtrim(input('     Matched EQ(s) [or restart]: ', 's'));
+        eq = strtrim(input('     Matched EQ(#) [or back/restart]: ', 's'));
 
         if strcmpi(eq, 'restart')
 
@@ -303,7 +303,7 @@ switch lower(yn)
 
             system(sprintf('killall %s', close_pdf));
             clc
-            reviewevt(sac, redo, diro) 
+            reviewevt(sac, redo, diro)
             return
 
         end
@@ -313,47 +313,47 @@ switch lower(yn)
                      '     Type ''dbcont'' to continue.\n\n'])
             keyboard
             continue
-            
+
         end
 
         eq = str2num(eq);
         if ~all(ismember(eq, [1:length(EQ)])) || isempty(eq)
-            fprintf('\n     Bad input: specify integer value between [1:%i], inclusive.\n\n', length(EQ))
+            fprintf('\n     Bad input: specify integer values between [1:%i], inclusive.\n\n', length(EQ))
             continue
 
         end
 
         for i = 1:length(eq)
-            % Copy matched earthquake but delete associated phases for now.  
+            % Copy matched earthquake but delete associated phases for now.
             % They will be added back after the next round of user prompts.
             rev_EQ(i) = EQ(eq(i));
             rev_EQ(i).TaupTimes = [];
-            
+
             phflag = false;
             while ~phflag
 
-                ph = input(sprintf(['     Matched TaupTimes(s) for ' ...
+                ph = input(sprintf(['     Matched TaupTimes(#) for ' ...
                                     'EQ(%i) [or restart]: '],  eq(i)), 's');
-                
+
                 if strcmpi(strtrim(ph), 'restart')
 
                     %% Recursive.
- 
+
                     system(sprintf('killall %s', close_pdf));
                     clc
                     reviewevt(sac, redo, diro)
                     return
 
                 end
-                
+
                 if strcmpi(strtrim(ph), 'back')
                     fprintf(['\n     Paused execution again for repeat inspection.\n', ...
                              '     Type ''dbcont'' to continue.\n\n'])
                     keyboard
                     continue
-                    
+
                 end
-                
+
                 if strcmp(strtrim(ph), ':')
                     rev_EQ(i).TaupTimes = EQ(eq(i)).TaupTimes;
                     phflag = true;
@@ -363,11 +363,11 @@ switch lower(yn)
 
                 ph = str2num(ph);
                 if ~all(ismember(ph, [1:length(EQ(eq(i)).TaupTimes)])) || isempty(ph)
-                    fprintf(['\n     Bad input: specify integer value between [1:%i], inclusive,\n' ...
+                    fprintf(['\n     Bad input: specify integer values between [1:%i], inclusive,\n' ...
                              '                or : [colon] to include all phases.\n\n'], ...
                             length(EQ(eq(i)).TaupTimes))
                     continue
-                    
+
                 end
 
                 rev_EQ(i).TaupTimes = EQ(eq(i)).TaupTimes(ph);
@@ -403,11 +403,11 @@ if previously_reviewed
         git_tracked = true;
 
         % Must cd to directory; can't use git -C with archaic git version (<1.8.5).
-        startdir = pwd;  
+        startdir = pwd;
         cd(old_review.folder)
         [~, ~] = system(sprintf('git rm -- %s', old_review.name));
         fprintf('\n\nRan "git rm -- %s" in %s', old_review.name, ...
-                old_review.folder)        
+                old_review.folder)
 
         try
             % If you've just cleared a directory you can't cd into it; git
@@ -444,7 +444,7 @@ if previously_reviewed && git_tracked
     [~, ~] = system(sprintf('git add -- %s', new_review.name));
     fprintf('\n\nRan "git add -- %s" in %s\n', new_review.name, ...
             new_review.folder)
-    
+
     try
         % Same note for try statement, above.
         cd(startdir)
