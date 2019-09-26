@@ -1,5 +1,5 @@
 function EQ = reviewevt(sac, redo, diro, viewr)
-% EQ = REVIEWEVT(sac, redo, diro, viewer)
+% EQ = REVIEWEVT(sac, redo, diro, viewr)
 %
 % REVIEWEVT is the smart SAC file to event matching tool.
 %
@@ -155,6 +155,11 @@ if isempty(pdfdir)
 end
 
 %% Open raw PDFs to conduct event review.
+
+if contains(computer, 'MAC') && viewr ~= 3
+    warning('Seems you are using a MAC...probably want viewr = 3')
+
+end
 
 switch viewr
   case 1
