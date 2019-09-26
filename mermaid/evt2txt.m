@@ -4,17 +4,17 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 % EVT2TXT converts reviewed .evt files (which are really .mat files)
 % to human readable textfiles.
 %
-% EVT2TXT (over)writes: 
+% EVT2TXT (over)writes:
 %    [revdir]/reviewed/identified/txt/identified.txt
 %    [revdir]/reviewed/unidentified/txt/unidentified.txt
 %    [revdir]/reviewed/all.txt
-% 
+%
 % These paths must exist before calling EVT2TXT.
 %
 % Inputs:
 % revdir    Path to directory containing 'reviewed' subdirectory
 %               (def: $MERMAID/events)
-% geoazur   logical true to assume GeoAzur's naming scheme 
+% geoazur   logical true to assume GeoAzur's naming scheme
 %               (def: false)
 %
 % Output:
@@ -22,7 +22,7 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 % txt       Formatted text structure with fields:
 %           .identified
 %           .unidentified
-%           .all  
+%           .all
 %
 % GeoAzur naming scheme example:
 %    'm12.20130416T105310.sac'
@@ -36,12 +36,12 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 %    mkdir ~/cpsac2evt_example/reviewed/identified/txt/
 %    mkdir ~/cpsac2evt_example/reviewed/unidentified/txt/
 %
-% Ex: (write a line to identified.txt and all.txt; 
+% Ex: (write a line to identified.txt and all.txt;
 %      nothing to write for unidentified)
 %    sacdir = fullfile(getenv('OMNIA'), 'exfiles')
 %    revdir = '~/cpsac2evt_example';
 %    txt = EVT2TXT(sacdir, revdir, false)
-% 
+%
 % See also: cpsac2evt.m, reviewevt.m, revsac.m, getevt.m
 %
 % Author: Joel D. Simon
@@ -114,7 +114,7 @@ for i = 1:2
     % !! Edit this line to accommodate different SAC naming schemes.  In
     % our case the first 15 chars of the filename tag the time of the
     % first sample of the seismogram.
-    if ~geoazur 
+    if ~geoazur
         sactime = cellfun(@(xx) xx(1:15), sac, 'UniformOutput', false);
 
     else
@@ -133,7 +133,7 @@ for i = 1:2
         tmp = load(evt{j}, '-mat');
         EQ = tmp.EQ;
         clear('tmp')
-        
+
         if strcmp(status, 'identified')
             % Make note of multiple event and/or phase matches by tagging the
             % public ID or phase name with a ('*') prefix.
@@ -141,13 +141,13 @@ for i = 1:2
             if length(EQ) > 1
                 publicid = ['*' publicid];
             end
-            
+
             eqphase = EQ(1).TaupTimes(1).phaseName;
             if length(EQ(1).TaupTimes) > 1
                 eqphase = ['*' eqphase];
 
             end
-            data = {EQ(1).Filename, 
+            data = {strippath(EQ(1).Filename),
                     EQ(1).PreferredTime(1:19),
                     EQ(1).PreferredLatitude,
                     EQ(1).PreferredLongitude,
@@ -158,7 +158,7 @@ for i = 1:2
                     eqphase,
                     publicid};
 
-            
+
         else
             data = {sac{j}, NaN(1,9)};
 
@@ -170,28 +170,28 @@ end
 
 % Write 'identified.txt' and 'unidentified.txt'.
 for i = 1:2
-    status = review_status{i};    
+    status = review_status{i};
     fout  = fullfile(revdir, 'reviewed', status, 'txt', [status '.txt']);
-    
+
     if exist(fout, 'file')
         wstatus = fileattrib(fout, '+w', 'a');
-        if wstatus == 0 
-            error('Unable to allow write access to %s.', fout) 
-            
+        if wstatus == 0
+            error('Unable to allow write access to %s.', fout)
+
         end
     end
 
     fid = fopen(fout, 'w');
     for j = 1:length(txt.(status))
         fprintf(fid, txt.(status){j});
-        
+
     end
     fclose(fid);
-    
+
     wstatus = fileattrib(fout, '-w', 'a');
-    if wstatus == 0 
-        error('Unable to restrict write access to %s.', fout) 
-        
+    if wstatus == 0
+        error('Unable to restrict write access to %s.', fout)
+
     end
 end
 
@@ -204,21 +204,21 @@ txt.all = txt.all(idx);
 fout  = fullfile(revdir, 'reviewed', 'all.txt');
 if exist(fout, 'file')
     wstatus = fileattrib(fout, '+w', 'a');
-    if wstatus == 0 
-        error('Unable to allow write access to %s.', fout) 
-        
+    if wstatus == 0
+        error('Unable to allow write access to %s.', fout)
+
     end
 end
 
 fid = fopen(fout, 'w');
 for j = 1:length(txt.all)
     fprintf(fid, txt.all{j});
-    
+
 end
 fclose(fid);
 
 wstatus = fileattrib(fout, '-w', 'a');
-if wstatus == 0 
-    error('Unable to restrict write access to %s.', fout) 
-    
+if wstatus == 0
+    error('Unable to restrict write access to %s.', fout)
+
 end
