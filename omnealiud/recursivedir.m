@@ -6,7 +6,7 @@ function filenames = recursivedir(d, filenames) % input: filenames is an interna
 %
 % Input:
 % d             Directory structure output from dir.m
-% 
+%
 % Output:
 % filenames     All (non-dot) filenames contained recursively
 %                   in the input directory.
@@ -17,7 +17,7 @@ function filenames = recursivedir(d, filenames) % input: filenames is an interna
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 09-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 26-Sep-2019, Version 2017b on MACI64
 
 %% Recursive.
 
@@ -55,3 +55,4 @@ for i = 1:length(d)
 
     end
 end
+filenames = unique(filenames);
