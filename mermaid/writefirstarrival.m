@@ -27,7 +27,7 @@ function writefirstarrival(s, redo, filename)
 %    (7) Maximum absolute amplitude in counts in the time window starting at 
 %        "dat" and extending 1/2 the length of the input window (maxc_y)
 % 
-% See also: firstarrival.m, readfirstarrivals.m
+% See also: firstarrival.m, readfirstarrival.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
