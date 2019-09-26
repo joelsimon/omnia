@@ -27,7 +27,7 @@ function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, mod
 % model         Taup model (def: 'ak135')
 % ph            Taup phases (def: defphases)
 %
-% Output:
+% Output: (both empty in case of redo = false and refetch not required)
 % tr        Cell of trace(s) returned by irisFetch.Traces,
 %               if any (def: {})
 % merged    Cell of merged filenames, if any (def: {})
