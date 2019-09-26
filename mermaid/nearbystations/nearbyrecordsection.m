@@ -1,11 +1,15 @@
-function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, normlize, nearbydir)
-% F = NEARBYRECORDSECTION(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, normlize, nearbydir)
+function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, normlize, nearbydir, returntype)
+% F = NEARBYRECORDSECTION(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, normlize, nearbydir, returntype)
 %
 % NEEDS HEADER AND WORKING 'ATIME' OPTION
+% returntype   For third-generation+ MERMAID only:
+%              'ALL': both triggered and user-requested SAC files
+%              'DET': triggered SAC files as determined by onboard algorithm (def)
+%              'REQ': user-requested SAC files
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 14-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 25-Sep-2019, Version 2017b on GLNXA64
 
 defval('id', '10948555')
 defval('lohi', [1 5]);
@@ -15,6 +19,7 @@ defval('mer_evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('mer_sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('normlize', true)
 defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
+defval('returntype', 'DET')
 
 if strcmpi(alignon, 'atime')
     error('alignon = ''atime'' not yet coded')
@@ -23,14 +28,19 @@ end
 
 % Plot the baseline MERMAID record section.
 [F, mer_EQ] = recordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
-                            mer_sacdir, normlize);
+                            mer_sacdir, normlize, returntype);
+if isempty(mer_EQ)
+    return
+
+end
 
 % The event date for this ID is the same for every mer_EQ and is
 % always the first EQ in the list.
 evtdate = datetime(irisstr2date(mer_EQ{1}(1).PreferredTime));
 
 % Get the nearby SAC files and EQ structures.
-[~, ~, nearby_sac, nearby_EQ] = getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir);
+[~, ~, nearby_sac, nearby_EQ] = ...
+    getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir, true, returntype);
 
 % Remove nearby EQ structures with no phase arrivals (empty
 % .TaupTimes, e.g., in the case of incomplete or merged data).
@@ -43,22 +53,44 @@ for i = 1:length(nearby_EQ)
 end
 nearby_EQ(rm_idx) = [];
 nearby_sac(rm_idx) = [];
+clearvars('rm_idx')
+
+% This the requested number of seconds between the first sample of the
+% seismogram and the theoretical first arrival; i.e., how long we
+% want the noise segment to be on the abbreviated (shortened) trace.
+abbrev_offset = 100;
+
+% We want to compare apples-to-apples phase wise so ensure we are
+% looking at the same phase / phase branch in nearby_EQ as the first
+% arrivals in mer_EQ;
+first_phase_idx = firstnearbyphase(mer_EQ, nearby_EQ);
+
+% If there is no reportedly-matching phase in the nearby_EQ struct,
+% remove that structure entirely, as well as the corresponding nearby_sac index.
+rm_idx = find(isnan(first_phase_idx));
+nearby_EQ(rm_idx) = [];
+nearby_sac(rm_idx) = [];
+
+% Finally remove the NaN indices from first_phase_idx itself s.t. the
+% indexing now matches that of nearby_EQ and nearby_sac.
+first_phase_idx(rm_idx) = [];
+clearvars('rm_idx')
 
 if strcmpi(alignon, 'etime')
     % Expand the x-axis (to the left) by starting 100 s (ish) before the first arrival.
     mer_first = cellfun(@(xx) xx(1).TaupTimes(1).arrivaldatetime, mer_EQ);
     nearby_first = cellfun(@(xx) xx(1).TaupTimes(1).arrivaldatetime, nearby_EQ);
-    all_first = [mer_first nearby_first];
+    all_first = [mer_first ; nearby_first];
     min_first = min(all_first);
     F.ax.XLim(1) = round(seconds(min_first - evtdate) -  100, -2);
 
-    % Expand the y-axis by 5 degrees beyond the min and max distances.
+    % Expand the y-axis by 10 degrees beyond the min and max distances.
     mer_dists = cellfun(@(xx) xx(1).TaupTimes(1).distance, mer_EQ);
     nearby_dists = cellfun(@(xx) xx(1).TaupTimes(1).distance, nearby_EQ);
-    all_dists = [mer_dists nearby_dists];
+    all_dists = [mer_dists ; nearby_dists];
     min_dist = min(all_dists) - 10;
     max_dist = max(all_dists) + 10;
-    if min_dist < 0 
+    if min_dist < 0
         min_dist = 0;
 
     end
@@ -70,46 +102,55 @@ if strcmpi(alignon, 'etime')
 
 end
 
-% This the requested number of seconds between the first sample of the
-% seismogram and the theoretical first arrival; i.e., how long we
-% want the noise segment to be on the abbreviated (shortened) trace.
-abbrev_offset = 100; 
-
 phase_cell = {};
 for i = 1:length(nearby_EQ)
-    tt = nearby_EQ{i}(1).TaupTimes;
-    if isempty(tt) 
-        continue
+    tt = nearby_EQ{i}.TaupTimes;
 
-    end
-
-    % Parse the event info.
-    dist(i) = tt.distance;
+    % Note this event's distance -- just take the distance attached to the
+    % first phase as they distance does not vary between phases.
+    dist(i) = tt(1).distance;
 
     % Read the NEARBY_SAC data.
     [x{i}, h{i}] = readsac(nearby_sac{i});
 
-    fs = round(1 / h{i}.DELTA);
-    if fs > 20
-        R = floor(fs / 20);
-        x{i} = decimate(x{i}, R);
-        h{i}.DELTA = h{i}.DELTA * R;
-        fprintf('\nDecimated %s from %i to %i [Hz]', nearby_EQ{i}(1).Filename, fs, round(1 / h{i}.DELTA))
+    % seisdate is in absolute UTC time.
+    seisdate{i} = seistime(h{i});
 
+    % Decimate the data to get as close as possible to 20 Hz.
+    if isnan(lohi)
+        fs = round(1 / h{i}.DELTA);
+        if fs > 20
+            R = floor(fs / 20);
+            x{i} = decimate(x{i}, R);
+
+            %% Very important: adjust the appropriate header variables .NPTS and .DELTA
+            h{i}.NPTS = length(x{i});
+            h{i}.DELTA = h{i}.DELTA * R;
+
+            fprintf('\nDecimated %s from %i to %i [Hz]\n', nearby_EQ{i}(1).Filename, fs, round(1 / h{i}.DELTA))
+
+        end
     end
 
     % This is the current "time" (NOT ABSOLUTE IN UTC) in seconds assigned
     % the first sample; all times in tt are in reference to this time.
-    full_pt0(i) = tt(1).pt0;
+    full_pt0(i) = tt(first_phase_idx(i)).pt0;
 
-    % This is the currently defined x-xaxis for the complete trace.
+    % This is the currently defined x-xaxis for the complete trace
+    % (possibly after decimation).
     full_xax{i} = xaxis(h{i}.NPTS, h{i}.DELTA, full_pt0(i));
 
     % This is the current number of seconds between the first sample of
     % the seismogram and the theoretical first arrival; i.e. the
     % length of the noise segment.
-    full_offset = tt(1).truearsecs - tt(1).pt0;
-    
+    %
+    % N.B: here we don't use tt(1) we use tt(first_phase_idx(1))
+    % because we want to compare the phase in nearby_EQ that most
+    % closesly matches the first arriving phase(s) in MERMAID data;
+    % e.g., if tt(1).phaseName = 'Pdiff' and the first phase in
+    % MERMAID is 'PKIKP' then we don't want to use tt(1).
+    full_offset = tt(first_phase_idx(i)).truearsecs - tt(first_phase_idx(i)).pt0;
+
     % This is the time assigned first sample of the abbreviated segment,
     % still in the same reference of full_xax.
     abbrev_pt0(i) = full_offset - abbrev_offset;
@@ -124,9 +165,6 @@ for i = 1:length(nearby_EQ)
 
     % This returns the abbreviated trace and its window in reference to
     % the full trace.
-    % [abbrev_x{i}, abbrev_W(i)] = timewindow(x{i}, NaN, abbrev_pt0, ...
-    %                                         'first', h{i}.DELTA, full_pt0);
-
     [abbrev_x{i}, abbrev_W(i)] = timewindow(x{i}, 250, abbrev_pt0(i), ...
                                              'first', h{i}.DELTA, full_pt0(i));
     abbrev_xax{i} = abbrev_W(i).xax;
@@ -138,22 +176,11 @@ for i = 1:length(nearby_EQ)
 
     end
 
-    % % This is the arrival time (s) still in the timing-reference of the
-    % % full trace.
-    % abbrev_first_arrival = abbrev_pt0 + abbrev_offset;
-
-    % % We want to normalize to the maximum value of the first arrival. Take
-    % % a time window that is 30 seconds, centered on first arrival time.
-    % [abbrev_x_first{i}, abbrev_W_first(i)] = ...
-    %     timewindow(abbrev_x{i}, 30, abbrev_first_arrival, 'middle', h{i}.DELTA, abbrev_pt0);
-    % abbrev_xax_first{i} = abbrev_W_first(i).xax;
-
     % Identify the phases in the abbreviated segments only.
     arrival_times = [tt.truearsecs];
-    xlims = minmax((abbrev_xax{1}'));
+    xlims = minmax(abbrev_xax{i}');
     arrival_idx = arrival_times >= xlims(1) & arrival_times <= xlims(2);
     phase_cell = [phase_cell {tt(arrival_idx).phaseName}];
-
 
 end
 
@@ -161,24 +188,9 @@ end
 % one with the shortest epicentral distance, ignoring propagation
 % patterns etc.) and may be used below to normalize but maintain
 % distance decay.
-%maxx = max(cellfun(@(xx) max(abs(xx)), abbrev_x_first));
-
-% Cannot do:
- maxx = max(cellfun(@(xx) max(abs(xx)), abbrev_x));
-% in case one empty abbrev_x (if an EQ structure was skipped due to e tt = [])
-% for i = 1:length(abbrev_x)
-%     if isempty(abbrev_x{i}) 
-%         abbrev_maxx(i) = 0;
-
-%     else
-%         abbrev_maxx(i) = max(abs(abbrev_x{i}));
-
-%     end
-% end
-% maxx = max(abbrev_maxx);
+maxx = max(cellfun(@(xx) max(abs(xx)), abbrev_x));
 
 nearby_color = repmat(0.5, [1, 3]);
-
 hold(F.ax, 'on');
 % Normalize the traces and annotate with float numbers.
 for i = 1:length(abbrev_x)
@@ -192,9 +204,9 @@ for i = 1:length(abbrev_x)
         % Normalize this seismogram with max amplitude of all
         % seismograms, thereby showing distance decay.
         abbrev_x{i} = abbrev_x{i} / maxx;
-        
+
     end
-    
+
     % Verify all the timing makes sense.
     % figure
     % hold on
@@ -210,9 +222,6 @@ for i = 1:length(abbrev_x)
     % seconds) between the evtdate and seisdate.B and subtract it from
     % the abbreviated trace to set the time of the first sample of the
     % abbreviated zero trace to 0.
-    
-    % seisdate is in absolute UTC time.
-    seisdate{i} = seistime(h{i});
 
     % delay is in absolute UTC time between event rupture and the first
     % sample of the full trace.
@@ -266,6 +275,7 @@ else
     tc = taupCurve('ak135', nearby_EQ{1}(1).PreferredDepth, phase_str);
 
     % Overlay travel time curves.
+    rm_idx = [];
     for i = 1:length(tc)
         if isempty(tc(i).time)
             rm_idx = [rm_idx i];
@@ -274,10 +284,13 @@ else
         end
         F.ph(i) = plot(F.ax, tc(i).time, tc(i).distance, 'LineWidth', ...
                        1.5, 'LineStyle', '-');
-        
+
     end
-    phase_cell(rm_idx) = [];
-    F.ph(rm_idx) = [];
+    if ~isempty(rm_idx)
+        phase_cell(rm_idx) = [];
+        F.ph(rm_idx) = [];
+
+    end
     F.lg = legend(F.ph, phase_cell, 'AutoUpdate', 'off', 'Location', ...
                   'NorthWest', 'FontSize', F.xl.FontSize);
 
