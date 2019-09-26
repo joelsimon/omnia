@@ -2,18 +2,18 @@ function EQ = nearbysac2evt(id, redo, mer_evtdir, mer_sacdir, nearbydir)
 % EQ = NEARBYSAC2EVT(id, redo, mer_evtdir, mer_sacdir, nearbydir)
 %
 % NEARBYSAC2EVT runs sac2evt.m on all SAC files related to a single
-% event ID, contained in [nearbydir]/SAC/[id], and saves them the
-% output EQ structures in .evt files in [nearbydir]/evt/[id].
-% 
+% event ID contained in [nearbydir]/sac/[id], and saves the output EQ
+% structures in .evt files in [nearbydir]/evt/[id].
+%
 % Any existing .evt files removed, e.g., in the case of redo = true,
 % are printed to the screen.*
 %
 % Input:
 % id            Event ID [last column of 'identified.txt']
 %                   defval('11052554')
-% redo          true to delete* existing [sacdir]/[id]/*.SAC. and
-%                   refetch SAC files (def: false)
-% mer_evtdir    Path to directory containing MERMAID 'raw/' and 'reviewed' 
+% redo          true to delete* existing [nearbydir]/evt/[id]/ .evt files and
+%                   refetch .evt files with sac2evt.m (def: false)
+% mer_evtdir    Path to directory containing MERMAID 'raw/' and 'reviewed/'
 %                   subdirectories (def: $MERMAID/events/)
 % mer_sacdir    Path to directory to be (recursively) searched for
 %                   MERMAID SAC files (def: $MERMAID/processed/)
@@ -107,7 +107,7 @@ for i = 2:length(nearby_sac)
 
     % Compute the theoretical phase arrival times.
     tt = arrivaltime(h, evtdate, [evla evlo], model, evdp, ph, h.B);
-    
+
     EQ = EQ_template;
     EQ.Filename = strippath(nearby_sac{i});
     EQ.TaupTimes = tt;
@@ -171,7 +171,7 @@ else
 
 end
 
-% Determine continuation.  
+% Determine continuation.
 % Files are removed with gitrmdir.m in two cases:
 % (1) redo is true and .evt files exist
 % (2) redo is false but .evt filenames do not match .SAC filenames
@@ -179,7 +179,7 @@ if redo
     cont = true;
     if evt_files_exist
         [git_removed, deleted] = gitrmdir(evt_dir)
-        
+
     end
 else
     if evt_files_exist
@@ -193,6 +193,6 @@ else
         end
     else
         cont = true;
-        
+
     end
 end

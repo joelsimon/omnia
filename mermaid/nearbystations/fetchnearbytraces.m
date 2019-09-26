@@ -16,7 +16,7 @@ function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, mod
 % Input:
 % id        Event ID [last column of 'identified.txt']
 %               defval('11052554')
-% redo      true to delete* existing [sacdir]/[id]/*.SAC. and
+% redo      true to delete* existing [sacdir]/sac/[id]/ SAC files and
 %               refetch SAC files (def: false)
 % txtfile   Filename of textfile of station metadata from http://ds.iris.edu/gmap/
 %               (def: $MERMAID/events/nearbystations/nearbystations.txt)
