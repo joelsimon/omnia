@@ -25,7 +25,7 @@ function merged = mergenearbytraces(tr, id, sacdir)
 % Output:
 % merged    Cell of merged filenames, if any (def: {})
 %
-% See also: mersac, fetchnearbytraces.m, irisFetch.Traces
+% See also: mergesac, fetchnearbytraces.m, irisFetch.Traces
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
