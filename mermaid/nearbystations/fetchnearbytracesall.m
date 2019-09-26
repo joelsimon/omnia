@@ -1,13 +1,15 @@
 function [fetched, failed] = fetchnearbytracesall
-% failed = FETCHNEARBYTRACESALL
+% [fetched, failed] = FETCHNEARBYTRACESALL
 %
-% Run fetchnearbytraces.m for all event IDs
-% (last column of 'identified.txt')
-% assuming JDS system defaults.
+% Fetches and writes SAC files for every event ID for all nearby
+% stations using fetchnearbytraces.m.
+%
+% Pulls event IDs from the last column of 'identified.txt', written
+% with evt2txt.m, assuming JDS system defaults.
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 03-Sep-2019, Version 2017b
+% Last modified: 26-Sep-2019, Version 2017b on GLNXA64
 
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'identified.txt'))
@@ -28,9 +30,11 @@ for i = 1:length(star_idx)
 end
 id = unique(id);
 
+attempted = 0;
 fetched = {};
 failed = {};
 for i = 1:length(id)
+    attempted = attempted + 1;
     try
         tr = fetchnearbytraces(id{i}, false, txtfile, mer_evtdir, nearby_sacdir);
         if ~isempty(tr)
@@ -43,3 +47,8 @@ for i = 1:length(id)
 
     end
 end
+
+fprintf('Total events:      %4i\n', length(id))
+fprintf('Events attempted:  %4i\n', attempted)
+fprintf('Events fetched:    %4i\n', length(fetched))
+fprintf('Events failed:     %4i\n', length(failed))
