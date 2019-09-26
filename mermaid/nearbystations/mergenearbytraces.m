@@ -15,6 +15,8 @@ function merged = mergenearbytraces(tr, id, sacdir)
 %
 % the latter of which are moved to [sacdir]/unmerged.
 %
+% Requires program: SAC
+%
 % Input:
 % tr        Trace structures from fetchnearbytraces.m
 % id        Event ID [last column of 'identified.txt']

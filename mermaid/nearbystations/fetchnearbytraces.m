@@ -13,6 +13,8 @@ function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, mod
 % Any existing SAC files removed, e.g., in the case of redo = true,
 % are printed to the screen.*
 %
+% Requires program: SAC
+%
 % Input:
 % id        Event ID [last column of 'identified.txt']
 %               defval('11052554')
@@ -166,7 +168,11 @@ if exist(iddir, 'dir') == 7
     lower_dsac = skipdotdir(dir(fullfile(iddir, '**/*sac')));
     upper_dSAC = skipdotdir(dir(fullfile(iddir, '**/*SAC')));
 
+    %% N.B.: By default Mac systems are case-insensitive, so the
+    %% above will duplicate *.sac and *SAC -- filename uniqueness
+    %% is ensured via recursivedir.m, called by gitrmdir.m.
     dsac = [lower_dsac ; upper_dSAC];
+
     if ~isempty(dsac)
         sac_files_exist = true;
 
