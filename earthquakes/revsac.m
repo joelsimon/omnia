@@ -21,7 +21,7 @@ function [sac, evt] = revsac(iup, sacdir, evtdir, returntype)
 % returntype   For third-generation+ MERMAID only:
 %              'ALL': both triggered and user-requested SAC files (def)
 %              'DET': triggered SAC files as determined by onboard algorithm
-%              'REQ': user-requested SAC files%
+%              'REQ': user-requested SAC files
 % Output:
 % sac          Cell array of SAC filenames whose corresponding
 %                  .evt file is in the reviewed subdirectory of interest
