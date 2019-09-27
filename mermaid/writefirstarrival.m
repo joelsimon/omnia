@@ -1,5 +1,7 @@
-function writefirstarrival(s, redo, filename, fmt)
-% WRITEFIRSTARRIVAL(s, redo, filename, fmt)
+function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
+                           evtdir, EQ)
+% WRITEFIRSTARRIVAL(s, redo, filename, fmt, wlen, lohi, sacdir, ...
+%                   evtdir, EQ)
 %
 % WRITEFIRSTARRIVAL writes the output of firstarrival.m a text file.
 %
@@ -8,13 +10,21 @@ function writefirstarrival(s, redo, filename, fmt)
 % time of the first-arriving phase is labeled "syn".
 %
 % Input:
-% s        List of identified SAC filenames (def: revsac(1))
+% s        Cell array of identified SAC filenames (def: revsac(1))
 % redo     true: delete and remake the text file
 %          false: append new lines to the existing tex file unless
 %              that SAC file name already exists in the text file (def)
 % filename Output text file name (def: $MERMAID/.../firstarrivals.txt)
-% fmt      Line format (e.g., to set if using SAC files with names
+% fmt      Line format, e.g., set if using SAC files with names
 %              longer than 44 chars (see default internally)
+% wlen     Window length [s] (def: 30)
+% lohi     1x2 array of corner frequencies (def: [1 5]])
+% sacdir   Directory containing (possibly subdirectories)
+%              of .sac files (def: $MERMAID/processed)
+% evtdir   Directory containing (possibly subdirectories)
+%              of .evt files (def: $MERMAID/events)
+% EQ      Cell array (same size as 's') of EQ structs, if they are
+%             not reviewed, or one different from saved is preferred
 %
 % Output:
 % Text file with the following columns (firstarrivals.m outputs in parentheses):
@@ -33,7 +43,7 @@ function writefirstarrival(s, redo, filename, fmt)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 26-Sep-2019, Version 2017b on MACI64
+% Last modified: 27-Sep-2019, Version 2017b on MACI64
 
 % Defaults.
 defval('s', revsac(1))
@@ -47,6 +57,10 @@ defval('fmt', ['%44s    '  , ...
                '%5.2f    ' , ...
                '%9.1f    ' , ...
                '%11i\n'])
+defval('wlen', 30)
+defval('lohi', [1 5])
+defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
+defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 
 % Sort out if deleting, appending to, or creating output file.
 file_exists = (exist(filename,'file') == 2);
@@ -89,8 +103,7 @@ parfor i = 1:length(s)
    end
 
    % Concatenate the write lines.
-   %   wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, fmt);
-   wline = single_wline(sac, true, [], [], [], [], fmt);
+   wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, fmt, EQ);
    wlines = [wlines wline];
 
 end
@@ -115,12 +128,12 @@ end
 fileattrib(filename, '-w')
 
 %_______________________________________________________________________________%
-function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt)
-% Local call to and formatting of firstarrival.m
+function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt, EQ)
+% Local call to, and formatting of, firstarrival.m
 
 % Collect.
 [tres, dat, syn, ph, delay, twosd, ~, ~, ~, maxc_y, SNR] = ...
-    firstarrival(sac, true, wlen, lohi, sacdir, evtdir);
+    firstarrival(sac, true, wlen, lohi, sacdir, evtdir, EQ);
 
 % Parse.
 data = {strippath(sac), ...
