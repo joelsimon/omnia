@@ -1,9 +1,11 @@
 function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
           SNR, EQ, W1, xw2, W2] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ)
+% [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
+%          SNR, EQ, W1, xw2, W2] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ)
 % NEEDS HEADER
 %                  tres = dat - syn
 %
-% Input:   
+% Input:
 % s        SAC filename
 % ci       true to estimate arrival time uncertainty via
 %              1000 realizations of M1 method (def: false)
@@ -23,11 +25,13 @@ function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 % dat      Actual arrival time computed with cpest.m [s]*
 % syn      Theoretical arrival time computed with taupTime.m [s]*
 % ph       Phase name associated with tres
+% delay    Time delay between true arrival time and time at largest
+%             amplitude (max_y) [s]
 % xw1      Windowed segment of x, after bandpass filtering,
-%              centered on first theoretical arrival time 
+%              centered on first theoretical arrival time
 % xaxw1    x-axis centered on syn at 0 seconds, i.e., compliment to xw1
 % maxc_x   Time at of maximum (or minimum) amplitude of bandpassed signal [s]*
-% maxc_y   Amplitude (counts) of maximum (or minimum) amplitude of bandpassed 
+% maxc_y   Amplitude (counts) of maximum (or minimum) amplitude of bandpassed
 %              signal within window beginning at dat and ending wlen/2 later
 % twosd    2-standard deviation error estimation per M1 method [s]**
 %              (def NaN)
@@ -35,7 +39,7 @@ function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 %              via getevt.m
 %% W1
 %% xw2
-%% W2     
+%% W2
 %
 % *The x-axis here is w.r.t to original, NOT windowed, seismogram,
 % i.e. xaxis(h.NPTS, h.DELTA, h.B), where h is the SAC header
@@ -84,7 +88,7 @@ end
 % structure and the SAC file header.
 if ~isequal(EQ(1).TaupTimes(1).pt0, h.B)
     error('EQ(1).TaupTimes(1).pt0 ~= h.B')
- 
+
 end
 
 % The synthetic (theoretical, 'syn') arrival time is stored in the EQ structure.
@@ -99,7 +103,7 @@ xf = bandpass(x, 1/h.DELTA, lohi(1), lohi(2));
 xaxw1 = W1.xax - syn;
 
 % Changepoint estimate sample considering only the windowed portion centered on the theoretical first arrival.
-cp = cpest(xw1, 'fast', false, true);  
+cp = cpest(xw1, 'fast', false, true);
 
 % Signal-to-noise ratio considering window 1 (W1: centered on syn,
 % length wlen), not window 2 (W2: starting at dat, length wlen/2).
@@ -141,12 +145,12 @@ if SNR > 1
     % the maximum counts value.
     maxc_x = W2.xax(find(xw2 == maxc_y));
 
-    % delay is then the dif between the arrival time and the time of the
-    % largest amplitude within the signal segment.
+    % delay is then the time difference between the arrival time and the
+    % time of the largest amplitude within the signal segment.
     delay = maxc_x - dat;
 
     % Uncertainty estimate.
-    if ci 
+    if ci
         M1 = cpci(xw1, 'kw', 1000, [], 'fast', false, true);
 
         % Do not remove 1 sample from M1 before multiplying it by the sampling
@@ -157,7 +161,7 @@ if SNR > 1
 
     else
         twosd = NaN;
-        
+
     end
 else
     dat = NaN;
