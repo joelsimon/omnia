@@ -61,6 +61,7 @@ defval('wlen', 30)
 defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
+defval('EQ', [])
 
 % Sort out if deleting, appending to, or creating output file.
 file_exists = (exist(filename,'file') == 2);
@@ -95,6 +96,13 @@ wline = [];
 wlines = [];
 parfor i = 1:length(s)
     sac = s{i};
+    if ~isempty(EQ)
+        single_EQ = EQ{i};
+
+    else
+        single_EQ = [];
+
+    end
 
    % Skip SAC files that are already written.
    if ~redo && ~isempty(mgrep(filename, strippath(sac)))
@@ -103,7 +111,7 @@ parfor i = 1:length(s)
    end
 
    % Concatenate the write lines.
-   wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, fmt, EQ);
+   wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, fmt, single_EQ);
    wlines = [wlines wline];
 
 end
@@ -128,12 +136,12 @@ end
 fileattrib(filename, '-w')
 
 %_______________________________________________________________________________%
-function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt, EQ)
+function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt, single_EQ)
 % Local call to, and formatting of, firstarrival.m
 
 % Collect.
 [tres, dat, syn, ph, delay, twosd, ~, ~, ~, maxc_y, SNR] = ...
-    firstarrival(sac, true, wlen, lohi, sacdir, evtdir, EQ);
+    firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ);
 
 % Parse.
 data = {strippath(sac), ...
