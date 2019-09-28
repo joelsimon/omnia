@@ -61,9 +61,19 @@ defval('EQ', [])
 
 % Read data and retrieve event structure.  EQ contains the theoretical
 % arrival times of all phases included in the time window, computed
-% with arrivaltime.m (which calls taupTimes.m).
-s = fullsac(s, sacdir);
+% with arrivaltime.m (which calls taupTime.m).
+
+% Nab fullpath SAC file name, if not supplied.
+if isempty(fileparts(s))
+    s = fullsac(s, sacdir);
+
+end
 [x, h] = readsac(s);
+
+% Nab EQ structure, if not supplied (assuming MERMAID data here;
+% getevt.m at this time assumes MERMAID event directory structure.
+% If, for example, you want to use this function for a 'nearby' EQ you
+% must supply it directly as input).
 if isempty(EQ)
     EQ = getevt(s, evtdir);
 
