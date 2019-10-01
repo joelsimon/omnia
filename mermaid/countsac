@@ -4,7 +4,7 @@
 # and .pdf files, and changepoint (.cp) files.
 #
 # Last modified by fjsimons-at-alum.mit.edu, 02/12/2019
-# Last modified by jdsimon-at-printceton.edu, 09/18/2019
+# Last modified by jdsimon-at-printceton.edu, 10/01/2019
 
 set MERMAID = $MERMAID
 
@@ -12,15 +12,43 @@ set MERMAID = $MERMAID
 set floatnum = (08 09 10 11 12 13 16 17 18 19 20 21 22 23 24 25)
 set sac_count = 0
 set allsac = `find $MERMAID/processed/ -iname '*.sac'`
+printf "\n               All      DET      REQ      Most Recent\n"
+
+# OSX does not have the standard date formatting commands.  Must use a
+# psuedo-swtich statment.  Redirect any error to the /dev/null/ to
+# suppress output to stdout and check if it failed. On a proper Linux
+# machine ths will display as '01-Jan-0001'; in Mac terminal it breaks.
+date -d 00010101 +'%d-%b-%Y' >& /dev/null
+if ( $? == 0 ) then
+    set osx = 0
+else
+    set osx = 1
+endif
 
 foreach float ($floatnum[*])
-   set perfloat = `ls -l $allsac | awk '/'P-$float'/' | wc -l`
-   printf "Float %s   : %5i\n" $float $perfloat
-   @ sac_count += $perfloat
-end
+    # This tallies the SAC files.
+    ls $allsac | awk '/'P-$float'/' > $MERMAID/temp
+    set total = `cat $MERMAID/temp | wc -l`
+    set det =  `grep .DET. $MERMAID/temp  | wc -l`
+    set req =  `grep .REQ. $MERMAID/temp  | wc -l`
+    rm $MERMAID/temp
 
-echo ------------------
-printf "Total .sac :  %4i\n\n" $sac_count
+    @ total_count += $total
+    @ det_count += $det
+    @ req_count += $req
+
+    # This finds the date of the last SAC file.
+    set perfloat = `ls -1 $MERMAID/processed/*P-$float*/*/*.sac | tail -1`
+    set lasttime = `basename $perfloat | awk '{print substr($0,1,8)}'`
+    if ( $osx == 0) then
+        set lastdate = `date -d $lasttime +'%d-%b-%Y'`
+    else
+	set lastdate = `date -jf "%Y%m%d" $lasttime +"%d-%b-%Y"`
+    endif
+    printf "Float %s   : %5i    %5i    %5i      %s\n" $float $total $det $req $lastdate
+end
+echo -----------------------------------------------------
+printf "Total      : %5i    %5i    %5i\n\n" $total_count $det_count $req_count
 
 # Count .evt files.
 set rawevt_count = 0
@@ -45,10 +73,10 @@ set cp_count = `find $MERMAID/events/changepoints/ -iname '*.cp' | wc -l`
 set failed_count = 0
 set failed_count = `grep .sac $MERMAID/events/raw/matchall_fail.txt | wc -l`
 
-echo     ----------------------
-printf "Total raw  .evt : %4i\n" $rawevt_count
-printf "Total fail .evt : %4i\n" $failed_count
-printf "Total      .cp  : %4i\n" $cp_count
-printf "Total raw  .pdf : %4i [2 * raw .evt = %4i]\n" $rawpdf_count $double_rawevt_count
-printf "Total rev  .evt : %4i\n" $revevt_count
-printf "Unreviewed .evt : %4i\n" $need_review
+echo     -----------------------
+printf "Total raw  .evt : %5i\n" $rawevt_count
+printf "Total fail .evt : %5i\n" $failed_count
+printf "Total      .cp  : %5i\n" $cp_count
+printf "Total raw  .pdf : %5i [2 * raw .evt = %4i]\n" $rawpdf_count $double_rawevt_count
+printf "Total rev  .evt : %5i\n" $revevt_count
+printf "Unreviewed .evt : %5i\n\n" $need_review
