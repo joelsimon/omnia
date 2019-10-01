@@ -34,29 +34,36 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 %    (4) Time delay between cpest.m arrival time estimate and
 %        maximum absolute amplitude (delay)
 %    (5) 2-standard deviation error estimation per M1 method (twosd)
-%    (6) Signal-to-noise ratio of "dat" in a time window centered on "syn"
-%        (SNR)
-%    (7) Maximum absolute amplitude in counts in the time window starting at
+%    (6) Maximum absolute amplitude in counts in the time window starting at
 %        "dat" and extending 1/2 the length of the input window (maxc_y)
+%    (7) Signal-to-noise ratio of "dat" in a time window centered on "syn"
+%        (SNR), defined as ratio of biased variance of signal/noise
+%        (see wtsnr.m)
+%    (8) IRIS event ID
+%    (9) Incomplete window flag: true for incomplete, false
+%        otherwise (see timewindow.m)
+%
 %
 % See also: firstarrival.m, readfirstarrival.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 27-Sep-2019, Version 2017b on MACI64
+% Last modified: 01-Oct-2019, Version 2017b on MACI64
 
 % Defaults.
 defval('s', revsac(1))
 defval('redo', false)
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'firstarrivals.txt'))
-defval('fmt', ['%44s    '  , ...
-               '%5s    '   , ...
-               '%6.2f    ' , ...
-               '%6.2f    ' , ...
-               '%5.2f    ' , ...
-               '%9.1f    ' , ...
-               '%11i\n'])
+defval('fmt', ['%44s    ' , ...
+               '%5s    ' ,  ...
+               '%6.2f   ' , ...
+               '%6.2f   ' , ...
+               '%5.2f   ' , ...
+               '%+19.12E    ' , ...
+               '%18.12E    '  , ...
+               '%8s    ' , ...
+               '%i\n'])
 defval('wlen', 30)
 defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
@@ -104,15 +111,15 @@ parfor i = 1:length(s)
 
     end
 
-   % Skip SAC files that are already written.
-   if ~redo && ~isempty(mgrep(filename, strippath(sac)))
-       continue
+    % Skip SAC files that are already written.
+    if ~redo && ~isempty(mgrep(filename, strippath(sac)))
+        continue
 
-   end
+    end
 
-   % Concatenate the write lines.
-   wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, fmt, single_EQ);
-   wlines = [wlines wline];
+    % Concatenate the write lines.
+    wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, fmt, single_EQ);
+    wlines = [wlines wline];
 
 end
 
@@ -140,8 +147,9 @@ function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt, single_E
 % Local call to, and formatting of, firstarrival.m
 
 % Collect.
-[tres, dat, syn, ph, delay, twosd, ~, ~, ~, maxc_y, SNR] = ...
+[tres, dat, syn, ph, delay, twosd, ~, ~, ~, maxc_y, SNR, EQ, ~, ~, ~, incomplete] = ...
     firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ);
+publicid = fx(strsplit(EQ(1).PublicId, '='),  2);
 
 % Parse.
 data = {strippath(sac), ...
@@ -149,8 +157,10 @@ data = {strippath(sac), ...
         tres,           ...
         delay,          ...
         twosd,          ...
+        round(maxc_y),  ...
         SNR,            ...
-        round(maxc_y)};
+        publicid,       ...
+        incomplete};
 
 % Format.
 wline = sprintf(fmt, data{:});
