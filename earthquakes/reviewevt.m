@@ -227,7 +227,7 @@ if ~isempty(EQ)
                         length([EQ(1).TaupTimes.phaseName])]), ...
                                       EQ(1).TaupTimes.phaseName) '\n']);
 
-    fprintf([ '     EQ(1) arrivals (s):' sprintf(repmat('  %5.1f', [1 ...
+    fprintf([ '     EQ(1) arrivals [s]:' sprintf(repmat('  %5.1f', [1 ...
                         length([EQ(1).TaupTimes.truearsecs])]), ...
                                       EQ(1).TaupTimes.truearsecs) '\n\n']);
 
@@ -308,7 +308,7 @@ switch lower(yn)
 
             system(sprintf('killall %s', close_pdf));
             clc
-            reviewevt(sac, redo, diro)
+            reviewevt(sac, redo, diro, viewr)
             return
 
         end
@@ -346,7 +346,7 @@ switch lower(yn)
 
                     system(sprintf('killall %s', close_pdf));
                     clc
-                    reviewevt(sac, redo, diro)
+                    reviewevt(sac, redo, diro, viewr)
                     return
 
                 end
