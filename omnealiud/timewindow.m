@@ -1,39 +1,41 @@
-function [xw, W] = timewindow(x, wlen, pivot, fml, delta, pt0)
-% [xw, W] = TIMEWINDOW(x, wlen, pivot, fml, delta, pt0)
+function [xw, W, incomplete] = timewindow(x, wlen, pivot, fml, delta, pt0)
+% [xw, W, incomplete] = TIMEWINDOW(x, wlen, pivot, fml, delta, pt0)
 %
 % TIMEWINDOW returns a windowed segmentation of x and a structure
 % relating the timing of the windowed segmentation to the original
 % time series.
 %
 % Input:
-% x         The time series to be windowed
-% wlen      Window length in seconds, or NaN to return
-%           the entire segment before/after 'pivot' (see Ex2)
-% pivot     Time on x-axis around which window is constructed
-%               Note: not seconds offset from pt0, but rather
-%               the absolute time on the x-axis when
-%               x-axis = xaxis(length(x), delta, pt0)
-% fml       Position of pivot relative to window
-%           'first': pivot time is time at first sample of window
-%           'middle' pivot time is time at middle sample of window
-%                    which extends 1/2*wlen from pivot left and right 
-%           'last: pivot time is time at last sample of window
-% delta     Sampling interval in seconds
-%               (e.g, h.DELTA in SAC header)
-% pt0       Time assigned to the first sample of x, in seconds
-%              (e.g., h.B in SAC header)
+% x          The time series to be windowed
+% wlen       Window length in seconds, or NaN to return
+%            the entire segment before/after 'pivot' (see Ex2)
+% pivot      Time on x-axis around which window is constructed
+%                Note: not seconds offset from pt0, but rather
+%                the absolute time on the x-axis when
+%                x-axis = xaxis(length(x), delta, pt0)
+% fml        Position of pivot relative to window
+%            'first': pivot time is time at first sample of window
+%            'middle' pivot time is time at middle sample of window
+%                     which extends 1/2*wlen from pivot left and right
+%            'last: pivot time is time at last sample of window
+% delta      Sampling interval in seconds
+%                (e.g, h.DELTA in SAC header)
+% pt0        Time assigned to the first sample of x, in seconds
+%               (e.g., h.B in SAC header)
 %
 % Output:
-% xw        Windowed time series
-% W         Structure of timing info that relates xw to x:
-%           .delta: input delta
-%           .xax: x-axis of x observed by window
-%           .xlsamp: sample index in x of first sample of xw
-%           .xrsamp: sample index in x of last sample of xw
-%           .xlsecs: time assigned in x to first sample of xw
-%           .xrsecs: time assigned in x to last sample of xw
-%           .wlensamp: true window length in samples
-%           .wlensecs: true window length in seconds
+% xw         Windowed time series
+% W          Structure of timing info that relates xw to x:
+%            .delta: input delta
+%            .xax: x-axis of x observed by window
+%            .xlsamp: sample index in x of first sample of xw
+%            .xrsamp: sample index in x of last sample of xw
+%            .xlsecs: time assigned in x to first sample of xw
+%            .xrsecs: time assigned in x to last sample of xw
+%             .wlensamp: true window length in samples
+%            .wlensecs: true window length in seconds
+% incomplete true if requested time window extends beyond edge of
+%            input time series (def: false)
 %
 % Ex1: (Seismogram in blue, windowed portions in red and magenta.)
 %      (Note that 0 seconds here is the event origin time (h.O).)
@@ -59,10 +61,20 @@ function [xw, W] = timewindow(x, wlen, pivot, fml, delta, pt0)
 %    plot(W400.xax, x400, 'r')
 %    plot(W200.xax, x200, 'm'); shg
 %
+% Ex3: (requested time window extends beyond last sample)
+%    [x, h] = readsac('centcal.1.BHZ.SAC');
+%    % Assign first sample of seismogram t = 0 s.
+%    xax = xaxis(length(x), h.DELTA, 0);
+%    % Request 200 s window starting at 600 s on x-xaxis.
+%    [xw, W, incomplete] = TIMEWINDOW(x, 200, 600, 'first', h.DELTA, 0);
+%    % We see the incomplete flag is logical true.
+%    incomplete
+%    % And the window returned is only ~130 seconds.
+%    W.wlensecs
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 12-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 01-Oct-2019, Version 2017b on MACI64
 
 % Set up x-axis of complete time series and perform some error
 % catching.
@@ -111,9 +123,9 @@ switch lower(fml)
 
 end
 
-hit_edge = false;
+incomplete = false;
 if requested_xlsecs < xax(1)
-    hit_edge = true;
+    incomplete = true;
     requested_xlsecs = xax(1);
     warning(sprintf(['Requested window extends beyond first sample ' ...
                      'of x.\nUsing first sample of x as first sample ' ...
@@ -122,7 +134,7 @@ if requested_xlsecs < xax(1)
 end
 
 if requested_xrsecs > xax(end);
-    hit_edge = true;
+    incomplete = true;
     requested_xrsecs = xax(end);
     warning(sprintf(['Requested window extends beyond last sample ' ...
                      'of x.\nUsing last sample of x as last sample ' ...
@@ -155,7 +167,7 @@ W.wlensecs = wlensecs;
 
 % Final check to see if rounding on left and right increased the
 % difference in the actual window length beyond one sampling interval.
-if abs(W.wlensecs - wlen) > delta && ~hit_edge
+if abs(W.wlensecs - wlen) > delta && ~incomplete
     error(['Difference between actual and requested window length ' ...
            'greater than one sampling interval'])
 
