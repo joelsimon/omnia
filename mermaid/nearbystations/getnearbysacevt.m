@@ -37,7 +37,7 @@ function [mer_sac, mer_EQ, nearby_sac, nearby_EQ] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 06-Sep-2019, Version 2017b
+% Last modified: 01-Oct-2019, Version 2017b on MACI64
 
 % Defaults.
 defval('id', '10948555')
@@ -82,12 +82,21 @@ else
     nearby_sac = {};
 
 end
-nearby_sac = nearby_sac(:);
+nearby_sac = unique(nearby_sac(:));
 
 nearby_evtdir = skipdotdir(dir(fullfile(nearbydir, 'evt', id, '*.evt')));
+if length(nearby_evtdir) ~= length(nearby_sac)
+    error(['The number of nearby SAC files and nearby .evt files ' ...
+           'differs for event ID: %s'], id)
+
+end
+
 if ~isempty(nearby_evtdir)
-    for i = 1:length(nearby_evtdir);
-        tmp = load(fullfile(nearby_evtdir(i).folder, nearby_evtdir(i).name), '-mat');
+    for i = 1:length(nearby_sac);
+        nearby_evt_file = strippath(nearby_sac{i});
+        nearby_evt_file = nearby_evt_file(1:end-3);
+        nearby_evt_file = [nearby_evt_file 'evt'];
+        tmp = load(fullfile(nearby_evtdir(i).folder, nearby_evt_file), '-mat');
         nearby_EQ{i} = tmp.EQ;
         clearvars('tmp')
 
