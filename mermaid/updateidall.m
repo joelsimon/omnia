@@ -43,8 +43,7 @@ for i = 1:length(id)
             updated = [updated ; id{i}];
 
         end
-    catch ME
-        keyboard
+    catch
         failed = [failed ; id{i}];
 
     end
