@@ -9,7 +9,7 @@ function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, mer_sacd
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 25-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 02-Oct-2019, Version 2017b on GLNXA64
 
 defval('id', '10948555')
 defval('lohi', [1 5]);
@@ -171,9 +171,10 @@ for i = 1:length(nearby_EQ)
 
     % Taper and filter.
     if ~isnan(lohi)
-        x{i} = detrend(x{i}, 'linear');
         taper = hanning(length(abbrev_x{i}));
-        abbrev_x{i} = bandpass(taper .* abbrev_x{i}, 1/h{i}.DELTA, lohi(1), lohi(2));
+        abbrev_x{i} = detrend(abbrev_x{i}, 'linear');
+        abbrev_x{i} = taper .* abbrev_x{i};
+        abbrev_x{i} = bandpass(abbrev_x{i}, 1/h{i}.DELTA, lohi(1), lohi(2));
 
     end
 
