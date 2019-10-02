@@ -92,8 +92,10 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 26-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 02-Oct-2019, Version 2017b on GLNXA64
 
+% A note:
+%
 % If using viewr = 3 (Preview) on Mac:
 %
 % It may be hard to close all the windows with every new earthquake
@@ -119,7 +121,7 @@ defval('viewr', 2)
 % !! JDS: Don't try to slot getevt.m here -- it's more complicated  !!
 % !! than it's worth.  This works, leave it.                        !!
 
-sacname = strippath(sac);
+sacname = strippath(strtrim(sac));
 sans_sac =  strrep(sacname, '.sac', '');
 
 raw_diro = fullfile(diro, 'raw');
@@ -223,11 +225,15 @@ if ~isempty(EQ)
 
 
     % These list all phases of largest earthquake.
-    fprintf(['\n\n\n     EQ(1) phases:      ' sprintf(repmat('  %5s', [1 ...
+    fprintf(['\n\n\n     EQ(1).TaupTimes(#):' sprintf(repmat('  %5i', [1 ...
+                        length([EQ.PreferredMagnitudeValue])]), ...
+                                              1:length([EQ(1).TaupTimes])) '\n'])
+
+    fprintf([      '     EQ(1) phases:      ' sprintf(repmat('  %5s', [1 ...
                         length([EQ(1).TaupTimes.phaseName])]), ...
                                       EQ(1).TaupTimes.phaseName) '\n']);
 
-    fprintf([ '     EQ(1) arrivals [s]:' sprintf(repmat('  %5.1f', [1 ...
+    fprintf([      '     EQ(1) arrivals [s]:' sprintf(repmat('  %5.1f', [1 ...
                         length([EQ(1).TaupTimes.truearsecs])]), ...
                                       EQ(1).TaupTimes.truearsecs) '\n\n']);
 
@@ -400,7 +406,11 @@ system(sprintf('killall %s', close_pdf));
 % in the case of a staged file.  I don't see this every happening
 % outside of testing so I'm not coding for it.  Further, it would
 % really confuse an end-user other than myself (JDS) unfamiliar with
-% that I'm doing here.
+% what I'm doing here.
+
+% Joel note: gitrmfile.m will handle all these cases and more and the
+% workflow below could be refactored. But, at the moment it ain't
+% broken so....
 
 if previously_reviewed
     oldfile = fullfile(old_review.folder, old_review.name);
