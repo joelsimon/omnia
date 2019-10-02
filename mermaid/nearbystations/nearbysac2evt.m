@@ -1,5 +1,5 @@
-function EQ = nearbysac2evt(id, redo, mer_evtdir, mer_sacdir, nearbydir)
-% EQ = NEARBYSAC2EVT(id, redo, mer_evtdir, mer_sacdir, nearbydir)
+function EQ = nearbysac2evt(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
+% EQ = NEARBYSAC2EVT(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
 %
 % NEARBYSAC2EVT runs sac2evt.m on all SAC files related to a single
 % event ID contained in [nearbydir]/sac/[id], and saves the output EQ
