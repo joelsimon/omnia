@@ -4,7 +4,7 @@
 # and .pdf files, and changepoint (.cp) files.
 #
 # Last modified by fjsimons-at-alum.mit.edu, 02/12/2019
-# Last modified by jdsimon-at-printceton.edu, 10/01/2019
+# Last modified by jdsimon-at-princeton.edu, 10/02/2019
 
 set MERMAID = $MERMAID
 
@@ -47,7 +47,7 @@ foreach float ($floatnum[*])
     endif
     printf "Float %s   : %5i    %5i    %5i      %s\n" $float $total $det $req $lastdate
 end
-echo -----------------------------------------------------
+echo  -----------------------------------------------------
 printf "Total      : %5i    %5i    %5i\n\n" $total_count $det_count $req_count
 
 # Count .evt files.
@@ -73,7 +73,6 @@ set cp_count = `find $MERMAID/events/changepoints/ -iname '*.cp' | wc -l`
 set failed_count = 0
 set failed_count = `grep .sac $MERMAID/events/raw/matchall_fail.txt | wc -l`
 
-echo     -----------------------
 printf "Total raw  .evt : %5i\n" $rawevt_count
 printf "Total fail .evt : %5i\n" $failed_count
 printf "Total      .cp  : %5i\n" $cp_count
