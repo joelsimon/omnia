@@ -3,19 +3,38 @@
 # Simple shell script to:
 # 1) retrieve MERMAID data
 # 2) write new SAC (.sac) files
-# 3) write changepoint (.cp) files with uncertainty estimates 
+# 3) write changepoint (.cp) files with uncertainty estimates
 # 4) generate preliminary match to the seismic catalog and write
 #    corresponding .evt and .pdf files
+#
+# Switches to master branch in MERMAID server, processed, and event
+# directories before proceeding.
 #
 # No I/0 and requires internal editing as it was built for JDS' system
 # defaults.
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 04-Aug-2019
+# Last modified: 04-Oct-2019
 
 # Keep track of starting directory.
 start_dir=`pwd`
+
+# Ensure you are in master (and not some dev) branch in the three relevant directories.
+printf '\n\n!!!!! Switching to master branch in dirs $MERMAID: server, processed, and events !!!!!\n\n'
+
+cd $MERMAID
+cd server
+git checkout master  >& /dev/null
+cd ..
+
+cd processed
+git checkout master  >& /dev/null
+cd ..
+
+cd events
+git checkout master  >& /dev/null
+cd ..
 
 # Pull most recent data.
 echo -e 'Copying server...\n'
@@ -30,12 +49,12 @@ rm -f server_out
 #     exit;
 # fi
 
+
 # Generate SAC files.
 echo -e 'Writing SAC files...\n'
-cd $MERMAID
 source activate pymaid
 python scripts/main.py
-source deactivate 
+source deactivate
 echo -e '\n...completed writing SAC files\n'
 
 # Generate raw matches to the IRIS catalog.  Note that upon exiting
@@ -60,12 +79,6 @@ echo -e '\nMatching to the seismic catalog...\n'
 # Display current count.
 echo -e '\nHere is the complete list:\n'
 $OMNIA/mermaid/countsac
-echo 
-
-# Display date of last SAC file.
-echo -e '\nHere are the dates of the last SAC files:\n'
-$OMNIA/mermaid/lastsac
-echo
 
 # Return from whence you came.
 /usr/bin/cd $start_dir
