@@ -20,6 +20,8 @@ function writeglobalcatalog(minmag, maxmag, stime, etime, txtdir)
 % *N/A*         Writes separate textfile for every magnitude unit
 %                   with columns: date lat lon depth mag id
 %
+% See also: readglobalcatalog.m
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 05-Oct-2019, Version 2017b on GLNXA64
@@ -64,25 +66,26 @@ for i = 1:length(mags)
                               'start', stime, 'end', etime);
 
     end
-
+                   
     txtfile = fullfile(txtdir, sprintf('M%i.txt', mags(i)));
-    fid = fopen(txtfile, 'a+');
-
+    fid = fopen(txtfile, 'w');
     if ~isempty(ev)
+        % anon func to convert time string into FDSN time string.
+        fdsnstr = @(x)  [x(1:10) 'T' x(12:end)];
         for j = length(ev):-1:1
-            data = {ev(j).PreferredTime, ...
+            data = {fdsnstr(ev(j).PreferredTime), ...
                     ev(j).PreferredLatitude, ...
                     ev(j).PreferredLongitude, ...
                     ev(j).PreferredDepth, ...
                     ev(j).PreferredMagnitudeValue, ...
                     fx(strsplit(ev(j).PublicId, '='),  2)};
-
             fprintf(fid, sprintf(fmt, data{:}));
 
         end
-
     else
-        fprintf(fid, 'NaN');
+        fprintf(fid, '');
 
     end
+    fclose(fid);
+
 end
