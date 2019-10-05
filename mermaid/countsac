@@ -4,6 +4,8 @@
 # and .pdf files, and changepoint (.cp) files.
 #
 # Last modified by fjsimons-at-alum.mit.edu, 02/12/2019
+# Last modified by jdsimon-at-princeton.edu, 05/10/2019
+
 # Last modified by jdsimon-at-princeton.edu, 10/04/2019
 
 set MERMAID = $MERMAID
@@ -47,7 +49,7 @@ foreach float ($floatnum[*])
 	set lasttime_req = `basename $perfloat_req | awk '{print substr($0,1,8)}'`
     else
 
-    	set lasttime_req = '00010101'  # Dummy date stamp in case of empty.
+    	set lasttime_req = '19700101'  # Dummy date stamp in case of empty.
 
     endif
 
@@ -63,7 +65,7 @@ foreach float ($floatnum[*])
     printf "Float %s : %5i    %5i    %s    %5i    %s\n" $float $total $det $lastdate_det $req $lastdate_req
 
 end
-printf "----------------------------------------------------------------\n"
+printf -- "----------------------------------------------------------------\n"
 printf "   Total : %5i    %5i                   %5i\n\n" $total_count $det_count $req_count
 
 # Count .evt files.

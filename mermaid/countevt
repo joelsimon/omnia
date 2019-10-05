@@ -4,7 +4,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 04-Oct-2019
+# Last modified: 05-Oct-2019
 
 set MERMAID = $MERMAID
 
@@ -54,5 +54,5 @@ foreach float ($floatnum[*])
     printf "Float %s : %5i   |   %5i     %5i     %5i  |  %5i     %5i     %5i\n" $float $total $id $det_id $req_id $null $det_null $req_null
 
 end
-printf "------------------------------------------------------------------------------\n"
+printf -- "------------------------------------------------------------------------------\n"
 printf "Total :    %5i   |   %5i     %5i     %5i  |  %5i     %5i     %5i\n\n" $total_count $total_id $total_det_id $total_req_id $total_null $total_det_null $total_req_null
