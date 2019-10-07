@@ -66,8 +66,16 @@ for i = 1:length(mags)
                               'start', stime, 'end', etime);
 
     end
-                   
+
     txtfile = fullfile(txtdir, sprintf('M%i.txt', mags(i)));
+    if exist(txtfile, 'file') == 2
+        wstatus = fileattrib(txtfile, '+w', 'a');
+        if wstatus == 0
+            error('Unable to allow write access to %s.', txtfile)
+
+        end
+    end
+
     fid = fopen(txtfile, 'w');
     if ~isempty(ev)
         % anon func to convert time string into FDSN time string.
@@ -79,7 +87,7 @@ for i = 1:length(mags)
                     ev(j).PreferredDepth, ...
                     ev(j).PreferredMagnitudeValue, ...
                     fx(strsplit(ev(j).PublicId, '='),  2)};
-            fprintf(fid, sprintf(fmt, data{:}));
+            fprintf(fid, fmt, data{:});
 
         end
     else
@@ -87,5 +95,11 @@ for i = 1:length(mags)
 
     end
     fclose(fid);
+    fprintf('\nWrote: %s\n', txtfile)
 
+    wstatus = fileattrib(txtfile, '-w', 'a');
+    if wstatus == 0
+        error('Unable to restrict write access to %s.', txtfile)
+
+    end
 end
