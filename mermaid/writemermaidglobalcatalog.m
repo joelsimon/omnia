@@ -14,7 +14,7 @@ function writemermaidglobalcatalog(globalfile, idfile, nfloats)
 % Input:
 % globalfile  Name of text file output writeglobalcatalog.m
 %                 (def: $MERMAID/events/globalcatalog/M5.txt)
-% filename    Name of 'identified.txt' file output by evt2txt.m, 
+% filename    Name of 'identified.txt' file output by evt2txt.m,
 %                 (def: $MERMAID/events/reviewed/identified/txt/identified.txt)
 % nfloats     Number of floats to consider (def: 16), which
 %                 controls the field width of the last column
@@ -125,7 +125,7 @@ function writefile(iddir, eqtime, eqlat, eqlon, eqdepth, eqmag, ...
                    globe_id, totcolumn, numcolumn, returntype, fmt, mag_unit)
 % This function writes a single file given a return type (e.g., 'DET')
 % and its corresponding data, found above.
-    
+
 fout  = fullfile(iddir, sprintf('M%s_%s.txt', mag_unit, returntype));
 if exist(fout, 'file') == 2
     wstatus = fileattrib(fout, '+w', 'a');
