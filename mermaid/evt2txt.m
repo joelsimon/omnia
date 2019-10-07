@@ -173,7 +173,7 @@ for i = 1:2
     status = review_status{i};
     fout  = fullfile(revdir, 'reviewed', status, 'txt', [status '.txt']);
 
-    if exist(fout, 'file')
+    if exist(fout, 'file') == 2
         wstatus = fileattrib(fout, '+w', 'a');
         if wstatus == 0
             error('Unable to allow write access to %s.', fout)
@@ -202,7 +202,7 @@ txt.all = [txt.identified txt.unidentified];
 txt.all = txt.all(idx);
 
 fout  = fullfile(revdir, 'reviewed', 'all.txt');
-if exist(fout, 'file')
+if exist(fout, 'file') == 2
     wstatus = fileattrib(fout, '+w', 'a');
     if wstatus == 0
         error('Unable to allow write access to %s.', fout)
