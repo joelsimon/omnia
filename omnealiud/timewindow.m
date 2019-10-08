@@ -5,6 +5,11 @@ function [xw, W, incomplete] = timewindow(x, wlen, pivot, fml, delta, pt0)
 % relating the timing of the windowed segmentation to the original
 % time series.
 %
+% Note that rounding may result in a window length that differs from
+% the one requested by more than one sampling interval.  A warning
+% will alert the user should this occur.  The "exact" length of the
+% window returned is specified in W.wlensecs.
+%
 % Input:
 % x          The time series to be windowed
 % wlen       Window length in seconds, or NaN to return
@@ -32,7 +37,7 @@ function [xw, W, incomplete] = timewindow(x, wlen, pivot, fml, delta, pt0)
 %            .xrsamp: sample index in x of last sample of xw
 %            .xlsecs: time assigned in x to first sample of xw
 %            .xrsecs: time assigned in x to last sample of xw
-%             .wlensamp: true window length in samples
+%            .wlensamp: true window length in samples
 %            .wlensecs: true window length in seconds
 % incomplete true if requested time window extends beyond edge of
 %            input time series (def: false)
@@ -168,7 +173,7 @@ W.wlensecs = wlensecs;
 % Final check to see if rounding on left and right increased the
 % difference in the actual window length beyond one sampling interval.
 if abs(W.wlensecs - wlen) > delta && ~incomplete
-    error(['Difference between actual and requested window length ' ...
-           'greater than one sampling interval'])
+    warning(['Difference between actual and requested window length ' ...
+             'greater than one sampling interval'])
 
 end
