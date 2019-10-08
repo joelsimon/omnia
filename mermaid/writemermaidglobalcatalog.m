@@ -1,5 +1,5 @@
-function writemermaidglobalcatalog(globalfile, idfile, nfloats)
-% WRITEMERMAIDGLOBALCATALOG(globalfile, idfile, nfloats)
+function mercatfile = writemermaidglobalcatalog(globalfile, idfile, nfloats)
+% mercatfile = WRITEMERMAIDGLOBALCATALOG(globalfile, idfile, nfloats)
 %
 % WRITEMERMAIDGLOBALCATALOG reads the text file output by
 % writeglobalcatalog.m and appends to each line (corresponding to a
@@ -13,7 +13,7 @@ function writemermaidglobalcatalog(globalfile, idfile, nfloats)
 %
 % Input:
 % globalfile  Name of text file output writeglobalcatalog.m
-%                 (def: $MERMAID/events/globalcatalog/M5.txt)
+%                 (def: $MERMAID/events/globalcatalog/M6.txt)
 % filename    Name of 'identified.txt' file output by evt2txt.m,
 %                 (def: $MERMAID/events/reviewed/identified/txt/identified.txt)
 % nfloats     Number of floats to consider (def: 16), which
@@ -23,13 +23,16 @@ function writemermaidglobalcatalog(globalfile, idfile, nfloats)
 % *N/A*       Writes M?_all.txt, M?_DET.txt, M?_REQ.txt,
 %                 where ? is a magnitude unit (e.g., '5'),
 %                 in the same directory as idfile
+% mercatfile  3x1 cell of All, DET, and REQ files written
+%
+% See also: readmermaidglobalcatalog.m, plotmermaidglobalcatalog.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 07-Oct-2019, Version 2017b on MACI64
 
 % Defaults.
-defval('globalfile', fullfile(getenv('MERMAID'), 'events', 'globalcatalog', 'M5.txt'));
+defval('globalfile', fullfile(getenv('MERMAID'), 'events', 'globalcatalog', 'M6.txt'));
 defval('idfile', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'identified.txt'))
 defval('nfloats', 16)
@@ -59,7 +62,7 @@ all_float_tot_column = zeros(size(globe_id));
 det_float_tot_column = all_float_tot_column;
 req_float_tot_column = all_float_tot_column;
 
-all_float_num_column = repmat({'NaN'}, size(globe_id));
+all_float_num_column = repmat({NaN}, size(globe_id));
 det_float_num_column = all_float_num_column;
 req_float_num_column = all_float_num_column;
 
@@ -110,19 +113,23 @@ fmt = ['%23s    '  , ...
 % Write all, det, and req files.
 iddir = fileparts(idfile);
 mag_unit = globalfile(end-4);
-writefile(iddir, eqtime, eqlat, eqlon, eqdepth, eqmag, globe_id, ...
-          all_float_tot_column, all_float_num_column, 'ALL', fmt, mag_unit);
+mercatfile{1} = writefile(iddir, eqtime, eqlat, eqlon, eqdepth, ...
+                          eqmag, globe_id, all_float_tot_column, ...
+                          all_float_num_column, 'ALL', fmt, mag_unit);
 
-writefile(iddir, eqtime, eqlat, eqlon, eqdepth, eqmag, globe_id, ...
-          det_float_tot_column, det_float_num_column, 'DET', fmt, mag_unit);
+mercatfile{2} = writefile(iddir, eqtime, eqlat, eqlon, eqdepth, ...
+                          eqmag, globe_id, det_float_tot_column, ...
+                          det_float_num_column, 'DET', fmt, mag_unit);
 
-writefile(iddir, eqtime, eqlat, eqlon, eqdepth, eqmag, globe_id, ...
-          req_float_tot_column,req_float_num_column, 'REQ', fmt, mag_unit);
-
+mercatfile{3} = writefile(iddir, eqtime, eqlat, eqlon, eqdepth, ...
+                          eqmag, globe_id, req_float_tot_column, ...
+                          req_float_num_column, 'REQ', fmt, mag_unit);
+mercatfile = mercatfile';
 
 %_____________________________________________________________%
-function writefile(iddir, eqtime, eqlat, eqlon, eqdepth, eqmag, ...
-                   globe_id, totcolumn, numcolumn, returntype, fmt, mag_unit)
+function fout = writefile(iddir, eqtime, eqlat, eqlon, eqdepth, ...
+                          eqmag, globe_id, totcolumn, numcolumn, ...
+                          returntype, fmt, mag_unit)
 % This function writes a single file given a return type (e.g., 'DET')
 % and its corresponding data, found above.
 
