@@ -319,6 +319,10 @@ s = {'20181231T114420.20_5C2A50AD.MER.DET.WLT5.sac', ...
      '20191001T021345.20_5D9491FA.MER.DET.WLT5.sac', ...
      '20191001T030052.20_5D9491FA.MER.DET.WLT5.sac', ...
      '20191002T062451.20_5D9491FA.MER.DET.WLT5.sac', ... % First motion up
+     '20190930T040502.08_5D9371A0.MER.DET.WLT5.sac', ... % First motion up
+     '20191003T054955.20_5D9C0EDC.MER.DET.WLT5.sac', ... % First motion up
+     '20191003T123650.20_5D9C0EDC.MER.DET.WLT5.sac', ... % First motion up
+     '20191007T224903.20_5D9C0EDC.MER.DET.WLT5.sac', ... % First motion up
     };
 
 s = unique(s);
