@@ -10,8 +10,8 @@ function newticks = numticks(ax, xory, num)
 % NUMTICKS.
 %
 % Input:
-% ax          Axes handle
-% xory        Axes limit to adjust, 'x' or 'y'   
+% ax          Axes handle (def: gca)
+% xory        Axes limit to adjust, 'x' or 'y'
 % num         Number of ticklabels on adjusted limit
 %
 % Output:
@@ -26,7 +26,10 @@ function newticks = numticks(ax, xory, num)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 28-May-2019, Version 2017b
+% Last modified: 14-Oct-2019, Version 2017b on GLNXA64
+
+% Default.
+defval('ax', gca);
 
 % Sanity checks for first two input arguments. linspace.m handles
 % the last input argument with an 'isscalar' check.
