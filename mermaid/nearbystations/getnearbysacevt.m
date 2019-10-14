@@ -85,13 +85,13 @@ end
 nearby_sac = unique(nearby_sac(:));
 
 nearby_evtdir = skipdotdir(dir(fullfile(nearbydir, 'evt', id, '*.evt')));
-if length(nearby_evtdir) ~= length(nearby_sac)
-    error(['The number of nearby SAC files and nearby .evt files ' ...
-           'differs for event ID: %s'], id)
-
-end
-
 if ~isempty(nearby_evtdir)
+    if length(nearby_evtdir) ~= length(nearby_sac)
+        error(['The number of nearby SAC files and nearby .evt files ' ...
+               'differs for event ID: %s'], id)
+
+    end
+
     for i = 1:length(nearby_sac);
         nearby_evt_file = strippath(nearby_sac{i});
         nearby_evt_file = nearby_evt_file(1:end-3);
