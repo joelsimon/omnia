@@ -5,7 +5,7 @@ function s = burps
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 30-Sep-2019, Version 2017b on MACI64
+% Last modified: 14-Oct-2019, Version 2017b on GLNXA64
 
 s = {'20181231T114420.20_5C2A50AD.MER.DET.WLT5.sac', ...
      '20190126T130957.20_5C4CA6CB.MER.DET.WLT5.sac', ...
@@ -323,14 +323,59 @@ s = {'20181231T114420.20_5C2A50AD.MER.DET.WLT5.sac', ...
      '20191003T054955.20_5D9C0EDC.MER.DET.WLT5.sac', ... % First motion up
      '20191003T123650.20_5D9C0EDC.MER.DET.WLT5.sac', ... % First motion up
      '20191007T224903.20_5D9C0EDC.MER.DET.WLT5.sac', ... % First motion up
+     '20190709T132743.13_5DA237B4.MER.DET.WLT5.sac', ... % Very noisy
+     '20190716T065509.13_5DA237B4.MER.DET.WLT5.sac', ...
+     '20190716T081551.13_5DA237B4.MER.DET.WLT5.sac', ...
+     '20190716T142343.13_5DA237B4.MER.DET.WLT5.sac', ...
+     '20190716T214531.13_5DA237B4.MER.DET.WLT5.sac', ...
+     '20190717T024637.13_5DA237B4.MER.DET.WLT5.sac', ... % First motion up
+     '20190717T065950.13_5DA237B4.MER.DET.WLT5.sac', ... % *1
+     '20190725T113719.13_5DA237B4.MER.DET.WLT5.sac', ...
+     '20191009T053046.20_5D9F3D8C.MER.DET.WLT5.sac', ...
+     '20191010T085607.20_5D9F3D8C.MER.DET.WLT5.sac', ... % Archetypal
     };
 
 s = unique(s);
 s = sort(s);
 s = s(:);
 
+dates = cellfun(@(xx) datetime(xx(1:8), 'InputFormat', 'uuuuMMdd', 'TimeZone', 'UTC'), s, 'UniformOutput', true);
+floats = cellfun(@(xx) str2num(xx(17:18)), s, 'UniformOutput', true);
+
+floatnum = unique(floats);
+
+figure
+ha = krijetem(subnum(length(floatnum), 1));
+shrink(ha, 1.1, 2.25)
+hold(gca, 'on')
+for i = 1:length(floatnum)
+    idx = find(floats == floatnum(i));
+    axes(ha(i))
+    % if i > 3
+    %     movev(ha(i), -i*0.02);
+
+    % end
+    stem(dates(idx), ones(length(dates(idx))));
+    box(ha(i), 'on')
+    ha(i).XLim = [min(dates) max(dates)]
+    ha(i).YLim = [0 2];
+    ha(i).Title.String = sprintf('MERMAID %i, n = %i', floatnum(i), length(idx));
+    ha(i).YTick = [];
+
+end
+longticks(ha, 2);
+latimes
+axesfs([], 10, 10)
+savepdf('burps')
 return
 
 fid = fopen('burps.txt', 'w');
 fprintf(fid, '%s\n', s{:});
 fclose(fid);
+
+%______________________________________________________________________________%
+
+% *1 Beautifully shows deflection of MERMAID up/down, with final slow
+% and controlled return to mean (from high pressure, i.e., rising back
+% to 1500 m after being pushed down, on the order of 3e7 counts, or
+% ~1.75 cm).
