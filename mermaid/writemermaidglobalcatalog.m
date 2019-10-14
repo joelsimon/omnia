@@ -14,7 +14,7 @@ function mercatfile = writemermaidglobalcatalog(globalfile, idfile, nfloats)
 % Input:
 % globalfile  Name of text file output writeglobalcatalog.m
 %                 (def: $MERMAID/events/globalcatalog/M6.txt)
-% filename    Name of 'identified.txt' file output by evt2txt.m,
+% idfile      Name of 'identified.txt' file output by evt2txt.m,
 %                 (def: $MERMAID/events/reviewed/identified/txt/identified.txt)
 % nfloats     Number of floats to consider (def: 16), which
 %                 controls the field width of the last column
