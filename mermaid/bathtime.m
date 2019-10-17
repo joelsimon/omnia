@@ -50,6 +50,7 @@ function [tdiff, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 17-Oct-2019, Version 2017b on GLNXA64
+% Documented pp. 73-75, 2017.2
 
 % Defaults.
 defval('mod', 'ak135')
