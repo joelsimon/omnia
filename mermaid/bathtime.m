@@ -16,7 +16,7 @@ function [tdiff, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
 % mod        Either 'ak135', 'iasp91', or 'prem' (def: 'ak135')
 % ph         Phase names allowed in TauP, e.g., 'P' or 'SKIKS';
 %                not 'P''' or 'PcP2' (def: 'p')
-% theta1    Incidence angle of ray incident on ocean bottom,
+% theta1     Incidence angle of ray incident on ocean bottom,
 %                0 <= i < 90 [deg] (def: 0)
 % z_ocean    Bathymetric depth (must be negative) [m] (def: -4000)*
 % z_mermaid  Depth of MERMAID at time of recording
@@ -26,7 +26,7 @@ function [tdiff, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
 % tdiff      Time difference between reference model with bathymetry
 %                and receiver at depth, and reference model with no bathymetry
 %                and receiver at the surface (i.e., normal taupTime)
-% theta2    Incidence angle of acoustic wave recorded at MERMAID
+% theta2     Incidence angle of acoustic wave recorded at MERMAID
 %
 % *Adjusted down (deeper) to z_mermaid in the case that z_mermaid is
 %  deeper than the reported ocean depth, e.g., under assumption that
