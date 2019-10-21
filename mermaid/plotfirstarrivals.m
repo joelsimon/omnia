@@ -1,4 +1,4 @@
-function [f, ha, lax, th, tx] = plotfirstarrivals(wlen, label)
+function [f, ha, lax, th, tx] = plotfirstarrivals(s, wlen, label)
 
 
 defval('s', [])
