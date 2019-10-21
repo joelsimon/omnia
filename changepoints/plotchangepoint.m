@@ -6,10 +6,10 @@ function F = plotchangepoint(CP, scales, cpar, normaleyes, symmetric)
 %
 % Input:
 % CP           Output of changepoint.m
-% scales       An array of scales to plot, or 'all' (def: 'all'), 
-%                  where scale n+1 approximation at scale n. 
+% scales       An array of scales to plot, or 'all' (def: 'all'),
+%                  where scale n+1 approximation at scale n.
 % cpar         'ar': plot vertical lines at arsecs (def)
-%              'cp': plot vertical lines at cpsecs 
+%              'cp': plot vertical lines at cpsecs
 % normaleyes   true to normalize plots (def: true)
 % symmetric    true to make y-axis symmetric about 0 (def: true)
 %
@@ -41,7 +41,7 @@ function F = plotchangepoint(CP, scales, cpar, normaleyes, symmetric)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 21-Jun-2019, Version 2017b
+% Last modified: 21-Oct-2019, Version 2017b on MACI64
 
 % Defaults.
 defval('scales', 'all')
@@ -93,8 +93,8 @@ if strcmp(CP.domain, 'time-scale')
     da_normfunc = @(xx) norm2ab(xx, 0, 1);
     aic_normfunc = @(xx) norm2ab(xx, 0, 1);
 
-else 
-    % The normalization of the data (da) and the AIC curve (aic) differ
+else
+    % The normalization of the data (da) and the AIC curve (aicj) differ
     % because, generally, the waveform (da) has both positive and
     % negative values and thus normalizing to the maximum
     % negative/positive value is sufficient while not artificially
@@ -111,28 +111,28 @@ else
 end
 
 % AIC-pick  colors.
-col.tsf =  [0 1 1]; 
-col.tsm = [1 0 0]; 
-col.tsl = [0.5 1 0]; 
+col.tsf =  [0 1 1];
+col.tsm = [1 0 0];
+col.tsl = [0.5 1 0];
 col.t = [0.5 0 1];
 
 % If 'time-scale' domain check if smoothed with 'fml' option, this
 % changes how it's plotted.
 if ~isempty(CP.inputs.fml)
     issmooth = true;
-    
+
     % Per the color-scheme of Simon & Simons, 2019: start of smear is
     % blue; middle of smear is red; end of smear is green.    switch CP.inputs.fml
     switch CP.inputs.fml
       case 'first'
         Color =  col.tsf;
-        
+
       case 'middle'
         Color = col.tsm;
-        
+
       case 'last'
         Color = col.tsl;
-        
+
     end
 else
     issmooth = false;
@@ -144,11 +144,11 @@ ax_idx = 1;
 sc_idx = 0;
 for i = scales
     % Update the axes and scale indices.
-    ax_idx = ax_idx + 1;  
+    ax_idx = ax_idx + 1;
     sc_idx = sc_idx + 1;
 
     % Make current axes active.
-    ax = ha(ax_idx);  
+    ax = ha(ax_idx);
     ha2(ax_idx) = axes;
     ax2 = ha2(ax_idx);
     hold(ax2, 'on')
@@ -165,13 +165,15 @@ for i = scales
 
       case 'ar'
         vlsecs = CP.arsecs{i};
-        dabe = CP.arsamp{i}; 
+        dabe = CP.arsamp{i};
 
       otherwise
         error('Specify either ''cp'' for changepoint or ''ar'' for arrival for input: cpar')
-        
+
     end
 
+    %% Time-scale domain
+    %__________________________________________________________________________%
     if strcmp(CP.domain, 'time-scale')
         % In the time-scale domain plot the absolute values of the detail and
         % approximation coefficients (e.g., like a scalogram).
@@ -185,17 +187,16 @@ for i = scales
 
         end
 
-        hold(ax, 'on')        
+        hold(ax, 'on')
         if issmooth
             % Smoothing requested: smooth abe/dbe time smears to a single, 'representative' sample.
             smooth_xvals = CP.outputs.xax(CP.outputs.dabe{i});
-            
+
             pl.da{sc_idx} = plot(ax, smooth_xvals, da, 'Color', ...
                             [0.5 0.5 0.5], 'LineWidth', LineWidth);
 
             pl.aicj{sc_idx} = plot(ax2, smooth_xvals, aicj, 'Color', ...
                               'k', 'LineWidth', LineWidth);
-            
 
             pl.vl{sc_idx} = plot(ax2, [vlsecs vlsecs], ax2.YLim, ...
                             'LineWidth', 1.5 * LineWidth, 'Color', Color);
@@ -204,26 +205,18 @@ for i = scales
             set(pl.aicj{sc_idx}, 'Color', 'k', 'LineWidth', LineWidth);
 
         else
-            % Now we work with exactly with the detail and approximation subspace
-            % projections -- not their absolute values.
-            if normaleyes
-                da = da_normfunc(da);
-                aicj = aic_normfunc(aicj);
-
-            end
-
             % No smoothing requested: twice-replicate the normalized data so that
             % they may be plotted over their representative time smear.
             yvals_da = repmat(da, 1, 2);
             yvals_aicj = repmat(aicj, 1, 2);
             xvals = CP.outputs.wtxax{i};
-            
+
             % This switches marker type if the length of the time-smear is a
             % single point and not a line.
             for j = 1:length(da)
                 if length(xvals(j, :)) == 1
                     LineStyle = '+';
-                    
+
                 else
                     LineStyle = '-';
 
@@ -252,30 +245,35 @@ for i = scales
                 % round to sample first before converting to seconds.
                 middle_sample = smoothscale({dabe}, 'middle');
                 middle_secs = CP.outputs.xax(middle_sample{:});
-            end
-            
-            pl.vl{sc_idx}(1) = plot(ax2, repmat(left_secs, 1, 2), ax2.YLim, ...
-                               'LineWidth', 1.5 * LineWidth, 'Color', col.tsf);
-            pl.vl{sc_idx}(2) = plot(ax2, repmat(middle_secs, 1, 2), ax2.YLim, ...
-                               'LineWidth', 1.5 * LineWidth, 'Color', col.tsm);
-            pl.vl{sc_idx}(3) = plot(ax2, repmat(right_secs, 1, 2), ax2.YLim, ...
-                               'LineWidth', 1.5 * LineWidth, 'Color', col.tsl);           
 
+            else
+                left_secs = NaN;
+                right_secs = NaN;
+                middle_secs = NaN;
+
+            end
+            pl.vl{sc_idx}(1) = plot(ax2, repmat(left_secs, 1, 2), ax2.YLim, ...
+                                    'LineWidth', 1.5 * LineWidth, 'Color', col.tsf);
+            pl.vl{sc_idx}(2) = plot(ax2, repmat(middle_secs, 1, 2), ax2.YLim, ...
+                                    'LineWidth', 1.5 * LineWidth, 'Color', col.tsm);
+            pl.vl{sc_idx}(3) = plot(ax2, repmat(right_secs, 1, 2), ax2.YLim, ...
+                                    'LineWidth', 1.5 * LineWidth, 'Color', col.tsl);
         end
 
         % Label the y-axis.
         if i == length(CP.outputs.da)
             lbl_str = sprintf('$a_{%i}$', i - 1);
-            
+
         else
             lbl_str = sprintf('$d_{%i}$', i);
-            
+
         end
         ylabel(ax, sprintf('%s', lbl_str))
         hold(ax, 'off')
 
-    else 
-        % Domain == 'time'.
+    %__________________________________________________________________________%
+    %% Time domain
+    else
         if normaleyes
             da = da_normfunc(da);
             aicj = aic_normfunc(aicj);
@@ -287,7 +285,7 @@ for i = scales
         xvals = CP.outputs.xax;
         yvals_da = da;
         yvals_aicj = aicj;
-        
+
         pl.da{sc_idx} = plot(ax, xvals, yvals_da, 'Color', [0.5 0.5 0.5], ...
                         'LineWidth', LineWidth);
         pl.aicj{sc_idx} = plot(ax2, xvals, yvals_aicj, 'Color', 'k', ...
@@ -303,16 +301,16 @@ for i = scales
         % Label the y-axis.
         if i == length(CP.outputs.da)
             lbl_str = sprintf('$\\overline{x}_{%i}$', i - 1);
-            
+
         else
             lbl_str = sprintf('$x_{%i}$', i);
-            
+
         end
         ylabel(ax, sprintf('%s', lbl_str))
 
         if symmetric && ~normaleyes
             symaxes(ax, 'y');
-            
+
         end
     end
     hold(ax2, 'off')
@@ -338,7 +336,7 @@ ax_idx = 1;
 sc_idx = 0;
 for i = scales
     % Loop over the scales updating the axis and scale indices.
-    ax_idx = ax_idx + 1;  
+    ax_idx = ax_idx + 1;
     sc_idx = sc_idx + 1;
 
     set(ha2(ax_idx), 'Position', ha(ax_idx).Position, 'XLim', ha(ax_idx).XLim);
