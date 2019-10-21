@@ -1,7 +1,7 @@
 function [f, ax, tx] = plotfirstarrival(s, ax, FontSize, EQ)
 % NEEDS HEADER
 
-defval('s', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
+defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 defval('ax', [])
 defval('FontSize', [14 12])
 defval('EQ', [])
