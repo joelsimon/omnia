@@ -1,7 +1,7 @@
 function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
-                           evtdir, EQ)
+                           evtdir, EQ, bathy)
 % WRITEFIRSTARRIVAL(s, redo, filename, fmt, wlen, lohi, sacdir, ...
-%                   evtdir, EQ)
+%                   evtdir, EQ, bathy)
 %
 % WRITEFIRSTARRIVAL writes the output of firstarrival.m a text file.
 %
@@ -25,6 +25,8 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 %              of .evt files (def: $MERMAID/events)
 % EQ      Cell array (same size as 's') of EQ structs, if they are
 %             not reviewed, or one different from saved is preferred
+% bathy    logical true apply bathymetric travel time correction,
+%              computed with bathtime.m (def: true)
 %
 % Output:
 % Text file with the following columns (firstarrivals.m outputs in parentheses):
@@ -69,6 +71,7 @@ defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
+defval('bathy', true)
 
 % Sort out if deleting, appending to, or creating output file.
 file_exists = (exist(filename,'file') == 2);
@@ -118,7 +121,7 @@ parfor i = 1:length(s)
     end
 
     % Concatenate the write lines.
-    wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, fmt, single_EQ);
+    wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy);
     wlines = [wlines wline];
 
 end
@@ -143,12 +146,12 @@ end
 fileattrib(filename, '-w')
 
 %_______________________________________________________________________________%
-function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt, single_EQ)
+function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy)
 % Local call to, and formatting of, firstarrival.m
 
 % Collect.
 [tres, dat, syn, ph, delay, twosd, ~, ~, ~, maxc_y, SNR, EQ, ~, ~, ~, incomplete] = ...
-    firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ);
+    firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy);
 publicid = fx(strsplit(EQ(1).PublicId, '='),  2);
 
 % Parse.

@@ -1,7 +1,7 @@
 function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
-          SNR, EQ, W1, xw2, W2, incomplete] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ)
+          SNR, EQ, W1, xw2, W2, incomplete] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy)
 % [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
-%          SNR, EQ, W1, xw2, W2, incomplete] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ)
+%          SNR, EQ, W1, xw2, W2, incomplete] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy)
 % NEEDS HEADER
 % The data are detrended (linear) then tapered with a Hanning
 % window before bandpass filtering.
@@ -21,6 +21,9 @@ function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 % EQ       EQ structure if event not reviewed, or [] if
 %              event reviewed and to be retrieved with
 %              getevt.m (def: [])
+% bathy    logical true apply bathymetric travel time correction,
+%              computed with bathtime.m (def: true)
+%              [N.B: does not adjust EQ.TaupTimes]
 %
 % Output:
 % tres     Travel time residual [s] w.r.t first phase arrival:
@@ -60,13 +63,14 @@ function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 % Contact: jdsimon@princeton.edu
 % Last modified: 02-Oct-2019, Version 2017b on GLNXA64
 
-defval('s', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
+defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 defval('ci', true)
 defval('wlen', 30)
 defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
+defval('bathy', true)
 
 % Start with baseline assumption both time windows will be complete.
 incomplete1 = false;
@@ -116,7 +120,17 @@ end
 
 % The synthetic (theoretical, 'syn') arrival time is stored in the EQ structure.
 syn = EQ(1).TaupTimes(1).truearsecs;
+
+% Correct the travel time for bathymetry.
 ph = EQ(1).TaupTimes(1).phaseName;
+if bathy
+    z_ocean = gebco(h.STLO, h.STLA);
+    tdiff = bathtime(EQ(1).TaupTimes(1).model, ph, ...
+                     EQ(1).TaupTimes(1).incidentDeg, z_ocean, -h.STDP);
+    syn = syn + tdiff;
+
+end
+
 
 % Bandpass filter the time series and select a windowed segment.
 if ~isnan(lohi)
