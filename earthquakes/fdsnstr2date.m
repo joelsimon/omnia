@@ -36,6 +36,7 @@ function tdate = fdsnstr2date(tstr)
 %% Recursive.
 
 if iscell(tstr)
+    tdate = NaT(size(tstr), 'TimeZone', 'UTC');
     for i = 1:length(tstr)
 
         %% Recursive.
@@ -43,7 +44,6 @@ if iscell(tstr)
         tdate(i) = fdsnstr2date(tstr{i});
 
     end
-    tdate = reshape(tdate, size(tstr));
     return
 
 end
