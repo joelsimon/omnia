@@ -1,18 +1,23 @@
-function varargout = readidentified(filename, starttime, endtime)
-% [sac, eqtime, eqlat, eqlon, eqregion, eqdepth, eqdist, eqmag, ...
-%      eqphase1, eqid, eqdate] = READIDENTIFIED(filename, starttime, endtime)
+function varargout = readidentified(filename, starttime, endtime, reftime)
+% [sac, eqtime, eqlat, eqlon, eqregion, eqdepth, eqdist, eqmag, eqphase1, ...
+%  eqid, sacdate, eqdate] = READIDENTIFIED(filename, starttime, endtime, reftime)
 %
 % Reads and parses event information from identified.txt, written with
 % evt2txt.m, assuming Princeton MERMAID naming scheme (SAC filenames
-% of length 44).
+% of length 44). For all events, including those unidentified, see
+% readevt2txt.m.
 %
 % Input:
-% filename   Textfile name
+% filename   Textfile name: 'identified.txt', output by evt2txt.m
 %            (def: $MERMAID/events/reviewed/identified/txt/identified.txt)
-% starttime  Inclusive start time (earliest event time to consider),
-%                as datetime (def: start at first line of identified.txt)
-% endtime    Inclusive end time (latest event time to consider),
-%                as datetime (def: start at first line of identified.txt)
+% starttime  Inclusive start time (earliest event time to OR SAC file to consider),
+%                as datetime (def: start at first event OR SAC  in catalog)
+% endtime    Inclusive end time (latest event time OR SAC file to consider),
+%                as datetime (def: end at last event OR SAC file in catalog)
+% reftime    Reference for start and end times
+%            'EVT': start/end times refer to event (hypocenter) times
+%            'SAC': start/end times refer to SAC (time at first sample) times (def)
+%
 % Output:
 % sac        SAC filename
 % eqtime     Event rupture time ['yyyy-mm-dd HH:MM:SS']
@@ -25,17 +30,21 @@ function varargout = readidentified(filename, starttime, endtime)
 % eqmag      Event magnitude
 % eqphase1   Name of theoretical 1st-arriving phase
 % eqid       IRIS event public ID
+% sacdate    Time of first sample of seismogram, as datetime
 % eqdate     eqtime, as datetime
+%
+% See also: readevt2txt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 21-Oct-2019, Version 2017b on MACI64
+% Last modified: 22-Oct-2019, Version 2017b on GLNXA64
 
-% Default.
+% Defaults.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'identified.txt'))
-defval('starttime', NaT('TimeZone', 'UTC'))
-defval('endtime', NaT('TimeZone', 'UTC'))
+defval('starttime', NaT('TimeZone', 'UTC')) % Dummy variable; changed below
+defval('endtime', NaT('TimeZone', 'UTC')) % Dummy variable; changed below
+defval('reftime', 'SAC')
 
 % Sanity.
 if ~isdatetime(starttime) || ~isdatetime(endtime)
@@ -62,24 +71,41 @@ eqmag = cellfun(@(xx) str2double(xx(154:157)), lynes, 'UniformOutput', true);
 eqphase1 = strtrim(cellfun(@(xx) xx(162:167), lynes, 'UniformOutput', false));
 eqid = strtrim(cellfun(@(xx) xx(172:184), lynes, 'UniformOutput', false));
 eqdate = NaT(length(eqtime), 1, 'TimeZone', 'UTC');
+
+% Get SAC (time at first sample) and EQ (hypocenter time) datetimes.
+sacdate = mersac2date(sac);
+eqdate = NaT(size(eqtime), 'TimeZone', 'UTC');
 for i = 1:length(eqtime)
-    eqdate(i) = irisstr2date(eqtime{i}, 2);
+        eqdate(i) = irisstr2date(eqtime{i}, 2);
 
 end
 
-% Default start and end time to include entire catalog; defval.m
-% does not overwrite a non-empty input.
+% Switch which dates (SAC times or event times) to use to winnow the
+% return within a specific time interval.
+switch upper(reftime)
+  case 'SAC'
+    refdate = sacdate;
+
+  case 'EVT'
+    refdate = eqdate;
+
+  otherwise
+    error('specify either ''SAC'' or ''EVT'' for input reftime')
+
+end
+
+% Default start and end time to include entire catalog.
 if isnat(starttime)
-    starttime = min(eqdate);
+    starttime = min(refdate);
 
 end
 if isnat(endtime)
-    endtime = max(eqdate);
+    endtime = max(refdate);
 
 end
 
 % Determine which event indices fall within the time interval of interest.
-idx = find(isbetween(eqtime, starttime, endtime));
+idx = find(isbetween(refdate, starttime, endtime));
 
 % And return only those events.
 sac = sac(idx);
@@ -96,7 +122,7 @@ eqdate = eqdate(idx);
 
 % Collect outputs.
 outargs = {sac, eqtime, eqlat, eqlon, eqregion, eqdepth, eqdist, ...
-           eqmag, eqphase1, eqid, eqdate};
+           eqmag, eqphase1, eqid, sacdate, eqdate};
 varargout  = outargs(1:nargout);
 
 % *I battled textscan.m using the format from evt2txt.m with no luck;
