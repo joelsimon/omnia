@@ -1,5 +1,5 @@
-function [km, sumly] = cpsumly(x, verify)
-% [km, sumly] = CPSUMLY(x, verify)
+function [km, sumly, dvar] = cpsumly(x, verify)
+% [km, sumly, dvar] = CPSUMLY(x, verify)
 %
 % Changepoint Estimator via Summed Log-Likelihoods:
 %
@@ -16,14 +16,16 @@ function [km, sumly] = cpsumly(x, verify)
 % Input:
 % x         Time series, e.g. a seismogram
 % verify    logical true to check math (def: false)
-%              i.e., that final sumly follow from its constituents 
-%         
+%              i.e., that final sumly follow from its constituents
+%
 % Outputs:
-% km        Sample index, k, which maximizes the summed likelihood function 
+% km        Sample index, k, which maximizes the summed likelihood function
 %               (compare with km in cpest.m, which is the minimum
 %               of an AIC curve)
 % sumly     Eq. 15: summed log-likelihood curve of "noise" +
-%               "signal" model at each k 
+%               "signal" model at each k
+% dvar      The abs. value of the difference between estimated (data)
+%               noise and signal variances, |sigma_1^2 - sigma_2^2|
 %
 % Ex: (true changepoint at sample index 5000)
 %    x = normcpgen(1000, 500, 100);
@@ -40,8 +42,8 @@ function [km, sumly] = cpsumly(x, verify)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 07-Mar-2018, Version 2017b
-    
+% Last modified: 23-Oct-2019, Version 2017b on GLNXA64
+
 %% Recursive.
 
 % Set verify to true check the math here, specifically that equation
@@ -54,15 +56,15 @@ if all([~isnumeric(x) ~iscell(x)])
 
 end
 
-if iscell(x)    
+if iscell(x)
     % Preallocate output cell.
     sumly = cell(size(x));
 
     % Break up cell and run cpsumly.m on individual vectors.
     for i = 1:length(sumly)
-        
+
         %% Recursion.
-        
+
         [km(i), sumly{i}] = cpsumly(x{i}, verify);
 
     end
@@ -76,13 +78,14 @@ else
     % Preallocate.
     N = length(x);
     sumly = NaN(size(x));
+    dvar = NaN(size(x));
 
     % If verifying, stop at random sample index in domain.
     if verify
         test_sample = randi([2 N-2], 1);
 
     end
-    
+
     % At every sample index, compute the summed log-likelihood that
     % segments 1, 2 were drawn from distributions whose parameters are
     % in fact the sample statistics; i.e., assumed that the MLE
@@ -96,9 +99,13 @@ else
 
         % Equation 7.
         var1 = 1/k * sum([noise - mean(noise)].^2);
-        
+
         % Equation 12.
         var2 = 1/(N-k) * sum([signal - mean(signal)].^2);
+
+        % Difference in variances: local maxima (sufficiently far from the
+        % edges) should relate to km.
+        dvar(k) = abs(var1 - var2);
 
         %% Main -- Compute equation 15: the summed log-likelihood of both segments.
         sumly(k) = -1/2 * [k*log(var1) + (N-k)*log(var2) + N*(log(2*pi) + 1)];
@@ -108,7 +115,7 @@ else
         if isempty(idx) == false
             sumly = zipnan(sumly, idx);
         end
-        
+
         % A natural changepoint estimate would be that sample index
         % where the summed log-likelihood is maximized.
         [~, km] = max(sumly);
@@ -131,7 +138,7 @@ function check_math(noise, signal, var1, var2, sumly, N, k)
     %________________________________________________%
 
     % Equation 8 and 13: MLE variances already substituted for true
-    % variances; their sum should equal equation 15 ('sumly', above). 
+    % variances; their sum should equal equation 15 ('sumly', above).
     eq8 = -k/2 * [log(2*pi) + log(var1) + 1];
     eq13 = -(N-k)/2 * [log(2*pi) + log(var2) + 1];
     fprintf('Difference between (eq8+13)-eq15 = %e\n', (eq8+eq13) - sumly(k))

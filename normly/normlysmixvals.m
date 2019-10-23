@@ -1,5 +1,5 @@
-function [x, y] = normlysmixvals(k, trusigmas, N, ko)
-% [x, y] = NORMLYSMIXVALS(k, trusigmas, N, ko)
+function [x, y, dvar] = normlysmixvals(k, trusigmas, N, ko)
+% [x, y, dvar] = NORMLYSMIXVALS(k, trusigmas, N, ko)
 %
 % Returns the x (the normalized MLE of the variance) and y (its
 % corresponding summed log-likelihood) values PARAMETERS TO A
@@ -18,7 +18,7 @@ function [x, y] = normlysmixvals(k, trusigmas, N, ko)
 %
 % Input:
 % k            The index of the incorrect changepoint
-% trusigmas    Std. deviations of the generating norm distributions 
+% trusigmas    Std. deviations of the generating norm distributions
 %                  (def: [1 sqrt(2)])
 % N            Length time series generated here (def: 1000)
 % ko           Sample index of changepoint that separates noise, signal
@@ -26,9 +26,11 @@ function [x, y] = normlysmixvals(k, trusigmas, N, ko)
 %
 % Output:
 % x            The value on the x-axis on a normlysmix plot; i.e.,
-%                  the MLE of the normalized variance 
+%                  the MLE of the normalized variance
 % y            The likelihood value of the MLE of the normalized variance
-%     
+% dvar         The abs. value of the difference between expected (theoretical)
+%                  noise and signal variances, |sigma_o1^2 - sigma_o2^2|
+%
 % Both outputs are vectors in the form x, y = [noise signal sum], that
 % is, both x and y return a 1x3 vector that gives the normalized MLE
 % value and its likelihood for the noise section (segment 1), the
@@ -43,7 +45,7 @@ function [x, y] = normlysmixvals(k, trusigmas, N, ko)
 %
 % Citation: paper??
 %
-% See also: normly.m, normlysmix.m, plot2normlysmix.m, 
+% See also: normly.m, normlysmix.m, plot2normlysmix.m,
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
@@ -57,7 +59,7 @@ defval('ko', 500)
 
 % Sanity checks.
 % Noise and signal segments both need at least 1 sample.
-if N < 2 
+if N < 2
     error('Input argument ''N'' must be at least of length 2.')
 end
 
@@ -83,33 +85,33 @@ if k < ko
     % Noise -- there is no mixing; the sample variance is itself and the
     % normalized value is 1.
     noisevar = sigma1^2;
-    norm_noisevar = 1; 
+    norm_noisevar = 1;
 
     % "Signal" -- equation 21.
-    sigvar = 1/(N-k) * [(ko-k)*sigma1^2 + (N-ko)*sigma2^2]; 
-    norm_sigvar = sigvar / sigma2^2;                         
+    sigvar = 1/(N-k) * [(ko-k)*sigma1^2 + (N-ko)*sigma2^2];
+    norm_sigvar = sigvar / sigma2^2;
 
     % Sum -- equation 24.
-    norm_sumvar = 1 + 1/N*[(ko-k)*(sigma1^2/sigma2^2 - 1)]; % 
+    norm_sumvar = 1 + 1/N*[(ko-k)*(sigma1^2/sigma2^2 - 1)]; %
 
 % Changepoint late.
 elseif k > ko
 
     % "Noise" -- equation 16.
-    noisevar = 1/k* [ko*sigma1^2 + (k-ko)*sigma2^2]; 
-    norm_noisevar = noisevar / sigma1^2;                 
-    
+    noisevar = 1/k* [ko*sigma1^2 + (k-ko)*sigma2^2];
+    norm_noisevar = noisevar / sigma1^2;
+
     % Signal -- there is no mixing; the sample variance is itself and the
     % normalized value is 1.
     sigvar = sigma2^2;
     norm_sigvar = 1;
-    
+
     % Sum -- equation 23.
-    norm_sumvar = 1 + 1/N*[(k-ko)*(sigma2^2/sigma1^2 - 1)]; 
+    norm_sumvar = 1 + 1/N*[(k-ko)*(sigma2^2/sigma1^2 - 1)];
 
 % Changepoint correct.
 elseif k == ko
-    
+
     % Trivial case.
     noisevar = sigma1^2;
     norm_noisevar = 1;
@@ -120,6 +122,7 @@ elseif k == ko
     norm_sumvar = 1;
 
 end
+dvar = abs(noisevar - sigvar);
 
 % Collect the theoretical MLE variances (X-Axis).
 x = [norm_noisevar norm_sigvar norm_sumvar];
