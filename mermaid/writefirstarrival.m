@@ -50,7 +50,7 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 01-Oct-2019, Version 2017b on MACI64
+% Last modified: 25-Oct-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('s', revsac(1))
@@ -141,6 +141,12 @@ else
                                                       numlines), filename)
 end
 
+% Use a system call to sort the new entries.
+[status, result] = system(sprintf('sort -k1 -n -o %s %s', filename, filename));
+if status ~= 0
+    warning('unable to sort %s\nflags may differ on non-Linux machines', filename)
+
+end
 
 % Write protect the file.
 fileattrib(filename, '-w')
