@@ -1,5 +1,5 @@
-function [x, y, dvar] = normlysmixvals(k, trusigmas, N, ko)
-% [x, y, dvar] = NORMLYSMIXVALS(k, trusigmas, N, ko)
+function [x, y, dvar, rvar] = normlysmixvals(k, trusigmas, N, ko)
+% [x, y, dvar, rvar] = NORMLYSMIXVALS(k, trusigmas, N, ko)
 %
 % Returns the x (the normalized MLE of the variance) and y (its
 % corresponding summed log-likelihood) values PARAMETERS TO A
@@ -28,8 +28,10 @@ function [x, y, dvar] = normlysmixvals(k, trusigmas, N, ko)
 % x            The value on the x-axis on a normlysmix plot; i.e.,
 %                  the MLE of the normalized variance
 % y            The likelihood value of the MLE of the normalized variance
-% dvar         The abs. value of the difference between expected (theoretical)
-%                  noise and signal variances, |sigma_o1^2 - sigma_o2^2|
+% dvar         The difference between the expected (theoretical)
+%                  signal and noise variances, sigma_o2^2 - sigma_o1^2
+% rvar         The ratio of the expected (theoretical)
+%                  signal and noise variances, sigma_o2^2 / sigma_o1^2
 %
 % Both outputs are vectors in the form x, y = [noise signal sum], that
 % is, both x and y return a 1x3 vector that gives the normalized MLE
@@ -49,7 +51,7 @@ function [x, y, dvar] = normlysmixvals(k, trusigmas, N, ko)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 16-May-2018, Version 2017b
+% Last modified: 25-Oct-2019, Version 2017b on GLNXA64
 % Documented pp. 55-61, 2017.1.
 
 % Defaults.
@@ -122,7 +124,8 @@ elseif k == ko
     norm_sumvar = 1;
 
 end
-dvar = abs(noisevar - sigvar);
+dvar = sigvar - noisevar;
+rvar = sigvar / noisevar;
 
 % Collect the theoretical MLE variances (X-Axis).
 x = [norm_noisevar norm_sigvar norm_sumvar];

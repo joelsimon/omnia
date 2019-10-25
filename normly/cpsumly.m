@@ -1,5 +1,5 @@
-function [km, sumly, dvar] = cpsumly(x, verify)
-% [km, sumly, dvar] = CPSUMLY(x, verify)
+function [km, sumly, dvar, rvar] = cpsumly(x, verify)
+% [km, sumly, dvar, rvar] = CPSUMLY(x, verify)
 %
 % Changepoint Estimator via Summed Log-Likelihoods:
 %
@@ -24,8 +24,10 @@ function [km, sumly, dvar] = cpsumly(x, verify)
 %               of an AIC curve)
 % sumly     Eq. 15: summed log-likelihood curve of "noise" +
 %               "signal" model at each k
-% dvar      The abs. value of the difference between estimated (data)
-%               noise and signal variances, |sigma_1^2 - sigma_2^2|
+% dvar      The difference between estimated (data) signal and noise
+%               variances, sigma_2^2 - sigma_1^2
+% rvar      The ratio of the estimated (data) signal and noise
+%               variances, sigma_2^2 / sigma_1^2
 %
 % Ex: (true changepoint at sample index 5000)
 %    x = normcpgen(1000, 500, 100);
@@ -42,7 +44,7 @@ function [km, sumly, dvar] = cpsumly(x, verify)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 23-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 25-Oct-2019, Version 2017b on GLNXA64
 
 %% Recursive.
 
@@ -79,6 +81,7 @@ else
     N = length(x);
     sumly = NaN(size(x));
     dvar = NaN(size(x));
+    rvar = NaN(size(x));
 
     % If verifying, stop at random sample index in domain.
     if verify
@@ -103,9 +106,10 @@ else
         % Equation 12.
         var2 = 1/(N-k) * sum([signal - mean(signal)].^2);
 
-        % Difference in variances: local maxima (sufficiently far from the
-        % edges) should relate to km.
-        dvar(k) = abs(var1 - var2);
+        % Difference and ratio of variances: local maxima (sufficiently far
+        % from the edges) should relate to km.
+        dvar(k) = var2 - var1;
+        rvar(k) = var2 / var1;
 
         %% Main -- Compute equation 15: the summed log-likelihood of both segments.
         sumly(k) = -1/2 * [k*log(var1) + (N-k)*log(var2) + N*(log(2*pi) + 1)];
