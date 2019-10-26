@@ -1,19 +1,19 @@
 function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
           SNR, EQ, W1, xw2, W2, incomplete] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy)
 % [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
-%          SNR, EQ, W1, xw2, W2, incomplete] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy)
-% NEEDS HEADER
-% The data are detrended (linear) then tapered with a Hanning
-% window before bandpass filtering.
-%                  tres = dat - syn
+%          SNR, EQ, W1, xw2, W2, incomplete] = FIRSTARRIVAL(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy)
+%
+% Computes the travel time residual between the AIC-based arrival-time
+% estimate of paper?? and the theoretical arrival time of the
+% first-arriving phase in the associated EQ structure from cpsac2evt.m.
 %
 % Input:
-% s        SAC filename
+% s        SAC filename (def: '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 % ci       true to estimate arrival time uncertainty via
 %              1000 realizations of M1 method (def: false)
 % wlen     Window length [s] (def: 30)
-% lohi     1x2 array of corner frequencies, or NaN to skip
-%              bandpass and use raw data (def: [1 5]])
+% lohi     1 x 2 array of corner frequencies, or NaN to skip
+%              bandpass and use raw data (def: [1 5]])***
 % sacdir   Directory containing (possibly subdirectories)
 %              of .sac files (def: $MERMAID/processed)
 % evtdir   Directory containing (possibly subdirectories)
@@ -53,6 +53,9 @@ function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 %            1: W1 incomplete, W2 complete
 %            2: W1 complete, W2 incomplete
 %            3: Both time windows incomplete
+%
+% ***If 'lohi' is specific the data are linearly detrended then tapered
+% with a Hanning window before bandpass filtering
 %
 % *The x-axis here is w.r.t to original, NOT windowed, seismogram,
 % i.e. xaxis(h.NPTS, h.DELTA, h.B), where h is the SAC header
@@ -131,13 +134,7 @@ if bathy
                      EQ(1).TaupTimes(1).incidentDeg, z_ocean, -h.STDP);
     syn = syn + tdiff;
 
-    disp('travel-time residual corrected for bathymetry and MERMAID depth')
-
-else
-    disp('travel-time residual NOT corrected for bathymetry or MERMAID depth')
-
 end
-
 
 % Bandpass filter the time series and select a windowed segment.
 if ~isnan(lohi)
@@ -146,8 +143,8 @@ if ~isnan(lohi)
 
      end
 
-    taper = hanning(length(x));
     x = detrend(x, 'linear');
+    taper = hanning(length(x));
     x = taper .* x;
     xf = bandpass(x, 1/h.DELTA, lohi(1), lohi(2));
 
