@@ -33,8 +33,7 @@ function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 % ph       Phase name associated with tres
 % delay    Time delay between true arrival time and time at largest
 %             amplitude (max_y) [s]
-% xw1      Windowed segment of x, after bandpass filtering,
-%              centered on first theoretical arrival time
+% xw1      Windowed segment of x (maybe filtered) contained in W1
 % xaxw1    x-axis centered on syn at 0 seconds, i.e., compliment to xw1
 % maxc_x   Time at of maximum (or minimum) amplitude of bandpassed signal [s]*
 % maxc_y   Amplitude (counts) of maximum (or minimum) amplitude of bandpassed
@@ -45,9 +44,11 @@ function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 %              noise segments (see wtsnr.m)
 % EQ       Input EQ structure or reviewed EQ struct associated with SAC file
 %              via getevt.m
-%% W1
-%% xw2
-%% W2
+% W1       timewindow.m struct of length wlen [s]
+%              centered on theoretical first arrival time
+% xw2      Windowed segment of x (maybe filtered) contained in W2
+% W2       timewindow.m struct of length wlen/2 [s]
+%              beginning at dat
 % incomplete 0: Both time windows complete
 %            1: W1 incomplete, W2 complete
 %            2: W1 complete, W2 incomplete
@@ -61,8 +62,9 @@ function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 26-Oct-2019, Version 2017b on GLNXA64
 
+% Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 defval('ci', true)
 defval('wlen', 30)
@@ -129,6 +131,11 @@ if bathy
                      EQ(1).TaupTimes(1).incidentDeg, z_ocean, -h.STDP);
     syn = syn + tdiff;
 
+    disp('travel-time residual corrected for bathymetry and MERMAID depth')
+
+else
+    disp('travel-time residual NOT corrected for bathymetry or MERMAID depth')
+
 end
 
 
@@ -148,8 +155,7 @@ else
     xf = x;
 
 end
-[xw1, W1, incomplete1] = timewindow(xf, wlen, EQ(1).TaupTimes(1).truearsecs, ...
-                                   'middle', h.DELTA, h.B);
+[xw1, W1, incomplete1] = timewindow(xf, wlen, syn, 'middle', h.DELTA, h.B);
 
 % The offset x-axis, which sets syn at 0 s.
 xaxw1 = W1.xax - syn;
