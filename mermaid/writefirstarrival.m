@@ -25,6 +25,7 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 %              of .evt files (def: $MERMAID/events)
 % EQ      Cell array (same size as 's') of EQ structs, if they are
 %             not reviewed, or one different from saved is preferred
+%             (def: [] to retrieve reviewed EQ struct from evtdir with getevt.m)
 % bathy    logical true apply bathymetric travel time correction,
 %              computed with bathtime.m (def: true)
 %
