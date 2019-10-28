@@ -37,9 +37,8 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 % effect may be found at the default baseurl:
 % http://service.iris.edu/fdsnws/event/1/
 %
-% N.B: negative event depths are overwritten to 0 km in the
-% EQ.PreferredDepth field, whose value used for subsequent (e.g.
-% arrival times) computations.
+% N.B: negative event depths are set to 0 km for the purpose of
+% theoretical travel-time computation; see in-code comments for more.
 %
 % SAC2EVT has external dependencies -
 % *taupTime.m: last tested with Nov. 2002 version written by Qin Li
@@ -144,7 +143,13 @@ for i = 1:length(ev)
 
     end
 
-    % Set negative depths to 0 for taupTime.
+    % Set negative depths to 0 km for taupTime (but do no overwrite the
+    % EQ.PreferredDepth field, or any of the various EQ.Origins' Depth
+    % fields).  Therefore it is possible that the man EQ structure
+    % will display the (reported) negative event depth, but the
+    % TaupTimes srcDepth field will be adjusted to 0 km, and that
+    % adjusted depth is what is used to compute theoretical arrival
+    % times in the attached TaupTimes structure.
     depth = quake.PreferredDepth;
     if depth < 0
         depth = 0;
