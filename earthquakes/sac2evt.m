@@ -216,7 +216,9 @@ if ~isempty(EQ)
     [~, pidx] = sort(maxmag, 'descend');
     EQ = EQ(pidx);
 
-    % Move NaN magnitude values to end ('sort' omits NaN values).
+    % Move NaN magnitude values to end ('sort' omits NaN values, e.g.,
+    % http://ds.iris.edu/spud/event/11042481, for which no magnitude
+    % data exists).
     prefmagvals = [EQ.PreferredMagnitudeValue];
     [~, nanidx]  = unzipnan(prefmagvals);
     nan_EQ = EQ(nanidx);
