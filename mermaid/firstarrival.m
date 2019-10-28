@@ -23,7 +23,7 @@ function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 %              getevt.m (def: [])
 % bathy    logical true apply bathymetric travel time correction,
 %              computed with bathtime.m (def: true)
-%              [N.B: does not adjust EQ.TaupTimes]
+%              [N.B: does not adjust EQ.TaupTimes]****
 %
 % Output:
 % tres     Travel time residual [s] w.r.t first phase arrival:
@@ -54,18 +54,21 @@ function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 %            2: W1 complete, W2 incomplete
 %            3: Both time windows incomplete
 %
-% ***If 'lohi' is specific the data are linearly detrended then tapered
-% with a Hanning window before bandpass filtering
-%
 % *The x-axis here is w.r.t to original, NOT windowed, seismogram,
 % i.e. xaxis(h.NPTS, h.DELTA, h.B), where h is the SAC header
 % structure from readsac.m
 %
 % **See cpci.m and paper??
 %
+% ***If 'lohi' is specific the data are linearly detrended then tapered
+% with a Hanning window before bandpass filtering
+%
+% ****If mermaid depth is not contained in the header ('STDP' field),
+% then it is assumed to be 1500 m below the sea surface.
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 26-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 28-Oct-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -130,13 +133,21 @@ syn = EQ(1).TaupTimes(1).truearsecs;
 ph = EQ(1).TaupTimes(1).phaseName;
 if bathy
     z_ocean = gebco(h.STLO, h.STLA);
+    if h.STDP == -12345 || isnan(h.STDP)
+        warning('MERMAID depth not contained in header -- using 1500 m below sea surface')
+        z_mermaid = -1500;
+
+    else
+        z_mermaid = -h.STDP;
+
+    end
     tdiff = bathtime(EQ(1).TaupTimes(1).model, ph, ...
-                     EQ(1).TaupTimes(1).incidentDeg, z_ocean, -h.STDP);
+                     EQ(1).TaupTimes(1).incidentDeg, z_ocean, z_mermaid);
     syn = syn + tdiff;
 
 end
 
-% Bandpass filter the time series and select a windowed segment.
+% Bandpass filter the time series.
 if ~isnan(lohi)
     if round(1/h.DELTA) <= 2*lohi(2)
          error('Upper cutoff frequency >= 1/2 the sampling frequency')
@@ -152,6 +163,8 @@ else
     xf = x;
 
 end
+
+% Window the (bandpassed, maybe) time series.
 [xw1, W1, incomplete1] = timewindow(xf, wlen, syn, 'middle', h.DELTA, h.B);
 
 % The offset x-axis, which sets syn at 0 s.
