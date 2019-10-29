@@ -2,7 +2,7 @@ function varargout = readfirstarrival(filename, fmt)
 % [s, ph, tres, tptime, delay, twosd, maxc_y, SNR, ID, incomplete] = ...
 %     READFIRSTARRIVAL(filename, fmt)
 %
-% Reads and parses textfile output by writefirstarrivals.m.
+% Reads and parses textfile output by writefirstarrival.m.
 % See there for I/0.
 %
 % Author: Joel D. Simon
