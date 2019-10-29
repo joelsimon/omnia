@@ -14,7 +14,7 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 % redo     true: delete and remake the text file
 %          false: append new lines to the existing tex file unless
 %              that SAC file name already exists in the text file (def)
-% filename Output text file name (def: $MERMAID/.../firstarrivals.txt)
+% filename Output text file name (def: $MERMAID/.../firstarrival.txt)
 % fmt      Line format, e.g., set if using SAC files with names
 %              longer than 44 chars (see default internally)
 % wlen     Window length [s] (def: 30)
@@ -34,16 +34,17 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 %    (1) SAC filename
 %    (2) Theoretical 1st-arriving phase name (ph)
 %    (3) Travel time residual: dat - syn (tres)
-%    (4) Time delay between cpest.m arrival time estimate and
+%    (4) Theoretical travel time in seconds of (2), according to taupTime.m
+%    (5) Time delay between cpest.m arrival time estimate and
 %        maximum absolute amplitude (delay)
-%    (5) 2-standard deviation error estimation per M1 method (twosd)
-%    (6) Maximum absolute amplitude in counts in the time window starting at
+%    (6) 2-standard deviation error estimation per M1 method (twosd)
+%    (7) Maximum +-amplitude in counts in the time window starting at
 %        "dat" and extending 1/2 the length of the input window (maxc_y)
-%    (7) Signal-to-noise ratio of "dat" in a time window centered on "syn"
+%    (8) Signal-to-noise ratio of "dat" in a time window centered on "syn"
 %        (SNR), defined as ratio of biased variance of signal/noise
 %        (see wtsnr.m)
-%    (8) IRIS event ID
-%    (9) Incomplete window flag: true for incomplete, false
+%    (9) IRIS event ID
+%    (10) Incomplete window flag: true for incomplete, false
 %        otherwise (see timewindow.m)
 %
 %
@@ -51,16 +52,17 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 25-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 29-Oct-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('s', revsac(1))
 defval('redo', false)
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
-                            'identified', 'txt', 'firstarrivals.txt'))
+                            'identified', 'txt', 'firstarrival.txt'))
 defval('fmt', ['%44s    ' , ...
                '%5s    ' ,  ...
                '%6.2f   ' , ...
+               '%8.2f    ', ...
                '%6.2f   ' , ...
                '%5.2f   ' , ...
                '%+19.12E    ' , ...
@@ -106,7 +108,7 @@ end
 wline = [];
 wlines = [];
 parfor i = 1:length(s)
-    sac = s{i};
+   sac = s{i};
     if ~isempty(EQ)
         single_EQ = EQ{i};
 
@@ -160,11 +162,13 @@ function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt, single_E
 [tres, dat, syn, ph, delay, twosd, ~, ~, ~, maxc_y, SNR, EQ, ~, ~, ~, incomplete] = ...
     firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy);
 publicid = fx(strsplit(EQ(1).PublicId, '='),  2);
+tptime = EQ(1).TaupTimes(1).time;
 
 % Parse.
 data = {strippath(sac), ...
         ph,             ...
         tres,           ...
+        tptime,          ...
         delay,          ...
         twosd,          ...
         round(maxc_y),  ...
