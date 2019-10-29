@@ -74,11 +74,11 @@ else
 end
 
 % Label the axis.
-title(sprintf('%s = %.2f s, delay = %.2f s', tstr, tres, delay), ...
+title(sprintf('%s = %.2f s, [max. %.2f s later]', tstr, tres, delay), ...
       'FontWeight', 'Normal', 'FontSize', FontSize(1))
 sacname = strippath(strrep(s, '_', '\_'));
 
-ylabel(sprintf('counts [%.1e]', maxc_y), 'FontSize', FontSize(1))
+ylabel(sprintf('counts\n[max. %.1e]', maxc_y), 'FontSize', FontSize(1))
 xlabel(sprintf('time relative to \\textit{%s}-phase (s)\n[%s]', ph, ...
                sacname), 'FontSize', FontSize(1))
 
@@ -130,7 +130,7 @@ tx.ur = textpatch(ax, 'NorthEast',  [depthstr ', ' diststr], FontSize(2), ...
 
 
 % SNR.
-tx.ll = textpatch(ax, 'SouthWest', sprintf('SNR = %.1E', SNR), ...
+tx.ll = textpatch(ax, 'SouthWest', sprintf('SNR = %.1e', SNR), ...
                  FontSize(2), 'Times', 'LaTeX');
 
 % Uncertainty estimate.
