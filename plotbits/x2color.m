@@ -1,5 +1,5 @@
-function [col, cmap, cbticks, cbticklabels, idx] = x2color(x, xmin, xmax, cmap)
-% [col, cmap, cbticks, cbticklabels, idx] = X2COLOR(x, xmin, xmax, cmap)
+function [col, cbticks, cbticklabels, cmap, idx] = x2color(x, xmin, xmax, cmap)
+% [col, cbticks, cbticklabels, cmap, idx] = X2COLOR(x, xmin, xmax, cmap)
 %
 % Linearly maps data vector to RGB colormap.
 %
@@ -14,16 +14,16 @@ function [col, cmap, cbticks, cbticklabels, idx] = x2color(x, xmin, xmax, cmap)
 %               (def: min(x))
 % xmax      Inclusive x value of upper limit of cmap
 %               (def: max(x))
-% cmqp      Colormap (def: jet(64))
+% cmap      Colormap (def: jet(64))
 %
 % Output:
 % col          RGB value of x
-% cmap         Colormap
 % cbticks      Every possible discrete colorbar tick spanning
 %                  entire colormap (linspace(0,1,length(cmap)+1)
 % cbticklabels Every possible discrete colorbar tick label which
 %                  maps x to cbticks
 %
+% cmap         Colormap used
 % idx          Index (row) of coloramp: col = cmap(idx, :)
 %
 % Ex1: (recreate scatter.m automatic color-scaling)
@@ -35,7 +35,7 @@ function [col, cmap, cbticks, cbticklabels, idx] = x2color(x, xmin, xmax, cmap)
 %
 % Ex2: (set min. and max. color saturation levels to -1 and 3.7)
 %    x = linspace(-5, 5, 101);
-%    [col, cmap, cbticks, cbticklabels] = X2COLOR(x, -1, 3.7, jet(100));
+%    [col, cbticks, cbticklabels, cmap] = X2COLOR(x, -1, 3.7, jet(100));
 %    hold(axes, 'on')
 %    for i = 1:length(x)
 %        plot(i, x(i), 'o', 'MarkerFaceColor', col(i, :), 'MarkerEdgeColor', col(i, :));
