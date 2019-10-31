@@ -20,8 +20,8 @@ function [col, cbticks, cbticklabels, cmap, idx] = x2color(x, xmin, xmax, cmap)
 % col          RGB value of x
 % cbticks      Every possible discrete colorbar tick spanning
 %                  entire colormap (linspace(0,1,length(cmap)+1)
-% cbticklabels Every possible discrete colorbar tick label which
-%                  maps x to cbticks
+% cbticklabels Cell of chars of every possible discrete colorbar
+%                  tick label which maps x to cbticks
 %
 % cmap         Colormap used
 % idx          Index (row) of coloramp: col = cmap(idx, :)
@@ -47,7 +47,7 @@ function [col, cbticks, cbticklabels, cmap, idx] = x2color(x, xmin, xmax, cmap)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 30-Oct-2019, Version 2017b on MACI64
+% Last modified: 31-Oct-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('xmin', min(x))
@@ -73,4 +73,4 @@ col = cmap(idx, :);
 % Return the mapping for colorbar.m (whose ticks natively go from [0:1])
 % between ticks and ticklabels given the data.
 cbticks = linspace(0, 1, length(cmap)+1);
-cbticklabels = norm2ab(cbticks, xmin, xmax);
+cbticklabels = num2cell(norm2ab(cbticks, xmin, xmax));
