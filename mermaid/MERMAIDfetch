@@ -15,7 +15,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 04-Oct-2019
+# Last modified: 31-Oct-2019
 
 # Keep track of starting directory.
 start_dir=`pwd`
@@ -40,6 +40,12 @@ cd ..
 echo -e 'Copying server...\n'
 ~/github/omnia/mermaid/servercopy > server_out
 echo -e '\n...completed server copy\n'
+
+# Remove 25.vit
+cd server
+git rm -- 452.020-P-25.vit
+echo "Removed 452.020-P-25.vit from server"
+cd ..
 
 # Exit if no new data.
 nosac=$(grep 'nothing to commit' server_out | wc -l)
@@ -79,6 +85,13 @@ echo -e '\nMatching to the seismic catalog...\n'
 # Display current count.
 echo -e '\nHere is the complete list:\n'
 $OMNIA/mermaid/countsac
+
+# Add 25.vit back.
+cd server
+git reset HEAD -- 452.020-P-25.vit
+git checkout -- 452.020-P-25.vit
+echo "Added 452.020-P-25.vit back to server"
+cd ..
 
 # Return from whence you came.
 /usr/bin/cd $start_dir
