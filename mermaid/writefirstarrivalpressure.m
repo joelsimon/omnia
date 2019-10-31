@@ -34,20 +34,21 @@ function writefirstarrivalpressure(s, redo, filename, fmt, wlen, lohi, sacdir, .
 %    (4) Theoretical pressure in Pa of 1st arrival, according to reid.m (P)
 %    (5) Mb or Ml magnitude value used in reid.m, if it exists
 %    (6) Mb or Ml magnitude type used in reid.m, if it exists
-%    (7) Distance in degrees from MERMAID to event
-%    (8) MERMAID latitude in decimal degrees
-%    (9) MERMAID longitude in decimal degrees
-%    (10) Event latitude in decimal degrees
-%    (11) Event longitude in decimal degrees
-%    (12) IRIS event ID
-%    (13) Incomplete window flag: true for incomplete, false
+%    (7) Depth of event in km
+%    (8) Distance in degrees from MERMAID to event in degrees
+%    (9) MERMAID latitude in decimal degrees
+%    (10) MERMAID longitude in decimal degrees
+%    (11) Event latitude in decimal degrees
+%    (12) Event longitude in decimal degrees
+%    (13) IRIS event ID
+%    (14) Incomplete window flag: true for incomplete, false
 %        otherwise (see timewindow.m)
 %
 % See also: firstarrivalpressure.m, readfirstarrivalpressure.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 29-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 31-Oct-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('s', revsac(1))
@@ -60,6 +61,7 @@ defval('fmt', ['%44s    ' , ...
                '%6.2f   ' ,  ...
                '%4.1f    ',  ...
                '%5s    ',    ...
+               '%6.2f    ',  ...
                '%7.3f    ' , ...
                '%7.3f    ' , ...
                '%8.3f    ' , ...
@@ -164,10 +166,11 @@ function wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, b
 merlat = h.STLA;
 merlon = h.STLO;
 
-publicid = fx(strsplit(EQ(1).PublicId, '='),  2);
+depth = EQ(1).PreferredDepth;
+dist = EQ(1).TaupTimes(1).distance;
 evtlat = EQ(1).PreferredLatitude;
 evtlon = EQ(1).PreferredLongitude;
-dist = EQ(1).TaupTimes(1).distance;
+publicid = fx(strsplit(EQ(1).PublicId, '='),  2);
 
 if isempty(P)
     P = NaN;
@@ -193,6 +196,7 @@ data = {strippath(sac), ...
         P,              ...
         magval,         ...
         magtype,        ...
+        depth,          ...
         dist,           ...
         merlat,         ...
         merlon,         ...
