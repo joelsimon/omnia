@@ -2,9 +2,10 @@ function x = norm2ab(x, a, b)
 % x = NORM2AB(x, a, b)
 %
 % NORM2AB normalizes x between the minimum and maximum values a and b,
-% respectively.
+% respectively. Nonfinite values are ignored.
 %
 % Input:
+% x         1D array
 % a         Minimum normalized value
 % b         Maximum normalized value
 %

@@ -3,11 +3,8 @@ function writefirstarrivalpressure(s, redo, filename, fmt, wlen, lohi, sacdir, .
 % WRITEFIRSTARRIVALPRESSURE(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 %                   evtdir, EQ, bathy)
 %
-% WRITEFIRSTARRIVALPRESSURE writes the output of firstarrivalpressure.m a text file.
-%
-% N.B. in describing the text file below the "true" arrival time
-% (found with cpest.m) is labeled "dat", while the theoretical arrival
-% time of the first-arriving phase is labeled "syn".
+% WRITEFIRSTARRIVALPRESSURE writes the output of
+% firstarrivalpressure.m to a text file.
 %
 % Input:
 % s        Cell array of identified SAC filenames (def: revsac(1))
