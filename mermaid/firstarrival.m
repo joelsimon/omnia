@@ -1,6 +1,6 @@
-function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
+function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
           SNR, EQ, W1, xw2, W2, incomplete] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy)
-% [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
+% [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 %          SNR, EQ, W1, xw2, W2, incomplete] = FIRSTARRIVAL(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy)
 %
 % Computes the travel time residual between the AIC-based arrival-time
@@ -30,6 +30,7 @@ function [tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 %              estimated (cpest.m) - theoretical (taupTime.m)
 % dat      Actual arrival time computed with cpest.m [s]*
 % syn      Theoretical arrival time computed with taupTime.m [s]*
+% tadj     Time adjustment for bathymtry, if bathytime is true [s]
 % ph       Phase name associated with tres
 % delay    Time delay between true arrival time and time at largest
 %             amplitude (max_y) [s]
@@ -141,9 +142,12 @@ if bathy
         z_mermaid = -h.STDP;
 
     end
-    tdiff = bathtime(EQ(1).TaupTimes(1).model, ph, ...
+    tadj = bathtime(EQ(1).TaupTimes(1).model, ph, ...
                      EQ(1).TaupTimes(1).incidentDeg, z_ocean, z_mermaid);
-    syn = syn + tdiff;
+    syn = syn + tadj;
+
+else
+    tadj = NaN;
 
 end
 

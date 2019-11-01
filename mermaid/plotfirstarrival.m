@@ -56,8 +56,8 @@ else
 end
 
 % Compute first-arrival statistics.
-[tres, dat, syn, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, ...
- EQ, W1, xw2, W2] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy);
+[tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
+ SNR, EQ, W1, xw2, W2, incomplete] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy);
 
 % Plot time series.
 plot(ax, xaxw1, xw1, 'LineWidth', 1.5, 'Color', 'Blue')
