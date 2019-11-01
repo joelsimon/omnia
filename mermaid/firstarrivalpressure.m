@@ -46,7 +46,7 @@ function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, incomplete] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 29-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 01-Nov-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -58,8 +58,8 @@ defval('EQ', [])
 defval('bathy', true)
 
 % Run firstarrival to retrieve relevant statistics about the first-arriving phase.
-[~, ~, ~, ph, delay, ~, ~, ~, ~, maxc_y, ~, EQ, ~, xw2, W2, incomplete] = ...
-    firstarrival(s, false, wlen, lohi, sacdir, evtdir, EQ, bathy);
+[~, ~, ~, ~, ph, delay, ~, ~, ~, ~, maxc_y, ~, EQ, ~, xw2, W2, ...
+ incomplete] = firstarrival(s, false, wlen, lohi, sacdir, evtdir, EQ, bathy);
 
 % Find the new RMS time window which brackets just the time starting
 % at the AIC pick of the first arrival and extending 'delay' seconds,
