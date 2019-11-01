@@ -1,13 +1,13 @@
-function [tdiff, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
-% [tdiff, theta2] = BATHTIME(mod, ph, theta1, z_ocean, z_mermaid)
+function [tadj, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
+% [tadj, theta2] = BATHTIME(mod, ph, theta1, z_ocean, z_mermaid)
 %
 % Computes the travel time correction due to bathymetry and the depth
 % of MERMAID at the time of recording.  It assumes an acoustic
 % velocity of 1500 m/s in water.
 %
 % BATHTIME timing convention:
-% positive tdiff: adjusted theoretical arrival at MERMAID late compared to model
-% negative tdiff: adjusted theoretical arrival at MERMAID early compared to model
+% positive tadj: adjusted theoretical arrival at MERMAID late compared to model
+% negative tadj: adjusted theoretical arrival at MERMAID early compared to model
 %
 % Therefore, the corrected travel time at MERMAID is the theoretical
 % travel time plus the time difference (adjustment) computed here.
@@ -23,7 +23,7 @@ function [tdiff, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
 %                (must be negative) [m] (def: -1500)
 %
 % Output:
-% tdiff      Time difference between reference model with bathymetry
+% tadj       Time difference between reference model with bathymetry
 %                and receiver at depth, and reference model with no bathymetry
 %                and receiver at the surface (i.e., normal taupTime)
 % theta2     Incidence angle of acoustic wave recorded at MERMAID
@@ -35,17 +35,17 @@ function [tdiff, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
 %
 % Ex1: (P wave incident at seafloor at 0 degrees, in
 %       4 km deep ocean recorded by MERMAID at 1.5 km)
-%    [tdiff, theta2] = BATHTIME('ak135', 'p', 0, -4000, -1500)
+%    [tadj, theta2] = BATHTIME('ak135', 'p', 0, -4000, -1500)
 %
 % Ex2: (MERMAID "deeper" than ocean for P wave incident at 0 degrees;
 %       adjust ocean depth and find in this model the P wave would arrive
 %       1 s sooner than in ak135)
-%    [tdiff, theta2] = BATHTIME('ak135', 'p', 0, -5200, -5800)
+%    [tadj, theta2] = BATHTIME('ak135', 'p', 0, -5200, -5800)
 %
 % Ex3: (pathological case: S wave faster in model with bathymetry because
 %       incidence angle at seafloor is so high; faster to travel more vertically
 %       in water column)
-%    [tdiff, theta2] = BATHTIME('prem', 's', 89.9, -4000, -1500)
+%    [tadj, theta2] = BATHTIME('prem', 's', 89.9, -4000, -1500)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
@@ -225,4 +225,4 @@ beta2 = (z_ocean - z_mermaid) / cosd(theta2);
 t2 = beta2 / v2;
 
 % Total correction.
-tdiff = t2 - t1;
+tadj = t2 - t1;
