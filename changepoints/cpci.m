@@ -182,7 +182,14 @@ else
     %% Summarize.
     % Method 1.
     M1.ave = nanmean(M1.raw);
-    M1.onestd = nanstd(M1.raw, 1);
+    if bias
+        M1.onestd = nanstd(M1.raw, 1);
+
+    else
+        M1.onestd = nanstd(M1.raw, 0);
+
+    end
+
     M1.twostd = 2 * M1.onestd;
 
     % Skip the alpha summary if not requested; exit the function.
