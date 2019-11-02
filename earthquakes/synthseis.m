@@ -2,11 +2,11 @@ function [synthetic, params] = synthseis(x, cp, dists, abso, ...
                                          dtrnd, bias, stdnorm)
 % [synthetic, params] = SYNTHSEIS(x, cp, dists, abso, dtrnd,
 %                                  bias, stdnorm)
-% 
+%
 % SYNTHSEIS generates a synthetic seismogram given an input seismogram
 % and a changepoint which separates the noise and signal segments.
 %
-% Inputs: 
+% Inputs:
 % x                 A seismogram, or its wavelet details (accepts cells)
 % cp                Changepoint(s) (1 for 1D; length of cell for wavelets)
 % dists             Cell of distribution string names for cpgen.m
@@ -14,10 +14,11 @@ function [synthetic, params] = synthseis(x, cp, dists, abso, ...
 % abso              Logical true to work on abs(x) (def: false)
 %                      (computes using abs(x);
 %                      does not return abs(synthetic))*
-% dtrnd             Logical true to linearly detrend noise and signal 
+% dtrnd             Logical true to linearly detrend noise and signal
 %                       segments before computing parameters (def: false)
-% bias              Logical true for biased estimate of variance (def: true)
-%                   Logical false for unbiased estimate 
+% bias              logical true for biased estimate of variance (def: true)
+%                   logical false for unbiased estimate
+%                       (only appled to 'norm' at the moment)
 % stdnorm**         Logical true: "Noise" drawn from N(0,1),
 %                       and "signal" from N(0, sqrt(SNR)) (def: false)
 %                   Logical false: "Noise" drawn from
@@ -35,7 +36,7 @@ function [synthetic, params] = synthseis(x, cp, dists, abso, ...
 %    dtrnd = false
 %
 % See also: cpgen.m
-% 
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 04-Feb-2019, Version 2017b
@@ -58,7 +59,7 @@ if iscell(x)
     for i = 1:cell_len
         [synthetic{i}, params{i}] = synthseis(x{i}, cp(i), dists, ...
                                               abso, dtrnd, bias, stdnorm);
-    
+
     end
 else
     % Sanity.
@@ -72,7 +73,7 @@ else
     % The default is to assume standard normal for noise.  The 'else'
     % statement below allows for more advanced treatment.
     if stdnorm
-        dists = {'norm' 'norm'};        
+        dists = {'norm' 'norm'};
         if bias
             SNR = nanvar(x(cp+1:end), 1) / nanvar(x(1:cp), 1);
 
@@ -111,7 +112,7 @@ else
                 segment = detrend(segment, 'linear');
 
             end
-            
+
             % Generating distribution switch.
             switch lower(dists{i})
               case {'norm','normal'}
@@ -129,11 +130,11 @@ else
 
                 end
                 params{i} = {mean(log(segment)) std(log(segment))};
-                
+
               otherwise
                 error(sprintf(['Distribution type %s not programmed.\nAdd ' ...
                                'parameter estimation to %s.'], dists{i}, mfilename))
-                
+
             end
         end
     end
