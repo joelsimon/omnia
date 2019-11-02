@@ -14,7 +14,7 @@ function [F1, ha1, F2, ha2, N, E, P] = plotmermaidglobalcatalog(ha1, ha2, mercat
 %                  annotating the global seismic catalog with
 %                  MERMAID positive IDs
 %                  (def: $MERMAID/events/reviewed/identified/txt/M6_DET.txt)
-% statdate     Beginning and end datetime to consider for statistics
+% statdate     Beginning and end datetime to consider for statistics, inclusive
 %                 (def: [eqtime(1) , eqtime(end)])*
 % floatnums    Array of specific float numbers considered in
 %                  writemermaidglobalcatalog.m (def: [8:13 16:25])**
