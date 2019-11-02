@@ -7,6 +7,11 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ..
 % estimate of paper?? and the theoretical arrival time of the
 % first-arriving phase in the associated EQ structure from cpsac2evt.m.
 %
+% Note that the data are detrended, tapered, and bandpassed BEFORE
+% windowing (W1, W2), meaning that the taper will have different
+% effects depending on the length of the input time series as related
+% to the window length and particularly its position w.r.t to the edges.
+%
 % Input:
 % s        SAC filename (def: '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 % ci       true to estimate arrival time uncertainty via
