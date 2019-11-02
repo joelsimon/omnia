@@ -11,7 +11,7 @@ function varargout = cpbias(iters, lx, dist1, p1, dist2, p2, abso, dtrnd, plt, b
 % Essentially this is cpm1.m assuming every index, k, is the truth.
 %
 % Inputs: (all defaulted)
-% iters,...,bias          Inputs to cpm1/2.m, see there 
+% iters,...,bias          Inputs to cpm1/2.m, see there
 % plt                     1 to plot (def = 0)
 %
 % Outputs:
@@ -24,7 +24,7 @@ function varargout = cpbias(iters, lx, dist1, p1, dist2, p2, abso, dtrnd, plt, b
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 07-Mar-2018, Version 2017b
+% Last modified: 02-Nov-2019, Version 2017b on GLNXA64
 
 % Defaults
 defval('iters',1000)
@@ -54,18 +54,18 @@ parfor cp = 1:lx-1
     % Force never to plot in cptest.m; do that separately below (don't
     % want 1000 individual cptest.m plots...)
     [km, kw, mp, tp] = cptest([],iters,lx,cp,dist1,p1,dist2,p2,abso,dtrnd,[],bias);
-    
+
     mean_del_km(cp) = mean(km(isfinite(km)));
     mean_del_kw(cp) = mean(kw(isfinite(km)));
-    
-    std_del_km(cp) = std(km(isfinite(km)));
-    std_del_kw(cp) = std(kw(isfinite(kw)));
-    
+
+    std_del_km(cp) = std(km(isfinite(km)), 1);
+    std_del_kw(cp) = std(kw(isfinite(kw)), 1);
+
     mean_km_percerr(cp) = mean(mp(isfinite(mp)));
     mean_kw_percerr(cp) = mean(tp(isfinite(tp)));
-    
-    std_km_percerr(cp) = std(mp(isfinite(mp)));
-    std_kw_percerr(cp) = std(tp(isfinite(tp)));
+
+    std_km_percerr(cp) = std(mp(isfinite(mp)), 1);
+    std_kw_percerr(cp) = std(tp(isfinite(tp)), 1);
 end
 
 % Plot mean of experiment at every changepoint with
@@ -116,12 +116,8 @@ if plt
     movev(tl,2)
 end
 
-% Collect output 
+% Collect output
 varns = {mean_del_km,std_del_km,mean_del_kw,std_del_kw, ...
          mean_km_percerr,mean_kw_percerr,std_km_percerr, ...
          std_kw_percerr,f};
 varargout = varns(1:nargout);
-
-
-
-

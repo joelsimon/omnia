@@ -2,11 +2,11 @@ function f = plotcpm1s(del_km,del_kw)
 % f = PLOTCPM1S(del_km,del_kw)
 %
 % Plots summary histogram of all cpm1.m experiments.
-% 
-% Input:          
+%
+% Input:
 % del_km/w    Outputs from cpm1.m, see there
 %
-% Output: 
+% Output:
 % f           Struct of figure's handles and bits
 %
 % Ex: PLOTCPM1S here creates figure 2 (via cpm1.m)
@@ -41,7 +41,7 @@ else
 end
 f.h1 = histogram(del_km,binedges,'Normalization','prob');
 hold on
-f.h2 = histogram(del_kw,binedges,'Normalization','prob'); 
+f.h2 = histogram(del_kw,binedges,'Normalization','prob');
 hold off
 f.h1.FaceColor = 'k';
 f.h2.FaceColor = 'r';
@@ -56,9 +56,9 @@ f.yl = ylabel('Probabilty','FontName',defs.font.name,'FontSize', ...
               defs.font.sizeLabel,'FontWeight',defs.font.weight, ...
               'Interpreter',defs.Interpreter);
 meankm = mean(del_km);
-stdkm = std(del_km);
+stdkm = std(del_km, 1);
 meankw = mean(del_kw);
-stdkw = std(del_kw);
+stdkw = std(del_kw, 1);
 f.kmstr = sprintf(' %s: %s = %3.2f, %s = %.2f',kmstr,'$\mu$', ...
                    meankm,'$\sigma$',stdkm);
 f.kwstr = sprintf(' %s: %s = %3.2f, %s = %.2f',kwstr,'$\mu$', ...
@@ -80,5 +80,3 @@ uistack(f.h1,'top')
 function demo
     % This function is figure 2.
     cpm1(1000,1000,500,'norm',{0 1},'norm',{0 sqrt(2)},false,false,true)
-
-
