@@ -3,7 +3,7 @@ function reviewall(writecp, floatnum)
 %
 % Review all unreviewed $MERMAID events using reviewevt.m, assuming
 % same system configuration as JDS.
-% 
+%
 % Input:
 % writecp   true to run writechangepointall.m after review
 %           false to skip running writechangepointall.m (def)
@@ -11,12 +11,12 @@ function reviewall(writecp, floatnum)
 %               those .evt files associated with it (e.g., '12')
 %
 % Output:
-% N/A       Writes reviewed .evt files, updates .txt files, 
+% N/A       Writes reviewed .evt files, updates .txt files,
 %               writes .cp files with uncertainty estimation
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 01-Jun-2019, Version 2017b
+% Last modified: 02-Nov-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('writecp', false)
@@ -26,6 +26,7 @@ defval('floatnum', [])
 switch computer
   case 'MACI64'
     viewr = 3;
+
 otherwise
   viewr = 2;
 
@@ -76,6 +77,7 @@ evt2txt;
 
 fprintf('Updating first arrival text files...\n')
 writefirstarrival;
+writefirstarrivalpressure;
 
 if writecp
     try
