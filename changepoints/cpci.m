@@ -39,7 +39,7 @@ function [M1, M2] = cpci(x, cptype, iters, alphas, algo, dtrnd, bias, ...
 %                       each alpha lvl tested
 %      .span        Average sample spread at each alpha lvl tested
 %
-% See also: parcpci.m cpest.m, cpgen.m
+% See also: cpest.m, changepoint.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
@@ -79,168 +79,166 @@ end
 % Compute across multiple scales (e.g., acting on the details after a
 % wavelet transform, wt.m)?
 if iscell(x)
-    % Parallelism and recursion don't play nice. Call outside
-    % function to loop this function, then exit.
-    if skip_alphas
-        M1 = parcpci(x, cptype, iters, alphas, algo, dtrnd, bias, ...
-                     dists, stdnorm, skip_alphas);
-    else
-        [M1, M2] = parcpci(x, cptype, iters, alphas, algo, dtrnd, ...
-                           bias, stdnorm, dists, skip_alphas);
+
+    %% Recursive.
+
+    for i = 1:length(x)
+        [M1(i), M2(i)] = cpci(x{i}, cptype, iters, alphas, algo, dtrnd, ...
+                              bias, dists, stdnorm);
+
     end
+    return
 
-else
+end
 
-    % Which changepoint estimator is being used?
+% Which changepoint estimator is being used?
+switch cptype
+  case 'kw'
+    true_cp = cpest(x, algo, dtrnd);
+
+  case 'km'
+    [~, true_cp] = cpest(x, algo, dtrnd);
+
+  otherwise
+    error('Unrecognized ''cptype''. Supply ''km'' or ''kw''.')
+
+end
+
+% Initialize outputs.
+M1.raw = zeros(1, length(iters));
+M1.ave = NaN;
+M1.onestd = NaN;
+M1.twostd = NaN;
+
+% Don't bother generating M2 struct unless alpha tests requested.
+if ~skip_alphas
+    M2.restricted.h1 = zeros(1,length(alphas));
+    M2.restricted.span =  M2.restricted.h1;
+    M2.restricted.six8 = NaN;
+    M2.restricted.nine5 = NaN;
+
+    M2.unrestricted.h1 = M2.restricted.h1;
+    M2.unrestricted.span = M2.restricted.h1;
+    M2.unrestricted.six8 = NaN;
+    M2.unrestricted.nine5 = NaN;
+
+end
+
+% Run cpest 'iters' number of times, collect error of changepoint estimates.
+for i = 1:iters
+    % Generate a synthetic time series.
+    synth = synthseis(x, true_cp, dists, false, dtrnd, bias, stdnorm);
+
+    % Find the changepoint of the synthetic.
     switch cptype
       case 'kw'
-        true_cp = cpest(x, algo, dtrnd);
+        [est_cp, ~, aicx] = cpest(synth, algo, dtrnd);
 
       case 'km'
-        [~, true_cp] = cpest(x, algo, dtrnd);
-
-      otherwise
-        error('Unrecognized ''cptype''. Supply ''km'' or ''kw''.')
+        [~, est_cp, aicx] = cpest(synth, algo, dtrnd);
 
     end
 
-    % Initialize outputs.
-    M1.raw = zeros(1, length(iters));
-    M1.ave = NaN;
-    M1.onestd = NaN;
-    M1.twostd = NaN;
+    %% Crunch the numbers.
+    % Method 1: sample error distance.
+    M1.raw(i) = est_cp - true_cp;
 
-    % Don't bother generating M2 struct unless alpha tests requested.
-    if ~skip_alphas
-        M2.restricted.h1 = zeros(1,length(alphas));
-        M2.restricted.span =  M2.restricted.h1;
-        M2.restricted.six8 = NaN;
-        M2.restricted.nine5 = NaN;
-
-        M2.unrestricted.h1 = M2.restricted.h1;
-        M2.unrestricted.span = M2.restricted.h1;
-        M2.unrestricted.six8 = NaN;
-        M2.unrestricted.nine5 = NaN;
-
-    end
-
-    % Run cpest 'iters' number of times, collect error of changepoint estimates.
-    for i = 1:iters
-        % Generate a synthetic time series.
-        synth = synthseis(x, true_cp, dists, false, dtrnd, bias, stdnorm);
-
-        % Find the changepoint of the synthetic.
-        switch cptype
-          case 'kw'
-            [est_cp, ~, aicx] = cpest(synth, algo, dtrnd);
-
-          case 'km'
-            [~, est_cp, aicx] = cpest(synth, algo, dtrnd);
-
-        end
-
-        %% Crunch the numbers.
-        % Method 1: sample error distance.
-        M1.raw(i) = est_cp - true_cp;
-
-        % Skip the alpha tests at every iteration if alphas tests not requested.
-        if skip_alphas
-            continue
-
-        else
-            % Method 2: beta hypothesis tests.  Question: is cp (truth) within the
-            % spread at or below the waterlvl?  The null hypothesis
-            % (h_0) states the truth DOES NOT lie at or below the
-            % waterlvl.
-            for j = 1:length(alphas)
-                % Note waterlvls, not waterlvl (extra 's' in
-                % former) to perform both contiguity tests concurrently.
-                [xl_unrestricted(j), xr_unrestricted(j), xl_restricted(j), ...
-                 xr_restricted(j)] = waterlvlsalpha(aicx, alphas(j), est_cp);
-
-            end
-            % Keep track of the sample spread; I want to know how an alpha
-            % corresponds to a sample spread. Add 1 to x(right) -
-            % x(left) because if they are the same sample the test
-            % sees 1 sample, not zero samples.
-            M2.unrestricted.span = ...
-                M2.unrestricted.span + (xr_unrestricted - xl_unrestricted + 1);
-            M2.restricted.span = ...
-                M2.restricted.span + (xr_restricted - xl_restricted + 1);
-
-            % Is truth within span returned by waterlvl?  If so, reject
-            % the null hypothesis add +1 to the total count of rejections
-            % (alternative hypothesis, h_1, accepted).
-            M2.unrestricted.h1 = M2.unrestricted.h1 + ...
-                (xl_unrestricted <= true_cp & true_cp <= xr_unrestricted);
-            M2.restricted.h1 = M2.restricted.h1 + ...
-                (xl_restricted <= true_cp & true_cp <= xr_restricted);
-
-        end
-    end
-
-    %% Summarize.
-    % Method 1.
-    M1.ave = nanmean(M1.raw);
-    if bias
-        M1.onestd = nanstd(M1.raw, 1);
-
-    else
-        M1.onestd = nanstd(M1.raw, 0);
-
-    end
-
-    M1.twostd = 2 * M1.onestd;
-
-    % Skip the alpha summary if not requested; exit the function.
+    % Skip the alpha tests at every iteration if alphas tests not requested.
     if skip_alphas
-        return
+        continue
 
     else
-        % Method 2.
-        % Average spread of samples spanned by each alpha test.
-        M2.restricted.span = M2.restricted.span ./ iters;
-        M2.unrestricted.span = M2.unrestricted.span ./ iters;
+        % Method 2: beta hypothesis tests.  Question: is cp (truth) within the
+        % spread at or below the waterlvl?  The null hypothesis
+        % (h_0) states the truth DOES NOT lie at or below the
+        % waterlvl.
+        for j = 1:length(alphas)
+            % Note waterlvls, not waterlvl (extra 's' in
+            % former) to perform both contiguity tests concurrently.
+            [xl_unrestricted(j), xr_unrestricted(j), xl_restricted(j), ...
+             xr_restricted(j)] = waterlvlsalpha(aicx, alphas(j), est_cp);
 
-        % Percentage of times null hypothesis rejected.
-        M2.restricted.h1 = (M2.restricted.h1 ./ iters) * 100;
-        M2.unrestricted.h1 = (M2.unrestricted.h1 ./ iters) * 100;
-
-        % Find the alpha lvls where the null hypothesis was rejected 68% and
-        % 95% of the time.
-        [sigma_indexR, sigma_existR] = nearestidx(M2.restricted.h1, [68 95]);
-
-        % Loop over the sigma indices that exist. sigma_exist = 1 refers to
-        % the first percentage (68%); sigma_exist = 2 is 95%.  See
-        % second output of nearestidx.m for more.
-        m2_fields = {'six8' 'nine5'};
-        if ~isempty(sigma_existR)
-            for ii = sigma_existR'
-                M2.restricted.(m2_fields{ii}) = ...
-                    M2.restricted.span(sigma_indexR(ii));
-
-            end
         end
+        % Keep track of the sample spread; I want to know how an alpha
+        % corresponds to a sample spread. Add 1 to x(right) -
+        % x(left) because if they are the same sample the test
+        % sees 1 sample, not zero samples.
+        M2.unrestricted.span = ...
+            M2.unrestricted.span + (xr_unrestricted - xl_unrestricted + 1);
+        M2.restricted.span = ...
+            M2.restricted.span + (xr_restricted - xl_restricted + 1);
 
-        % Repeat for unrestricted test case.
-        [sigma_indexUR, sigma_existUR] = nearestidx(M2.unrestricted.h1, ...
-                                                    [68 95]);
-        if ~isempty(sigma_existUR)
-            for jj = sigma_existUR'
-                M2.unrestricted.(m2_fields{jj}) = ...
-                    M2.unrestricted.span(sigma_indexUR(jj));
+        % Is truth within span returned by waterlvl?  If so, reject
+        % the null hypothesis add +1 to the total count of rejections
+        % (alternative hypothesis, h_1, accepted).
+        M2.unrestricted.h1 = M2.unrestricted.h1 + ...
+            (xl_unrestricted <= true_cp & true_cp <= xr_unrestricted);
+        M2.restricted.h1 = M2.restricted.h1 + ...
+            (xl_restricted <= true_cp & true_cp <= xr_restricted);
 
-            end
+    end
+end
+
+%% Summarize.
+% Method 1.
+M1.ave = nanmean(M1.raw);
+if bias
+    M1.onestd = nanstd(M1.raw, 1);
+
+else
+    M1.onestd = nanstd(M1.raw, 0);
+
+end
+M1.twostd = 2 * M1.onestd;
+
+% Skip the alpha summary if not requested; exit the function.
+if skip_alphas
+    return
+
+else
+    % Method 2.
+    % Average spread of samples spanned by each alpha test.
+    M2.restricted.span = M2.restricted.span ./ iters;
+    M2.unrestricted.span = M2.unrestricted.span ./ iters;
+
+    % Percentage of times null hypothesis rejected.
+    M2.restricted.h1 = (M2.restricted.h1 ./ iters) * 100;
+    M2.unrestricted.h1 = (M2.unrestricted.h1 ./ iters) * 100;
+
+    % Find the alpha lvls where the null hypothesis was rejected 68% and
+    % 95% of the time.
+    [sigma_indexR, sigma_existR] = nearestidx(M2.restricted.h1, [68 95]);
+
+    % Loop over the sigma indices that exist. sigma_exist = 1 refers to
+    % the first percentage (68%); sigma_exist = 2 is 95%.  See
+    % second output of nearestidx.m for more.
+    m2_fields = {'six8' 'nine5'};
+    if ~isempty(sigma_existR)
+        for ii = sigma_existR'
+            M2.restricted.(m2_fields{ii}) = ...
+                M2.restricted.span(sigma_indexR(ii));
+
         end
     end
 
-    % Cleanup output.
-    M1 = orderfields(M1, {'ave' 'onestd' 'twostd' 'raw'});
-    if ~skip_alphas
-        M2.restricted  = orderfields(M2.restricted, {'six8' 'nine5' ...
-                            'h1' 'span'});
-        M2.unrestricted  = orderfields(M2.unrestricted, {'six8' ...
-                            'nine5' 'h1' 'span'});
+    % Repeat for unrestricted test case.
+    [sigma_indexUR, sigma_existUR] = nearestidx(M2.unrestricted.h1, ...
+                                                [68 95]);
+    if ~isempty(sigma_existUR)
+        for jj = sigma_existUR'
+            M2.unrestricted.(m2_fields{jj}) = ...
+                M2.unrestricted.span(sigma_indexUR(jj));
 
+        end
     end
+end
+
+% Cleanup output.
+M1 = orderfields(M1, {'ave' 'onestd' 'twostd' 'raw'});
+if ~skip_alphas
+    M2.restricted  = orderfields(M2.restricted, {'six8' 'nine5' ...
+                        'h1' 'span'});
+    M2.unrestricted  = orderfields(M2.unrestricted, {'six8' ...
+                        'nine5' 'h1' 'span'});
+
 end
