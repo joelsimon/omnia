@@ -77,11 +77,9 @@ end
 title(sprintf('%s = %.2f s, [max. %.2f s later]', tstr, tres, delay), ...
       'FontWeight', 'Normal', 'FontSize', FontSize(1))
 sacname = strippath(strrep(s, '_', '\_'));
-
 ylabel(sprintf('counts\n[max. %.1e]', maxc_y), 'FontSize', FontSize(1))
 xlabel(sprintf('time relative to \\textit{%s}-phase (s)\n[%s]', ph, ...
                sacname), 'FontSize', FontSize(1))
-
 
 % Adjust the axis.
 xlim([-wlen/2 wlen/2])
@@ -91,13 +89,9 @@ ylim([-rangey rangey])
 % Force 7 ticks on x-axis.
 numticks(ax, 'x', 7);
 
-% Force 3 ticks on y axis.
-if length(ax.YTick) > 3
-    % I have already forced symmetry with ylim above so we know the median
-    % value is going to be 0.
-    ax.YTick = [ax.YTick(1) median(ax.YTick) ax.YTick(end)];
-
-end
+% I have already forced symmetry with ylim above so we know the median
+% value is going to be 0.
+ax.YTick = [ax.YTick(1) median(ax.YTick) ax.YTick(end)];
 
 % Vertical lines marking theoretical and actual arrival times.
 hold(ax, 'on')
@@ -145,5 +139,4 @@ tack2corner(ax, tx.ll, 'SouthWest')
 tack2corner(ax, tx.lr, 'SouthEast')
 
 latimes
-
 f = gcf;
