@@ -51,7 +51,8 @@ end
 
 clc
 fprintf('Searching for unreviewed SAC files...\n')
-for i = 1:length(d)
+% Events are are sorted with earliest first.  Work backwards.
+for i = length(d):-1:1
     sac = strrep(d(i).name, '.raw.evt', '.sac');
     previously = getevt(sac);
     if isstruct(previously) || isempty(previously)
