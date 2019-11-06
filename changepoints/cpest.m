@@ -1,7 +1,7 @@
 function [kw, km, aicx, weights] = cpest(x, algo, dtrnd, bias)
 % [kw, km, aicx, weights] = CPEST(x, algo, dtrnd, bias)
 %
-% Changepoint Estimation via the Akaike Information Criterion.
+% Changepoint Estimation via the Akaike Information Criterion of paper??
 %
 % CPEST calculates an Akaike Information Criterion value for each
 % sample, and estimates the changepoint(s) (e.g., arrival of seismic
@@ -12,12 +12,9 @@ function [kw, km, aicx, weights] = cpest(x, algo, dtrnd, bias)
 % after-split AIC values at each sample.  The minimum, 'km', and
 % weighted average, 'kw' are both estimates of the "best" split, (the
 % changepoint) in the time series. Works in samples only.  km/w is
-% rounded to the nearest sample.
+% rounded to the nearest sample.  Nonfinite values are ignored and set
+% to NaN at their respective indices.
 %
-% +- Inf AIC values are ignored and set to NaN.  These usually occur
-% when at the edges were a sample variance equals 0 (AIC computation
-% includes log(sample_var), and log(o) = -Inf)).
-% 
 % Input: 
 % x             Time series, accepts 1D cells (e.g., 'd' from wt.m) 
 % algo          'fast' or 'slow' algorithm (def: 'fast')
