@@ -62,8 +62,7 @@ merged = {};
 id = strtrim(num2str(id));
 iddir = fullfile(sacdir, id);
 if ~need2continue(redo, iddir)
-    fprintf(['\nAlready fetched: %s/\nSet ''redo'' = true to ' ...
-             'refetch\n\n'], iddir)
+    fprintf('ID %s already fetched\n', id)
     return
 
 end
