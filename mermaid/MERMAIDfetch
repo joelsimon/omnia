@@ -43,6 +43,7 @@ echo -e '\n...completed server copy\n'
 
 # Remove 25.vit
 cd server
+git checkout -- 452.020-P-25.vit
 git rm -- 452.020-P-25.vit
 echo "Removed 452.020-P-25.vit from server"
 cd ..
