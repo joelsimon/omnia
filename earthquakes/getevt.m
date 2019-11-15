@@ -6,7 +6,7 @@ function [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = getevt(sac, evtdir, o
 %
 % Input: 
 % sac       SAC filename 
-%               (def: '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
+%               (def: '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 % evtdir    Path to directory containing 'raw/' and 'reviewed'
 %               subdirectories (def: $MERMAID/events/)
 % openpdf   logical true to open raw PDFs
@@ -43,7 +43,7 @@ function [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = getevt(sac, evtdir, o
 % Last modified: 21-Mar-2019, Version 2017b
 
 % Defaults.
-defval('sac', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
+defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('openpdf', false);
 
