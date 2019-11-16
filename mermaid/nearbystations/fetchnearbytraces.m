@@ -147,6 +147,9 @@ for i = 1:length(station)
         tr{tr_idx} = traces;
         irisFetch.Trace2SAC(tr{tr_idx}, iddir);
 
+        % Write a pole-zero file.
+        fetchsacpz(tr{tr_idx}, '/home/jdsimon/mermaid/events/nearbystations/sacpz')
+
     end
 end
 
