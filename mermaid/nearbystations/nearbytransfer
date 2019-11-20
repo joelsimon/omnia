@@ -1,0 +1,53 @@
+#! /bin/sh
+#
+# Removes nearby station(s) instrument response.
+#
+# Input:
+# (1) directory containing SAC files
+#     (e.g., $MERMAID/events/nearbystations/sac/10932551)
+# (2) output type: none, vel, or acc (see 'transfer' manual)
+# (3) pole-zero filename
+#     (e.g., $MERMAID/events/nearbystations/pz/nearbystations.pz)
+#
+# Output:
+# SAC files with their instrument response removed, with the
+# appropriate output type appended to their filenames.
+#
+# This script uses 'transfer' in SAC with freqlimits: 0.05 0.1 5 10,
+# i.e., transferring with a flat response between 10 s and 5 Hz. The
+# mean and the trend are removed before the transfer function is
+# called.
+#
+# The traces are NOT tapered, and no verification of the Nyquist
+# frequency is performed.
+#
+# The input pole-zero file is assumed to contain the instrument
+# response for all trace(s) supplied (i.e., it is a concatenation of
+# all pole-zero files for each individual station/channel/location
+# etc.).  See fetchnearbypz.m, which creates this file automatically.
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@princeton.edu
+# Last modified: 20-Nov-2019
+
+# Parse inputs.
+sacdir=$1
+otype=$2
+pzfile=$3
+
+# Make note of starting directory.
+stardir=pwd;
+cd $sacdir
+
+# Read entire SAC directory and transfer
+sac << !
+r $sacdir/*.SAC
+rmean
+rtrend
+transfer from polezero subtype $pzfile to $otype freqlimits 0.05 0.1 10 20
+w append .$otype
+q
+!
+
+# Return from whence you came.
+cd $startdir
