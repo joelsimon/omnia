@@ -1,16 +1,17 @@
-# Simple python script to convert .xml station response files to SAC
+# Simple python script to convert station.xml response files to SAC
 # pole-zero files.  Filename convention is maintained and extension
-# .xml is replaced with .pz.  Input .xml file is removed from system.
+# .xml is replaced with .pz.  Input .xml file is removed from system
+# after execution.
 #
 # Input: .xml filename (e.g., AM.RF737.00.Z.xml)
 # Output: .pz filename (e.g., AM.RF737.00.Z.pz)
-
+#
 # Requires obspy and is intended to be used within the MERMAID python
-# environment: pymaid
+# environment 'pymaid'.
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 16-Nov-2019, Python 2.7.15
+# Last modified: 16-Nov-2019, Python 2.7.15 (pyamid env.)
 
 import sys
 import os

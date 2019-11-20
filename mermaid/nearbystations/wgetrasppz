@@ -8,7 +8,7 @@
 #
 # This function requires python 2.7 and obspy and thus is not intended
 # to be called separately but rather wrapped into, e.g.,
-# fetchnearbypz.m
+# fetchnearbypz.m.
 #
 # Raspberry Shake response data is only (so far as I can tell)
 # returned as station.xml (and possibly SEED?) files, not the
@@ -16,16 +16,16 @@
 # writing they are not queryable from
 # http://service.iris.edu/irisws/sacpz/1/.  This script takes an xml
 # file and converts it to a pole-zero file, which necessitates a call
-# to xml2pz.m, as well as some minor post-processing of the
-# resultant pz file to cut off extra info ('Z', for UTC in datetimes),
-# which SAC does not like.
+# to xml2pz.m (which it expects to find in $MERMAID/earthquakes), as
+# well as some minor post-processing of the resultant pz file to cut
+# off extra info ('Z', for UTC in datetimes), which SAC does not like.
 #
 # *N.B.: Raspberry stations only use location '00' --
 #        https://manual.raspberryshake.org/stationNamingConvention.html
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 18-Nov-2019
+# Last modified: 18-Nov-2019, Python 2.7.15 (pymaid env.)
 
 # Input.
 sta=$1
@@ -44,6 +44,6 @@ python $OMNIA/earthquakes/xml2pz.py $xml
 sed -i 's/\..*Z//' $pz
 
 # This replaces the 'None' END datetime, which SAC transfer cannot
-# parse, with the default 2599-12-31T23:59:59 END datetime returned
+# parse, with the default '2599-12-31T23:59:59' END datetime returned
 # by http://service.iris.edu/irisws/pz/1/query?
 sed -i 's/None/2599-12-31T23:59:59/' $pz
