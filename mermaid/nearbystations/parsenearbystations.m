@@ -5,7 +5,7 @@ function [network, station, latitude, longitude, datacenter, url] = parsenearbys
 % http://ds.iris.edu/gmap/.
 %
 % Input:
-% txtfile      Text file to parse
+% txtfile      Text file of station names to parse, from http://ds.iris.edu/gmap
 %                  (def: '$MERMAID/events/nearbystations/nearbystations.txt')
 %
 % Output:

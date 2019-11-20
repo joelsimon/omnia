@@ -116,6 +116,10 @@ for i = 1:length(station)
         includePZ  = true;
 
       case 'RASPISHAKE'
+        % Raspberry Shake naming convention: AM.R????.00.?HZ
+        % SHZ:  50 sps
+        % EHZ: 100 sps
+        % https://manual.raspberryshake.org/stationNamingConvention.html
         DATASELECTSERVICE = 'https://fdsnws.raspberryshakedata.com/fdsnws/dataselect/1/';
         STATIONSERVICE = 'https://fdsnws.raspberryshakedata.com/fdsnws/station/1/';
         CHANNEL = '*Z';
