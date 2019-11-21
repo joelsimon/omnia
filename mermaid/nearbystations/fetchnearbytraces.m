@@ -26,8 +26,8 @@ function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, mod
 %               subdirectories (def: $MERMAID/events/)
 % sacdir    Directory to write [id]/*.SAC
 %               (def: $MERMAID/events/nearbystations/sac/)
-% model         Taup model (def: 'ak135')
-% ph            Taup phases (def: defphases)
+% model     Taup model (def: 'ak135')
+% ph        Taup phases (def: defphases)
 %
 % Output: (both empty in case of redo = false and refetch not required)
 % tr        Cell of trace(s) returned by irisFetch.Traces,
@@ -43,7 +43,7 @@ function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, mod
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 14-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 21-Nov-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '11052554')
@@ -151,8 +151,8 @@ for i = 1:length(station)
         tr{tr_idx} = traces;
         irisFetch.Trace2SAC(tr{tr_idx}, iddir);
 
-        % Write a pole-zero file.
-        fetchsacpz(tr{tr_idx}, '/home/jdsimon/mermaid/events/nearbystations/sacpz')
+        % % Write a pole-zero file.
+        % fetchsacpz(tr{tr_idx}, '/home/jdsimon/mermaid/events/nearbystations/sacpz')
 
     end
 end
