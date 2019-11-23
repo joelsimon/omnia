@@ -66,7 +66,7 @@ for i = 1:length(sta)
         pz = sprintf('%s.%s.00.Z.pz', net{i}, sta{i});
 
         % Make wget request.
-        query = sprintf('net=%s%ssta=%s%sloc=00%scha=*Z%sstart=2018-06-01T01:01:01', net{i}, '&',  sta{i}, '&', '&', '&');
+        query = sprintf('net=%s%ssta=%s%sloc=*%scha=*Z%sstart=2018-06-01T01:01:01', net{i}, '&',  sta{i}, '&', '&', '&');
         system(sprintf('wget ''%s'' -O %s', [baseurl query], pz));
 
     else

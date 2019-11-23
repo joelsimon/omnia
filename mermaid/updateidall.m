@@ -1,5 +1,5 @@
 function [updated, failed] = updateidall(force)
-% [updated, failed] = UPDATEIDALL
+% [updated, failed] = UPDATEIDALL(force)
 %
 % Updates every MERMAID and 'nearby' .evt file associated with every
 % identified event, using updateid.m
@@ -17,9 +17,7 @@ defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
 defval('txtfile', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystations.txt'))
 defval('mer_evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('mer_sacdir', fullfile(getenv('MERMAID'), 'processed'))
-defval('nearby_sacdir', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'sac'))
 defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
-
 
 [~, ~, ~, ~, ~, ~, ~, ~, ~, id] = readidentified(filename);
 
@@ -38,7 +36,7 @@ failed = {};
 for i = 1:length(id)
     attempted = attempted + 1;
     try
-        rev_evt = updateid(id{i}, false);
+        rev_evt = updateid(id{i}, force, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
         if ~isempty(rev_evt)
             updated = [updated ; id{i}];
 

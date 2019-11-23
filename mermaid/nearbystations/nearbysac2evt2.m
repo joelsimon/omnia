@@ -1,12 +1,8 @@
-function EQ = nearbysac2evt(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
-% EQ = NEARBYSAC2EVT(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
+function EQ = nearbysac2evt2(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
+% EQ = NEARBYSAC2EVT2(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
 %
-% NEARBYSAC2EVT runs sac2evt.m on all SAC files related to a single
-% event ID contained in [nearbydir]/sac/[id], and saves the output EQ
-% structures in .evt files in [nearbydir]/evt/[id].
-%
-% Any existing .evt files removed, e.g., in the case of redo = true,
-% are printed to the screen.*
+% NEARBYSAC2EVT2 is nearbysac2evt, but for the unmerged (incomplete)
+% SAC files.  It is required you run the latter before this function.
 %
 % Input:
 % id            Event ID [last column of 'identified.txt']
@@ -47,6 +43,7 @@ defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('model', 'ak135')
 defval('ph', defphases)
 defval('baseurl', 1);
+EQ = [];
 
 % Pull the MERMAID and nearby SAC & .evt files (the latter may not yet
 % exist) and see what the current status is.
@@ -55,35 +52,36 @@ if strcmp(id(1), '*')
     id(1) = [];
 
 end
-[~, ~, nearby_sac] = getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir);
+
+[~, ~, nearby_sac2] = getnearbysacevt2(id, mer_evtdir, mer_sacdir, nearbydir);
+if isempty(nearby_sac2)
+    fprintf('ID %s contains no unmerged SAC files\n', id)
+    return
+
+end
 
 % Decide where the .evt files exist/will be saved; make that folder if
 % it does not exist.
-evt_path = fullfile(nearbydir, 'evt', id);
+evt_path = fullfile(nearbydir, 'evt', id, 'unmerged');
 
 % Determine if continued execution of nearbysac2evt.m is necessary: if
 % .evt files exist, their names match the corresponding SAC files, and
 % redo=false, continuation is not warranted.
-if ~need2continue(id, redo, nearby_sac, nearbydir, evt_path)
+if ~need2continue(id, redo, nearby_sac2, nearbydir, evt_path)
     fprintf(['\nID %s already run: %s/\nSet ''redo'' = true to rerun ' ...
              '%s\n\n'], id, evt_path, mfilename)
-    EQ = [];
+
     return
 
 end
 [~, foo] = mkdir(evt_path);
 
-% Run sac2evt.m once for this specific event using the first nearby
-% SAC file.  Fetch the updated metadata once and then recompute phase
-% arrival times the next 2:end cases below.
-EQ = sac2evt(nearby_sac{1}, model, ph, baseurl, 'eventid', id);
-
-% Copy the updated event into an template which will be customized for
-% each nearby SAC file.
-EQ_template = EQ;
+% Instead of fetching once, we use the nearby_EQ as a template.
+[~, ~, ~, nearby_EQ] = getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir); % N.B. not getnearbysacevt2.m!
+EQ_template = nearby_EQ{1};
+clearvars('nearby_EQ');
 EQ_template = rmfield(EQ_template, 'Filename');
 EQ_template = rmfield(EQ_template, 'TaupTimes');
-EQ_template.Picks = []; % I currently do not save picks, but for future...
 
 % Parse event metadata information, the same for all nearby SAC files
 % (we are working with a single event), for arrivaltime.m
@@ -92,24 +90,16 @@ evla = EQ_template.PreferredLatitude;
 evlo = EQ_template.PreferredLongitude;
 evdp = EQ_template.PreferredDepth;
 
-% Save first EQ.
-evt_name = fullfile(evt_path, strippath(EQ.Filename));
-sac_suffix = suf(evt_name);
-evt_name(end-length(sac_suffix):end) = '.evt';
-save(evt_name, 'EQ', '-mat')
-
-% Assign first EQ to indexed temp variable and clear it.
 indexed_EQ{1} = EQ;
-clearvars('EQ')
-for i = 2:length(nearby_sac)
+for i = 1:length(nearby_sac2)
     % Read the header specific to this nearby SAC file.
-    [~, h] = readsac(nearby_sac{i});
+    [~, h] = readsac(nearby_sac2{i});
 
     % Compute the theoretical phase arrival times.
     tt = arrivaltime(h, evtdate, [evla evlo], model, evdp, ph, h.B);
 
     EQ = EQ_template;
-    EQ.Filename = strippath(nearby_sac{i});
+    EQ.Filename = strippath(nearby_sac2{i});
     EQ.TaupTimes = tt;
     EQ = reidpressure(EQ);
     EQ = orderfields(EQ);
@@ -127,11 +117,11 @@ end
 EQ = indexed_EQ;
 
 %______________________________________________________________%
-function cont = need2continue(id, redo, nearby_sac, nearbydir, evt_path)
+function cont = need2continue(id, redo, nearby_sac2, nearbydir, evt_path)
 % Output: cont --> logical continuation flag
 
 % Sanity: ensure nearby SAC files exist to convert to generate .evt files.
-if isempty(nearby_sac)
+if isempty(nearby_sac2)
     error('No nearbystations SAC files associated with event id: %s', id)
     cont = false;
     return
@@ -143,12 +133,12 @@ end
 evt_dir = dir(fullfile(evt_path, '*.evt'));
 if ~isempty(evt_dir)
     evt_files_exist = true;
-    if length(evt_dir) ~= length(nearby_sac)
+    if length(evt_dir) ~= length(nearby_sac2)
         evt_matches_sac = false;
 
     else
-        for i = 1:length(nearby_sac)
-            nopath_sac{i} = strippath(nearby_sac{i});
+        for i = 1:length(nearby_sac2)
+            nopath_sac{i} = strippath(nearby_sac2{i});
             nopath_evt{i} = evt_dir(i).name;
 
             nopath_sac{i}(end-3:end) = [];
@@ -175,7 +165,6 @@ end
 % Files are removed with gitrmdir.m in two cases:
 % (1) redo is true and .evt files exist
 % (2) redo is false but .evt filenames do not match .SAC filenames
-keyboard
 if redo
     cont = true;
     if evt_files_exist

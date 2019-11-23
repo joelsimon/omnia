@@ -31,7 +31,7 @@ function merged = mergenearbytraces(tr, id, sacdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 19-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 22-Nov-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '11052554')
@@ -57,11 +57,11 @@ end
 glob = unique(glob);
 
 % Pass each unique glob to mergesac, which will handle the rest:
-% $ mergesac {SAC directory} {file glob} {merge filename}
+% $ mergesac {SAC directory} {file glob}*.SAC {merge filename}
 m_idx = 0;
 iddir = fullfile(sacdir, num2str(id));
 for i = 1:length(glob)
-    filelist =  [glob{i} '*'];
+    filelist =  [glob{i} '*.SAC'];
     d = dir(fullfile(iddir, filelist));
 
     if length(d) > 1
