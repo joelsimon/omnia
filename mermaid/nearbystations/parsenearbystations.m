@@ -1,8 +1,14 @@
-function [network, station, latitude, longitude, datacenter, url] = parsenearbystations(txtfile)
-% [network, station, latitude, longitude, datacenter, url] = PARSENEARBYSTATIONS(txtfile)
+function [network, station, datacenter, url] = parsenearbystations(txtfile)
+% [network, station, datacenter, url] = PARSENEARBYSTATIONS(txtfile)
 %
 % Parses the textfile 'nearbystations.txt' generated at
 % http://ds.iris.edu/gmap/.
+%
+% N.B.: stations can and do change location, sensor type, active
+% status etc. while mainting the same station name.  And while the
+% input txtfile includes this information to some extent, it is not
+% returned by PARSENEARBYSTATIONS because the most up-to-date info
+% should be retrieved with irisFetch.Stations.
 %
 % Input:
 % txtfile      Text file of station names to parse, from http://ds.iris.edu/gmap
@@ -15,10 +21,10 @@ function [network, station, latitude, longitude, datacenter, url] = parsenearbys
 % url          Suggested* url of relevant data center
 %
 % *Invalid for http://raspberryshake.net: should be https ('s')
-% 
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 05-Sep-2019, Version 2017b
+% Last modified: 23-Nov-2019, Version 2017b on MACI64
 
 % Default.
 defval('txtfile', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystations.txt'))
@@ -26,7 +32,7 @@ defval('txtfile', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearb
 % Read the entire file into memory.
 tx = readtext(txtfile);
 
-% Find the lines that start with #DATACENTER (they separate blocks). 
+% Find the lines that start with #DATACENTER (they separate blocks).
 dcline = cellstrfind(tx, 'DATACENTER');
 
 % Remove the header, the only other place where the '|' column separator exists.
@@ -50,22 +56,20 @@ for i = 1:length(tx)
         block_datacenter = dataparts(1);
         block_url = dataparts(2);
         dcline(1) = [];  % After last datacenter dcline is empty.
-        
-    end    
+
+    end
 
     % Determine if this line describes a station or is an empty
     % line separating blocks.
     if isempty(strfind(tx{i}, '|'))
        continue
-       
+
     else
         % Parse the station info.
         tx_idx = tx_idx + 1;
         this_line = strsplit(tx{i}, '|');
         network{tx_idx} = this_line{1};
         station{tx_idx} = this_line{2};
-        latitude{tx_idx} = str2double(this_line{3});
-        longitude{tx_idx} = str2double(this_line{4});
         datacenter{tx_idx} = block_datacenter;
         url{tx_idx} = block_url;
 
@@ -75,7 +79,5 @@ end
 % Remove duplicate stations and reorder outputs accordingly.
 [station, uniq_idx] = unique(station);
 network = network(uniq_idx);
-latitude = latitude(uniq_idx);
-longitude = longitude(uniq_idx);
 datacenter = datacenter(uniq_idx);
 url = url(uniq_idx);
