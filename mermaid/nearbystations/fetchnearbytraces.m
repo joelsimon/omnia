@@ -43,7 +43,7 @@ function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, mod
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 21-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 23-Nov-2019, Version 2017b on MACI64
 
 % Defaults.
 defval('id', '11052554')
@@ -75,32 +75,13 @@ end
 EQ = EQ{1}(1);
 evtdate = datetime(irisstr2date(EQ.PreferredTime));
 
-% Get all the nearbystations.
-[network, station, station_latitude, station_longitude, datacenter] = ...
-    parsenearbystations(txtfile);
+% Get all the nearby stations.
+[network, station, datacenter] =  parsenearbystations(txtfile);
 
 tr_idx = 0;
 for i = 1:length(station)
-    % Compute theoretical arrival times.
-    tt = taupTime(model, EQ.PreferredDepth, ph, 'station', ...
-                  [station_latitude{i} station_longitude{i}], 'event', ...
-                  [EQ.PreferredLatitude EQ.PreferredLongitude]);
-    if isempty(tt)
-        continue
-
-    end
-
-    % Base the query time off the first arriving phase.
-    first_TaupTime = tt(1);
-    firstarrival_date = evtdate + seconds(first_TaupTime.time);
-
-    starttime_date = firstarrival_date - minutes(5);
-    starttime = irisdate2str(starttime_date);
-
-    endtime_date = firstarrival_date + minutes(55);
-    endtime = irisdate2str(endtime_date);
-
-    % Until the 'federated' option works for RASPISHAKE this will have to be hardcoded.
+    % Determine the relevant web addresses (until the 'federated' option
+    % works for RASPISHAKE this will have to suffice).
     switch upper(datacenter{i}{:})
       case 'IPGP'
         DATASELECTSERVICE = 'http://ws.ipgp.fr/fdsnws/dataselect/1/';
@@ -125,8 +106,8 @@ for i = 1:length(station)
     end
 
     % Consider all locations: they can be, e.g., '00', '10', etc., or '' (empty).
-    location = '*'; 
-    
+    location = '*';
+
     % See: https://ds.iris.edu/ds/nodes/dmc/data/formats/seed-channel-naming/
     % Here I consider channels most similar to MERMAID's sampling rate.
     channel = ['M*Z,' ...  %             Mid period: >   1 <  10 Hz
@@ -142,19 +123,67 @@ for i = 1:length(station)
     % can't find in the SEED manual and thus don't trust.
     quality = 'M';
 
-    % Fetch and write.
-    traces = irisFetch.Traces(network{i}, station{i}, location, ...
-                              channel, starttime, endtime, quality, ...
-                              ['DATASELECTURL:' DATASELECTSERVICE], ...
-                              ['STATIONURL:' STATIONSERVICE]);
-    
+    % Find the location of the station on the day of the event
+    % (stations move and maintain the same name, unfortunately).
+    starttime = fdsndate2str(evtdate);
+    endtime = fdsndate2str(evtdate + days(1));
+    sta = irisFetch.Stations('STATION', network{i}, station{i}, ...
+                             location, channel, 'start', starttime, ...
+                             'end', endtime, 'baseurl', STATIONSERVICE);
 
-    % Keep only nonempty traces.
-    if ~isempty(traces)
-        tr_idx = tr_idx + 1;
-        tr{tr_idx} = traces;
-        irisFetch.Trace2SAC(tr{tr_idx}, iddir);
+    % Move to next station if this stations did not exist / was down on
+    % the day of the event.
+    if isempty(sta)
+        continue
 
+    end
+
+    % The sta structure will almost always be of length 1.  It is
+    % larger when the station is turned off/on, and/or moved.
+    for j = 1:length(sta)
+        % Compute theoretical arrival times of the requesetd phases at
+        % this station.
+        tt = taupTime(model, EQ.PreferredDepth, ph, ...
+                      'station', [sta(j).Latitude sta(j).Longitude], ...
+                      'event', [EQ.PreferredLatitude EQ.PreferredLongitude]);
+
+        % Move to next station if there exist no phase arrivals of the type
+        % requested at this station for this event.
+        if isempty(tt)
+            continue
+
+        end
+
+        % Ensure the station was at the purpoted location at the
+        % time of the first arrival.
+        first_TaupTime = tt(1);
+        firstarrival_date = evtdate + seconds(first_TaupTime.time);
+        if  ~isempty(sta(j).EndDate) % assume still active if EndDate empty
+            if ~isbetween(firstarrival_date, ...
+                          irisstr2date(sta(j).StartDate), irisstr2date(sta(j).EndDate))
+                continue
+
+            end
+        end
+
+        % Base the query time for the traces off the time of the
+        % first-arriving phase.
+        starttime = irisdate2str(firstarrival_date - minutes(5));
+        endtime = irisdate2str(firstarrival_date + minutes(55));
+
+        % Fetch and write.
+        traces = irisFetch.Traces(network{i}, station{i}, location, ...
+                                  channel, starttime, endtime, quality, ...
+                                  ['DATASELECTURL:' DATASELECTSERVICE], ...
+                                  ['STATIONURL:' STATIONSERVICE]);
+
+        % Keep only nonempty traces.
+        if ~isempty(traces)
+            tr_idx = tr_idx + 1;
+            tr{tr_idx} = traces;
+            irisFetch.Trace2SAC(tr{tr_idx}, iddir);
+
+        end
     end
 end
 
