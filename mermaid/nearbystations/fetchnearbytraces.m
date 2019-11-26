@@ -61,7 +61,7 @@ merged = {};
 id = strtrim(num2str(id));
 iddir = fullfile(sacdir, id);
 if ~need2continue(redo, iddir)
-    fprintf('ID %s already fetched\n', id)
+    fprintf('ID %s .SAC files already fetched\n', id)
     return
 
 end
