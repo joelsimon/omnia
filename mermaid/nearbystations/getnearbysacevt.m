@@ -1,10 +1,10 @@
-function [mer_sac, mer_EQ, nearby_sac, nearby_EQ] = ...
+function [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
     getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir, check4update, returntype, otype)
-% [mer_sac, mer_EQ, nearby_sac, nearby_EQ] = ...
+% [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
 %      GETNEARBYSACEVT(id, mer_evtdir, mer_sacdir, nearbydir, check4update, returntype, otype)
 %
 % GETNEARBYSACEVT returns SAC filenames and EQ structures corresponding
-% to an input event ID for MERMAID data and their nearby stations.
+% to an input event ID for MERMAID and 'nearby' seismic stations.
 %
 % Input:
 % id            Event identification number in last
@@ -16,8 +16,8 @@ function [mer_sac, mer_EQ, nearby_sac, nearby_EQ] = ...
 % nearbydir     Path to directory containing nearby stations
 %                   'sac/' and 'evt/' subdirectories
 %                   (def: $MERMAID/events/nearbystations/)
-% check4update  true to determine if resultant EQs need updating
-%                   (def: true)
+% check4update  true verify EQ metadata does not differ across EQ structures
+%                   (def: true; see need2updateid.m)
 % returntype    For third-generation+ MERMAID only:
 %               'ALL': both triggered and user-requested SAC files (def)
 %               'DET': triggered SAC files as determined by onboard algorithm
@@ -27,23 +27,27 @@ function [mer_sac, mer_EQ, nearby_sac, nearby_EQ] = ...
 %               'none': return displacement time series (nm)
 %               'vel': return velocity time series (nm/s)
 %               'acc': return acceleration time series (nm/s/s)
-%               (N.B.: if nonempty the relevant SAC files must exist)
 %
 % Output:
 % mer_sac       Cell array of MERMAID SAC files
 % mer_EQ        Reviewed EQ structures for each MERMAID SAC file
-% nearby_sac    Cell array of 'nearby stations' SAC files*
-% nearby_EQ     EQ structures for each 'nearby stations' SAC file
+% nearby_sac    Cell array of SAC files from nearby stations
+% nearby_EQ     Cell array of EQ structures related to nearby
+%                   stations' SAC files
+% nearby_sacu   Cell array of unmerged SAC files from nearby stations,
+%                   if they exist (see mergenearbytraces.m)
+% nearby_EQu    Cell array of EQ structures related to nearby stations'
+%                   unmerged SAC files
 %
 % Ex:
-%    [mer_sac, mer_EQ, nearby_sac, nearby_EQ] = ...
+%    [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
 %      GETNEARBYSACEVT('10948555')
 %
-% See also: getnearbysacevt2.m, fetchnearbytraces.m, getsacevt.m
+% See also: fetchnearbytraces.m, nearbysac2evt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 01-Oct-2019, Version 2017b on MACI64
+% Last modified: 26-Nov-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '10948555')
@@ -56,87 +60,50 @@ defval('otype', [])
 
 %% MERMAID data --
 
-% Can use getsacevt.m because dir structure organized as getsacevt.m
-% expects.
+% Fetch MERMAID SAC files and EQ structures.
 id = strtrim(num2str(id));
 [mer_sac, mer_EQ] = getsacevt(id, mer_evtdir, mer_sacdir, false, returntype);
 
 %% Nearby station data --
 
+% Remove leading asterisks from ID number, if one exists.
+% Already ample warnings about possible multiple events in getsacevt.m.
 if strcmp(id(1), '*')
-    % Remove leading asterisks from ID number, if one exists.
-    % Already ample warnings about possible multiple events in getsacevt.m.
     id(1) = [];
 
 end
 
-% N.B. the above note only applies to MERMAID data: nearbysac2evt.m
-% automatically queries a SINGLE event and the .evt file only every
-% has a SINGLE EQ structure.
+% Get nearby SAC files.
+[nearby_sac, nearby_sacu] = getnearbysac(id, otype, nearbydir);
 
+% Get nearby EQ structures and their full paths for filename comparison.
+[nearby_EQ, nearby_EQu, nearby_evt, nearby_evtu] = getnearbyevt(id, nearbydir);
 
-suffix = [];
-if ~isempty(otype) 
-    if all(~strcmpi(otype, {'none', 'vel', 'acc'}))
-        error('If nonempty, otype must be one of: ''none'', ''vel'', or ''acc''')
+% Verify the list of nearby EQ structures corresponds exactly to the
+% list of nearby SAC files.
+all_nearby_sac = [nearby_sac ; nearby_sacu];
+all_nearby_evt = [nearby_evt ; nearby_evtu];
 
-    else
-        suffix = sprintf('.%s', otype);
-
-    end
-end
-
-nearby_SACdir = skipdotdir(dir(fullfile(nearbydir, 'sac', id, sprintf('*.SAC%s', suffix))));
-nearby_sacdir = skipdotdir(dir(fullfile(nearbydir, 'sac', id, sprintf('*.sac%s', suffix))));
-nearby_sacdir = [nearby_SACdir ; nearby_sacdir];
-if ~isempty(nearby_sacdir)
-    for i = 1:length(nearby_sacdir)
-        if ~nearby_sacdir(i).isdir
-            nearby_sac{i} = fullfile(nearby_sacdir(i).folder, nearby_sacdir(i).name);
-
-        end
-    end
-else
-    warning('Empty: %s', fullfile(nearbydir, 'sac', id))
-    nearby_sac = {};
+if ~isempty(otype)
+    all_nearby_sac = cellfun(@(xx) strrep(otype, ''), all_nearby_sac, 'UniformOutput', false);
 
 end
-nearby_sac = unique(nearby_sac(:));
+all_nearby_sac =  cellfun(@(xx) strrep(strippath(xx), 'SAC', ''), all_nearby_sac, 'UniformOutput', false);
 
-% We want the number of SAC files and .evt files to be allowed to
-% differ if we add more SAC files and have not yet made the associated
-% .evt files, e.g., in nearbysac2evt.m.  There call this function with
-% just 3 outputs.
-if nargout == 4
-    nearby_evtdir = skipdotdir(dir(fullfile(nearbydir, 'evt', id, '*.evt')));
-    if ~isempty(nearby_evtdir)
-        if length(nearby_evtdir) ~= length(nearby_sac)
-            error(['The number of nearby SAC files and nearby .evt files ' ...
-                   'differs for event ID: %s'], id)
+% There is no suffix applied to the 'nearby' stations' .evt filenames --
+% the event metadata is unrelated to the output type of the SAC file.
+all_nearby_evt =  cellfun(@(xx) strrep(strippath(xx), 'evt', ''), all_nearby_evt, 'UniformOutput', false);
 
-        end
+if ~isequal(all_nearby_sac, all_nearby_evt)
+    error(['the lists of nearby .SAC and .evt files differ for ID: ' ...
+    '%s\nremake the latter with nearbysac2evt(%s)'], id, id)
 
-        for i = 1:length(nearby_sac);
-            nearby_evt_file = strippath(nearby_sac{i});
-            nearby_evt_file = strrep(nearby_evt_file, suffix, ''); 
-            nearby_evt_file = nearby_evt_file(1:end-3);
-            nearby_evt_file = [nearby_evt_file 'evt'];
-            tmp = load(fullfile(nearby_evtdir(i).folder, nearby_evt_file), '-mat');
-            nearby_EQ{i} = tmp.EQ;
-            clearvars('tmp')
+end
 
-        end
-    else
-        warning('Empty: %s', fullfile(nearbydir, 'evt', id))
-        nearby_EQ = {};
+%% Verify all EQ structures contain the same event metadata and do not require update --
 
-    end
-    nearby_EQ = nearby_EQ(:);
+if check4update && need2updateid([mer_EQ ; nearby_EQ ; nearby_EQu; testEQ], id)
+    warning(['Event metadata differs between EQ structures.\nTo ' ...
+             'update run updateid(''%s'')'], id)
 
-    % Test if we need to update the files associated with this event ID.
-    if check4update && need2updateid([mer_EQ ; nearby_EQ], id)
-        warning(['Event metadata differs between EQ structures.\nTo ' ...
-                 'update run updateid(''%s'')'], id)
-
-    end
 end
