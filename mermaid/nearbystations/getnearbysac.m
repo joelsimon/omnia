@@ -5,6 +5,7 @@ function [nearby_sac, nearby_sacu] = getnearbysac(id, otype, nearbydir)
 %
 % Input:
 % id           IRIS public event identification number
+%                  (def: 10948555)
 % otype        Nearby SAC file output type, see rmnearbyresp.m
 %              []: (empty) return raw time series (def)
 %              'none': return displacement time series (nm)
@@ -60,10 +61,10 @@ if ~isempty(sacdir)
 
         end
     end
-    sac = sac(:);
+    sac = sort(sac(:));
 
 else
-    warning('No SAC files found matching:\n %s', sac_request);
+    %warning('No SAC files found matching:\n %s', sac_request);
     sac = {};
 
 end
