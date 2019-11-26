@@ -1,5 +1,5 @@
-function [fetched, failed] = nearbysac2evtall
-% [fetched, failed] = NEARBYSAC2EVTALL
+function [fetched, failed] = nearbysac2evtall(redo, starttime, endtime)
+% [fetched, failed] = NEARBYSAC2EVTALL(redo, starttime, endtime))
 %
 % Fetches and writes .evt files for every event ID for all nearby
 % stations using nearbysac2evt.m.
@@ -9,15 +9,18 @@ function [fetched, failed] = nearbysac2evtall
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 26-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 26-Nov-2019, Version 2017b on GLNXA64
 
+defval('redo', false)
+defval('starttime', [])
+defval('endtime', [])
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'identified.txt'))
 defval('mer_evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('mer_sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 
-[~, ~, ~, ~, ~, ~, ~, ~, ~, id] = readidentified(filename);
+[~, ~, ~, ~, ~, ~, ~, ~, ~, id] = readidentified(filename, starttime, endtime);
 
 star_idx = cellstrfind(id, '*');
 for i = 1:length(star_idx)
@@ -32,13 +35,10 @@ failed = {};
 for i = 1:length(id)
     attempted = attempted + 1;
     try
-        EQ = nearbysac2evt(id{i}, false, mer_evtdir, mer_sacdir, nearbydir);
-        if ~isempty(EQ)
-            fetched = fetch + 1;
+        nearbysac2evt(id{i}, redo, mer_evtdir, mer_sacdir, nearbydir);
+        fetched = [fetched; id{i}];
 
-        end
-
-    catch 
+    catch
         failed = [failed; id{i}];
 
     end
