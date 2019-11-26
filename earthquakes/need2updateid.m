@@ -16,20 +16,17 @@ function TF = need2updateid(EQ, id)
 %            false: metadata is identical across EQ structures
 %
 % See also: updateid.m
-% 
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 14-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 26-Nov-2019, Version 2017b on GLNXA64
 
+% Default.
+TF = false;
+
+% Sanity.
 if ~iscell(EQ)
     error('EQ list must be cell array of structures')
-
-end
-
-TF = false;
-if length(EQ) == 1
-    % Only one EQ struct matches this event -- nothing to check.
-    return
 
 end
 
@@ -39,6 +36,13 @@ end
 % differ and step through the list of EQs checking if the current EQ
 % info is different from the last.
 
+EQ(find(cellfun(@(xx) isempty(xx), EQ))) = [];
+if isempty(EQ) || length(EQ) == 1
+    % There is nothing to check -- all empty or only a single EQ.
+    return
+
+end
+
 % Initialize the a previous_EQ struct against which to check the
 % others.
 id = strtrim(num2str(id));
@@ -47,13 +51,14 @@ previous_EQ = strip_EQ(EQ{1}, id);
 % Check the current against the last former; exit if they differ.
 for i = 2:length(EQ)
     this_EQ = strip_EQ(EQ{i}, id);
+
     if ~isequaln(previous_EQ, this_EQ)
         TF = true;
         return
-        
+
     else
         previous_EQ = this_EQ;
-        
+
     end
 end
 
@@ -62,15 +67,15 @@ function base_EQ = strip_EQ(EQ, id)
 ID_idx = [];
 for i = 1:length(EQ)
     ID_idx{i} = fx(strsplit(EQ(i).PublicId, '='),  2);
-    
+
 end
 ID_idx = find(strcmp(ID_idx, id));
 
 if isempty(ID_idx)
-    error('Event id: %s not found in EQ(1)', id)
-    
+    error('ID %s not found in EQ for filename: %s', id, EQ(i).Filename)
+
 end
- 
+
 base_EQ = EQ(ID_idx);
 base_EQ = rmfield(base_EQ, 'Filename');
 base_EQ = rmfield(base_EQ, 'Picks');
