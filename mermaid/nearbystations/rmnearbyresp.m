@@ -1,7 +1,8 @@
-function rmnearbyresp(id, redo, otype, sacdir, nearbypz, tranfunc);
-% RMNEARBYRESP(id, redo, otype, sacdir, nearbypz, tranfunc)
+function [nearby_sac, nearby_sacu, new, newu] = rmnearbyresp(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits)
+% [nearby_sac, nearby_sacu, new, newu] = RMNEARBYRESP(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits)
 %
-% Remove the instrument response for nearby stations.
+% Remove the instrument response for nearby stations and save the
+% corrected SAC file in the same directory, with the output type appended.
 %
 % This function is simply a wrapper for the shell script
 % nearbytransfer.  See there for deconvolution details.
@@ -15,13 +16,21 @@ function rmnearbyresp(id, redo, otype, sacdir, nearbypz, tranfunc);
 %                defval('11052554')
 % redo       true to delete* existing corrected SAC files and remake them
 %                (def: false)
-% otype      Tranfer type in SAC: 'none', 'vel', or 'acc' (def)
-% sacdir     Directory where individual ID subdirectories live
-%                (def: $MERMAID/events/nearbystations/sac/)
+% otype      Transfer type in SAC: 'none', 'vel', or 'acc' (def)
+% nearbydir  Path to directory containing nearby stations
+%                'sac/' and 'evt/' subdirectories
+%                 (def: $MERMAID/events/nearbystations/)
 % nearbypz   Concatenated pole-zero file name (from fetchnearbypz.m)
 %                (def: $MERMAID/events/nearbystations/pz/nearbystations.pz)
-% transfunc  Shell script detailing SAC transfer function
-%               (def: $OMNIA/mermaid/nearbystations/nearbytransfer)
+% transcript Shell script detailing SAC transfer function
+%                (def: $OMNIA/mermaid/nearbystations/nearbytransfer)
+% freqlimits 1x4 array of freqlimits for SAC transfer in Hz
+%                (def: [0.05 0.1 10 20])
+% Output:
+% nearby_sac    Cell array of corrected SAC files from nearby stations
+% nearby_sacu   Cell array of corrected unmerged SAC files from nearby stations
+% new           logical true if corrected SAC generated fresh
+% newu          logical true if corrected SAC unmerged generated fresh
 %
 % *git history, if it exists, is respected with gitrmdir.m.
 %
@@ -29,16 +38,17 @@ function rmnearbyresp(id, redo, otype, sacdir, nearbypz, tranfunc);
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 21-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 26-Nov-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '11052554')
 defval('redo', false)
 defval('otype', 'acc')
-defval('sacdir', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'sac'))
+defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('nearbypz', fullfile(getenv('MERMAID'), 'events', 'nearbystations', ...
                             'pz', 'nearbystations.pz'))
 defval('transcript', fullfile(getenv('OMNIA'), 'mermaid', 'nearbystations', 'nearbytransfer'))
+defval('freqlimits', [0.05 0.1 10 20])
 
 % Sanity.
 if all(~strcmpi(otype, {'none', 'vel', 'acc'}))
@@ -46,28 +56,43 @@ if all(~strcmpi(otype, {'none', 'vel', 'acc'}))
 
 end
 
+% Parent SAC directory, where complete raw files exist.
+new = main(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits, '');
+
+% Child SAC directory, where incomplete (unmerged) raw files exist.
+newu = main(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits, 'unmerged');
+
+% Nab the corrected files.
+[nearby_sac, nearby_sacu] = getnearbysac(id, otype, nearbydir);
+
+%______________________________________________________________%
+function new = main(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits, isunmerged)
+
 % Generate suffix (e.g., '*.vel') to append to corrected SAC files.
-id = num2str(id);
-iddir = fullfile(sacdir, id);
 suffix = ['.' otype];
 
-% Parent SAC directory, where complete raw files exist.
+% Find the relevent directory of SAC files.
+id = num2str(id);
+iddir = fullfile(nearbydir, 'sac', id, isunmerged); % isemerged: empty is not merged
+
 if need2continue(redo, iddir, suffix)
-    system(sprintf('%s %s %s %s', transcript, iddir, otype, nearbypz));
+    % This is where the (black) magic happens.
+    [status, result] = system(sprintf('%s %s %s %s %f %f %f %f', ...
+                                      transcript, iddir, nearbypz, ...
+                                      otype, freqlimits(1), ...
+                                      freqlimits(2), freqlimits(3), ...
+                                      freqlimits(4)))
+
+    % Handle errors.
+    if status ~= 0 || contains(result, 'ERROR', 'IgnoreCase', true)
+        error('SAC transfer failed (full printout above)')
+
+    end
+    new = true;
 
 else
-    fprintf('ID %s already contains corrected SAC files of type ''%s''\n', id, otype)
-
-end
-
-% Child SAC directory, 'unmerged', where separated fragments of raw
-% files exist (nee2continue will deterime if that directory even
-% exists.)
-if need2continue(redo, fullfile(iddir, 'unmerged'), suffix)
-    system(sprintf('%s %s %s %s', transcript, fullfile(iddir, 'unmerged'), otype, nearbypz));
-
-else
-    fprintf('ID %s (unmerged) already contains corrected SAC files of type ''%s''\n', id, otype)
+    fprintf('ID %s%s already contains corrected SAC files of type ''%s''\n', id, isunmerged, otype)
+    new = false;
 
 end
 
