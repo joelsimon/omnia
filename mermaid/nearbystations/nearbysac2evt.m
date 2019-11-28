@@ -47,8 +47,6 @@ defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('model', 'ak135')
 defval('ph', defphases)
 defval('baseurl', 1);
-nearby_EQ = {};
-nearby_EQu = {};
 
 % Pull the MERMAID and nearby SAC & .evt files (the latter may not yet
 % exist) and see what the current status is.
@@ -64,24 +62,25 @@ end
 %
 if ~isempty(nearby_sac)
     evt_path = fullfile(nearbydir, 'evt', id);
-    nearby_EQ = main(id, redo, nearby_sac, evt_path, model, ph, baseurl);
+    nearby_EQ = main(id, redo, nearby_sac, evt_path, model, ph, baseurl, '');
 
 end
 
 if ~isempty(nearby_sacu)
     evtu_path = fullfile(nearbydir, 'evt', id, 'unmerged');
-    nearby_EQu = main(id, redo, nearby_sacu, evtu_path,  model, ph, baseurl);
+    nearby_EQu = main(id, redo, nearby_sacu, evtu_path,  model, ph, baseurl, ' unmerged');
 
 end
 
 %________________________________________________________________________________%
-function EQ = main(id, redo, sac, evt_path, model, ph, baseurl)
+function EQ = main(id, redo, sac, evt_path, model, ph, baseurl, moredetail)
 
 % Determine if continued execution of nearbysac2evt.m is necessary: if
 % .evt files exist, their names match the corresponding SAC files, and
 % redo=false, continuation is not warranted.
 if ~need2continue(id, redo, sac, evt_path)
-    fprintf('ID %s .evt files already fetched\n', id)
+    fprintf('ID %s%s .evt files already fetched\n', id, moredetail)
+    EQ = {};
     return
 
 end
