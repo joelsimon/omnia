@@ -40,7 +40,8 @@ wget "https://fdsnws.raspberryshakedata.com/fdsnws/station/1/query?network=AM&st
 # This converts the station.xml response file to a poles and zeros file for SAC.
 python $OMNIA/earthquakes/xml2pz.py $xml
 
-# This removes the fractional seconds and 'Z' from the datetimes, which SAC transfer cannot parse.
+# This removes the fractional seconds and 'Z' from the datetimes,
+# which SAC transfer cannot parse.
 sed -i 's/\..*Z//' $pz
 
 # This replaces the 'None' END datetime, which SAC transfer cannot
