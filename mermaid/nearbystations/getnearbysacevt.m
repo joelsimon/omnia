@@ -102,7 +102,7 @@ end
 
 %% Verify all EQ structures contain the same event metadata and do not require update --
 
-if check4update && need2updateid([mer_EQ ; nearby_EQ ; nearby_EQu; testEQ], id)
+if check4update && need2updateid([mer_EQ ; nearby_EQ ; nearby_EQu], id)
     warning(['Event metadata differs between EQ structures.\nTo ' ...
              'update run updateid(''%s'')'], id)
 

@@ -72,7 +72,7 @@ end
 ID_idx = find(strcmp(ID_idx, id));
 
 if isempty(ID_idx)
-    error('ID %s not found in EQ for filename: %s', id, EQ(i).Filename)
+    error('ID %s not found in EQ structure related to SAC file: %s', id, EQ(i).Filename)
 
 end
 

@@ -3,48 +3,51 @@
 # Removes nearby station(s) instrument response.
 #
 # Input:
-# (1) directory containing SAC files
+# (1) directory containing SAC files (see fetchnearbytraces.m)
 #     (e.g., $MERMAID/events/nearbystations/sac/10932551)
-# (2) output type: none, vel, or acc (see 'transfer' manual)
-# (3) pole-zero filename
+# (2) pole-zero filename (see fetchnearbypz.m)
 #     (e.g., $MERMAID/events/nearbystations/pz/nearbystations.pz)
+# (3) output type: none, vel, or acc (see 'transfer' in SAC manual)
+# (4-7) array of freqlimits, in Hz: e.g., 0.001 0.01 1 10
 #
 # Output:
 # SAC files with their instrument response removed, with the
 # appropriate output type appended to their filenames.
 #
-# This script uses 'transfer' in SAC with freqlimits: 0.05 0.1 5 10,
-# i.e., transferring with a flat response between 10 s and 5 Hz. The
-# mean and the trend are removed before the transfer function is
-# called.
-#
 # The traces are NOT tapered, and no verification of the Nyquist
-# frequency is performed.
+# frequency is performed.  The mean and the trend are removed before
+# the transfer function is called.
 #
 # The input pole-zero file is assumed to contain the instrument
 # response for all trace(s) supplied (i.e., it is a concatenation of
 # all pole-zero files for each individual station/channel/location
-# etc.).  See fetchnearbypz.m, which creates this file automatically.
+# etc.).  See fetchnearbypz.m, which creates this file
+# automatically. If no pole-zero file is found for a specific
+#
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 20-Nov-2019
+# Last modified: 26-Nov-2019
 
 # Parse inputs.
 sacdir=$1
-otype=$2
-pzfile=$3
+pzfile=$2
+otype=$3
+fl1=$4
+fl2=$5
+fl3=$6
+fl4=$7
 
 # Make note of starting directory.
 stardir=pwd;
 cd $sacdir
 
-# Read entire SAC directory and transfer
+# Read entire SAC directory and transfer.
 sac << !
 r $sacdir/*.SAC
 rmean
 rtrend
-transfer from polezero subtype $pzfile to $otype freqlimits 0.05 0.1 10 20
+transfer from polezero subtype $pzfile to $otype freqlimits $fl1 $fl2 $fl3 $fl4
 w append .$otype
 q
 !
