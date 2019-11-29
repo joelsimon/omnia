@@ -1,8 +1,9 @@
 function [nearby_sac, nearby_sacu, new, newu] = rmnearbyresp(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits)
-% [nearby_sac, nearby_sacu, new, newu] = RMNEARBYRESP(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits)
+% [nearby_sac, nearby_sacu, new, newu] = ...
+%     RMNEARBYRESP(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits)
 %
 % Remove the instrument response for nearby stations and save the
-% corrected SAC file in the same directory, with the output type appended.
+% corrected SAC file in the same directory with the output type appended.
 %
 % This function is simply a wrapper for the shell script
 % nearbytransfer.  See there for deconvolution details.
@@ -38,7 +39,7 @@ function [nearby_sac, nearby_sacu, new, newu] = rmnearbyresp(id, redo, otype, ne
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 26-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 29-Nov-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '11052554')
@@ -57,23 +58,29 @@ if all(~strcmpi(otype, {'none', 'vel', 'acc'}))
 end
 
 % Parent SAC directory, where complete raw files exist.
-new = main(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits, '');
+new = main(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits, false);
 
 % Child SAC directory, where incomplete (unmerged) raw files exist.
-newu = main(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits, 'unmerged');
+newu = main(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits, true);
 
 % Nab the corrected files.
 [nearby_sac, nearby_sacu] = getnearbysac(id, otype, nearbydir);
 
 %______________________________________________________________%
-function new = main(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits, isunmerged)
+function new = main(id, redo, otype, nearbydir, nearbypz, transcript, freqlimits, ismerge)
 
 % Generate suffix (e.g., '*.vel') to append to corrected SAC files.
 suffix = ['.' otype];
 
-% Find the relevent directory of SAC files.
+% Find the relevant directory of SAC files.
 id = num2str(id);
-iddir = fullfile(nearbydir, 'sac', id, isunmerged); % isemerged: empty is not merged
+iddir = fullfile(nearbydir, 'sac', id);
+mergestr = '';
+if ismerge
+    iddir = fullfile(iddir, 'unmerged');
+    mergestr = ' unmerged';
+
+end
 
 if need2continue(redo, iddir, suffix)
     % This is where the (black) magic happens.
@@ -91,9 +98,11 @@ if need2continue(redo, iddir, suffix)
     new = true;
 
 else
-    fprintf('ID %s%s already contains corrected SAC files of type ''%s''\n', id, isunmerged, otype)
     new = false;
+    if ~isempty(skipdotdir(dir(fullfile(iddir, ['*' suffix]))))
+        fprintf('ID %s%s already contains corrected SAC files of type ''%s''\n', id, mergestr, otype)
 
+    end
 end
 
 %______________________________________________________________%
@@ -106,7 +115,7 @@ function cont = need2continue(redo, iddir, suffix)
 % continuation flag on the combination of the user-requested redo flag
 % and the existence or lack thereof of corrected SAC files.
 %
-% Futher, even if redo is false, if the list of corrected files does
+% Further, even if redo is false, if the list of corrected files does
 % not match exactly the list of raw files, we need to dump everything
 % and start over; see gitrmdir.m
 
