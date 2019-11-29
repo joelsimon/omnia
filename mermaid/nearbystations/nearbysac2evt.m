@@ -1,5 +1,6 @@
 function [nearby_EQ, nearby_EQu] = nearbysac2evt(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
-% [nearby_EQ, nearby_EQu] = NEARBYSAC2EVT(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
+% [nearby_EQ, nearby_EQu] = ...
+%     NEARBYSAC2EVT(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
 %
 % NEARBYSAC2EVT runs sac2evt.m on all SAC files related to a single
 % event ID contained in [nearbydir]/sac/[id], and saves the output EQ
@@ -59,13 +60,12 @@ end
 % Grab all nearby stations' SAC files.
 [nearby_sac, nearby_sacu] = getnearbysac(id, [], nearbydir);
 
-%
+% Grall all nearby stations' .evt files, based on the SAC file names.
 if ~isempty(nearby_sac)
     evt_path = fullfile(nearbydir, 'evt', id);
     nearby_EQ = main(id, redo, nearby_sac, evt_path, model, ph, baseurl, '');
 
 end
-
 if ~isempty(nearby_sacu)
     evtu_path = fullfile(nearbydir, 'evt', id, 'unmerged');
     nearby_EQu = main(id, redo, nearby_sacu, evtu_path,  model, ph, baseurl, ' unmerged');
