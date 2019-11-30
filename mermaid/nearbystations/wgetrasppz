@@ -1,19 +1,19 @@
 #! /bin/sh
 #
-# Fetches Raspberry Shake pole-zero files for all '*Z' channels at
-# location '00'*, a given station starting from 2018-06-01T01:01:01.
+# Fetches and writes Raspberry Shake pole-zero files
+# (all locations*, all Z channels) starting from 2018-06-01T01:01:01.
 #
 # Input: station abbreviation (e.g., R06CD)
-# Output: AM.[station].00.Z.pz
+# Output: AM.[station].Z.pz
 #
-# This function requires python 2.7 and obspy and thus is not intended
+# This function requires Python 2.7 and obspy and thus is not intended
 # to be called separately but rather wrapped into, e.g.,
 # fetchnearbypz.m.
 #
 # Raspberry Shake response data is only (so far as I can tell)
 # returned as station.xml (and possibly SEED?) files, not the
-# classical SAC pole-zero files.  At the very least and at the time of
-# writing they are not queryable from
+# classical SAC pole-zero files.  At the very least (at the time of
+# writing) they are not queryable from
 # http://service.iris.edu/irisws/sacpz/1/.  This script takes an xml
 # file and converts it to a pole-zero file, which necessitates a call
 # to xml2pz.m (which it expects to find in $MERMAID/earthquakes), as
@@ -25,22 +25,23 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 18-Nov-2019, Python 2.7.15 (pymaid env.)
+# Last modified: 26-Nov-2019, Python 2.7.15 (pymaid env.)
 
 # Input.
 sta=$1
 
 # Output.
-xml=AM.$sta.00.Z.xml
-pz=AM.$sta.00.Z.pz
+xml=AM.$sta.Z.xml
+pz=AM.$sta.Z.pz
 
 # This fetches a station.xml response file.
-wget "https://fdsnws.raspberryshakedata.com/fdsnws/station/1/query?network=AM&station=$sta&cha*Z&loc=00&level=resp&start=2018-06-01T01:01:01&format=xml" -O $xml
+wget "https://fdsnws.raspberryshakedata.com/fdsnws/station/1/query?network=AM&station=$sta&loc=*&cha*Z&level=resp&start=2018-06-01T01:01:01&format=xml" -O $xml
 
 # This converts the station.xml response file to a poles and zeros file for SAC.
 python $OMNIA/earthquakes/xml2pz.py $xml
 
-# This removes the fractional seconds and 'Z' from the datetimes, which SAC transfer cannot parse.
+# This removes the fractional seconds and 'Z' from the datetimes,
+# which SAC transfer cannot parse.
 sed -i 's/\..*Z//' $pz
 
 # This replaces the 'None' END datetime, which SAC transfer cannot

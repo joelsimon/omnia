@@ -1,5 +1,6 @@
-function EQ = nearbysac2evt(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
-% EQ = NEARBYSAC2EVT(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
+function [nearby_EQ, nearby_EQu] = nearbysac2evt(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
+% [nearby_EQ, nearby_EQu] = ...
+%     NEARBYSAC2EVT(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
 %
 % NEARBYSAC2EVT runs sac2evt.m on all SAC files related to a single
 % event ID contained in [nearbydir]/sac/[id], and saves the output EQ
@@ -31,12 +32,12 @@ function EQ = nearbysac2evt(id, redo, mer_evtdir, mer_sacdir, nearbydir, model, 
 %
 % Output:
 % *N/A*    (writes reviewed .evt file)
-% EQ       EQ structures for each 'nearby' SAC file, 
+% EQ       EQ structures for each 'nearby' SAC file,
 %             or [] if already fetched and redo not required
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 26-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 26-Nov-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '10948555')
@@ -47,6 +48,8 @@ defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('model', 'ak135')
 defval('ph', defphases)
 defval('baseurl', 1);
+nearby_EQ = {};
+nearby_EQu = {};
 
 % Pull the MERMAID and nearby SAC & .evt files (the latter may not yet
 % exist) and see what the current status is.
@@ -55,20 +58,31 @@ if strcmp(id(1), '*')
     id(1) = [];
 
 end
-[mer_sac, mer_EQ, nearby_sac, nearby_EQ] = ...
-    getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir);
 
-% Decide where the .evt files exist/will be saved; make that folder if
-% it does not exist.
-evt_path = fullfile(nearbydir, 'evt', id);
+% Grab all nearby stations' SAC files.
+[nearby_sac, nearby_sacu] = getnearbysac(id, [], nearbydir);
+
+% Grall all nearby stations' .evt files, based on the SAC file names.
+if ~isempty(nearby_sac)
+    evt_path = fullfile(nearbydir, 'evt', id);
+    nearby_EQ = main(id, redo, nearby_sac, evt_path, model, ph, baseurl, '');
+
+end
+if ~isempty(nearby_sacu)
+    evtu_path = fullfile(nearbydir, 'evt', id, 'unmerged');
+    nearby_EQu = main(id, redo, nearby_sacu, evtu_path,  model, ph, baseurl, ' unmerged');
+
+end
+
+%________________________________________________________________________________%
+function EQ = main(id, redo, sac, evt_path, model, ph, baseurl, moredetail)
 
 % Determine if continued execution of nearbysac2evt.m is necessary: if
 % .evt files exist, their names match the corresponding SAC files, and
 % redo=false, continuation is not warranted.
-if ~need2continue(id, redo, nearby_sac, nearbydir, evt_path)
-    fprintf(['\nID %s already run: %s/\nSet ''redo'' = true to rerun ' ...
-             '%s\n\n'], id, evt_path, mfilename)
-    EQ = [];
+if ~need2continue(id, redo, sac, evt_path)
+    fprintf('ID %s%s .evt files already fetched\n', id, moredetail)
+    EQ = {};
     return
 
 end
@@ -77,79 +91,87 @@ end
 % Run sac2evt.m once for this specific event using the first nearby
 % SAC file.  Fetch the updated metadata once and then recompute phase
 % arrival times the next 2:end cases below.
-EQ = sac2evt(nearby_sac{1}, model, ph, baseurl, 'eventid', id);
 
-% Copy the updated event into an template which will be customized for
-% each nearby SAC file.
-EQ_template = EQ;
-EQ_template = rmfield(EQ_template, 'Filename');
-EQ_template = rmfield(EQ_template, 'TaupTimes');
-EQ_template.Picks = []; % I currently do not save picks, but for future...
+len_empty = 0;
+for i = 1:length(sac)
+    EQ_template = sac2evt(sac{i}, model, ph, baseurl, 'eventid', id);
+    if ~isempty(EQ_template)
+        % We only need one EQ for a template against which we may compute
+        % theoretical arrival times; the corresponding event will be
+        % the same for all SAC files.
+        % Copy the updated event into an template which will be customized for
+        % each nearby SAC file.
+        EQ_template = rmfield(EQ_template, 'Filename');
+        EQ_template = rmfield(EQ_template, 'TaupTimes');
+        EQ_template.Picks = []; % I currently do not save picks, but for future...
 
-% Parse event metadata information, the same for all nearby SAC files
-% (we are working with a single event), for arrivaltime.m
-evtdate = irisstr2date(EQ_template.PreferredTime);
-evla = EQ_template.PreferredLatitude;
-evlo = EQ_template.PreferredLongitude;
-evdp = EQ_template.PreferredDepth;
+        % Parse event metadata information, the same for all nearby SAC files
+        % (we are working with a single event), for arrivaltime.m
+        evtdate = irisstr2date(EQ_template.PreferredTime);
+        evla = EQ_template.PreferredLatitude;
+        evlo = EQ_template.PreferredLongitude;
+        evdp = EQ_template.PreferredDepth;
+        break
 
-% Save first EQ.
-evt_name = fullfile(evt_path, strippath(EQ.Filename));
-sac_suffix = suf(evt_name);
-evt_name(end-length(sac_suffix):end) = '.evt';
-save(evt_name, 'EQ', '-mat')
+    else
+        len_empty = len_empty + 1;
 
-% Assign first EQ to indexed temp variable and clear it.
-indexed_EQ{1} = EQ;
-clearvars('EQ')
-for i = 2:length(nearby_sac)
-    % Read the header specific to this nearby SAC file.
-    [~, h] = readsac(nearby_sac{i});
+    end
+end
 
-    % Compute the theoretical phase arrival times.
-    tt = arrivaltime(h, evtdate, [evla evlo], model, evdp, ph, h.B);
+for i = 1:length(sac)
+    if i > len_empty
+        % Read the header specific to this nearby SAC file.
+        [~, h] = readsac(sac{i});
 
-    EQ = EQ_template;
-    EQ.Filename = strippath(nearby_sac{i});
-    EQ.TaupTimes = tt;
-    EQ = reidpressure(EQ);
-    EQ = orderfields(EQ);
+        % Compute the theoretical phase arrival times.
+        tt = arrivaltime(h, evtdate, [evla evlo], model, evdp, ph, h.B);
 
-    evt_name = fullfile(evt_path, strippath(EQ.Filename));
-    sac_suffix = suf(evt_name);
-    evt_name(end-length(sac_suffix):end) = '.evt';
+        % If phases theoretically arrive in the time window of the seismogram
+        % attach that info and compute their 'expected' pressure.
+        if ~isempty(tt)
+            EQ = EQ_template;
+            EQ.Filename = strippath(sac{i});
+            EQ.TaupTimes = tt;
+            EQ = reidpressure(EQ);
+            EQ = orderfields(EQ);
 
+        else
+            % If no phases arrive in the time window save an empty EQ structure.
+            EQ = [];
+
+        end
+    else
+        % Save an empty EQ structure if you already looped past this SAC file
+        % in search of an EQ template and found no phase arrivals.
+        EQ = [];
+
+    end
+
+    % Save the EQ structure in an appropriately named .evt file.
+    evt_name = fullfile(evt_path, strrep(strippath(sac{i}), 'SAC', 'evt'));
     save(evt_name, 'EQ', '-mat')
-
-    indexed_EQ{i} = EQ;
+    EQ_list{i} = EQ;
     clearvars('EQ')
 
 end
-EQ = indexed_EQ;
+EQ = EQ_list(:);
 
-%______________________________________________________________%
-function cont = need2continue(id, redo, nearby_sac, nearbydir, evt_path)
+%________________________________________________________________________________%
+function cont = need2continue(id, redo, sac, evt_path)
 % Output: cont --> logical continuation flag
-
-% Sanity: ensure nearby SAC files exist to convert to generate .evt files.
-if isempty(nearby_sac)
-    error('No nearbystations SAC files associated with event id: %s', id)
-    cont = false;
-    return
-
-end
 
 % If .evt files already exist verify their filenames match those, and
 % only those, of the SAC files.
 evt_dir = dir(fullfile(evt_path, '*.evt'));
 if ~isempty(evt_dir)
     evt_files_exist = true;
-    if length(evt_dir) ~= length(nearby_sac)
+    if length(evt_dir) ~= length(sac)
         evt_matches_sac = false;
 
     else
-        for i = 1:length(nearby_sac)
-            nopath_sac{i} = strippath(nearby_sac{i});
+        for i = 1:length(sac)
+            nopath_sac{i} = strippath(sac{i});
             nopath_evt{i} = evt_dir(i).name;
 
             nopath_sac{i}(end-3:end) = [];

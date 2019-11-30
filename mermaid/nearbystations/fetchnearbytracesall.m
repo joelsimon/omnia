@@ -1,5 +1,5 @@
-function [fetched, failed] = fetchnearbytracesall
-% [fetched, failed] = FETCHNEARBYTRACESALL
+function [fetched, failed] = fetchnearbytracesall(redo, starttime, endtime)
+% [fetched, failed] = FETCHNEARBYTRACESALL(redo, starttime, endtime)
 %
 % Fetches and writes SAC files for every event ID for all nearby
 % stations using fetchnearbytraces.m.
@@ -11,6 +11,9 @@ function [fetched, failed] = fetchnearbytracesall
 % Contact: jdsimon@princeton.edu
 % Last modified: 26-Sep-2019, Version 2017b on GLNXA64
 
+defval('redo', false)
+defval('starttime', [])
+defval('endtime', [])
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'identified.txt'))
 defval('txtfile', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystations.txt'))
@@ -19,7 +22,7 @@ defval('mer_sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('nearby_sacdir', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'sac'))
 defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 
-[~, ~, ~, ~, ~, ~, ~, ~, ~, id] = readidentified(filename);
+[~, ~, ~, ~, ~, ~, ~, ~, ~, id] = readidentified(filename, starttime, endtime);
 
 % Find unique event identifications (ignoring leading asterisks which
 % signal possible multi-event traces).
@@ -33,13 +36,19 @@ id = unique(id);
 attempted = 0;
 fetched = {};
 failed = {};
+
+attempted2 = 0;
+fetched2 = {};
+failed2 = {};
 for i = 1:length(id)
     attempted = attempted + 1;
     try
-        tr = fetchnearbytraces(id{i}, false, txtfile, mer_evtdir, nearby_sacdir);
+        tr = fetchnearbytraces(id{i}, redo, txtfile, mer_evtdir, nearby_sacdir);
         if ~isempty(tr)
-            nearbysac2evt(id{i}, false, mer_evtdir, mer_sacdir, nearbydir);
             fetched = [fetched ; id{i}];
+
+        %     nearbysac2evt(id{i}, redo, mer_evtdir, mer_sacdir, nearbydir);
+        %     nearbysac2evt2(id{i}, redo, mer_evtdir, mer_sacdir, nearbydir);
 
         end
     catch

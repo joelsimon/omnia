@@ -22,7 +22,7 @@ function [sac, EQ] = getsacevt(id, evtdir, sacdir, check4update, returntype)
 % sac           Cell array of SAC files
 % EQ            Reviewed EQ structures for each SAC file
 %
-% See also: getnearbysac2evt.m, getsac.m, getevt.m
+% See also: getnearbysacevt.m, getsac.m, getevt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu

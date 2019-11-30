@@ -10,17 +10,24 @@ function [idx, sellout] = cellstrfind(sell, pattern)
 %
 % Output:
 % idx        The index of matches (def: {})
-% sellout    Cell of matching strings, 
+% sellout    Cell of matching strings,
 %                literally sell(idx) (def: {})
 %
-% Ex:
+% Ex1:
 %    sell = {'dog' 'froggy' 'hop' 'on' 'a' 'soggy' 'log' 'in' 'a' 'bog'}
 %    [idx, sellout] = CELLSTRFIND(sell, 'og')
 %    [idx, sellout] = CELLSTRFIND(sell, '[^0-9]og.y')
 %
+% Ex2: (?i) turns on case-insensitivity; (?-i) turns off case-insensitivity
+%    sell = {'UPPERCASE', 'lowercase', 'MiXeDcAsE', 'mIxEdCaSe'}
+%    [idx, sellout] = CELLSTRFIND(sell, 'case')
+%    [idx, sellout] = CELLSTRFIND(sell, '(?i)case')
+%    [idx, sellout] = CELLSTRFIND(sell, '(?i)ca(?-i)se')
+%    [idx, sellout] = CELLSTRFIND(sell, '(?i)cas(?-i)e')
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 07-Aug-2019, Version 2017b
+% Last modified: 28-Nov-2019, Version 2017b on GLNXA64
 
 matches = regexp(sell, pattern);
 idx = find(~cellfun(@isempty, matches));

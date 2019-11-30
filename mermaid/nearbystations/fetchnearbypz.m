@@ -24,15 +24,15 @@ function [nearbypz, pzfiles] = fetchnearbypz(txtfile, nearbydir)
 % *N/A*        *Writes [net].[sta].pz files in [nearbydir]/pz/
 %              *Writes concatenated nearbystations.pz in [nearbydir]/pz/
 % nearbypz     Filename of concatenated responses
-% pzfiles      Cell array of filenames of individual respones
+% pzfiles      Cell array of filenames of individual responses
 %
 % N.B.: the wget call in the shell script wgetrasppz is known to hang
 % and/or incorrectly write .xml files, ergo, this function may require
-% a rerun.
+% a rerun due to the unreliability of fdsnws.raspberryshakedata.com.
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 18-Nov-2019, Version 2017b on GLNXA64 & Python 2.7.15 (pymaid env.)
+% Last modified: 26-Nov-2019, Version 2017b & Python 2.7.15 (pymaid env.) on GLNXA64
 
 % Defaults.
 defval('txtfile', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystations.txt'))
@@ -55,24 +55,20 @@ baseurl = 'http://service.iris.edu/irisws/sacpz/1/query?';
 
 % Activate MERMAID python environment 'pymaid' s.t. subroutine
 % xml2pz.py (called in wgetrasppz) executes properly.
-system('source activate pymaid')
+[~,~] = system('source activate pymaid');
 
 % Loop over the stations and wget their pole-zero files.
-idx = 0;
 pzfiles = {};
 for i = 1:length(sta)
-    if ~strcmp(net{i}, 'AM')
-        % Pole-zero filename.
-        pz = sprintf('%s.%s.00.Z.pz', net{i}, sta{i});
+    % Pole-zero filename.
+    pz = sprintf('%s.%s.Z.pz', net{i}, sta{i});
 
+    if ~strcmp(net{i}, 'AM')
         % Make wget request.
-        query = sprintf('net=%s%ssta=%s%sloc=00%scha=*Z%sstart=2018-06-01T01:01:01', net{i}, '&',  sta{i}, '&', '&', '&');
+        query = sprintf('net=%s%ssta=%s%sloc=*%scha=*Z%sstart=2018-06-01T01:01:01', net{i}, '&',  sta{i}, '&', '&', '&');
         system(sprintf('wget ''%s'' -O %s', [baseurl query], pz));
 
     else
-        % Naming convention similar to above, except network here is always 'AM'.
-        pz = sprintf('AM.%s.00.Z.pz', sta{i});
-
         % Raspberry Shake gets special treatment because their response
         % metadata are returned as station.xml files, not SAC
         % pole-zero files.  The shell script wgetrasppz converts the
@@ -82,8 +78,8 @@ for i = 1:length(sta)
         system(sprintf('$OMNIA/mermaid/nearbystations/wgetrasppz %s %s', sta{i}));
 
     end
+
     % Concatenate a list of .pz files fetched.
-    idx = idx + 1;
     pzfiles = [pzfiles pz];
 
 end
@@ -91,7 +87,7 @@ end
 % Concatenate the .pz files themselves so that a single pole-zero file
 % can be read into SAC for all subsequent calls to 'transfer'.
 nearbypz = fullfile(pzdir, 'nearbystations.pz');
-system(sprintf(' truncate -s 0 %s', nearbypz));  % Don't use touch -- does not empty existing file.
+system(sprintf('truncate -s 0 %s', nearbypz));  % Don't use touch -- does not empty existing file.
 for i = 1:length(pzfiles)
     system(sprintf('cat %s >> %s', pzfiles{i}, nearbypz));
 
