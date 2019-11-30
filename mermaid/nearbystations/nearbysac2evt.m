@@ -48,6 +48,8 @@ defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('model', 'ak135')
 defval('ph', defphases)
 defval('baseurl', 1);
+nearby_EQ = {};
+nearby_EQu = {};
 
 % Pull the MERMAID and nearby SAC & .evt files (the latter may not yet
 % exist) and see what the current status is.
