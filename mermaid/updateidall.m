@@ -1,5 +1,5 @@
-function [updated, failed] = updateidall(force)
-% [updated, failed] = UPDATEIDALL(force)
+function [mer_updated, nearby_updated, nearbyu_updated, failed] = updateidall(force)
+% [mer_updated, nearby_updated, nearbyu_updated, failed] = UPDATEIDALL(force)
 %
 % Updates every MERMAID and 'nearby' .evt file associated with every
 % identified event, using updateid.m
@@ -9,15 +9,17 @@ function [updated, failed] = updateidall(force)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 26-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 29-Nov-2019, Version 2017b on GLNXA64
 
 defval('force', false)
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'identified.txt'))
-defval('txtfile', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystations.txt'))
 defval('mer_evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('mer_sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
+defval('model', 'ak135')
+defval('ph', defphases)
+defval('baseurl', 1);
 
 [~, ~, ~, ~, ~, ~, ~, ~, ~, id] = readidentified(filename);
 
@@ -31,23 +33,36 @@ end
 id = unique(id);
 
 attempted = 0;
-updated = {};
+mer_updated = {};
+nearby_updated = {};
+nearbyu_updated = {};
 failed = {};
 for i = 1:length(id)
     attempted = attempted + 1;
     try
-        rev_evt = updateid(id{i}, force, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
-        if ~isempty(rev_evt)
-            updated = [updated ; id{i}];
+        [me, ~, ne, ~, neu] = updateid(id{i}, force,  mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl);
+        if ~isempty(me)
+            mer_updated = [mer_updated ; id{i}];
 
         end
-    catch
+        if ~isempty(ne)
+            nearby_updated = [nearby_updated ; id{i}];
+
+        end
+        if ~isempty(neu)
+            nearbyu_updated = [nearbyu_updated ; id{i}];
+
+        end
+    catch ME
+        keyboard
         failed = [failed ; id{i}];
 
     end
 end
 
-fprintf('Total events:      %4i\n', length(id))
-fprintf('Events attempted:  %4i\n', attempted)
-fprintf('Events updated:    %4i\n', length(updated))
-fprintf('Events failed:     %4i\n', length(failed))
+fprintf('Total events:                   %4i\n', length(id))
+fprintf('Events attempted:               %4i\n', attempted)
+fprintf('MERMAID events updated:         %4i\n', length(mer_updated))
+fprintf('Nearby events updated:          %4i\n', length(nearby_updated))
+fprintf('Unmerged nearby events updated: %4i\n', length(nearbyu_updated))
+fprintf('Events failed:                  %4i\n', length(failed))
