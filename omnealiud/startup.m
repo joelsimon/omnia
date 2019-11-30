@@ -19,7 +19,7 @@
 %
 % STARTUP requires the environmental variables OMNIA and IRISFETCH to
 % be defined in your preferred shell's config file:
-% 
+%
 % with "export" for bash-like (bash, sh, zsh), -or-
 % with "setenv" in csh-like (csh, tsch).
 %
@@ -29,9 +29,9 @@
 %
 % Assumes MATLAB is subsequently launched in said shell, such that
 % these environmental variables are then known to MATLAB.
-% 
+%
 % See also: userpath.m
-% 
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 24-Jul-2019, Version 2017b
@@ -44,9 +44,3 @@ javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', ...
 % For irisFetch-Matlab.
 addpath(genpath(getenv('IRISFETCH')))
 javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
-
-% The rest is specific to JDS -- users who clone $OMNIA, and other
-% repositories it depends on, may delete.
-%____________________________________________________%
-addpath(genpath(getenv('COLLAB')))
-
