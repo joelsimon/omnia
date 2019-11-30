@@ -1,5 +1,6 @@
-function [rev_evt, rev_EQ] = updateid(id, force, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
-% [rev_evt, rev_EQ] = UPDATEID(id, force, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
+function [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu] = updateid(id, force, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
+% [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu] = ...
+%     UPDATEID(id, force, mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl)
 %
 % UPDATEID refetches event metadata from IRIS and updates (overwrites)
 % the associated .evt files for a given event ID.
@@ -35,9 +36,12 @@ function [rev_evt, rev_EQ] = updateid(id, force, mer_evtdir, mer_sacdir, nearbyd
 % Output:
 % *N/A*        Overwrites relevant .evt files with updated
 %                  event metadata
-% rev_evt      Full path to updated reviewed .evt files,
-%                  or [] if update not required
-% rev_EQ       Updated EQ structures
+% *_evt      Full path to updated reviewed .evt files
+%                  (MERMAID & nearby stations including unmerged)
+%                  or {} if update not required
+% *_EQ       Updated EQ structures
+%                  (MERMAID & nearby stations including unmerged)
+%                  or {} if update not required
 %
 % *git history, if it exists, is respected with gitrmdir.m.
 %
@@ -45,7 +49,7 @@ function [rev_evt, rev_EQ] = updateid(id, force, mer_evtdir, mer_sacdir, nearbyd
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 28-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 29-Nov-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '10937574')
@@ -56,8 +60,12 @@ defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('model', 'ak135')
 defval('ph', defphases)
 defval('baseurl', 1);
-rev_evt = {};
-rev_EQ = {};
+mer_evt = {};
+mer_EQ = {};
+nearby_evt = {};
+nearby_EQ = {};
+nearby_evtu = {};
+nearby_EQu = {};
 
 % Retrieve all EQ files associated with this event.  Do not
 % check4update because that happens here, next.
@@ -81,17 +89,13 @@ updated_EQ = sac2evt(mer_sac{1}, model, ph, baseurl, 'eventid', id);
 %% Apply the updated info to all EQ structs.
 
 % MERMAID -- EQ will always exist because this is what you matched on.
-[a1, b1] = main(updated_EQ, mer_EQ, mer_sac, fullfile(mer_evtdir, 'reviewed', 'identified', 'evt'), model, ph);
+[mer_evt, mer_EQ] = main(updated_EQ, mer_EQ, mer_sac, fullfile(mer_evtdir, 'reviewed', 'identified', 'evt'), model, ph);
 
 % Nearby stations -- may not exist.
-[a2, b2] = main(updated_EQ, nearby_EQ, nearby_sac, fullfile(nearbydir, 'evt', id), model, ph);
+[nearby_evt, nearby_EQ] = main(updated_EQ, nearby_EQ, nearby_sac, fullfile(nearbydir, 'evt', id), model, ph);
 
 % Nearby stations, unmerged -- may not exist.
-[a3, b3] = main(updated_EQ, nearby_EQu, nearby_sacu, fullfile(nearbydir, 'evt', id, 'unmerged'), model, ph);
-
-% Concatenate outputs.
-rev_evt = [a1 ; a2 ; a3];
-rev_EQ = [b1 ; b2 ; b3];
+[nearby_evtu, nearby_EQu] = main(updated_EQ, nearby_EQu, nearby_sacu, fullfile(nearbydir, 'evt', id, 'unmerged'), model, ph);
 
 %___________________________________________________________________________________________%
 function [rev_evt, rev_EQ] = main(updated_EQ, old_EQ, sac, evt_path, model, ph)
