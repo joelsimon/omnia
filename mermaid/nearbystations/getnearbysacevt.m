@@ -85,14 +85,14 @@ all_nearby_sac = [nearby_sac ; nearby_sacu];
 all_nearby_evt = [nearby_evt ; nearby_evtu];
 
 if ~isempty(otype)
-    all_nearby_sac = cellfun(@(xx) strrep(otype, ''), all_nearby_sac, 'UniformOutput', false);
+    all_nearby_sac = cellfun(@(xx) strrep(strippath(xx), ['.' otype], ''), all_nearby_sac, 'UniformOutput', false);
 
 end
-all_nearby_sac =  cellfun(@(xx) strrep(strippath(xx), 'SAC', ''), all_nearby_sac, 'UniformOutput', false);
+all_nearby_sac =  cellfun(@(xx) strrep(strippath(xx), '.SAC', ''), all_nearby_sac, 'UniformOutput', false);
 
 % There is no suffix applied to the 'nearby' stations' .evt filenames --
 % the event metadata is unrelated to the output type of the SAC file.
-all_nearby_evt =  cellfun(@(xx) strrep(strippath(xx), 'evt', ''), all_nearby_evt, 'UniformOutput', false);
+all_nearby_evt =  cellfun(@(xx) strrep(strippath(xx), '.evt', ''), all_nearby_evt, 'UniformOutput', false);
 
 if ~isequal(all_nearby_sac, all_nearby_evt)
     error(['the lists of nearby .SAC and .evt files differ for ID: ' ...
