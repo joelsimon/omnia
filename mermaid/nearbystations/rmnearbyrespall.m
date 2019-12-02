@@ -1,14 +1,15 @@
-function [corrected, correctedu, failed] = rmnearbyrespall(redo)
-% [corrected, correctedu, failed] = RMNEARBYRESPALL(redo)
+function [corrected, correctedu, failed] = rmnearbyrespall(redo, otype)
+% [corrected, correctedu, failed] = RMNEARBYRESPALL(redo, otype)
 %
 % Apply instrument-response correction to all 'nearby' stations SAC
 % files assuming JDS system defaults.
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 29-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 02-Dec-2019, Version 2017b on GLNXA64
 
 defval('redo', false)
+defval('otype', 'acc')
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'identified.txt'))
 
@@ -28,10 +29,10 @@ attempted = 0;
 corrected = {};
 correctedu = {};
 failed = {};
-for i = 1:length(id)
+parfor i = 1:length(id)
    attempted = attempted + 1;
     try
-        [~,~, new, newu] = rmnearbyresp(id{i}, redo);
+        [~,~, new, newu] = rmnearbyresp(id{i}, redo, otype);
         if new
             corrected = [corrected ; id{i}];
 
@@ -46,7 +47,8 @@ for i = 1:length(id)
     end
 end
 
-fprintf('Total events:      %4i\n', length(id))
-fprintf('Events attempted:  %4i\n', attempted)
-fprintf('Events corrected:  %4i\n', length(corrected))
-fprintf('Events failed:     %4i\n', length(failed))
+fprintf('Total events:               %4i\n', length(id))
+fprintf('Events attempted:           %4i\n', attempted)
+fprintf('Events corrected:           %4i\n', length(corrected{:}))
+fprintf('Unmeregd events corrected:  %4i\n', length(correctedu{:}))
+fprintf('Events failed:              %4i\n', length(failed))
