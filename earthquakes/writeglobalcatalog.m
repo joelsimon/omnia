@@ -11,7 +11,7 @@ function writeglobalcatalog(minmag, maxmag, stime, etime, txtdir)
 % stime         Time to start query, in FDSN format
 %                   (def: 2018-08-07T00:00:00.000)
 % etime         Time to end query, in FDSN format
-%                   (def: 2018-10-01T00:00:00.000)
+%                   (def: present time)
 % txtdir        Directory to write M?.txt, where ? represents
 %                   the magnitude unit covered by the text file,
 %                   e.g., M5.txt includes M5.0 to M5.9
@@ -24,7 +24,7 @@ function writeglobalcatalog(minmag, maxmag, stime, etime, txtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 05-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 02-Dec-2019, Version 2017b on MACI64
 
 % I cannot tell exactly when MERMAID P-08 (the first) really started
 % acquiring data, I think its this log file:
@@ -34,12 +34,18 @@ function writeglobalcatalog(minmag, maxmag, stime, etime, txtdir)
 %
 % While the one previous (08_5B66F5B9.LOG) is a 1 day sink and
 % surface, no data acquisition?
+%
+% Regardless, I see that:
+% (1) the first record it sent back was on 08-Aug-2019
+% (2) for my paper I will only use those data between 17-Sep-2018 --> 17-Sep-2019, ish.
+% So the start date does not matter as far as seismicity
+% statistics, just plotting.
 
 % Defaults.
 defval('minmag', 4);
 defval('maxmag', 9);
 defval('stime', '2018-08-07T00:00:00.000')
-defval('etime', '2019-10-01T00:00:00.000');
+defval('etime', fdsndate2str(datetime('now')))
 defval('txtdir', fullfile(getenv('MERMAID'), 'events', 'globalcatalog'));
 [~, foo]= mkdir(txtdir);
 
@@ -63,8 +69,7 @@ for i = 1:length(mags)
     ev = [];
     try
         ev = irisFetch.Events('minmag', mags(i), 'maxmag', mags(i) + 0.9, ...
-                              'start', stime, 'end', etime);
-
+                          'start', stime, 'end', etime);
     end
 
     txtfile = fullfile(txtdir, sprintf('M%i.txt', mags(i)));
@@ -79,7 +84,7 @@ for i = 1:length(mags)
     fid = fopen(txtfile, 'w');
     if ~isempty(ev)
         % anon func to convert time string into FDSN time string.
-        fdsnstr = @(x)  [x(1:10) 'T' x(12:end)];
+        fdsnstr = @(xx)  [xx(1:10) 'T' xx(12:end)];
         for j = length(ev):-1:1
             data = {fdsnstr(ev(j).PreferredTime), ...
                     ev(j).PreferredLatitude, ...
