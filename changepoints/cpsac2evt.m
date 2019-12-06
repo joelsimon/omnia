@@ -73,7 +73,7 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 01-Aug-2019, Version 2017b
+% Last modified: 06-Dec-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -157,6 +157,39 @@ for i = 1:2
     F(i).fig = figure;
     F(i).f = plotchangepoint(CP(i), 'all', 'ar', false, true);
 
+    % Shrink the distance between each subplot -- 'multiplier' is adjusted
+    % depending on the number of subplots (the number of wavelet scales
+    % plotted).
+    multiplier = 0;
+    switch CP(i).inputs.n
+      case 3
+        shrink(F(i).f.ha, 1, 1.53)
+        for l = 1:length(F(i).f.ha)
+            multiplier = multiplier + 1;
+            movev(F.f.ha(l), multiplier * 0.08)
+
+        end
+        movev(F(i).f.ha, -0.1)
+
+      case 5
+        for l = 1:length(F(i).f.ha)
+            multiplier = multiplier + 1;
+            movev(F(i).f.ha(l), multiplier * 0.015)
+
+        end
+        movev(F(i).f.ha, -0.1)
+
+      otherwise
+        % Add to this list with trial and error given more examples with
+        % differing sampling frequencies.
+        warning('No figure formatting scheme available for %i %s', ...
+                CP(i).n, plurals('scale', CP.n))
+
+    end
+    %keyboard
+    % Remove x-tick labels from all but last plot and label the lower x-axis.
+    set(F(i).f.ha(1:end-1), 'XTickLabel', '')
+
     if ~isempty(EQ)
         % Title the seismogram (first subplot).
         ax = F(i).f.ha(1);
@@ -227,6 +260,7 @@ for i = 1:2
     F(i).f.ha(end).XLabel.String = sprintf('time relative to %s UTC (s)\n[%s]', ...
                                            datestr(refdate), ...
                                            strippath(strrep(sac, '_', '\_')));
+    longticks(F(i).f.ha, 3);
 end
 
 % Set interpreter to LaTeX and fonts to Times.
@@ -239,6 +273,7 @@ for i = 1:length(F)
     % and re-tack2corner the annotations.
     for l = 1:length(F(i).f.ha)
         F(i).f.ha2(l).Position = F(i).f.ha(l).Position;
+        F(i).f.ha2(l).YAxis.TickLabelFormat = '%#.2g';
 
     end
 
@@ -256,12 +291,12 @@ for i = 1:length(F)
     pdfname = sprintf([strrep(strippath(sac), 'sac', '') '%s'], ...
                       [corw{i} '.raw']);
     rawpdf{i} = savepdf(pdfname, F(i).fig, fullfile(diro, 'raw', 'pdf'));
-    fprintf('Saved %s\n\n', rawpdf{i}{:});
+    fprintf('Saved:\n %s\n', rawpdf{i}{:});
 
 end
 
 % Save the .evt file with the EQ structure(s).
 save(rawevt, 'EQ', 'CP', '-mat')
-fprintf('Saved %s\n\n', rawevt);
+fprintf('Saved:\n %s\n', rawevt);
 outargs = {EQ, CP, rawevt, rawpdfc, rawpdfw, F};
 varargout = outargs(1:nargout);
