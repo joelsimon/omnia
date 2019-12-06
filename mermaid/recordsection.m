@@ -1,7 +1,7 @@
 function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
-                                      evtdir, procdir, normlize, returntype)
+                                      evtdir, procdir, normlize, returntype, ph)
 % [F, EQ, sac] = ...
-%     RECORDSECTION(id, lohi, alignon, ampfac, evtdir, procdir, normlize, returntype)
+%     RECORDSECTION(id, lohi, alignon, ampfac, evtdir, procdir, normlize, returntype, ph)
 %
 % Plots a record section of all MERMAID seismograms that recorded the
 % same event, according to 'identified.txt' (output of evt2txt.m)
@@ -26,6 +26,8 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 %              'ALL': both triggered and user-requested SAC files
 %              'DET': triggered SAC files as determined by onboard algorithm (def)
 %              'REQ': user-requested SAC files
+% ph        Comma separated list of phases whose travel time curves are to be overlain
+%               (def: the phases present in the corresponding .evt files)
 %
 % Output:
 % F        Structure with figure handles and bits
@@ -53,7 +55,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 25-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 06-Dec-2019, Version 2017b on GLNXA64
 
 % Wish list:
 %
@@ -79,6 +81,7 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('normlize', true)
 defval('returntype', 'DET')
+defval('ph', []);
 
 % Find all the SAC files that match this event ID.
 id = num2str(id);
@@ -203,22 +206,29 @@ if strcmpi(alignon, 'atime')
     botz(F.vl);
 
 else
-    % Compute travel time curves for the phases present.
+    % Compute travel time curves.
+    if ~isempty(ph)
+        % Overwrite the phase_cell just built with those requested phases.
+        phase_cell = commasepstr2cell(ph);
+
+    end
     phase_cell = unique(phase_cell);
     phase_str = cell2commasepstr(phase_cell, ', ');
     tt = taupCurve('ak135', EQ1.PreferredDepth, phase_str);
 
     % Overlay travel time curves.
+    phases_plotted = {};
     for i = 1:length(tt)
         F.ph(i) = plot(F.ax, tt(i).time, tt(i).distance, 'LineWidth', ...
-                       1.5, 'LineStyle', '-');
+                       1, 'LineStyle', '-');
+        phases_plotted = [phases_plotted tt(i).phaseName];
 
     end
 
     % XLabel specific to aligning on event-rupture time.
-    % F.xl = xlabel(sprintf('time relative to %s UTC (s)', evttime));
-    F.xl = xlabel(sprintf('time relative to %s UTC (s)\n[%s]', evttime, id));
-    F.lg = legend(F.ph, phase_cell, 'AutoUpdate', 'off', 'Location', ...
+    F.xl = xlabel(sprintf('time relative to %s UTC (s)', evttime));
+    %F.xl = xlabel(sprintf('time relative to %s UTC (s)\n[%s]', evttime, id));
+    F.lg = legend(F.ph, phases_plotted, 'AutoUpdate', 'off', 'Location', ...
                   'NorthWest', 'FontSize', F.xl.FontSize);
 
 
@@ -238,7 +248,7 @@ if ~isnan(lohi)
 end
 
 % Cosmetics.
-F.yl = ylabel(F.ax, 'distance ($^{\circ}$)');
+F.yl = ylabel(F.ax, 'epicentral distance (degrees)');
 F.tl.FontWeight = 'normal';
 latimes
 
@@ -247,7 +257,7 @@ rangex = range(F.ax.XLim);
 shiftx = rangex * 0.025;
 for i = 1:length(F.pltx)
     if mod(i, 2) ~= 0
-        F.pltx(i).Position(1) = xax{i}(1) - (1.75 * shiftx); % 1.75 to account for width of number.
+        F.pltx(i).Position(1) = xax{i}(1) - (1.6 * shiftx); % to account for width of number.
 
     else
         F.pltx(i).Position(1) = xax{i}(end) + shiftx;
