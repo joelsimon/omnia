@@ -1,11 +1,18 @@
-function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, normlize, nearbydir, returntype)
-% F = NEARBYRECORDSECTION(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, normlize, nearbydir, returntype)
+function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, normlize, nearbydir, returntype, otype)
+% F = NEARBYRECORDSECTION(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, normlize, nearbydir, returntype, otype)
+%
+%% NEED TO ADD nearby_sacu; nearby_EQu;
 %
 % NEEDS HEADER AND WORKING 'ATIME' OPTION
 % returntype   For third-generation+ MERMAID only:
 %              'ALL': both triggered and user-requested SAC files
 %              'DET': triggered SAC files as determined by onboard algorithm (def)
 %              'REQ': user-requested SAC files
+% otype        []: (empty) return raw time series
+%              'none': return displacement time series (nm)
+%              'vel': return velocity time series (nm/s)
+%              'acc': return acceleration time series (nm/s/s) (def)
+%
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
@@ -20,6 +27,7 @@ defval('mer_sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('normlize', true)
 defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('returntype', 'DET')
+defval('otype', 'acc')
 
 if strcmpi(alignon, 'atime')
     error('alignon = ''atime'' not yet coded')
@@ -46,7 +54,7 @@ evtdate = datetime(irisstr2date(mer_EQ{1}(1).PreferredTime));
 % .TaupTimes, e.g., in the case of incomplete or merged data).
 rm_idx = [];
 for i = 1:length(nearby_EQ)
-    if isempty(nearby_EQ{i}(1).TaupTimes)
+    if isempty(nearby_EQ{i})
         rm_idx = [rm_idx i];
 
     end
@@ -238,13 +246,20 @@ for i = 1:length(abbrev_x)
     F.pltr2(i) = plot(F.ax, evt_xax{i}, ampfac * abbrev_x{i} + dist(i));
     F.pltr2(i).Color = nearby_color;
 
-    % Assumes Princeton MERMAID float naming convention, where the float
-    % number is the two digits immediately following the first period
-    % in the NEARBY_SAC filename.
-    station_info = strsplit(strippath(nearby_sac{i}), '.');
-    floatnum = cell2commasepstr(station_info(1:4), '.');
 
-    F.pltx2(i) = text(F.ax, 0, dist(i), sprintf('%14s', num2str(floatnum)));
+    % This unique network.station.location.channel name may be found by
+    % keeping all characters up to the fourth period ('.')
+    % delimiter. DO NOT USE strsplit because it ignores
+    % empties between delims (e.g.,
+    % AU.NIUE..BHZ.2018.220.01.38.57.SAC.acc, where the
+    % location is missing).
+    % station_info = strsplit(strippath(nearby_sac{i}), '.');
+    % floatnum = cell2commasepstr(station_info(1:4), '.');
+
+    sta_name = strippath(nearby_sac{i});
+    delims = strfind(sta_name, '.');
+    sta = sta_name(1:delims(4)-1);
+    F.pltx2(i) = text(F.ax, 0, dist(i), sprintf('%14s', sta));
     F.pltx2(i).Color = nearby_color;
 
 end
