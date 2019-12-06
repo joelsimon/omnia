@@ -1,6 +1,6 @@
-function varargout = readidentified(filename, starttime, endtime, reftime)
+function varargout = readidentified(filename, starttime, endtime, reftime, returntype)
 % [sac, eqtime, eqlat, eqlon, eqregion, eqdepth, eqdist, eqmag, eqphase1, ...
-%  eqid, sacdate, eqdate] = READIDENTIFIED(filename, starttime, endtime, reftime)
+%  eqid, sacdate, eqdate] = READIDENTIFIED(filename, starttime, endtime, reftime, returntype)
 %
 % Reads and parses event information from identified.txt, written with
 % evt2txt.m, assuming Princeton MERMAID naming scheme (SAC filenames
@@ -8,15 +8,18 @@ function varargout = readidentified(filename, starttime, endtime, reftime)
 % readevt2txt.m.
 %
 % Input:
-% filename   Textfile name: 'identified.txt', output by evt2txt.m
-%            (def: $MERMAID/events/reviewed/identified/txt/identified.txt)
-% starttime  Inclusive start time (earliest event time to OR SAC file to consider),
-%                as datetime (def: start at first event OR SAC  in catalog)
-% endtime    Inclusive end time (latest event time OR SAC file to consider),
-%                as datetime (def: end at last event OR SAC file in catalog)
-% reftime    Reference for start and end times
-%            'EVT': start/end times refer to event (hypocenter) times
-%            'SAC': start/end times refer to SAC (time at first sample) times (def)
+% filename     Textfile name: 'identified.txt', output by evt2txt.m
+%              (def: $MERMAID/events/reviewed/identified/txt/identified.txt)
+% starttime    Inclusive start time (earliest event time to OR SAC file to consider),
+%                  as datetime (def: start at first event OR SAC  in catalog)
+% endtime      Inclusive end time (latest event time OR SAC file to consider),
+%                  as datetime (def: end at last event OR SAC file in catalog)
+% reftime      Reference for start and end times
+%              'EVT': start/end times refer to event (hypocenter) times
+%              'SAC': start/end times refer to SAC (time at first sample) times (def)
+% returntype   'ALL': both triggered and user-requested SAC files (def)
+%              'DET': triggered SAC files as determined by onboard algorithm
+%              'REQ': user-requested SAC file
 %
 % Output:
 % sac        SAC filename
@@ -37,7 +40,7 @@ function varargout = readidentified(filename, starttime, endtime, reftime)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 22-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 04-Dec-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -45,6 +48,7 @@ defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
 defval('starttime', NaT('TimeZone', 'UTC')) % Dummy variable; changed below
 defval('endtime', NaT('TimeZone', 'UTC')) % Dummy variable; changed below
 defval('reftime', 'SAC')
+defval('returntype', 'ALL')
 
 % Sanity.
 if ~isdatetime(starttime) || ~isdatetime(endtime)
@@ -53,6 +57,10 @@ if ~isdatetime(starttime) || ~isdatetime(endtime)
 end
 if isempty(starttime.TimeZone) || isempty(endtime.TimeZone)
     error('starttime and endtime must have a specified time zone')
+
+end
+if all(~strcmpi(returntype, {'ALL', 'DET', 'REQ'}))
+    error('Specify one of ''ALL'', ''DET'', or ''REQ'' for input: returntype')
 
 end
 
@@ -104,10 +112,17 @@ if isnat(endtime)
 
 end
 
-% Determine which event indices fall within the time interval of interest.
+% Determine which indices fall within the time interval of interest.
 idx = find(isbetween(refdate, starttime, endtime));
 
-% And return only those events.
+% Separate by return type if requested.
+if ~strcmpi(returntype, 'ALL')
+    ridx = cellstrfind(sac, sprintf('MER.%s.*sac', upper(returntype)));
+    idx = intersect(idx, ridx);
+
+end
+
+% Return parsed results.
 sac = sac(idx);
 eqtime = eqtime(idx);
 eqlat = eqlat(idx);
@@ -118,6 +133,7 @@ eqdist = eqdist(idx);
 eqmag = eqmag(idx);
 eqphase1 = eqphase1(idx);
 eqid = eqid(idx);
+sacdate = sacdate(idx);
 eqdate = eqdate(idx);
 
 % Collect outputs.
