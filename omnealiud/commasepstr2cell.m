@@ -25,7 +25,7 @@ function b = commasepstr2cell(a, delimiter)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 11-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 05-Dec-2019, Version 2017b on GLNXA64
 
 defval('delimiter', ',')
 
@@ -41,8 +41,9 @@ end
 
 idx = strfind(a, delimiter);
 if isempty(idx);
-    error('Input: %s\ndoes not include specified delimiter: ''%s''', ...
-          a, delimiter)
+    % No delimiter of specified type.
+    b = {a};
+    return
 
 end
 
