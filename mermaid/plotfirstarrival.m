@@ -60,7 +60,7 @@ end
  SNR, EQ, W1, xw2, W2, incomplete] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy);
 
 % Plot time series.
-plot(ax, xaxw1, xw1, 'LineWidth', 1.5, 'Color', 'Blue')
+plot(ax, xaxw1, xw1, 'LineWidth', 1, 'Color', 'Blue')
 ax.FontSize = FontSize(2);
 
 % Adjust title if travel-time residual uses corrected theoretical
@@ -74,7 +74,7 @@ else
 end
 
 % Label the axis.
-title(sprintf('%s = %.2f s, [max. %.2f s later]', tstr, tres, delay), ...
+title(sprintf('%s = %.2f s [max. %.2f s later]', tstr, tres, delay), ...
       'FontWeight', 'Normal', 'FontSize', FontSize(1))
 sacname = strippath(strrep(s, '_', '\_'));
 ylabel(sprintf('counts\n[max. %.1e]', maxc_y), 'FontSize', FontSize(1))
