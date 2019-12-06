@@ -44,3 +44,5 @@ javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', ...
 % For irisFetch-Matlab.
 addpath(genpath(getenv('IRISFETCH')))
 javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
+
+addpath(fullfile(getenv('AGU'), 'talk', 'code'))
