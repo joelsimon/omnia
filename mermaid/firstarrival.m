@@ -74,7 +74,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ..
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 28-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 18-Dec-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -158,8 +158,9 @@ end
 
 % Bandpass filter the time series.
 if ~isnan(lohi)
-    if round(1/h.DELTA) <= 2*lohi(2)
-         error('Upper cutoff frequency >= 1/2 the sampling frequency')
+    if 1/h.DELTA < 2*lohi(end)
+        % Nyquist.
+        error('Upper cutoff frequency >= 1/2 the sampling frequency')
 
      end
 
