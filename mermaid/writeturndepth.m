@@ -77,16 +77,22 @@ for i = 1:length(sac)
                         [EQ(1).PreferredLatitude EQ(1).PreferredLongitude], ...
                         'turn');
 
+        % Potentially multiple arrivals of same phase (e.g., triplication);
+        % the first-arriving phase only.
+        tp = tp(1);
+
         % Find the index of the turning depth.
         turn_idx = find(tp.pierce.depth);
 
-        % Parse outputs.
+        % Parse outputs.  Most usually there will be a single turning depth
+        % but on occasion there may be two depths of equal value at
+        % slightly different locations; take their average.
         phasename = tp.phaseName;
-        turndepth = tp.pierce.depth(turn_idx);
-        turnlat = tp.pierce.latitude(turn_idx);
-        turnlon = tp.pierce.longitude(turn_idx);
-    end
+        turndepth = mean(tp.pierce.depth(turn_idx));
+        turnlat = mean(tp.pierce.latitude(turn_idx));
+        turnlon = mean(tp.pierce.longitude(turn_idx));
 
+    end
     % Collect the data.
     data = {strippath(sac{i}), ...
             phasename, ...
