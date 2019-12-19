@@ -14,7 +14,7 @@ function tt_path=taupPath(model,depth,phase,varargin)
 %   'km'  value:   Epicentral distance in kilometer
 %   'sta'/'station' value:  Station location [Lat Lon]
 %   'evt'/'event' value:    Event location [Lat Lon]
-% 
+%
 % Output argument:
 %   tt_path is a structure array with fields:
 %   tt_path(index).time
@@ -35,7 +35,7 @@ function tt_path=taupPath(model,depth,phase,varargin)
 %   taupPath([],550,'P,sS','deg',45.6)
 %   taupPath('prem',0,'Pdiff,PKP,PKIKP','sta',[-40 -100],'evt',[30,50])
 %
-% This program calls TauP toolkit for calculation, which is 
+% This program calls TauP toolkit for calculation, which is
 % developed by:
 %   H. Philip Crotwell, Thomas J. Owens, Jeroen Ritsema
 %   Department of Geological Sciences
@@ -44,14 +44,16 @@ function tt_path=taupPath(model,depth,phase,varargin)
 %   crotwell@seis.sc.edu
 %
 % Written by:
-%   Qin Li 
+%   Qin Li
 %   Unverisity of Washington
 %   qinli@u.washington.edu
 %   Nov, 2002
 %
-% Last modified by jdsimon@princeton.edu Ver. 2017b, 14-Sep-2018.
+% Last modified by jdsimon@princeton.edu Ver. 2017b, 19-Dec-2019.
 
 % Joel D. Simon changelog -
+%
+% 19-Dec-2019: set default output to empty so this doesn't error if phases do not exist.
 %
 % 14-Sep-2018: ascending sort of tt structure based on 'time' field.
 
@@ -135,7 +137,7 @@ if matArrivals.length==0
     fprintf('   Phases do not exist at specified distance!\n');
 end;
 
-tt_path = [];
+tt = [];
 for ii=1:matArrivals.length
     tt(ii).time=matArrivals(ii).getTime;
     tt(ii).distance=matArrivals(ii).getDistDeg;
@@ -151,7 +153,7 @@ for ii=1:matArrivals.length
 end;
 
 c={'b','r','g','m','c','y', ...
-   'b--','r--','g--','m--','c--','y--', ... 
+   'b--','r--','g--','m--','c--','y--', ...
    'b-.','r-.','g-.','m-.','c-.','y-.', ...
    'b:','r:','g:','m:','c:','y:'};
 p={};
@@ -179,11 +181,11 @@ if nargout==0 & matArrivals.length>0
     end;
     legend(h,p);
     return;
-    
+
 end;
 
 % jdsimon@princeton.edu edit -- sort the rows in ascending order
-% (first arriving phases first). 
+% (first arriving phases first).
 if ~isempty(tt)
     [~, idx] = sort([tt.time], 'ascend');
     tt = tt(idx);
@@ -196,5 +198,3 @@ function [cx,cy]=circle(r)
     cx=sin(ang)*r;
     cy=cos(ang)*r;
 return;
-
-

@@ -3,7 +3,7 @@ function tt_pierce=taupPierce(model,depth,phase,varargin)
 % TAUPPIERCE calculate points where specified rays pierce discontinuities
 %      using TauP toolkit
 %
-% tt_pierce=taupPierce(model,depth,phase,'option',value,...) 
+% tt_pierce=taupPierce(model,depth,phase,'option',value,...)
 %
 % Input arguments:
 % The first three arguments are fixed:
@@ -15,11 +15,11 @@ function tt_pierce=taupPierce(model,depth,phase,varargin)
 %   'km'  value:   Epicentral distance in kilometer
 %   'sta'/'station' value:  Station location [Lat Lon]
 %   'evt'/'event' value:    Event location [Lat Lon]
-%   'az' value:    Azimuth (event to station) in degree. This is used to  
-%                  calculate lat and lon of pierce points if the event lat lon 
+%   'az' value:    Azimuth (event to station) in degree. This is used to
+%                  calculate lat and lon of pierce points if the event lat lon
 %                  and distance are also given.
-%   'baz' value:   Back azimuth (station to event) in degree. This is used to  
-%                  calculate lat and lon of pierce points if the event lat lon 
+%   'baz' value:   Back azimuth (station to event) in degree. This is used to
+%                  calculate lat and lon of pierce points if the event lat lon
 %                  and distance are also given.
 %   'dev':         only calculate underside and bottom turn points
 %   'turn':        only calculate bottom turning points
@@ -46,7 +46,7 @@ function tt_pierce=taupPierce(model,depth,phase,varargin)
 %   taupPierce([],50,'P,S','deg',55.6,'turn')
 %   taupPierce('prem',50,'P,PKP','sta',[-40 -100],'evt',[30,50],'pierce',100)
 %
-% This program calls TauP toolkit for calculation, which is 
+% This program calls TauP toolkit for calculation, which is
 % developed by:
 %   H. Philip Crotwell, Thomas J. Owens, Jeroen Ritsema
 %   Department of Geological Sciences
@@ -55,14 +55,16 @@ function tt_pierce=taupPierce(model,depth,phase,varargin)
 %   crotwell@seis.sc.edu
 %
 % Written by:
-%   Qin Li 
+%   Qin Li
 %   Unverisity of Washington
 %   qinli@u.washington.edu
 %   Nov, 2002
 %
-% Last modified in Ver. 2017b by jdsimon@princeton.edu, 14-Sep-2018.
+% Last modified in Ver. 2017b by jdsimon@princeton.edu, 19-Sep-2019.
 
 % Joel D. Simon changelog -
+%
+% 19-Dec-2019: set default output to empty so this doesn't error if phases do not exist
 %
 % 14-Sep-2018: ascending sort of tt structure based on 'time' field.
 
@@ -162,7 +164,7 @@ if nargout==0
     return;
 end;
 
-tt_pierce = [];
+tt = [];
 for ii=1:matArrivals.length
     tt(ii).time=matArrivals(ii).getTime;
     tt(ii).distance=matArrivals(ii).getDistDeg;
@@ -178,7 +180,7 @@ for ii=1:matArrivals.length
 end;
 
 % jdsimon@princeton.edu edit -- sort the rows in ascending order
-% (first arriving phases first). 
+% (first arriving phases first).
 if ~isempty(tt)
     [~, idx] = sort([tt.time], 'ascend');
     tt = tt(idx);
