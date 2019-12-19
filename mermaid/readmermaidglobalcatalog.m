@@ -3,7 +3,7 @@ function [eqtime, eqlat, eqlon, eqdepth, eqmag, eqid, mertot, mernum] ...
 % [eqtime, eqlat, eqlon, eqdepth, eqmag, eqid, mertot, mernum] ...
 %     = READMERMAIDGLOBALCATALOG(mercatfile, nfloats)
 %
-% READMERMAIDGLOBALCATALOG reads a sing textfile output by
+% READMERMAIDGLOBALCATALOG reads a single-magnitude textfile output by
 % writemermaidglobalcatalog.m
 %
 % Input:
