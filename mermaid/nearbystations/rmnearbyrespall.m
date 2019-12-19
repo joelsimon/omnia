@@ -1,15 +1,14 @@
-function [corrected, correctedu, failed] = rmnearbyrespall(redo, otype)
-% [corrected, correctedu, failed] = RMNEARBYRESPALL(redo, otype)
+function [corrected, correctedu, failed] = rmnearbyrespall(redo)
+% [corrected, correctedu, failed] = RMNEARBYRESPALL(redo)
 %
-% Apply instrument-response correction to all 'nearby' stations SAC
-% files assuming JDS system defaults.
+% Apply instrument-response correction ('none', 'vel', and 'acc') to
+% all 'nearby' stations SAC files assuming JDS system defaults.
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Dec-2019, Version 2017b on GLNXA64
+% Last modified: 18-Dec-2019, Version 2017b on GLNXA64
 
 defval('redo', false)
-defval('otype', 'acc')
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'identified.txt'))
 
@@ -25,30 +24,36 @@ for i = 1:length(star_idx)
 end
 id = unique(id);
 
-attempted = 0;
-corrected = {};
-correctedu = {};
-failed = {};
-parfor i = 1:length(id)
-   attempted = attempted + 1;
-    try
-        [~,~, new, newu] = rmnearbyresp(id{i}, redo, otype);
-        if new
-            corrected = [corrected ; id{i}];
+otype = {'none', 'vel', 'acc'};
+ostr = {'displacement', 'velocity', 'acceleration'};
+for j = 1:length(otype)
+    attempted.(otype{j}) = 0;
+    corrected.(otype{j}) = {};
+    correctedu.(otype{j}) = {};
+    failed.(otype{j}) = {};
+    for i = 1:length(id)
+        attempted.(otype{j}) = attempted.(otype{j}) + 1;
+        try
+            [~, ~, new, newu] = rmnearbyresp(id{i}, redo, otype{j});
+            if new
+                corrected.(otype{j}) = [corrected.(otype{j}) ; id{i}];
+
+            end
+            if newu
+                correctedu.(otype{j}) = [correctedu.(otype{j}) ; id{i}];
+
+            end
+        catch
+            failed.(otype{j}) = [failed.(otype{j}); id{i}];
 
         end
-        if newu
-            correctedu = [correctedu ; id{i}];
-
-        end
-    catch
-        failed = [failed; id{i}];
-
     end
-end
 
-fprintf('Total events:               %4i\n', length(id))
-fprintf('Events attempted:           %4i\n', attempted)
-fprintf('Events corrected:           %4i\n', length(corrected{:}))
-fprintf('Unmeregd events corrected:  %4i\n', length(correctedu{:}))
-fprintf('Events failed:              %4i\n', length(failed))
+    fprintf('\nRemoving instrument response and writing %s SAC files...\n', ostr{j})
+    fprintf('Total events:               %4i\n', length(id))
+    fprintf('Events attempted:           %4i\n', attempted.(otype{j}))
+    fprintf('Events corrected:           %4i\n', length(corrected.(otype{j})))
+    fprintf('Unmeregd events corrected:  %4i\n', length(correctedu.(otype{j})))
+    fprintf('Events failed:              %4i\n\n', length(failed.(otype{j})))
+
+end
