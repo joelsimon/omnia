@@ -1,11 +1,10 @@
 function zmax = topz(lobj, ha)
 % zmax = TOPZ(lobj,ha)
 %
-% TOPZ moves a LINE object to the top of the visual pile.  
+% TOPZ moves a LINE object to the top of the visual pile.
 %
 % Simply adds 1 to the input axes' maximum ZData.  Defaults to use
-% parent axes ZData, but user may supply other container as input.  If
-% line object handles supplied will set all to the same ZData value.
+% parent axes ZData, but user may supply other container as input.
 % Stacks multiple line objects in order they are input.
 %
 % Inputs:
