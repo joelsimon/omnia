@@ -1,6 +1,6 @@
-function [eqtime, eqlat, eqlon, eqdepth, eqmag, eqid, mertot, mernum] ...
+function [eqtime, eqlat, eqlon, eqdepth, eqmag, eqid, mertot, mernum, mernumstr] ...
     = readmermaidglobalcatalog(mercatfile, nfloats)
-% [eqtime, eqlat, eqlon, eqdepth, eqmag, eqid, mertot, mernum] ...
+% [eqtime, eqlat, eqlon, eqdepth, eqmag, eqid, mertot, mernum, mernumstr] ...
 %     = READMERMAIDGLOBALCATALOG(mercatfile, nfloats)
 %
 % READMERMAIDGLOBALCATALOG reads a single-magnitude textfile output by
@@ -20,11 +20,12 @@ function [eqtime, eqlat, eqlon, eqdepth, eqmag, eqid, mertot, mernum] ...
 % eqmag      Event magnitude (IRIS preferred)
 % eqid       IRIS event public ID
 % mertot     Total number of MERMAIDs reporting positive ID of event
-% mernum     Specific float numbers reporting positive ID of event
+% mernum     Specific float numbers reporting positive ID of event (double)
+% mernumstr  Specific float numbers reporting positive ID of event (cell of chars)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 05-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 21-Dec-2019, Version 2017b on GLNXA64
 
 % Default.
 defval('mercatfile', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -56,3 +57,16 @@ eqmag = l{5};
 eqid = l{6};
 mertot = l{7};
 mernum = cellfun(@(xx) str2num(xx), l{8}, 'UniformOutput', false);
+mernumstr = l{8};
+
+% Ensure proper sorting.
+[~, idx] = sort(eqtime);
+eqtime = eqtime(idx);
+eqlat = eqlat(idx);
+eqlon = eqlon(idx);
+eqdepth = eqdepth(idx);
+eqmag = eqmag(idx);
+eqid = eqid(idx);
+mertot = mertot(idx);
+mernum = mernum(idx);
+mernumstr = mernumstr(idx);
