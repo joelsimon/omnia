@@ -24,7 +24,7 @@ function writeglobalcatalog(minmag, maxmag, stime, etime, txtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Dec-2019, Version 2017b on MACI64
+% Last modified: 21-Dec-2019, Version 2017b on GLNXA64
 
 % I cannot tell exactly when MERMAID P-08 (the first) really started
 % acquiring data, I think its this log file:
@@ -70,6 +70,12 @@ for i = 1:length(mags)
     try
         ev = irisFetch.Events('minmag', mags(i), 'maxmag', mags(i) + 0.9, ...
                           'start', stime, 'end', etime);
+
+        % Sort with most earliest first/most recent last (the default: can't use
+        % 'ascend' with cell arrays).
+        [~, idx] = sort({ev.PreferredTime});
+        ev = ev(idx);
+
     end
 
     txtfile = fullfile(txtdir, sprintf('M%i.txt', mags(i)));
