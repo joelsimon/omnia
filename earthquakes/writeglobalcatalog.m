@@ -24,22 +24,7 @@ function writeglobalcatalog(minmag, maxmag, stime, etime, txtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 21-Dec-2019, Version 2017b on GLNXA64
-
-% I cannot tell exactly when MERMAID P-08 (the first) really started
-% acquiring data, I think its this log file:
-%
-% 08_5B685191.LOG, L110
-% [date -d @1533624310 = Tue Aug  7 02:45:10 EDT 2018]
-%
-% While the one previous (08_5B66F5B9.LOG) is a 1 day sink and
-% surface, no data acquisition?
-%
-% Regardless, I see that:
-% (1) the first record it sent back was on 08-Aug-2019
-% (2) for my paper I will only use those data between 17-Sep-2018 --> 17-Sep-2019, ish.
-% So the start date does not matter as far as seismicity
-% statistics, just plotting.
+% Last modified: 24-Dec-2019, Version 2017b on GLNXA64
 
 % Defaults.
 defval('minmag', 4);
@@ -91,7 +76,7 @@ for i = 1:length(mags)
     if ~isempty(ev)
         % anon func to convert time string into FDSN time string.
         fdsnstr = @(xx)  [xx(1:10) 'T' xx(12:end)];
-        for j = length(ev):-1:1
+        for j = 1:length(ev)
             data = {fdsnstr(ev(j).PreferredTime), ...
                     ev(j).PreferredLatitude, ...
                     ev(j).PreferredLongitude, ...
