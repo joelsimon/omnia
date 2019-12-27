@@ -3,11 +3,10 @@ function writeaccess(lock, filename)
 %
 % Manage write access to an input file.
 %
-%
 % Input:
-% lock       'lock': restrict write-access (def)
-%            'unlock': allow write-access
-% filename    Filename
+% lock       'lock': restrict write access (def)
+%            'unlock': grant write access
+% filename   Filename to restrict or grant write access
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
@@ -32,7 +31,7 @@ switch lower(lock)
   case 'unlock'
     wstatus = fileattrib(filename, '+w', 'a');
     if wstatus == 0
-        error('Unable to allow write access to %s.', filename)
+        error('Unable to grant write access to %s.', filename)
 
     end
 
