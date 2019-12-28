@@ -10,11 +10,11 @@ function writeaccess(lock, filename)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 24-Dec-2019, Version 2017b on GLNXA64
+% Last modified: 27-Dec-2019, Version 2017b on MACI64
 
 defval('lock', 'lock')
 
-if ~exist(filename, 'file') == 2
+if exist(filename, 'file') ~= 2
     warning('filename %s does not exist', filename)
     return
 
