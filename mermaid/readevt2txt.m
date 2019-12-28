@@ -1,6 +1,6 @@
-function varargout = readevt2txt(filename, starttime, endtime)
+function varargout = readevt2txt(filename, starttime, endtimem, returntype)
 % [sac, eqtime, eqlat, eqlon, eqregion, eqdepth, eqdist, eqmag, ...
-%      eqphase1, eqid, sacdate, eqdate] = READEVT2TXT(filename, starttime, endtime)
+%      eqphase1, eqid, sacdate, eqdate] = READEVT2TXT(filename, starttime, endtime, returntype)
 %
 % Reads and parses event information from 'all.txt', written with
 % evt2txt.m, assuming Princeton MERMAID naming scheme (SAC filenames
@@ -18,6 +18,9 @@ function varargout = readevt2txt(filename, starttime, endtime)
 %                as datetime (def: start at first SAC file in catalog)
 % endtime    Inclusive end time (latest SAC time to consider),
 %                as datetime (def: end at SAC file in catalog)
+% returntype   'ALL': both triggered and user-requested SAC files (def)
+%              'DET': triggered SAC files as determined by onboard algorithm
+%              'REQ': user-requested SAC file
 % Output:
 % sac        SAC filename
 % eqtime     Event rupture time ['yyyy-mm-dd HH:MM:SS']
@@ -37,12 +40,13 @@ function varargout = readevt2txt(filename, starttime, endtime)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 22-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 27-Dec-2019, Version 2017b on MACI64
 
 % Default.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', 'all.txt'))
 defval('starttime', NaT('TimeZone', 'UTC'))
 defval('endtime', NaT('TimeZone', 'UTC'))
+defval('returntype', 'ALL')
 
 % Sanity.
 if ~isdatetime(starttime) || ~isdatetime(endtime)
@@ -51,6 +55,10 @@ if ~isdatetime(starttime) || ~isdatetime(endtime)
 end
 if isempty(starttime.TimeZone) || isempty(endtime.TimeZone)
     error('starttime and endtime must have a specified time zone')
+
+end
+if all(~strcmpi(returntype, {'ALL', 'DET', 'REQ'}))
+    error('Specify one of ''ALL'', ''DET'', or ''REQ'' for input: returntype')
 
 end
 
@@ -89,8 +97,15 @@ if isnat(endtime)
 
 end
 
-% Determine which event indices fall within the time interval of interest.
+% Determine which indices fall within the time interval of interest.
 idx = find(isbetween(sacdate, starttime, endtime));
+
+% Separate by return type if requested.
+if ~strcmpi(returntype, 'ALL')
+    ridx = cellstrfind(sac, sprintf('MER.%s.*sac', upper(returntype)));
+    idx = intersect(idx, ridx);
+
+end
 
 % And return only those events.
 sac = sac(idx);
