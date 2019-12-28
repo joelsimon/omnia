@@ -31,8 +31,8 @@ function [F1, ha1, F2, ha2, N, E, P] = plotmermaidglobalcatalog(ha1, ha2, mercat
 %
 % *PLOTMERMAIDGLOBALCATALOG always plots the entire time series from
 % the first to last eqtime in mercatfile. However, statistics may be
-% collect within any date range contained within that file.  E.g., if
-% one wants to only plot and analyze one month of data, set the
+% collected within any date range contained within that file.  E.g.,
+% if one wants to only plot and analyze one month of data, set the
 % statdate as input and adjust the XLim after execution.
 %
 % **Must be monotonically increasing, positive integer array
