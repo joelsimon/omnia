@@ -1,5 +1,5 @@
-function [F1, ha1, F2, ha2, N, E, P] = plotmermaidglobalcatalog(ha1, ha2, mercatfile, statdate, floatnums)
-% [F1, ha1, F2, ha2, N, E, P] = ...
+function [F1, ha1, F2, ha2] = plotmermaidglobalcatalog(ha1, ha2, mercatfile, statdate, floatnums)
+% [F1, ha1, F2, ha2] = ...
 %     PLOTMERMAIDGLOBALCATALOG(ha1, ha2, mercatfile, statdate, floatnums)
 %
 % PLOTMERMAIDGLOBALCATALOG generates a stem plot displaying MERMAID
@@ -23,10 +23,11 @@ function [F1, ha1, F2, ha2, N, E, P] = plotmermaidglobalcatalog(ha1, ha2, mercat
 % ha1          Stem plot axes handle
 % F2           Structure with ha2 handle bits
 % ha2          Histogram axes handle.
-% N            Total  events (not just those ID'd) within time period
+% N            Total unique events (not just those ID'd) within the time period
+% ID           Number of unique events ID'd within time period
 % E            Mean number of reports (event detections) per MERMAID
-%                  within time period
-% P            Probability any given MERMAID will report any given event
+%                  within the time period
+% P            Probability any given MERMAID reported any given event
 %                  within the time period
 %
 % *PLOTMERMAIDGLOBALCATALOG always plots the entire time series from
@@ -39,19 +40,20 @@ function [F1, ha1, F2, ha2, N, E, P] = plotmermaidglobalcatalog(ha1, ha2, mercat
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 14-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 02-Jan-2020, Version 2017b on GLNXA64
 
 % Default.
 defval('ha1', [])
 defval('ha2', [])
 defval('statdate', NaT('TimeZone', 'UTC'))
 defval('mercatfile', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
-                              'identified', 'txt', 'M6_DET.txt'))
+                              'identified', 'txt', 'M5_DET.txt'))
 defval('floatnums', [8:13 16:25])
 
 % Read the data from the relevant MERMAID catalog file.
+num_floats = length(floatnums);
 [eqtime, eqlat, eqlon, eqdepth, eqmag, eqid, mertot, mernum] = ...
-    readmermaidglobalcatalog(mercatfile, length(floatnums));
+    readmermaidglobalcatalog(mercatfile, num_floats);
 
 % Convert EQ time strings to datetimes.
 eqtime = fdsnstr2date(eqtime);
@@ -63,7 +65,7 @@ if isnat(statdate)
 
 end
 
-% Event indices within the requested time range.
+% Event indices within the requested time range (inclusive).
 idx = find(isbetween(eqtime, statdate(1), statdate(2)));
 
 % Event indices outside the requested time range.
@@ -72,7 +74,7 @@ idx_out = setdiff(all_idx', idx);
 
 % Events within time range.
 pos_id = intersect(find(mertot), idx);
-null_id = setdiff(all_idx, pos_id);
+null_id = setdiff(idx, pos_id);
 
 % Events outside time range.
 pos_id_out = intersect(find(mertot), idx_out);
@@ -94,23 +96,32 @@ end
 % gray, while those within the time range are plotting in black.
 hold(ha1, 'on')
 F1.pl_pos = stem(ha1, eqtime(pos_id), mertot(pos_id), 'k', 'MarkerFaceColor', 'k');
-F1.pl_null = stem(ha1, eqtime(null_id), mertot(null_id), 'kx');
+F1.pl_null = stem(ha1, eqtime(null_id), repmat(-1.25, size(mertot(null_id))), 'kx', 'MarkerSize', 4);
 F1.pl_pos_out = stem(ha1, eqtime(pos_id_out), mertot(pos_id_out), 'Color', [0.5 0.5 0.5], 'MarkerFaceColor', [0.5 0.5 0.5]);
-F1.pl_null_out = stem(ha1, eqtime(null_id_out), mertot(null_id_out), 'x', 'Color', [0.5 0.5 0.5]);
+F1.pl_null_out = stem(ha1, eqtime(null_id_out), repmat(-1.25, size(mertot(null_id_out))), 'x','MarkerSize', 4, 'Color', [0.5 0.5 0.5]);
 hold(ha1, 'off')
 
 % Label the axes, considering only requested time range.
-n_events = length(idx);
-n_reported = length(pos_id);
-total_reports = sum(mertot(pos_id));
+num_events = length(idx);
+num_events_ID = length(pos_id);
+perc_events_ID = (num_events_ID / num_events) * 100; % considering all floats
+num_mermaids_reporting_per_event = mertot(pos_id);
+tot_event_reports = sum(num_mermaids_reporting_per_event);
+
+% Mean number of unique events reported per MERMAID over time period.
+mean_events_ID_per_mermaid = tot_event_reports / num_floats;
+mean_num_mermaids_reporting_per_event = mean(num_mermaids_reporting_per_event);
+
+% Probability any given MERMAID will report any given event over the time period.
+P = mean_events_ID_per_mermaid / num_events;
 
 mag_unit = str2num(mercatfile(end-8));
-F1.tl = title(ha1, sprintf('M%i-%i.9: events=%i, events reported=%i (total reports=%i)', ...
-                           mag_unit, mag_unit, n_events, n_reported, total_reports));
-F1.yl = ylabel(ha1, sprintf('MERMAIDs reporting\n(out of %i)', length(floatnums)));
+F1.tl = title(ha1, sprintf('%i unique events (%i identified [%.1f%s])', num_events, num_events_ID, perc_events_ID, '\%'));
+F1.yl = ylabel(ha1, sprintf('MERMAID identifications'));
 F1.xl = xlabel(ha1, 'event date');
 
-ha1.YLim = [0 length(floatnums)];
+%ha1.YLim = [0 num_floats];
+ha1.YLim = [-2.5 num_floats];
 
 %% Axis 2: histogram;
 if isempty(ha2)
@@ -155,20 +166,20 @@ end
 % Generate the histogram.
 F2.h = histogram(ha2, all_nums, 'BinMethod', 'Integer', 'FaceColor', 'k');
 F2.xl = xlabel(ha2, 'MERMAID station');
-F2.yl = ylabel(ha2, sprintf('events reported\n(out of %i)', length(idx)));
+F2.yl = ylabel(ha2, sprintf('events identified'));
 
 % Update the x-axis in case labels need to be remapped after adjusting
 % for missing float numbers.
-ha2.XTick = [floatnums(1) : floatnums(1) + length(floatnums) - 1]
+ha2.XTick = [floatnums(1) : floatnums(1) + num_floats - 1];
 ha2.XTickLabel = sprintfc('%d', floatnums); % undocumented function
 F.mtx = mean(all_nums);
 
-ha2.XLim = [floatnums(1)-.5 floatnums(1)+length(floatnums)-.5];
+ha2.XLim = [floatnums(1)-.5 floatnums(1)+num_floats-.5];
 ha2.YLim = [0 length(idx)];
 
-F2.tl = title(ha2, sprintf(['M%i-%i.9: average events reported per ' ...
-                    'MERMAID=%.2f'], mag_unit, mag_unit, sum(mertot(idx)) ...
-                           / length(floatnums)));
+F2.tl = title(ha2, sprintf(['%i total identifications (average of %i ' ...
+                    'per MERMAID)'], tot_event_reports, ...
+                           round(mean_events_ID_per_mermaid)));
 
 % Cosmetics.
 box(ha1, 'on')
@@ -179,13 +190,20 @@ longticks(ha2, 2)
 latimes(F1.f)
 latimes(F2.f)
 
-%% Final statistics.
+% Final printout.
+fprintf(['\nConcerning the magnitude range %i-%.1f and time period ' ...
+         '%s to %s (inclusive):\n'], mag_unit, mag_unit+.9, datestr(statdate(1)), ...
+        datestr(statdate(2)))
+fprintf('there were %i unique global events\n', num_events)
+fprintf(['of those, %i (%.1f%s) were positively identified by at ' ...
+         'least one of %i mermaids\n'], num_events_ID, perc_events_ID, ...
+        '%', num_floats)
+fprintf(['for every identified event there were on average %.1f ' ...
+         'MERMAIDS reporting that unique event\n'], ...
+        mean_num_mermaids_reporting_per_event)
+fprintf('in total, %i event identifications were reported by %i MERMAIDS\n', tot_event_reports, num_floats)
+fprintf('meaning that on average each MERMAID reported %.1f unique events\n', mean_events_ID_per_mermaid)
 
-% All possible events (not just those ID'd) over time period.
-N = length(idx);
 
-% Mean number of reports per MERMAID over time period.
-E = (sum(mertot(idx))/length(floatnums));
+%
 
-% Probability any given MERMAID will report any given event over the time period.
-P = E / N;
