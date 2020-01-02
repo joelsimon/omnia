@@ -5,10 +5,31 @@ function nearbyworkflow
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 18-Dec-2019, Version 2017b on GLNXA64
+% Last modified: 02-Jan-2020, Version 2017b on GLNXA64
 
 clc
-fetchnearbytracesall;
-rmnearbyrespall;
-nearbysac2evtall;
-updateidall;
+[~, failed] = fetchnearbytracesall;
+if ~isempty(failed)
+    error('fetchnearbytracesall failed')
+
+end
+
+[~, ~, failed] = rmnearbyrespall;
+if ~isempty(failed.none) || ~isempty(failed.vel) || ~isempty(failed.acc)
+    error('rmnearbyrespall failed')
+
+end
+
+[~, ~, failed] = nearbysac2evtall;
+if ~isempty(failed)
+    error('nearbysac2evtall failed')
+
+end
+
+[~, ~, ~, failed] = updateidall;
+if ~isempty(failed)
+    error('fetchnearbytracesall failed')
+
+end
+
+fprintf('\nworkflow completed without error\n')
