@@ -8,9 +8,9 @@ function writeglobalcatalog(minmag, maxmag, stime, etime, txtdir)
 % Input:
 % minmag        Minimum magnitude (def: 4), integer only
 % minmag        Maximum magnitude (def: 9), integer only
-% stime         Time to start query, in FDSN format
-%                   (def: 2018-08-07T00:00:00.000)
-% etime         Time to end query, in FDSN format
+% stime         Time to start query, in FDSN str format (not datetime)
+%                   (def: '2018-08-07T00:00:00.000')
+% etime         Time to end query, in FDSN str format (not datetime)
 %                   (def: present time)
 % txtdir        Directory to write M?.txt, where ? represents
 %                   the magnitude unit covered by the text file,
@@ -24,7 +24,7 @@ function writeglobalcatalog(minmag, maxmag, stime, etime, txtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 24-Dec-2019, Version 2017b on GLNXA64
+% Last modified: 02-Jan-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('minmag', 4);
@@ -37,6 +37,10 @@ defval('txtdir', fullfile(getenv('MERMAID'), 'events', 'globalcatalog'));
 % Sanity
 if ~isint(minmag) || ~isint(maxmag)
     error('mimag and maxmag must be integers')
+
+end
+if ~ischar(stime) || ~ischar(etime)
+    error('stime and etime must be character arrays, not, e.g., datetimes')
 
 end
 
@@ -60,6 +64,9 @@ for i = 1:length(mags)
         % 'ascend' with cell arrays).
         [~, idx] = sort({ev.PreferredTime});
         ev = ev(idx);
+
+    catch
+        warning('No events match requested magnitude range within requested time window')
 
     end
 
