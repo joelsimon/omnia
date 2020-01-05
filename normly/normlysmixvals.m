@@ -51,7 +51,7 @@ function [x, y, dvar, rvar] = normlysmixvals(k, trusigmas, N, ko)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 25-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 04-Jan-2020, Version 2017b on GLNXA64
 % Documented pp. 55-61, 2017.1.
 
 % Defaults.
@@ -84,31 +84,31 @@ sigma2 = trusigmas(2);
 % Changepoint early.
 if k < ko
 
-    % Noise -- there is no mixing; the sample variance is itself and the
-    % normalized value is 1.
+    % Noise: there is no mixing; the sample variance is itself and the
+    % normalized value is 1 -- equation 20.
     noisevar = sigma1^2;
     norm_noisevar = 1;
 
-    % "Signal" -- equation 21.
+    % Mixed "Signal" -- equation 19.
     sigvar = 1/(N-k) * [(ko-k)*sigma1^2 + (N-ko)*sigma2^2];
     norm_sigvar = sigvar / sigma2^2;
 
-    % Sum -- equation 24.
+    % Jointly normalized -- equation 24.
     norm_sumvar = 1 + 1/N*[(ko-k)*(sigma1^2/sigma2^2 - 1)]; %
 
 % Changepoint late.
 elseif k > ko
 
-    % "Noise" -- equation 16.
+    % Mixed "Noise" -- equation 16.
     noisevar = 1/k* [ko*sigma1^2 + (k-ko)*sigma2^2];
     norm_noisevar = noisevar / sigma1^2;
 
-    % Signal -- there is no mixing; the sample variance is itself and the
-    % normalized value is 1.
+    % Signal: there is no mixing; the sample variance is itself and the
+    % normalized value is 1 -- equation 17.
     sigvar = sigma2^2;
     norm_sigvar = 1;
 
-    % Sum -- equation 23.
+    % Jointly normalized -- equation 23.
     norm_sumvar = 1 + 1/N*[(k-ko)*(sigma2^2/sigma1^2 - 1)];
 
 % Changepoint correct.
@@ -146,8 +146,8 @@ sumlike = noiselike + siglike;
 % Collect the theoretical log-likelihoods associated with each MLE (Y-Axis).
 y = [noiselike siglike sumlike];
 
-% * This is the full equation. We can avoid this calculation by
-% summing two normalized sections, but here is equation 15 for
-% reference. Uncomment to check the difference..
-%sumlike2 = -1/2* [k*log(noisevar) + (N-k)*log(sigvar) + N*(log(2* pi)+1)];
-%difer(sumlike-sumlike2)
+% % * This is the full equation. We can avoid this calculation by
+% % summing two normalized sections, but here is equation 15 for
+% % reference. Uncomment to check the difference..
+% sumlike2 = -1/2* [k*log(noisevar) + (N-k)*log(sigvar) + N*(log(2* pi)+1)];
+% sumlike2 - sumlike
