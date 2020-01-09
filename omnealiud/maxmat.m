@@ -3,7 +3,7 @@ function [val, row, col] = maxmat(mat, mima)
 %
 % MAXMAT returns the maximum (or minimum) index(ices) and value(s) of
 % an input 2D matrix.  Outputs 'row' and 'col' are the M x N pairs of
-% indices in 'mat' that each contain the maximum (of minimum) value,
+% indices in 'mat' that each contain the maximum (or minimum) value,
 % 'val.'
 %
 % Input:
