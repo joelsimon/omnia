@@ -1,11 +1,11 @@
-function f = plotnormlystest(MLE, lys, ha, nglog);
+function f = plotnormlystest(MLE, lys, ha, nglog, nork);
 % f = plotnormlystest(MLE, lys, ha, nglog);
 %
 % Plots normlystest.m log-likelihood curves with two-standard
 % deviation whiskers.
 %
 % In keeping with notation of simon+2019.pdf, standard deviation and
-% variance statistics are returned in their biased forms: 
+% variance statistics are returned in their biased forms:
 %
 %                       1/N; not 1/(N-1)
 %
@@ -19,9 +19,9 @@ function f = plotnormlystest(MLE, lys, ha, nglog);
 %    [lys,MLE] = normlystest(sqrt(2),[.5 1.5],100,1000,25,true,false)
 %    f = PLOTNORMLYSTEST(MLE,lys)
 %
-% Citation: ??
-%
 % See also: normlystest.m, plot2normlystest.m
+%
+% Cite: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
@@ -76,10 +76,10 @@ f.stdy = std(neg * lys.maxval, 1);
 f.vary = var(neg * lys.maxval, 1);
 
 % Annotated box with sample statistics; mean, std., var. of MLE.
-meanstr = sprintf(['mean($\\hat{\\sigma}^2/\\sigma_{\\circ}^2$) = ' ...
-                   '%.3f'], f.meanx);
-varstr = sprintf(['~~~var($\\hat{\\sigma}^2/\\sigma_{\\circ}^2$) = ' ...
-                  '%.3f'], f.varx);
+meanstr = sprintf(['Mean($\\hat\\sigma_%i^2/\\sigma_{%i_\\circ}^2$) = ' ...
+                   '%.3f'], nork, nork, f.meanx);
+varstr = sprintf(['~~~Var($\\hat\\sigma_%i^2/\\sigma_{%i_\\circ}^2$) = ' ...
+                  '%.3f'], nork, nork, f.varx);
 
 % latex-formatted text before the interpreter is set.
 [f.bh, f.th] = boxtex(bpos, ax, sprintf('%s\n%s', meanstr, varstr));
@@ -90,7 +90,7 @@ f.th.Interpreter = 'Latex';
 [f.xhair,f.xhairhg] = crosshair(ax, f.meanx, f.meany, 2*f.stdx, 2*f.stdy);
 
 % X & Y labels.
-xlabel(ax, 'variance $\sigma^2/\sigma_{\circ}^2$', 'Interpreter', ' Latex');
+xlabel(ax, 'Normalized Variance $\sigma^2/\sigma_{\circ}^2$', 'Interpreter', ' Latex');
 ylabel(ax, '$l(\mu=0,\sigma^2|f(x))$', 'Interpreter', ...
               'Latex');
 

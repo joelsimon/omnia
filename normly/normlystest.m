@@ -1,6 +1,6 @@
 function [lys,MLE,f,y] = normlystest(trusigma,normvars,npts,lx, ...
-                                     ntests,plt,nglog,ha)
-% [lys,MLE,f,y] = NORMLYSTEST(trusigma,normvars,npts,lx,ntests,plt,nglog,ha)
+                                     ntests,plt,nglog,ha,nork)
+% [lys,MLE,f,y] = NORMLYSTEST(trusigma,normvars,npts,lx,ntests,plt,nglog,ha,nork)
 %
 % NORMLYSTEST loops normlys.m ntests number of times, generating new
 % random data given the parameters at each iteration. In normlys.m you
@@ -12,9 +12,9 @@ function [lys,MLE,f,y] = normlystest(trusigma,normvars,npts,lx, ...
 % statistics of after all tests.
 %
 % Input:
-% trusigma*    True standard deviation of the generating norm distribution 
+% trusigma*    True standard deviation of the generating norm distribution
 %                  (def: sqrt(2))
-% normvars*    Normalized sigma^2 to test for noise, signal; 
+% normvars*    Normalized sigma^2 to test for noise, signal;
 %                  called 'axlim' in suggestsigmas.m (def: [.5 1.5])
 % npts        Number of x-axis points (e.g., number of likelihood
 %                 calculations per time series tested) (def: 100)
@@ -25,7 +25,8 @@ function [lys,MLE,f,y] = normlystest(trusigma,normvars,npts,lx, ...
 % plt          true to plot (def: false)
 % nglog        true to plot negative log-likelihood curves (def: false)
 % ha           Axis handle to set plot, if passed (def: [])
-% 
+% nork         Integer 1 or 2 for noise or signal segment
+%
 % Output:
 % lys          Struct containing likelihood info w/ fields:
 %  .avecurve       average likelihood value, of all tests, at every sigma
@@ -44,7 +45,7 @@ function [lys,MLE,f,y] = normlystest(trusigma,normvars,npts,lx, ...
 %  .xaxis          suggested x-axis for plotting
 % f            Struct containing relevant figure handles, if created (def: [])
 % y            Every time series randomly generated herein
-%  
+%
 % * trusigmas is a 1x2 array of standard deviations, not variances,
 % while normvars is a bracketed range of normalized variances to test.
 % The units of normalized variance are (test sigma)^2/(true sigma)^2;
@@ -58,17 +59,17 @@ function [lys,MLE,f,y] = normlystest(trusigma,normvars,npts,lx, ...
 %    [lys,MLE] = NORMLYSTEST(sqrt(2),[.25 2],100,1000,40,true,true)
 %    hold on; plot(MLE.xaxis,-lys.avecurve,'m','LineWidth',4) % Plot average.
 %
-% Citation: ??
-%
 % See also: normlys.m, plotnormlystest.m, plot2normlystest.m
+%
+% Cite: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 15-Jan-2018, Version 2017b
+% Last modified: 10-Jan-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('trusigma',sqrt(2))
-defval('normvars',[.5 1.5])
+defval('normvars',[0.5 1.5])
 defval('npts',500)
 defval('lx',1000)
 defval('ntests',100)
@@ -86,8 +87,8 @@ lys.maxval(ntests) = 0;
 lys.maxidx(ntests) = 0;
 
 MLE.sigmastested(npts) = 0;
-MLE.sigma(ntests) = 0; 
-MLE.sigma2(ntests) = 0; 
+MLE.sigma(ntests) = 0;
+MLE.sigma2(ntests) = 0;
 MLE.xaxis(npts) = 0;
 
 % Use the input normalized sigma^2 to get sigma array.
@@ -102,11 +103,11 @@ for i = 1:ntests
     [lys.curve{i},~,MLE.sigma(i)] = normlys(0,MLE.sigmastested,y{i});
 
     % Return the sigma that is most likely as MLE.sigma.
-    MLE.sigma2(i) = MLE.sigma(i)^2;    
+    MLE.sigma2(i) = MLE.sigma(i)^2;
 
     % Collect the maximum value and index of the likelihood curve.
     [lys.maxval(i),lys.maxidx(i)] = max(lys.curve{i});
-    
+
     % And add the current likelihood curve to a growing summed likelihood,
     % which will be divided after loop by ntests to get a mean
     % likelihood value at every sigma tested.
@@ -133,5 +134,5 @@ MLE = orderfields(MLE,{'avesigma','trusigma','avesigma2','trusigma2', ...
 
 % Plot it, maybe.
 if plt
-    f = plotnormlystest(MLE, lys, ha, nglog);
+    f = plotnormlystest(MLE, lys, ha, nglog, nork);
 end

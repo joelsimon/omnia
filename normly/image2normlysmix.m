@@ -1,6 +1,6 @@
 function [f1, f2, f3, maxly, nMLE, sMLE] = image2normlysmix(perc, trusigmas,  lx, cp, axlim, npts, ntests, tinc, cmap)
 % [f1, f2, f3. maxly, nMLE, sMLE] = IMAGE2NORMLYSMIX(perc, trusigmas, lx, cp, axlim, npts, ntests, cmap)
-% 
+%
 % IMAGE2NORMLYSMIX plots the summed log-likelihood surface in two
 % variance coordinates.  It identifies the MLE variances and the
 % associated summed log-likelihood considering the entire surface.  It
@@ -10,7 +10,7 @@ function [f1, f2, f3, maxly, nMLE, sMLE] = image2normlysmix(perc, trusigmas,  lx
 %
 % Input:
 % perc        Percentage of lx mixed between noise, signal (def: 10)
-% trusigmas   2 standard deviations of noise, signal segments 
+% trusigmas   2 standard deviations of noise, signal segments
 %                 (def: [1 sqrt(2)])
 % lx          Length random time series generated here (def: 1000)
 % cp          Sample index of changepoint that separates noise, signal
@@ -20,7 +20,7 @@ function [f1, f2, f3, maxly, nMLE, sMLE] = image2normlysmix(perc, trusigmas,  lx
 % npts        Number of x-axis points (e.g., number of likelihood
 %                 calculations per time series tested) (def: 100)
 % ntests      Number of likelihood curves plotted (def: 100)
-% tinc        Tick increment: X and YTick intervals in normalized 
+% tinc        Tick increment: X and YTick intervals in normalized
 %                 variance coordinates [axlim(1):tinc:axlim(2)] (def: 0.25)
 % cmp         String specifying colormap (e.g., 'jet(5)') (def: 'jet')
 %
@@ -33,23 +33,23 @@ function [f1, f2, f3, maxly, nMLE, sMLE] = image2normlysmix(perc, trusigmas,  lx
 % nMLE        MLE of the normalized variance of the noise segment
 % sMLE        MLE of the normalized variance of the signal segment
 %
-% Ex: 
+% Ex:
 %    IMAGE2NORMLYSMIX(25, [1 sqrt(2)], 1000, 500, [0.5 1.5], 1000, 100, 0.25, 'jet')
-% 
-% Citation: ??
 %
 % See also: plot2normlysmix.m
 %
+% Cite: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 27-May-2019, Version 2017b
+% Last modified: 09-Jan-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('perc', 10)
 defval('trusigmas', [1 sqrt(2)])
 defval('lx', 1000)
 defval('cp', 500)
-defval('axlim', [.5 1.5])
+defval('axlim', [0.5 1.5])
 defval('npts', 100)
 defval('ntests', 100)
 defval('tinc', 0.25)
@@ -113,7 +113,7 @@ colormap(eval(cmap))
 f.cf = colorbar(f.ax1)
 f.cf.Label.Interpreter = 'Latex';
 f.cf.TickLabelInterpreter = 'Latex';
-f.cf.Label.String = 'summed log-likelihood $\ell$';
+f.cf.Label.String = 'Summed log likelihood $\ell$';
 f.cf.Label.FontSize = f.ax1.XLabel.FontSize;
 
 % X and Y axes tick positions are the same.
@@ -166,20 +166,20 @@ f.ylab1 = cellfun(@(xx) sprintf('%1.2f', xx), num2cell(sk.xaxis(tickpos)), ...
 set(f.ax1, 'YTickLabels', f.ylab1);
 
 % Secondary x-axis = sigmas tested: noise
-f.xl1 = xlabel(f.ax1, '$\sigma_1^2\big/\sigma_{1\circ}^2$');
+f.xl1 = xlabel(f.ax1, '$\hat\sigma_1^2\big/\sigma_{1_\circ}^2$');
 f.xlab2 = cellfun(@(xx) sprintf('%1.2f', xx), ...
                   num2cell(nk.sigmastested(tickpos).^2), 'UniformOutput', ...
                   false);
 
 % Secondary y-axis = sigmas test: signal
-f.yl1 = ylabel(f.ax1, '$\sigma_2^2\big/\sigma_{2\circ}^2$');
+f.yl1 = ylabel(f.ax1, '$\hat\sigma_2^2\big/\sigma_{2_\circ}^2$');
 f.ylab2 = cellfun(@(xx) sprintf('%1.2f', xx), ...
                   num2cell(sk.sigmastested(tickpos).^2), 'UniformOutput', ...
                   false);
 
 % Generate secondary axes.
-[f.ax2, f.xl2, f.yl2] = xtraxis(f.ax1, tickpos, f.xlab2, '$\sigma_1^2$', ...
-                                tickpos, f.ylab2, '$\sigma_2^2$');
+[f.ax2, f.xl2, f.yl2] = xtraxis(f.ax1, tickpos, f.xlab2, '$\hat\sigma_1^2$', ...
+                                tickpos, f.ylab2, '$\hat\sigma_2^2$');
 
 %% Adjust the ticks and labels per the increment requested.
 

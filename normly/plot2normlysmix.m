@@ -1,16 +1,16 @@
 function f = plot2normlysmix(perc, trusigmas, lx, cp, axlim, npts, ntests, meth)
 % f = PLOT2NORMLYSMIX(perc,trusigmas,lx,cp,axlim,npts,ntests,meth)
-% 
+%
 % Like plot2normlystest.m, except this function includes some
 % percentage of noise/signal included in each test.
 %
 % In keeping with notation of simon+2019.pdf, standard deviation and
-% variance statistics are returned in their biased forms: 
+% variance statistics are returned in their biased forms:
 %
 %                       1/N; not 1/(N-1)
 % Input:
 % perc        Percentage of lx mixed between noise, signal (def: 10)
-% trusigmas   2 standard deviations of noise, signal segments 
+% trusigmas   2 standard deviations of noise, signal segments
 %                 (def: [1 sqrt(2)])
 % lx          Length random time series generated here (def: 1000)
 % cp          Sample index of changepoint that separates noise, signal
@@ -20,7 +20,7 @@ function f = plot2normlysmix(perc, trusigmas, lx, cp, axlim, npts, ntests, meth)
 % npts        Number of x-axis points (e.g., number of likelihood
 %                 calculations per time series tested) (def: 100)
 % ntests      Number of likelihood curves plotted (def: 100)
-% meth        1: Sum log-likelihoods same normalized variance 
+% meth        1: Sum log-likelihoods same normalized variance
 %             2: Sum log-likelihoods using single value of correctly
 %                mixed section: its maximum log-likelihood (def)
 %             3: Sum log-likelihoods using single value of correctly
@@ -29,19 +29,19 @@ function f = plot2normlysmix(perc, trusigmas, lx, cp, axlim, npts, ntests, meth)
 %                distribution
 % Output:
 % f           Struct with relevant figure handles
-%                 NOTE: f.ha1 through f.ha(4) are linked; 
+%                 NOTE: f.ha1 through f.ha(4) are linked;
 %                 f.ha(5) and f.ha(6) are linked.
 %
 % Ex:
 %    f = PLOT2NORMLYSMIX(25,[1 sqrt(2)],1000,500,[0.1 10],100,25,1)
 %
-% Citation: ??
-%
 % See also: normlysmix.m, plotnormlysmix.m, plotnormlysmixsum.m.
+%
+% Cite: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 25-May-2019, Version 2017b
+% Last modified: 10-Jan-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('perc', 10)
@@ -112,8 +112,8 @@ f.pos6 = axpos(f.ha(6));
 ax = f.ha(1);
 f.f1 = plotnormlysmixsum(lnk, lsk, false, ax, meth);
 
-ylabel(ax, 'summed log-likelihood $\ell$', 'Interpreter', 'Latex');
-xlabel(ax, 'variance $\sigma^2/\sigma_{\circ}^2$', 'Interpreter', ...
+ylabel(ax, 'Summed log likelihood $\ell$', 'Interpreter', 'Latex');
+xlabel(ax, 'Normalized variance $\hat\sigma^2/\sigma_{\circ}^2$', 'Interpreter', ...
        'Latex');
 
 f.f1.hl = fx(horzline(f.f1.meany, ax, 'k'), 1);
@@ -121,12 +121,11 @@ f.f1.hl = fx(horzline(f.f1.meany, ax, 'k'), 1);
 %%_____________________________________________________%%
 % Second plot: the noise, n(k), when the CHANGEPOINT is LATE
 ax = f.ha(2);
-f.f2 = plotnormlysmix(lnk, false, ax);
+f.f2 = plotnormlysmix(lnk, false, ax,1);
 
-
-xlabel(ax, 'variance $\sigma_1^2/\sigma_{1\circ}^2$', 'Interpreter', ...
+xlabel(ax, 'Normalized variance $\hat\sigma_1^2/\sigma_{1_\circ}^2$', 'Interpreter', ...
        'Latex');
-ylabel(ax, 'log-likelihoods $\ell_1,~\ell_2$', 'Interpreter', 'Latex');
+ylabel(ax, 'Log likelihoods $\ell_1,~\ell_2$', 'Interpreter', 'Latex');
 
 set(f.f2.ly, 'Color', 'b')
 set(f.f2.MLE, 'Color', 'k', 'MarkerFaceColor', 'k')
@@ -136,9 +135,9 @@ f.f2.hl = fx(horzline(f.f2.meany, ax, 'k'), 1);
 %%_____________________________________________________%%
 % Third plot: the signal, s(k), when the CHANGEPOINT is EARLY
 ax = f.ha(3);
-f.f3 = plotnormlysmix(esk, false, ax);
+f.f3 = plotnormlysmix(esk, false, ax,2);
 
-xlabel(ax, 'variance $\sigma_2^2/\sigma_{2\circ}^2$', ...
+xlabel(ax, 'Normalized variance $\hat\sigma_2^2/\sigma_{2_\circ}^2$', ...
        'Interpreter', 'Latex');
 
 set(f.f3.ly, 'Color', 'r')
@@ -206,7 +205,7 @@ hold(ax,'on')
 f.f6.vltru = fx(vertline(cp, ax, 'k'), 1);
 f.f6.vlest = fx(vertline(cp-mixsamps, ax, 'k:'), 1);
 
-xlabel(ax, 'sample index $k$', 'Interpreter', 'latex');
+xlabel(ax, 'Sample index $k$', 'Interpreter', 'latex');
 ylabel(ax, '$x$', 'Interpreter', 'latex');
 
 xlim(ax,[1 lx]);
@@ -238,7 +237,7 @@ set(f.ha, 'TickDir', 'out')
 f = orderfields(f);
 return
 
-% To highlight a random time series -- 
+% To highlight a random time series --
 f.f1.hily = f.f1.ly(late_ynum);
 f.f1.hily.Color = 'k';
 f.f1.hily.LineWidth = defs.lineWidth;
