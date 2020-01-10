@@ -10,7 +10,7 @@ function f = plot2normlystest(trusigmas, axlim, npts, lx, bp, ntests)
 % for example) is done. Will require cleanup to make pretty.
 %
 % In keeping with notation of simon+2019.pdf, standard deviation and
-% variance statistics are returned in their biased forms: 
+% variance statistics are returned in their biased forms:
 %
 %                       1/N; not 1/(N-1)
 %
@@ -27,14 +27,16 @@ function f = plot2normlystest(trusigmas, axlim, npts, lx, bp, ntests)
 % Output:
 % f           Struct with relevant figure handles
 %
-% Ex: 
+% Ex:
 %    f = PLOT2NORMLYSTEST([1 sqrt(2)], [0.5 1.5], 100, 1000, 500, 25)
 %
-% Citation: ??
-% 
 % See also: plotnormlystest.m, normlystest.m, suggestsigmas.m
 %
-% Last modified in Ver. 2017b by jdsimon@princeton.edu, 6-Feb-2018.
+% Cite: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
+%
+% Author: Joel D. Simon
+% Contact: jdsimon@princeton.edu
+% Last modified: 09-Jan-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('trusigmas', [1 sqrt(2)])
@@ -69,7 +71,7 @@ width = r_edge - l_edge;
 f.ha(5).Position(1) = l_edge;
 f.ha(5).Position(3) = width;
 
-% Start plotting 
+% Start plotting
 % Length of noise and signal.
 lnk = length(1:bp);
 lsk = length(bp+1:lx);
@@ -78,26 +80,27 @@ lsk = length(bp+1:lx);
 % Second plot: first normlystest.m, the noise, n(k).
 ax = f.ha(2);
 [lys2, ~ , f.f2] = normlystest(trusigmas(1), axlim, npts, lnk, ntests, ...
-                               true, false, ax);
+                               true, false, ax, 1);
 set(f.f2.ly, 'Color', 'b')
 set(f.f2.MLE,'Color', 'k', 'MarkerFaceColor', 'k')
 
-xlabel(ax, 'variance $\sigma_1^2/\sigma_{1\circ}^2$', 'Interpreter', ...
+xlabel(ax, 'Normalized variance $\hat\sigma_1^2/\sigma_{1_\circ}^2$', 'Interpreter', ...
        'Latex');
-ylabel(ax, 'log-likelihoods $\ell_1,~\ell_2$', 'Interpreter', 'Latex');
+ylabel(ax, 'Log likelihoods $\ell_1,~\ell_2$', 'Interpreter', 'Latex');
 
 f.f2.hl = fx(horzline(f.f2.meany, ax, 'k'), 1);
+
 
 %_________________________________________________________________%
 % Third plot: second normlystest.m, the signal, s(k).
 ax = f.ha(3);
 [lys3, ~, f.f3] = normlystest(trusigmas(2), axlim, npts, lsk, ntests, ...
-                              true, false, ax);
+                              true, false, ax, 2);
 
 set(f.f3.ly, 'Color', 'r')
 set(f.f3.MLE, 'Color', 'k', 'MarkerFaceColor', 'k')
 
-xlabel(ax, 'variance $\sigma_2^2/\sigma_{2\circ}^2$', ...
+xlabel(ax, 'Normalized variance $\hat\sigma_2^2/\sigma_{2_\circ}^2$', ...
        'Interpreter', 'Latex');
 
 
@@ -142,9 +145,9 @@ f.f1.vary = var([f.f1.MLE.YData], 1);
 [f.f1.xhair,f.f1.xhairhg] = crosshair(ax, f.f1.meanx, f.f1.meany, 2*f.f1.stdx, 2*f.f1.stdy);
 
 % Add a text box.
-meanstr = sprintf(['mean($\\hat{\\sigma}^2/\\sigma_{\\circ}^2$) = ' ...
+meanstr = sprintf(['Mean($\\hat{\\sigma}^2/\\sigma_{\\circ}^2$) = ' ...
                    '%.3f'], f.f1.meanx);
-varstr = sprintf(['~~~var($\\hat{\\sigma}^2/\\sigma_{\\circ}^2$) = ' ...
+varstr = sprintf(['~~~Var($\\hat{\\sigma}^2/\\sigma_{\\circ}^2$) = ' ...
                   '%.3f'], f.f1.varx);
 [f.f1.bh,f.f1.th] = boxtex('lm', ax, sprintf('%s\n%s', meanstr, varstr));
 f.f1.th.Interpreter = 'latex';
@@ -156,9 +159,9 @@ set(f.f1.MLE, 'MarkerSize', f.f2.MLE(1).MarkerSize)
 set(f.f1.MLE, 'ZData', f.f1.xhair.c.ZData);
 set(f.f1.xhair.c, 'ZData', f.f1.MLE(1).ZData+1);
 
-xlabel(ax, 'variance $\sigma^2/\sigma_{\circ}^2$', 'Interpreter', ...
+xlabel(ax, 'Normalized variance $\hat\sigma^2/\sigma_{\circ}^2$', 'Interpreter', ...
        'Latex');
-ylabel(ax, 'summed log-likelihood $\ell$', 'Interpreter', 'Latex')
+ylabel(ax, 'Summed log likelihood $\ell$', 'Interpreter', 'Latex')
 
 f.f1.hl = fx(horzline(f.f1.meany, ax, 'k'), 1);
 
@@ -167,9 +170,9 @@ f.f1.hl = fx(horzline(f.f1.meany, ax, 'k'), 1);
 ax = f.ha(4);
 tstr = sprintf('Shown are %i tests:', ntests);
 kstr = sprintf('$k = 1,...,1000,~k_{\\circ} = %i$,', bp);
-nstr = sprintf(['$n(k)\\sim\\mathcal{N}(\\mu_{1}=0,\\sigma_{1\\' ...
+nstr = sprintf(['$n(k)\\sim\\mathcal{N}(\\mu_{1_\\circ}=0,\\sigma_{1_\\' ...
                 'circ}^2=%.2f$),'], trusigmas(1)^2);
-sstr = sprintf(['$s(k)\\sim\\mathcal{N}(\\mu_{2}=0,\\sigma_{2\\' ...
+sstr = sprintf(['$s(k)\\sim\\mathcal{N}(\\mu_{2_\\circ}=0,\\sigma_{2_\\' ...
                 'circ}^2=%.2f),$'], trusigmas(2)^2);
 xstr = sprintf('$x(k) = n(k) + s(k).$');
 f.f4.th = text(ax, 0, 1, sprintf('%s\n%s\n%s\n%s\n%s', tstr, kstr, ...
@@ -189,7 +192,7 @@ hold(ax, 'off')
 
 % Annotate and label.
 f.f5.vl = fx(vertline(bp, f.ha(5), 'k'));
-xlabel(ax, 'sample index $k$', 'Interpreter', 'Latex');
+xlabel(ax, 'Sample index $k$', 'Interpreter', 'Latex');
 ylabel(ax, '$x$', 'Interpreter', 'Latex');
 box(ax, 'on');
 xlim(ax, [1 lx])

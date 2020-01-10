@@ -1,5 +1,5 @@
-function f = plotnormlysmix(nkorsk,nglog,ha)
-% f = PLOTNORMLYSMIX(nkorsk,nglog,ha)
+function f = plotnormlysmix(nkorsk,nglog,ha,nork)
+% f = PLOTNORMLYSMIX(nkorsk,nglog,ha,nork)
 %
 % Plots normlysmix.m log-likelihood curves. See there for I/O
 % information.  No defaulted inputs.
@@ -18,7 +18,7 @@ function f = plotnormlysmix(nkorsk,nglog,ha)
 % time series segment ('n(k)','s(k)') etc.  See plot2normlysmix.m.
 %
 % In keeping with notation of simon+2019.pdf, standard deviation and
-% variance statistics are returned in their biased forms: 
+% variance statistics are returned in their biased forms:
 %
 %                       1/N; not 1/(N-1)
 %
@@ -31,18 +31,18 @@ function f = plotnormlysmix(nkorsk,nglog,ha)
 %    title('Changepoint early: noise')
 %    f2 = PLOTNORMLYSMIX(esk);
 %    title('Changepoint early: signal');
-%    f3 = PLOTNORMLYSMIX(lnk); 
+%    f3 = PLOTNORMLYSMIX(lnk);
 %    title('Changepoint late: noise');
 %    f4 = PLOTNORMLYSMIX(lsk);
 %    title('Changepoint late: signal');
 %
-% Citation: ??
-%
 % See also: normlysmix.m, plot2normlysmix.m
+%
+% Cite: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 04-Aug-2017, Version 2017b
+% Last modified: 10-Jan-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('nglog',false)
@@ -110,10 +110,10 @@ f.vary = var(neg * nkorsk.lys_maxval, 1);
 
 % latex-formatted text before the interpreter is set.
 % Annotated box with sample statistics; mean, std., var. of MLE.
-meanstr = sprintf(['mean($\\hat{\\sigma}^2/\\sigma_{\\circ}^2$) = ' ...
-                   '%.3f'], f.meanx);
-varstr = sprintf(['~~~var($\\hat{\\sigma}^2/\\sigma_{\\circ}^2$) = ' ...
-                  '%.3f'], f.varx);
+meanstr = sprintf(['Mean($\\hat\\sigma_%i^2/\\sigma_{%i_\\circ}^2$) = ' ...
+                   '%.3f'], nork, nork, f.meanx);
+varstr = sprintf(['~~~Var($\\hat\\sigma_%i^2/\\sigma_{%i_\\circ}^2$) = ' ...
+                  '%.3f'], nork, nork, f.varx);
 [f.bh, f.th] = boxtex(bpos, ax, sprintf('%s\n%s', meanstr, varstr));
 f.th.Interpreter = 'Latex';
 

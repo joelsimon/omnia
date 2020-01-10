@@ -38,6 +38,8 @@
 
 % For my code, and code my code requires.
 addpath(genpath(getenv('OMNIA')))
+
+% For MatTaup.
 javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', ...
                      'matTaup.jar'))
 
@@ -45,4 +47,5 @@ javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', ...
 addpath(genpath(getenv('IRISFETCH')))
 javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
 
-addpath(fullfile(getenv('AGU'), 'talk', 'code'))
+%________________________________________________________________%
+% Any others, specific to JDS.

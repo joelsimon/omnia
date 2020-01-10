@@ -1,0 +1,14 @@
+#! /bin/bash
+#
+# Print date of last surfacing for each Princeton MERMAID, 
+# as read from ESO website textfile.
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@princeton.edu
+# Last modified: 10-Jan-2020
+
+wget 'http://geoweb.princeton.edu/people/simons/SOM/all.txt' -qO last_surface.txt  # -q for 'quiet', to suppress output
+printf '\nLast surfacing:\n'
+sed -n '08,23p' last_surface.txt | awk '{print $1,$2}'
+printf '\n'
+rm last_surface.txt

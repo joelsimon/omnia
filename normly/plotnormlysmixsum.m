@@ -19,7 +19,7 @@ function f = plotnormlysmixsum(nk, sk, nglog, ha, meth);
 % the time series is magenta.
 %
 % % In keeping with notation of simon+2019.pdf, standard deviation and
-% variance statistics are returned in their biased forms: 
+% variance statistics are returned in their biased forms:
 %
 %                       1/N; not 1/(N-1)
 % Input:
@@ -27,7 +27,7 @@ function f = plotnormlysmixsum(nk, sk, nglog, ha, meth);
 % sk          Early or late signal structure from normlysmix.m
 % nglog       true to plot negative log-likelihoods (def: false)
 % ha          Axes handle to place plot
-% meth        1: Sum log-likelihoods same normalized variance 
+% meth        1: Sum log-likelihoods same normalized variance
 %             2: Sum log-likelihoods using single value of correctly
 %                mixed section: its maximum log-likelihood (def)
 %             3: Sum log-likelihoods using single value of correctly
@@ -43,13 +43,13 @@ function f = plotnormlysmixsum(nk, sk, nglog, ha, meth);
 %    f_early = PLOTNORMLYSMIXSUM(enk, esk, false, gca, 1); figure
 %    f_late  = PLOTNORMLYSMIXSUM(lnk, lsk, false, gca, 1)
 %
-% Citation: ??
-%
 % See also: plot2normlysmix.m, normlysmix.m (particularly nk/sk naming convention)
+%
+% Cite: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 05-Jun-2019, Version 2017b
+% Last modified: 10-Jan-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('nglog',false)
@@ -61,7 +61,7 @@ defval('ha',[]);
 experiment = [nk.info ' & ' sk.info];
 acceptable_experiment = {'changepoint early: noise & changepoint early: signal', ...
                          'changepoint late: noise & changepoint late: signal'};
-if ~sum(contains(acceptable_experiment, experiment)) 
+if ~sum(contains(acceptable_experiment, experiment))
     error(['Incorrect nk, sk structures supplied: enk goes with esk; ' ...
            'lnk goes with lsk'])
 
@@ -128,20 +128,20 @@ else
         col(3) = col(3)/fac;
     end
 end
-    
-%% Main. 
+
+%% Main.
 hold(f.ha,'on')
 grid(f.ha,'on')
 grid(f.ha,'minor')
 ntests = length(nk.lys);
 
-% Decide the static variable for cases 1 and 2 below: 
+% Decide the static variable for cases 1 and 2 below:
 % changepoint early: noise value is static (no incorrect mixing of the signal)
 % changepoint late: signal value is static (no incorrect mixing of the noise)
 if contains(experiment, 'early')
     static = nk;
     varies = sk;
-    
+
 else
     static = sk;
     varies = nk;
@@ -153,7 +153,7 @@ for i = 1:ntests;
     switch meth
       case 1
         % Sum at indices of same normalized test variance.
-        summed = neg * (nk.lys{i} + sk.lys{i});        
+        summed = neg * (nk.lys{i} + sk.lys{i});
         %disp('meth 1: sum at normalized variances')
 
       case 2
@@ -172,9 +172,9 @@ for i = 1:ntests;
                    'because the true sigma of the generating ' ...
                    'distribution is not within the range of sigmas tested'])
         end
-        summed = neg * (varies.lys{i} + static.lys{i}(trusigma_idx)); 
+        summed = neg * (varies.lys{i} + static.lys{i}(trusigma_idx));
         %disp('meth 3: sum at static value = maximum likelihood at trusigma of unmixed section')
-       
+
       otherwise
         error('Specify 1 2 or 3 for input: ''meth''')
 
@@ -225,9 +225,9 @@ f.tl.FontSize = defs.font.sizeTitle;
 f.tl.FontWeight = defs.font.weight;
 
 % Annotated box.
-meanstr = sprintf('mean($\\hat{\\sigma}^2/\\sigma^2$) = %.3f', f.meanx);
-varstr = sprintf('~~~var($\\hat{\\sigma}^2/\\sigma^2$) = %.3f', f.varx);
-f.bxstr = sprintf('%s\n%s', meanstr, varstr); 
+meanstr = sprintf('Mean($\\hat{\\sigma}^2/\\sigma_\\circ^2$) = %.3f', f.meanx);
+varstr = sprintf('~~~Var($\\hat{\\sigma}^2/\\sigma_\\circ^2$) = %.3f', f.varx);
+f.bxstr = sprintf('%s\n%s', meanstr, varstr);
 [f.bh,f.th] = boxtex(bpos,ax,'foo');
 f.th.String = f.bxstr;
 f.th.Interpreter = defs.font.Interpreter;
