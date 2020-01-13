@@ -1,5 +1,5 @@
-function writeaccess(lock, filename)
-% WRITEACCESS(lock, filename)
+function writeaccess(lock, filename, warn)
+% WRITEACCESS(lock, filename, warn)
 %
 % Manage write access to an input file.
 %
@@ -7,15 +7,21 @@ function writeaccess(lock, filename)
 % lock       'lock': restrict write access (def)
 %            'unlock': grant write access
 % filename   Filename to restrict or grant write access
+% warn       logical true to warn if filename does not exist
+%                (def: true)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 27-Dec-2019, Version 2017b on MACI64
 
 defval('lock', 'lock')
+defval('warn', true)
 
 if exist(filename, 'file') ~= 2
-    warning('filename %s does not exist', filename)
+    if warn
+        warning('filename %s does not exist', filename)
+
+    end
     return
 
 end
