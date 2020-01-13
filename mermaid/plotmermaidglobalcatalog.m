@@ -40,7 +40,7 @@ function [F1, ha1, F2, ha2] = plotmermaidglobalcatalog(ha1, ha2, mercatfile, sta
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Jan-2020, Version 2017b on GLNXA64
+% Last modified: 13-Jan-2020, Version 2017b on GLNXA64
 
 % Default.
 defval('ha1', [])
@@ -117,8 +117,8 @@ P = mean_events_ID_per_mermaid / num_events;
 
 mag_unit = str2num(mercatfile(end-8));
 F1.tl = title(ha1, sprintf('%i unique events (%i identified [%.1f%s])', num_events, num_events_ID, perc_events_ID, '\%'));
-F1.yl = ylabel(ha1, sprintf('MERMAID identifications'));
-F1.xl = xlabel(ha1, 'event date');
+F1.yl = ylabel(ha1, sprintf('MERMAID\nidentifications'));
+F1.xl = xlabel(ha1, 'Event date');
 
 %ha1.YLim = [0 num_floats];
 ha1.YLim = [-2.5 num_floats];
@@ -166,7 +166,7 @@ end
 % Generate the histogram.
 F2.h = histogram(ha2, all_nums, 'BinMethod', 'Integer', 'FaceColor', 'k');
 F2.xl = xlabel(ha2, 'MERMAID station');
-F2.yl = ylabel(ha2, sprintf('events identified'));
+F2.yl = ylabel(ha2, sprintf('Events identified'));
 
 % Update the x-axis in case labels need to be remapped after adjusting
 % for missing float numbers.
@@ -177,7 +177,7 @@ F.mtx = mean(all_nums);
 ha2.XLim = [floatnums(1)-.5 floatnums(1)+num_floats-.5];
 ha2.YLim = [0 length(idx)];
 
-F2.tl = title(ha2, sprintf(['%i total identifications (average of %i ' ...
+F2.tl = title(ha2, sprintf(['%i identifications (average of %i ' ...
                     'per MERMAID)'], tot_event_reports, ...
                            round(mean_events_ID_per_mermaid)));
 
@@ -203,7 +203,4 @@ fprintf(['for every identified event there were on average %.1f ' ...
         mean_num_mermaids_reporting_per_event)
 fprintf('in total, %i event identifications were reported by %i MERMAIDS\n', tot_event_reports, num_floats)
 fprintf('meaning that on average each MERMAID reported %.1f unique events\n', mean_events_ID_per_mermaid)
-
-
-%
 
