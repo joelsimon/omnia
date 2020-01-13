@@ -47,7 +47,7 @@ defval('ha1', [])
 defval('ha2', [])
 defval('statdate', NaT('TimeZone', 'UTC'))
 defval('mercatfile', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
-                              'identified', 'txt', 'M5_DET.txt'))
+                              'identified', 'txt', 'M6_DET.txt'))
 defval('floatnums', [8:13 16:25])
 
 % Read the data from the relevant MERMAID catalog file.
@@ -90,6 +90,16 @@ else
 
 end
 
+% Find the event(s) reported by the most MERMAIDs.  These indices
+% match those of eqtime, eqid etc.  They are not the same index-base
+% as mertot(idx), which includes only those in the time window of
+% interest, though I'm careful in the next line to only search for
+% maximum-event reporst within the time window of interest
+% (mertot(idx)).
+max_mertot_idx = find(mertot == max(mertot(idx)));
+max_mertot_eqtime = eqtime(max_mertot_idx);
+max_mertot_eqid = eqid(max_mertot_idx);
+
 % Generate the stem plot showing number of MERMAIDS reporting event
 % through time.  Missed events are labeled with an 'x' at 0 on the
 % y-axis.  Any events outside the requested time range are plotting in
@@ -100,6 +110,19 @@ F1.pl_null = stem(ha1, eqtime(null_id), repmat(-1.25, size(mertot(null_id))), 'k
 F1.pl_pos_out = stem(ha1, eqtime(pos_id_out), mertot(pos_id_out), 'Color', [0.5 0.5 0.5], 'MarkerFaceColor', [0.5 0.5 0.5]);
 F1.pl_null_out = stem(ha1, eqtime(null_id_out), repmat(-1.25, size(mertot(null_id_out))), 'x','MarkerSize', 4, 'Color', [0.5 0.5 0.5]);
 hold(ha1, 'off')
+
+% Find the F.pl_pos indices that correspond to the max so I can
+% highlight the one(s) I want in post.
+mag_unit = str2num(mercatfile(end-8));
+if ~isempty(max_mertot_idx)
+    fprintf('\n\nMAGNITUDE %i-%i.9: max. of %i MERMAID identification(s) per event\n\n', mag_unit, mag_unit, max(mertot(idx)))
+    for i = 1:length(max_mertot_eqtime);
+        fprintf('F1.pl_pos.XData(%i)\n', ...
+                find(datenum(F1.pl_pos.XData) == datenum(max_mertot_eqtime(i)))); % This will be unique so find is okay.
+        fprintf('Date: %s\nID:   %s\n\n', datestr(max_mertot_eqtime(i)), max_mertot_eqid{i})
+
+    end
+end
 
 % Label the axes, considering only requested time range.
 num_events = length(idx);
@@ -115,7 +138,6 @@ mean_num_mermaids_reporting_per_event = mean(num_mermaids_reporting_per_event);
 % Probability any given MERMAID will report any given event over the time period.
 P = mean_events_ID_per_mermaid / num_events;
 
-mag_unit = str2num(mercatfile(end-8));
 F1.tl = title(ha1, sprintf('%i unique events (%i identified [%.1f%s])', num_events, num_events_ID, perc_events_ID, '\%'));
 F1.yl = ylabel(ha1, sprintf('MERMAID\nidentifications'));
 F1.xl = xlabel(ha1, 'Event date');
@@ -203,4 +225,3 @@ fprintf(['for every identified event there were on average %.1f ' ...
         mean_num_mermaids_reporting_per_event)
 fprintf('in total, %i event identifications were reported by %i MERMAIDS\n', tot_event_reports, num_floats)
 fprintf('meaning that on average each MERMAID reported %.1f unique events\n', mean_events_ID_per_mermaid)
-
