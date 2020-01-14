@@ -15,16 +15,21 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 31-Oct-2019
+# Last modified: 14-Jan-2020
 
 # Keep track of starting directory.
 start_dir=`pwd`
 
 # Ensure you are in master (and not some dev) branch in the three relevant directories.
-printf '\n\n!!!!! Switching to master branch in dirs $MERMAID: server, processed, and events !!!!!\n\n'
+printf '\n\n!!!!! Switching to master branch in dirs $MERMAID: server, locations, processed, and events !!!!!\n\n'
 
 cd $MERMAID
+
 cd server
+git checkout master  >& /dev/null
+cd ..
+
+cd locations
 git checkout master  >& /dev/null
 cd ..
 
@@ -75,7 +80,7 @@ echo -e '\n...completed writing SAC files\n'
 # do with MATLAB closing before the parallel pool is completely shut
 # down.  Doesn't seem to affect the output of this code, however.
 echo -e '\nMatching to the seismic catalog...\n'
-/usr/local/MATLAB/R2017b/bin/matlab -r "run matchall.m; exit"
+/usr/local/MATLAB/R2017b/bin/matlab -r "run matchall.m; run fetchmerloc.m; exit" >& /dev/null
 
 ## 28-Jun-2019
 ## -nodisplay does not work with updated plotchangepoint.m, which sets
