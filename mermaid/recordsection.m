@@ -195,7 +195,7 @@ current_xlim = get(F.ax, 'XLim');
 current_ylim = get(F.ax, 'YLim');
 if strcmpi(alignon, 'atime')
     % XLabel specific to aligning on first-arrival.
-    F.xl = xlabel(sprintf(['time relative to first arrival(s)\n[origin: ' ...
+    F.xl = xlabel(sprintf(['Time relative to first arrival(s)\n[origin: ' ...
                         '%s UTC]'], evttime));
 
     warning(['Theoretical first arrival may not be the same phase ' ...
@@ -226,7 +226,7 @@ else
     end
 
     % XLabel specific to aligning on event-rupture time.
-    F.xl = xlabel(sprintf('time relative to %s UTC (s)', evttime));
+    F.xl = xlabel(sprintf('Time relative to %s UTC (s)', evttime));
     %F.xl = xlabel(sprintf('time relative to %s UTC (s)\n[%s]', evttime, id));
     F.lg = legend(F.ph, phases_plotted, 'AutoUpdate', 'off', 'Location', ...
                   'NorthWest', 'FontSize', F.xl.FontSize);
@@ -248,7 +248,7 @@ if ~isnan(lohi)
 end
 
 % Cosmetics.
-F.yl = ylabel(F.ax, 'epicentral distance (degrees)');
+F.yl = ylabel(F.ax, 'Epicentral distance (degrees)');
 F.tl.FontWeight = 'normal';
 latimes
 
