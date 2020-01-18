@@ -7,12 +7,13 @@ function writechangepointall
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 30-Aug-2019, Version 2017b
+% Last modified: 17-Jan-2020, Version 2017b on GLNXA64
 
-pool = gcp;
 diro = fullfile(getenv('MERMAID'), 'events', 'changepoints');
 s = fullsac;
-parfor i = 1:length(s)
+%pool = gcp;
+%parfor i = 1:length(s)
+for i = 1:length(s)
     CP = getcp(s{i}, diro);
     if isempty(CP)
         sans_sac = strrep(strippath(s{i}), '.sac', '');
@@ -32,4 +33,4 @@ parfor i = 1:length(s)
 
     end        
 end
-delete(pool)
+%delete(pool)
