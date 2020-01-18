@@ -187,7 +187,7 @@ end
 
 % Generate the histogram.
 F2.h = histogram(ha2, all_nums, 'BinMethod', 'Integer', 'FaceColor', 'k');
-F2.xl = xlabel(ha2, 'MERMAID station');
+F2.xl = xlabel(ha2, 'MERMAID (excluding ''P-'' prefx)');
 F2.yl = ylabel(ha2, sprintf('Events identified'));
 
 % Update the x-axis in case labels need to be remapped after adjusting
