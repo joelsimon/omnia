@@ -1,4 +1,4 @@
-function varargout = readevt2txt(filename, starttime, endtimem, returntype)
+function varargout = readevt2txt(filename, starttime, endtime, returntype)
 % [sac, eqtime, eqlat, eqlon, eqregion, eqdepth, eqdist, eqmag, ...
 %      eqphase1, eqid, sacdate, eqdate] = READEVT2TXT(filename, starttime, endtime, returntype)
 %
