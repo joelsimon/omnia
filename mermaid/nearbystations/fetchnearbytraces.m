@@ -67,13 +67,13 @@ if ~need2continue(redo, iddir)
 end
 
 % Get the EQ structures associated with this event.
-[sac, EQ] = getsacevt(id, evtdir);
+[~, EQ] = getsacevt(id, evtdir);
 
 % Keep only the first: they may differ in origin time slightly
 % depending on catalog and when they were last queried, but they
 % should all be roughly the same.
 EQ = EQ{1}(1);
-evtdate = datetime(irisstr2date(EQ.PreferredTime));
+evtdate = irisstr2date(EQ.PreferredTime);
 
 % Get all the nearby stations.
 [network, station, datacenter] =  parsenearbystations(txtfile);
@@ -113,13 +113,13 @@ for i = 1:length(station)
     channel = ['M*Z,' ...  %             Mid period: >   1 <  10 Hz
                'B*Z,' ...  %             Broad band: >= 10 <  80 Hz
                'H*Z,' ...  %        High broad band: >= 80 < 250 Hz
-               'S*Z,' ...  %           Short period: >= 10 <  80 Hz (Raspbery Shake)
-               'E*Z'];     % Extremely short period: >= 80 < 250 HZ (Raspbery Shake)
+               'S*Z,' ...  %           Short period: >= 10 <  80 Hz (Raspberry Shake)
+               'E*Z'];     % Extremely short period: >= 80 < 250 HZ (Raspberry Shake)
 
     % See: http://www.fdsn.org/pdf/SEEDManual_V2.4.pdf.
     % Choices are D, R, Q, M. M seems to assure best quality ("Data center
     % modified, time-series values have not been changed")
-    % irisFetch.Traces also has B ("best") qaulity indicator that I
+    % irisFetch.Traces also has B ("best") quality indicator that I
     % can't find in the SEED manual and thus don't trust.
     quality = 'M';
 
@@ -141,7 +141,7 @@ for i = 1:length(station)
     % The sta structure will almost always be of length 1.  It is
     % larger when the station is turned off/on, and/or moved.
     for j = 1:length(sta)
-        % Compute theoretical arrival times of the requesetd phases at
+        % Compute theoretical arrival times of the requested phases at
         % this station.
         tt = taupTime(model, EQ.PreferredDepth, ph, ...
                       'station', [sta(j).Latitude sta(j).Longitude], ...
@@ -154,7 +154,7 @@ for i = 1:length(station)
 
         end
 
-        % Ensure the station was at the purpoted location at the
+        % Ensure the station was at the purported location at the
         % time of the first arrival.
         first_TaupTime = tt(1);
         firstarrival_date = evtdate + seconds(first_TaupTime.time);
