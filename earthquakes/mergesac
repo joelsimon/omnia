@@ -18,7 +18,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 17-Sep-2019
+# Last modified: 23-Jan-2020
 
 # Collect input variables.
 sacdir=$1
@@ -58,11 +58,10 @@ fi
 # Merge input file list and write output SAC file.
 sac << !
 read "$filelist"
-merge verbose gap zero overlap average
+merge verbose gap zero overlap average # *
 write $outfname
 quit
 !
-
 # Move input file list to 'unmerged/'.
 mkdir unmerged  >& /dev/null
 mv $filelist unmerged
@@ -84,3 +83,13 @@ printf "Wrote %s\n\n" $outfname
 # Return from whence you came.
 cd $startdir
 exit 0
+
+#_______________________________________________________________________#
+
+# * NOTE TO SELF: In testing "overlap average" I found that it does not
+#   work if the headers have identical timing (you cannot "merge
+#   overlap average" copies of the same SAC file).  Instead you must
+#   write a new SAC file with the same data but offset the B and E
+#   fields equally by some amount to trick SAC into recognizing them as
+#   different. Oddly enough, "merge overlap compare" does work with
+#   copies of the same file with identical timing.
