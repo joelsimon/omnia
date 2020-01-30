@@ -86,10 +86,11 @@ exit 0
 
 #_______________________________________________________________________#
 
-# * NOTE TO SELF: In testing "overlap average" I found that it does not
-#   work if the headers have identical timing (you cannot "merge
-#   overlap average" copies of the same SAC file).  Instead you must
-#   write a new SAC file with the same data but offset the B and E
-#   fields equally by some amount to trick SAC into recognizing them as
+# * NOTE TO SELF: In testing "overlap average" I found that it does
+#   not work if the headers have identical timing (you cannot "merge
+#   overlap average" copies of the same SAC file).  Instead, to
+#   overlap identical data for testing purposes, you must write a new
+#   SAC file with the same data but offset the B and E fields equally
+#   by some amount to trick SAC into recognizing them as
 #   different. Oddly enough, "merge overlap compare" does work with
 #   copies of the same file with identical timing.
