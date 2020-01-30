@@ -1,4 +1,4 @@
-function fetchcppttracesall
+function requestcppttracesall
 %
 % Script(ish) to generate requests for all CPPT data.
 %
@@ -27,4 +27,4 @@ for i = 1:length(star_idx)
 end
 id = unique(id);
 
-fetchcppttraces(id);
+requestcppttraces(id);

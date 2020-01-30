@@ -1,5 +1,5 @@
-function reqfile = fetchcppttraces(id, reqdir, cpptfile, evtdir, model, ph)
-% reqfile = FETCHCPPTTRACES(id, reqdir, cpptfile, evtdir, model, ph)
+function reqfile = requestcppttraces(id, reqdir, cpptfile, evtdir, model, ph)
+% reqfile = REQUESTCPPTTRACES(id, reqdir, cpptfile, evtdir, model, ph)
 %
 % Write textfiles for CPPT data requests.
 %
