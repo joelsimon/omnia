@@ -9,7 +9,7 @@ function [mer_updated, nearby_updated, nearbyu_updated, failed] = updateidall(fo
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 29-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 01-Feb-2020, Version 2017b on GLNXA64
 
 defval('force', false)
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -17,6 +17,7 @@ defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
 defval('mer_evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('mer_sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
+defval('cpptdir', fullfile(getenv('MERMAID'), 'events', 'cpptstations'))
 defval('model', 'ak135')
 defval('ph', defphases)
 defval('baseurl', 1);
@@ -36,11 +37,12 @@ attempted = 0;
 mer_updated = {};
 nearby_updated = {};
 nearbyu_updated = {};
+cppt_updated = {};
 failed = {};
 for i = 1:length(id)
     attempted = attempted + 1;
     try
-        [me, ~, ne, ~, neu] = updateid(id{i}, force,  mer_evtdir, mer_sacdir, nearbydir, model, ph, baseurl);
+        [me, ~, ne, ~, neu, ~, ce] = updateid(id{i}, force,  mer_evtdir, mer_sacdir, nearbydir, cpptdir, model, ph, baseurl);
         if ~isempty(me)
             mer_updated = [mer_updated ; id{i}];
 
@@ -51,6 +53,10 @@ for i = 1:length(id)
         end
         if ~isempty(neu)
             nearbyu_updated = [nearbyu_updated ; id{i}];
+
+        end
+        if ~isempty(ce)
+            cppt_updated = [cppt_updated ; id{i}];
 
         end
     catch ME
@@ -65,4 +71,5 @@ fprintf('Events attempted:               %4i\n', attempted)
 fprintf('MERMAID events updated:         %4i\n', length(mer_updated))
 fprintf('Nearby events updated:          %4i\n', length(nearby_updated))
 fprintf('Unmerged nearby events updated: %4i\n', length(nearbyu_updated))
+fprintf('CPPT events updated:            %4i\n', length(cppt_updated))
 fprintf('Events failed:                  %4i\n', length(failed))
