@@ -6,6 +6,12 @@ function [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
 % GETNEARBYSACEVT returns SAC filenames and EQ structures corresponding
 % to an input event ID for MERMAID and 'nearby' seismic stations.
 %
+% SAC files and EQ structures associated with 'nearby' stations are only
+% returned if corresponding MERMAID data exist for that event ID, for
+% that returntype (see Ex2).  To return 'nearby' SAC or EQ information
+% regardless of that datas' existence in the MERMAID record, see
+% getnearbysac.m and getnearbyevt.m.
+%
 % Input:
 % id            Event identification number in last
 %                   column of identified.txt (def: 10948555)
@@ -43,8 +49,8 @@ function [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
 %    [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
 %      GETNEARBYSACEVT('10948555')
 %
-% Ex2: (nearby .evt, though they exist, are not returned because there are
-%       no requested 'REQ' MERMAID SAC files associated with this event ID)
+% Ex2: (nearby .evt data, though they exist, are not returned because there are
+%       no requested ('REQ') MERMAID SAC files associated with this event ID)
 %    [a, b, c, d] = GETNEARBYSACEVT('10932551', [], [], [], [], 'DET')
 %    [a, b, c, d] = GETNEARBYSACEVT('10932551', [], [], [], [], 'REQ')
 %
@@ -52,7 +58,7 @@ function [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 26-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 01-Feb-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('id', '10948555')
