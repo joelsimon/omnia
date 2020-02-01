@@ -28,6 +28,14 @@ function [nearby_EQ, nearby_EQu, nearby_evt, nearby_evtu] = getnearbyevt(id, nea
 defval('id', '10948555')
 defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 
+% Sanity.
+id = num2str(id);
+iddir = fullfile(nearbydir, 'evt', id);
+if exist(iddir, 'dir') ~= 7
+    error(sprintf('Nonexistent event ID directory:\n%s', iddir))
+
+end
+
 % Fetch complete evt files in top-level directory.
 evt_request =  fullfile(nearbydir, 'evt', id, '*.evt');
 [nearby_EQ, nearby_evt] = getem(evt_request);
