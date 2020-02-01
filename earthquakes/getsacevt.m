@@ -20,13 +20,15 @@ function [sac, EQ] = getsacevt(id, evtdir, sacdir, check4update, returntype)
 %
 % Output:
 % sac           Cell array of SAC files
+%                 ({} if none exist for that returntype)
 % EQ            Reviewed EQ structures for each SAC file
+%                 ({} if none exist for that returntype)
 %
 % See also: getnearbysacevt.m, getsac.m, getevt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 27-Aug-2019, Version 2017b
+% Last modified: 31-Jan-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('id', '10948555')
@@ -38,6 +40,12 @@ defval('returntype', 'ALL')
 % This function is just simple wrapper.
 id = num2str(id);
 sac = getsac(id, evtdir, sacdir, returntype);
+if isempty(sac)
+    EQ = {};
+    return
+
+end
+
 for i = 1:length(sac)
     % Must be cell in case multiple EQ's corresponding to one SAC file.
     EQ{i}  = getevt(sac{i}, evtdir);
