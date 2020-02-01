@@ -1,6 +1,6 @@
-function [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu, cppt_EQ] = ...
+function [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu, cppt_EQ, cppt_evt] = ...
     updateid(id, force, mer_evtdir, mer_sacdir, nearbydir, cpptdir, model, ph, baseurl)
-% [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu, cppt_EQ] = ...
+% [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu, cppt_EQ, cppt_evt] = ...
 %     UPDATEID(id, force, mer_evtdir, mer_sacdir, nearbydir, cpptdir, model, ph, baseurl)
 %
 % UPDATEID refetches event metadata from IRIS and updates (overwrites)
@@ -41,11 +41,9 @@ function [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu, cppt_
 % *N/A*        Overwrites relevant .evt files with updated
 %                  event metadata
 % *_evt      Full path to updated reviewed .evt files
-%                  (MERMAID & nearby stations including unmerged)
-%                  or {} if update not required
+%                  (MERMAID, 'nearby' stations including unmerge, and CPPT)
 % *_EQ       Updated EQ structures
-%                  (MERMAID & nearby stations including unmerged)
-%                  or {} if update not required
+%                  (MERMAID, 'nearby' stations including unmerged, and CPPT)
 %
 % *git history, if it exists, is respected with gitrmdir.m.
 %
