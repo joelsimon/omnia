@@ -22,7 +22,7 @@ function [nearby_EQ, nearby_EQu, nearby_evt, nearby_evtu] = getnearbyevt(id, nea
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 25-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 01-Feb-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '10948555')
@@ -30,9 +30,11 @@ defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 
 % Sanity.
 id = num2str(id);
-iddir = fullfile(nearbydir, 'evt', id);
-if exist(iddir, 'dir') ~= 7
-    error(sprintf('Nonexistent event ID directory:\n%s', iddir))
+idpath = fullfile(nearbydir, 'evt', id);
+iddir = dir(fullfile(idpath, '**/*.evt'));
+if isempty(iddir)
+    error(sprintf(['Requested event ID directory:\n%s\nDoes not ' ...
+                   'exist/contains no .evt files'], idpath))
 
 end
 
@@ -63,7 +65,6 @@ if ~isempty(evtdir)
     EQ = EQ(:);
 
 else
-    %warning('No .evt files found matching:\n %s', evt_request);
     evt = {};
     EQ = {};
 
