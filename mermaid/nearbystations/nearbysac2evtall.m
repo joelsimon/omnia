@@ -1,5 +1,5 @@
 function [fetched, fetchedu, failed] = nearbysac2evtall(redo, starttime, endtime)
-% [fetched, fetchedu, failed] = NEARBYSAC2EVTALL(redo, starttime, endtime))
+% [fetched, fetchedu, failed] = NEARBYSAC2EVTALL(redo, starttime, endtime)
 %
 % Fetches and writes .evt files for every event ID for all nearby
 % stations using nearbysac2evt.m.
