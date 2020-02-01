@@ -64,6 +64,8 @@ defval('check4update', true)
 defval('returntype', 'ALL')
 defval('otype', [])
 
-% This function is simply a script for getnearbysacevt.m
+% This function is simply a script for getnearbysacevt.m; supply
+% 'cpptsac2evt.m' as undocumented input there for proper warnings
+% (see postscript note there).
 [mer_sac, mer_EQ, cppt_sac, cppt_EQ] = ...
-    getnearbysacevt(id, mer_evtdir, mer_sacdir, cpptdir, check4update, returntype, otype);
+    getnearbysacevt(id, mer_evtdir, mer_sacdir, cpptdir, check4update, returntype, otype, 'cpptsac2evt');
