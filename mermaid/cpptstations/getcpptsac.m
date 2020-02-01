@@ -5,7 +5,7 @@ function cppt_sac = getcpptsac(id, otype, cpptdir)
 %
 % Input:
 % id          IRIS public event identification number
-%                 (def: 10948555)
+%                 (def: 10932551)
 % otype       CPPT SAC file output type
 %             []: (empty) return raw time series (def)
 %             'none': return displacement time series (nm)

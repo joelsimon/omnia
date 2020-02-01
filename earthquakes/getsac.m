@@ -21,12 +21,13 @@ function sac = getsac(id, evtdir, sacdir, returntype)
 %
 % Output:
 % sac          Cell array of SAC files
+%                  ({} if none exist for that returntype)
 %
 % See also: evt2txt.m, getsacevt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 25-Sep-2019, Version 2017b on GLNXA64
+% Last modified: 31-Jan-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('id', '10948555')
@@ -85,7 +86,7 @@ switch upper(returntype)
     idx = cellstrfind(sac, 'MER.DET.*.sac');
     if isempty(idx)
         warning('No triggered (''DET'') SAC files found for ID: %s', id)
-        sac = [];
+        sac = {};
         return
 
     end
@@ -94,7 +95,7 @@ switch upper(returntype)
     idx = cellstrfind(sac, 'MER.REQ.*.sac');
     if isempty(idx)
         warning('No requested (''REQ'') SAC files found for ID: %s', id)
-        sac = [];
+        sac = {};
         return
 
     end

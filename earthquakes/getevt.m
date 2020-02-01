@@ -4,16 +4,16 @@ function [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = getevt(sac, evtdir, o
 % GETEVT returns the EQ structures built with cpsac2evt.m and winnowed
 % (reviewed) with reviewevt.m.
 %
-% Input: 
-% sac       SAC filename 
+% Input:
+% sac       SAC filename
 %               (def: '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 % evtdir    Path to directory containing 'raw/' and 'reviewed'
 %               subdirectories (def: $MERMAID/events/)
 % openpdf   logical true to open raw PDFs
 %
 % Output:
-% revEQ     Reviewed EQ structure returned by reviewevt.m 
-% rawEQ     Raw EQ structure returned by cpsac2evt.m 
+% revEQ     Reviewed EQ structure returned by reviewevt.m
+% rawEQ     Raw EQ structure returned by cpsac2evt.m
 % rawCP     CP structure returned by cpsac2evt.m,
 %              or NaN if the CP structure was not saved in *raw.evt
 % rawPDF    Path to raw .pdfs returned by cpsac2evt.m
@@ -26,17 +26,17 @@ function [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = getevt(sac, evtdir, o
 %      revEQ = [] means that none of the possible events found by
 %              cpsac2evt.m are matches after review with reviewevt.m
 %
-%      revEQ = NAN means this SAC file hasn't been reviewed 
+%      revEQ = NAN means this SAC file hasn't been reviewed
 %              (there exists no matching .evt file in the 'reviewed' directory)
 %
 % Before running the example below run the example in reviewevt.m
-% 
+%
 % Ex: (retrieve reviewed EQ structure showing M4.8 P wave arrival)
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
 %    evtdir = '~/cpsac2evt_example';
 %    EQ  = GETEVT(sac, evtdir)
 %
-% See also: reviewevt.m, revsac.m, cpsac2evt.m, 
+% See also: reviewevt.m, revsac.m, cpsac2evt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
@@ -57,9 +57,9 @@ defval('openpdf', false);
 
 sans_sac = strrep(strippath(sac), '.sac', '');
 raw_evt = fullfile(evtdir, 'raw', 'evt', [sans_sac '.raw.evt']);
-if ~exist(raw_evt, 'file') 
+if ~exist(raw_evt, 'file')
     error('%s does not exist', raw_evt)
-    
+
 end
 
 % Assign load.m output to variable for use in parfor loop.
@@ -67,7 +67,7 @@ raw_tmp = load(raw_evt, '-mat');
 rawEQ = raw_tmp.EQ;
 if isfield(raw_tmp, 'CP')
     rawCP = raw_tmp.CP;
-    
+
 else
     rawCP = [];
 
@@ -97,9 +97,9 @@ end
 corw = {'complete' 'windowed'};
 for i = 1:length(corw)
     rawPDF{i} = fullfile(evtdir, 'raw', 'pdf', sprintf([sans_sac '.%s.raw.pdf'], corw{i}));
-    if ~exist(rawPDF{i}, 'file') 
+    if ~exist(rawPDF{i}, 'file')
         error('%s does not exist', rawPDF{i})
-        
+
     end
 end
 
@@ -119,6 +119,6 @@ if openpdf
     end
     for i = 1:length(corw)
         system(sprintf(openpdf, rawPDF{i}));
-        
+
     end
 end
