@@ -1,5 +1,5 @@
 function [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
-    getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir, check4update, returntype, otype)
+    getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir, check4update, returntype, otype, sac2evtfunc) %**
 % [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
 %      GETNEARBYSACEVT(id, mer_evtdir, mer_sacdir, nearbydir, check4update, returntype, otype)
 %
@@ -68,6 +68,7 @@ defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('check4update', true)
 defval('returntype', 'ALL')
 defval('otype', [])
+defval('sac2evtfunc', 'nearbysac2evt') %**
 
 %% MERMAID data --
 
@@ -116,8 +117,8 @@ all_nearby_sac =  cellfun(@(xx) strrep(strippath(xx), '.SAC', ''), all_nearby_sa
 all_nearby_evt =  cellfun(@(xx) strrep(strippath(xx), '.evt', ''), all_nearby_evt, 'UniformOutput', false);
 
 if ~isequal(all_nearby_sac, all_nearby_evt)
-    error(['the lists of nearby .SAC and .evt files differ for ID: ' ...
-    '%s\nremake the latter with nearbysac2evt(%s)'], id, id)
+    error(['The lists of nearby .SAC and .evt files differ for ID: ' ...
+    '%s\nRemake the latter with: %s(%s, true)'], id, sac2evtfunc, id)
 
 end
 
@@ -128,3 +129,9 @@ if check4update && need2updateid([mer_EQ ; nearby_EQ ; nearby_EQu], id)
              'update run updateid(''%s'')'], id)
 
 end
+
+% ** N.B.: sac2evtfunc is an undocumented input to adjust warning in case
+% all_nearby_sac and all_nearby_evt lists differ because this function
+% is called for CPPT data as well (getcpptsacevt.m is just a wrapper
+% that points here), and if THOSE data need update then the warning
+% should say cpptsac2evt.m, not nearbysac2evt.m.
