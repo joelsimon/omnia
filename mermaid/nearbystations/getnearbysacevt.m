@@ -39,9 +39,14 @@ function [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
 % nearby_EQu    Cell array of EQ structures related to nearby stations'
 %                   unmerged SAC files
 %
-% Ex:
+% Ex1:
 %    [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
 %      GETNEARBYSACEVT('10948555')
+%
+% Ex2: (nearby .evt, though they exist, are not returned because there are
+%       no requested 'REQ' MERMAID SAC files associated with this event ID)
+%    [a, b, c, d] = GETNEARBYSACEVT('10932551', [], [], [], [], 'DET')
+%    [a, b, c, d] = GETNEARBYSACEVT('10932551', [], [], [], [], 'REQ')
 %
 % See also: fetchnearbytraces.m, nearbysac2evt.m
 %
@@ -64,6 +69,16 @@ defval('otype', [])
 id = strtrim(num2str(id));
 [mer_sac, mer_EQ] = getsacevt(id, mer_evtdir, mer_sacdir, false, returntype);
 
+% If MERMAID did not see this event, then do not return any
+% corresponding nearby SAC or event files.
+if isempty(mer_sac) % mer_EQ is empty as well
+    nearby_sac = {};
+    nearby_EQ = {};
+    nearby_sacu = {};
+    nearby_EQu = {};
+    return
+
+end
 %% Nearby station data --
 
 % Remove leading asterisks from ID number, if one exists.
