@@ -18,7 +18,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 23-Jan-2020
+# Last modified: 04-Feb-2019
 
 # Collect input variables.
 sacdir=$1
@@ -55,10 +55,10 @@ if [ $numfiles == 1 ]; then
 
 fi
 
-# Merge input file list and write output SAC file.
+# Merge input file list and write output SAC file.*
 sac << !
 read "$filelist"
-merge verbose gap zero overlap average # *
+merge verbose gap zero overlap average
 write $outfname
 quit
 !
@@ -82,7 +82,6 @@ printf "Wrote %s\n\n" $outfname
 
 # Return from whence you came.
 cd $startdir
-exit 0
 
 #_______________________________________________________________________#
 
