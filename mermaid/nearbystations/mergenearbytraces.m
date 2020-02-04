@@ -31,7 +31,7 @@ function merged = mergenearbytraces(tr, id, sacdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 22-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 04-Feb-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '11052554')
@@ -64,18 +64,29 @@ for i = 1:length(glob)
     filelist =  [glob{i} '*.SAC'];
     d = dir(fullfile(iddir, filelist));
 
+    % If the list of files that match the glob is greater than one, merge em.
     if length(d) > 1
         outfname = [glob{i} 'merged.SAC'];
-        [status, result] = ...
-            system(sprintf('mergesac %s "%s" %s', iddir, filelist, outfname));
+        temp_file = sprintf('%s_mergesac_out.txt', iddir);
 
-        if status == 0
-            m_idx = m_idx + 1;
-            merged{m_idx} = fullfile(iddir, outfname);
+        % Call the shell script mergesac.
+        [status, result] = ...
+            system(sprintf('mergesac %s "%s" %s > %s', iddir, filelist, outfname, temp_file));
+
+        % Inspect the printout from mergesac for SAC errors.
+        if ~isempty(mgrep(temp_file, 'ERROR'))
+            error('mergesac failed\nfor more detail see: %s', temp_file)
 
         else
-            error('mergesac failed with the following message --\n%s', result)
+            delete(temp_file)
+            if status == 0
+                m_idx = m_idx + 1;
+                merged{m_idx} = fullfile(iddir, outfname);
 
+            else % shell exit status ~= 0
+                error('mergesac failed with the following message:\n%s', result)
+
+            end
         end
     end
 end
