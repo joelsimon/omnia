@@ -1,6 +1,6 @@
-function [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu, cppt_EQ, cppt_evt] = ...
+function [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu, cppt_evt, cppt_EQ] = ...
     updateid(id, force, mer_evtdir, mer_sacdir, nearbydir, cpptdir, model, ph, baseurl)
-% [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu, cppt_EQ, cppt_evt] = ...
+% [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu, cppt_evt, cppt_EQ] = ...
 %     UPDATEID(id, force, mer_evtdir, mer_sacdir, nearbydir, cpptdir, model, ph, baseurl)
 %
 % UPDATEID refetches event metadata from IRIS and updates (overwrites)
@@ -79,7 +79,6 @@ cppt_sac = {};
 cppt_evt = {};
 cppt_EQ = {};
 
-
 % Retrieve all MERMAID EQ files associated with this event -- will
 % always exist because you matched on that event. No need to
 % check4update because that happens here, next.
@@ -91,6 +90,9 @@ id = num2str(id);
 %% want to make the retrieval of MERMAID data hinge on the existence of
 %% other data; MERMAID data will always exist here and thus this
 %% function sill always AT LEAST check those EQ structures.
+
+% Ensure list of SAC files matches list of evt files for 'nearby' data.
+iddirmatch(nearbydir, id)
 
 % Retrieve all 'nearby' EQ files associated with this event. N.B.:
 % 'otype' is irrelevant here because it applies to the .SAC files, not
@@ -104,7 +106,8 @@ if ~isempty(nearby_iddir)
 
 end
 
-% Repeat the same fetch for CPPT data.
+% Repeat process for CPPT data.
+iddirmatch(cpptdir, id)
 cppt_idpath = fullfile(cpptdir, 'evt', id);
 cppt_iddir = dir(fullfile(cppt_idpath, '**/*.evt'));
 if ~isempty(cppt_iddir)
@@ -164,4 +167,5 @@ if ~isempty(old_EQ)
     end
     rev_evt = rev_evt(:);
     rev_EQ = rev_EQ(:);
+
 end
