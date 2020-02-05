@@ -12,7 +12,7 @@ function [sac, EQ] = getsacevt(id, evtdir, sacdir, check4update, returntype)
 % sacdir        Path to directory to be (recursively) searched for
 %                   SAC files (def: $MERMAID/processed/)
 % check4update  true to determine if resultant EQs need updating
-%                   (def: false)
+%                   (def: true)
 % returntype    For third-generation+ MERMAID only:
 %               'ALL': both triggered and user-requested SAC & .evt files (def)
 %               'DET': triggered SAC & .evt files as determined by onboard algorithm
@@ -34,7 +34,7 @@ function [sac, EQ] = getsacevt(id, evtdir, sacdir, check4update, returntype)
 defval('id', '10948555')
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
-defval('check4update', false)
+defval('check4update', true)
 defval('returntype', 'ALL')
 
 % This function is just simple wrapper.
