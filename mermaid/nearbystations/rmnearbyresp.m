@@ -39,7 +39,7 @@ function [nearby_sac, nearby_sacu, new, newu] = rmnearbyresp(id, redo, otype, ne
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 29-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 06-Feb-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '11052554')
@@ -92,7 +92,7 @@ if need2continue(redo, iddir, suffix)
 
     % Handle errors.
     if status ~= 0 || contains(result, 'ERROR', 'IgnoreCase', true)
-        error('SAC transfer failed (full printout above)')
+        error('SAC transfer failed (full printout from %s above)', strippath(transcript))
 
     end
     new = true;
