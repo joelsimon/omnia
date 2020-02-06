@@ -62,6 +62,7 @@ merge verbose gap zero overlap average
 write $outfname
 quit
 !
+
 # Move input file list to 'unmerged/'.
 mkdir unmerged  >& /dev/null
 mv $filelist unmerged
