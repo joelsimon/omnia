@@ -21,9 +21,7 @@
 # The input pole-zero file is assumed to contain the instrument
 # response for all trace(s) supplied (i.e., it is a concatenation of
 # all pole-zero files for each individual station/channel/location
-# etc.).  See fetchnearbypz.m, which creates this file
-# automatically. If no pole-zero file is found for a specific
-#
+# etc.).  See fetchnearbypz.m, which creates this file automatically.
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
