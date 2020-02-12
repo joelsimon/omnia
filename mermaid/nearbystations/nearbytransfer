@@ -1,6 +1,16 @@
 #! /bin/sh
 #
-# Removes nearby station(s) instrument response.
+# Remove 'nearby' stations' instrument response.
+#
+# Each trace has its mean removed, then its trend removed, then it is
+# is tapered, then deconvolved between freq limits, then multiplied by
+# 1.0e9 to convert from M to NM (former the SEED convention from which
+# these PZ files written, the latter the SAC convention that writes
+# the output files with the adjusted headers).
+#
+# The multiplication is necessary because SAC does not look at the
+# header comments concerning the amplitude unit -- you have to do that
+# yourself (see "PZ EXAMPLES", pg. 7 of TRANSFER.pdf).
 #
 # Input:
 # (1) directory containing SAC files (see fetchnearbytraces.m)
@@ -14,10 +24,6 @@
 # SAC files with their instrument response removed, with the
 # appropriate output type appended to their filenames.
 #
-# The traces are NOT tapered, and no verification of the Nyquist
-# frequency is performed.  The mean and the trend are removed before
-# the transfer function is called.
-#
 # The input pole-zero file is assumed to contain the instrument
 # response for all trace(s) supplied (i.e., it is a concatenation of
 # all pole-zero files for each individual station/channel/location
@@ -25,7 +31,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 26-Nov-2019
+# Last modified: 07-Feb-2020
 
 # Parse inputs.
 sacdir=$1
@@ -44,11 +50,13 @@ cd $sacdir
 sac << !
 r $sacdir/*.SAC
 rmean
-rtrend
+rtr
+taper
 transfer from polezero subtype $pzfile to $otype freqlimits $fl1 $fl2 $fl3 $fl4
+mul 1.0e9
 w append .$otype
 q
 !
 
-# Return from whence you came.
+# Return to start directory.
 cd $startdir
