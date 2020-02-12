@@ -6,14 +6,13 @@ function [corrected, correctedu, failed] = rmnearbyrespall(redo)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 18-Dec-2019, Version 2017b on GLNXA64
+% Last modified: 12-Feb-2020, Version 2017b on GLNXA64
 
 defval('redo', false)
-defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
-                            'identified', 'txt', 'identified.txt'))
 
-% Get MERMAID-identified event numbers.
-[~, ~, ~, ~, ~, ~, ~, ~, ~, id] = readidentified(filename);
+% Fetch all event IDs in the nearby directory.
+d = skipdotdir(dir(fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'sac')));
+id = {d.name}';
 
 % Find unique event identifications (ignoring leading asterisks which
 % signal possible multi-event traces).
