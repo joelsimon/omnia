@@ -1,6 +1,6 @@
 function [Pa, m] = counts2pressure(counts)
 % [Pa, m] = COUNTS2PRESSURE(counts)
-% 
+%
 % COUNTS2PRESSURE converts raw amplitude counts of the
 % third-generation MERMAID (manufactured by Osean.fr) into their
 % representative pressure [Pa] and equivalent perturbation to
@@ -17,7 +17,7 @@ function [Pa, m] = counts2pressure(counts)
 % as is done in the MERMAID manual.
 %
 % Input:
-% counts    The raw amplitude(s) output by MERMAID 
+% counts    The raw amplitude(s) output by MERMAID
 %               (accepts multiscale cell arrays)
 %
 % Output:
@@ -27,7 +27,7 @@ function [Pa, m] = counts2pressure(counts)
 % In Ex1 we see a reading of -5e7 counts is equivalent to a drop in
 % pressure of roughly 294 Pa, or equivalently, an ascent of (depth is
 % negative) of about 29 mm.
-% 
+%
 % Ex1: (MERMAID signal -5e7 counts)
 %   [Pa, m] = COUNTS2PRESSURE(-5e7)
 %
@@ -59,22 +59,23 @@ if iscell(counts)
 
 end
 
+% Main.
 for i = 1:length(counts)
     Pa(i) = counts(i) / 170176;
     m(i) = pressure2depth(Pa(i), 'Pa');
 
 end
 
-% *I..e., the float ascending or descending, or equivalently, the
-% float remaining stationary as the ground moves down or up (and thus
-% height of the water column above the float goes down or up).
+% *I.e., the float ascending or descending, or equivalently, the float
+% remaining stationary as the ground moves down or up (and thus height
+% of the water column above the float goes down or up).
 %
 % Depending on your reference frame:
 % Float moves up relative to ground -> pressure drops -> negative counts
-% Float moves up relative to ground == ground moves down relative to float   
+% Float moves up relative to ground == ground moves down relative to float
 %
 % Float moves down relative to ground -> pressure increases -> positive counts
-% Float moves down relative to ground == ground moves up relative to float   
+% Float moves down relative to ground == ground moves up relative to float
 %
 % Of course MERMAID signals are most usually travelling pressure waves
 % so the above are purely a theoretical view of what is happening
