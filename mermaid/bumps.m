@@ -1,11 +1,11 @@
 function s = bumps
 % s = BUMPS
 %
-% Returns a list of mysterious MERMAID signals.
+% Returns a list of MERMAID glitches(?).
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Jan-2020, Version 2017b on GLNXA64
+% Last modified: 12-Feb-2020, Version 2017b on GLNXA64
 
 s = {'20181231T114420.20_5C2A50AD.MER.DET.WLT5.sac', ...
      '20190126T130957.20_5C4CA6CB.MER.DET.WLT5.sac', ...
@@ -456,6 +456,7 @@ s = {'20181231T114420.20_5C2A50AD.MER.DET.WLT5.sac', ...
      '20200106T030213.12_5E143E16.MER.DET.WLT5.sac', ...
      '20200105T142624.12_5E143E16.MER.DET.WLT5.sac', ...
      '20200111T195241.12_5E1A8CB2.MER.DET.WLT5.sac', ...
+     '20200206T060320.23_5E3FC2C0.MER.DET.WLT5.sac', ... % All motions up; odd
     };
 
 s = unique(s);
