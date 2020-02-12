@@ -24,7 +24,7 @@ function [nearby_sac, nearby_sacu] = getnearbysac(id, otype, nearbydir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 29-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 12-Feb-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('id', '10948555')
@@ -32,7 +32,7 @@ defval('otype', [])
 defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 
 % Sanity.
-id = num2str(id);
+id = strtrim(num2str(id));
 iddir = fullfile(nearbydir, 'sac', id);
 if exist(iddir, 'dir') ~= 7
     error(sprintf('Nonexistent event ID directory:\n%s', iddir))
