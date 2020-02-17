@@ -111,7 +111,7 @@ defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
-defval('bathy', false)
+defval('bathy', true)
 
 % Start with baseline assumption both time windows will be complete.
 incomplete1 = false;
