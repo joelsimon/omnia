@@ -166,20 +166,20 @@ f.ylab1 = cellfun(@(xx) sprintf('%1.2f', xx), num2cell(sk.xaxis(tickpos)), ...
 set(f.ax1, 'YTickLabels', f.ylab1);
 
 % Secondary x-axis = sigmas tested: noise
-f.xl1 = xlabel(f.ax1, '$\hat\sigma_1^2\big/\sigma_{1_\circ}^2$');
+f.xl1 = xlabel(f.ax1, '$\sigma_1^2\big/\sigma_{1_\circ}^2$');
 f.xlab2 = cellfun(@(xx) sprintf('%1.2f', xx), ...
                   num2cell(nk.sigmastested(tickpos).^2), 'UniformOutput', ...
                   false);
 
 % Secondary y-axis = sigmas test: signal
-f.yl1 = ylabel(f.ax1, '$\hat\sigma_2^2\big/\sigma_{2_\circ}^2$');
+f.yl1 = ylabel(f.ax1, '$\sigma_2^2\big/\sigma_{2_\circ}^2$');
 f.ylab2 = cellfun(@(xx) sprintf('%1.2f', xx), ...
                   num2cell(sk.sigmastested(tickpos).^2), 'UniformOutput', ...
                   false);
 
 % Generate secondary axes.
-[f.ax2, f.xl2, f.yl2] = xtraxis(f.ax1, tickpos, f.xlab2, '$\hat\sigma_1^2$', ...
-                                tickpos, f.ylab2, '$\hat\sigma_2^2$');
+[f.ax2, f.xl2, f.yl2] = xtraxis(f.ax1, tickpos, f.xlab2, '$\sigma_1^2$', ...
+                                tickpos, f.ylab2, '$\sigma_2^2$');
 
 %% Adjust the ticks and labels per the increment requested.
 

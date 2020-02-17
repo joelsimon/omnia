@@ -84,7 +84,7 @@ ax = f.ha(2);
 set(f.f2.ly, 'Color', 'b')
 set(f.f2.MLE,'Color', 'k', 'MarkerFaceColor', 'k')
 
-xlabel(ax, 'Normalized variance $\hat\sigma_1^2/\sigma_{1_\circ}^2$', 'Interpreter', ...
+xlabel(ax, 'Normalized variance $\sigma_1^2/\sigma_{1_\circ}^2$', 'Interpreter', ...
        'Latex');
 ylabel(ax, 'Log likelihoods $\ell_1,~\ell_2$', 'Interpreter', 'Latex');
 
@@ -100,7 +100,7 @@ ax = f.ha(3);
 set(f.f3.ly, 'Color', 'r')
 set(f.f3.MLE, 'Color', 'k', 'MarkerFaceColor', 'k')
 
-xlabel(ax, 'Normalized variance $\hat\sigma_2^2/\sigma_{2_\circ}^2$', ...
+xlabel(ax, 'Normalized variance $\sigma_2^2/\sigma_{2_\circ}^2$', ...
        'Interpreter', 'Latex');
 
 
@@ -159,7 +159,7 @@ set(f.f1.MLE, 'MarkerSize', f.f2.MLE(1).MarkerSize)
 set(f.f1.MLE, 'ZData', f.f1.xhair.c.ZData);
 set(f.f1.xhair.c, 'ZData', f.f1.MLE(1).ZData+1);
 
-xlabel(ax, 'Normalized variance $\hat\sigma^2/\sigma_{\circ}^2$', 'Interpreter', ...
+xlabel(ax, 'Normalized variance $\sigma^2/\sigma_{\circ}^2$', 'Interpreter', ...
        'Latex');
 ylabel(ax, 'Summed log likelihood $\ell$', 'Interpreter', 'Latex')
 

@@ -113,7 +113,7 @@ ax = f.ha(1);
 f.f1 = plotnormlysmixsum(lnk, lsk, false, ax, meth);
 
 ylabel(ax, 'Summed log likelihood $\ell$', 'Interpreter', 'Latex');
-xlabel(ax, 'Normalized variance $\hat\sigma^2/\sigma_{\circ}^2$', 'Interpreter', ...
+xlabel(ax, 'Normalized variance $\sigma^2/\sigma_{\circ}^2$', 'Interpreter', ...
        'Latex');
 
 f.f1.hl = fx(horzline(f.f1.meany, ax, 'k'), 1);
@@ -123,7 +123,7 @@ f.f1.hl = fx(horzline(f.f1.meany, ax, 'k'), 1);
 ax = f.ha(2);
 f.f2 = plotnormlysmix(lnk, false, ax,1);
 
-xlabel(ax, 'Normalized variance $\hat\sigma_1^2/\sigma_{1_\circ}^2$', 'Interpreter', ...
+xlabel(ax, 'Normalized variance $\sigma_1^2/\sigma_{1_\circ}^2$', 'Interpreter', ...
        'Latex');
 ylabel(ax, 'Log likelihoods $\ell_1,~\ell_2$', 'Interpreter', 'Latex');
 
@@ -137,7 +137,7 @@ f.f2.hl = fx(horzline(f.f2.meany, ax, 'k'), 1);
 ax = f.ha(3);
 f.f3 = plotnormlysmix(esk, false, ax,2);
 
-xlabel(ax, 'Normalized variance $\hat\sigma_2^2/\sigma_{2_\circ}^2$', ...
+xlabel(ax, 'Normalized variance $\sigma_2^2/\sigma_{2_\circ}^2$', ...
        'Interpreter', 'Latex');
 
 set(f.f3.ly, 'Color', 'r')
