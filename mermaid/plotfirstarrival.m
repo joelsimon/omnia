@@ -1,8 +1,10 @@
-function [f, ax, tx] = plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, lohi, sacdir, evtdir, bathy)
-% [f, ax, tx] = PLOTFIRSTARRIVAL(s, ax, FontSize, EQ, ci, wlen, lohi, sacdir, evtdir, bathy)
+function [f, ax, tx] = plotfirstarrival(s, ax, FontSize, EQ, ci, ...
+                                        wlen, lohi, sacdir, evtdir, bathy)
+% [f, ax, tx] = PLOTFIRSTARRIVAL(s, ax, FontSize, EQ, ci, ...
+%                                wlen, lohi, sacdir, evtdir, bathy)
 %
-% Plots output of firstarrival.m centered on theoretical
-% first-phase-arrival time.
+% Plots the output of firstarrival.m, with a time-axis centered on
+% theoretical first-phase-arrival time.
 %
 % s        SAC filename (def: '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 % ax       Axis handle, or [] to generate new (def: [])
@@ -27,11 +29,11 @@ function [f, ax, tx] = plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, lohi, sac
 % ax       Axis handle
 % tx       textpatch.m handles where, e.g., tx.ul is 'upper left'
 %
-% *See paper??
+% See: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 26-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 17-Feb-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -56,8 +58,8 @@ else
 end
 
 % Compute first-arrival statistics.
-[tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
- SNR, EQ, W1, xw2, W2, incomplete] = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy);
+[tres, ~, syn, ~, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ, W1] = ...
+    firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy);
 
 % Plot time series.
 plot(ax, xaxw1, xw1, 'LineWidth', 1, 'Color', 'Blue')
