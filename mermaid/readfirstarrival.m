@@ -1,5 +1,5 @@
 function varargout = readfirstarrival(filename, fmt)
-% [s, ph, tres, tptime, tadj, delay, twosd, maxc_y, SNR, ID, incomplete] = ...
+% [s, ph, tres, tptime, tadj, delay, twosd, maxc_y, SNR, ID, winflag, tapflag, zerflag] = ...
 %     READFIRSTARRIVAL(filename, fmt)
 %
 % Reads and parses textfile output by writefirstarrival.m.
@@ -23,8 +23,10 @@ defval('fmt', ['%44s    ' , ...
                '%19.12f    ' , ...
                '%18.12f    '  , ...
                '%8s    ' , ...
-               '%u\n'])
-
+               '%u    ', ...
+               '%3s    ', ...
+               '%u\n']);
+               
 % Read.
 fid = fopen(filename, 'r');
 lynes = textscan(fid, fmt);
@@ -41,8 +43,11 @@ twosd = lynes{7};
 maxc_y = double(lynes{8});
 SNR = lynes{9};
 ID = lynes{10};
-incomplete = lynes{11};
+winflag = double(lynes{11});
+tapflag = str2double(lynes{12});
+zerflag = double(lynes{13});
 
 % Collect.
-outargs = {s, ph, tres, tptime, tadj, delay, twosd, maxc_y, SNR, ID, incomplete};
+outargs = {s, ph, tres, tptime, tadj, delay, twosd, maxc_y, SNR, ID, ...
+           winflag, tapflag, zerflag};
 varargout = outargs(1:nargout);

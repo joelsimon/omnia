@@ -12,7 +12,7 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 % Input:
 % s        Cell array of identified SAC filenames (def: revsac(1))
 % redo     true: delete and remake the text file
-%          false: append new lines to the existing tex file unless
+%          false: append new lines to the existing text file unless
 %              that SAC file name already exists in the text file (def)
 % filename Output text file name (def: $MERMAID/.../firstarrival.txt)
 % fmt      Line format, e.g., set if using SAC files with names
@@ -45,15 +45,15 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 %        (SNR), defined as ratio of biased variance of signal/noise
 %        (see wtsnr.m)
 %    (10) IRIS event ID
-%    (11) Incomplete window flag: true for incomplete, false
-%        otherwise (see timewindow.m)
-%
+%    (11) Incomplete window flag (sentinel value: 'winflag')
+%    (12) Taper flag (sentinel value: 'tapflag')
+%    (13) *Likely* null-value flag, x = 0 (sentinel value: 'zerflag')
 %
 % See also: firstarrival.m, readfirstarrival.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 03-Dec-2019, Version 2017b on GLNXA64
+% Last modified: 17-Feb-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('s', revsac(1))
@@ -70,7 +70,10 @@ defval('fmt', ['%44s    ' , ...
                '%+19.12E    ' , ...
                '%18.12E    '  , ...
                '%8s    ' , ...
-               '%i\n'])
+               '%i    ', ...
+               '%3i    ', ...
+               '%i\n']);
+
 defval('wlen', 30)
 defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
@@ -110,7 +113,7 @@ end
 wline = [];
 wlines = [];
 parfor i = 1:length(s)
-   sac = s{i};
+    sac = s{i};
     if ~isempty(EQ)
         single_EQ = EQ{i};
 
@@ -161,7 +164,7 @@ function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt, single_E
 % Local call to, and formatting of, firstarrival.m
 
 % Collect.
-[tres, dat, syn, tadj, ph, delay, twosd, ~, ~, ~, maxc_y, SNR, EQ, ~, ~, ~, incomplete] = ...
+[tres, dat, syn, tadj, ph, delay, twosd, ~, ~, ~, maxc_y, SNR, EQ, ~, ~, ~, winflag, tapflag, zerflag] = ...
     firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy);
 publicid = fx(strsplit(EQ(1).PublicId, '='),  2);
 tptime = EQ(1).TaupTimes(1).time;
@@ -177,7 +180,9 @@ data = {strippath(sac), ...
         maxc_y,         ...
         SNR,            ...
         publicid,       ...
-        incomplete};
+        winflag,        ...
+        tapflag,        ...
+        zerflag};
 
 % Format.
 wline = sprintf(fmt, data{:});
