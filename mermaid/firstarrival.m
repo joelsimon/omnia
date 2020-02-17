@@ -196,7 +196,7 @@ end
 % Check if any two contiguous datum within first time window == 0
 % (likely signals missing, filler values).
 zero_vals = find(xw1  == 0);
-if any(diff(zero_vals)) == 1 % diff = 1 means zero-values are next to each other
+if any(diff(zero_vals) == 1) % diff == 1 means zero-values are next to each other
         zerflag = 1;
 
 end
@@ -251,7 +251,7 @@ if ~isnan(lohi)
          % (likely signals missing, filler values).
          within_taper = x(left_taper_idx(1):right_taper_idx(end));
          zero_vals = find(within_taper == 0);
-         if any(diff(zero_vals)) == 1
+         if any(diff(zero_vals) == 1)
              zerflag = 1;
 
          end
@@ -315,7 +315,7 @@ if SNR > 1
     % Check if any two contiguous datum within the second time window == 0
     % (likely signals missing, filler values).
     zero_vals = find(xw2  == 0);
-    if any(diff(zero_vals)) == 1
+    if any(diff(zero_vals) == 1)
         zerflag = 1;
 
     end
