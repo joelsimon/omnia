@@ -42,7 +42,7 @@ function [xf,co,npol,npas,tipe,HABS2,F,EPB]=...
 % detrend.m.
 
 defval('npol',2)
-defval('npas',1)
+defval('npas',2)
 defval('colo',0.05)
 defval('cohi',0.50)
 defval('Fs',110)
