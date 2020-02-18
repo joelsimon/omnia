@@ -29,7 +29,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % ci       true to estimate arrival time uncertainty via
 %              1000 realizations of M1 method (def: false)
 % wlen     Window length [s] (def: 30)
-% lohi     1 x 2 array of corner frequencies, or NaN to skip
+% lohi     1 x 2 array of corner frequencies [Hz], or NaN to skip
 %              bandpass and use raw data (def: [1 5]])***
 % sacdir   Directory containing (possibly subdirectories)
 %              of .sac files (def: $MERMAID/processed)
@@ -93,15 +93,14 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %
 % **See cpci.m Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
-% ***If 'lohi' is specific the data are tapered with a Hanning window
-% before bandpass filtering
+% ***2 pole, 2 pass Butterworth filter
 %
 % ****If MERMAID depth is not contained in the header ('STDP' field),
 % then it is assumed to be 1500 m below the sea surface
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 17-Feb-2020, Version 2017b on MACI64
+% Last modified: 18-Feb-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -270,7 +269,7 @@ if ~isnan(lohi)
      end
 
      % Bandpass entire (maybe tapered) time series.
-     x = bandpass(x, 1/h.DELTA, lohi(1), lohi(2));
+     x = bandpass(x, 1/h.DELTA, lohi(1), lohi(2), 2, 2, 'butter');
 
      % Remove the relevant window from the tapered and filtered time series.
      [xw1, W1, incomplete1] = timewindow(x, wlen, syn, 'middle', h.DELTA, h.B);

@@ -8,8 +8,8 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 %
 % Input:
 % id        Event identification number (def: 10948555)
-% lohi      Bandpass corner frequencies in Hz, or
-%               NaN to plot raw seismograms  (def: [1 5])
+% lohi      Bandpass (2 pole, 2 pass Butterworth) corner frequenies [Hz],
+%               or NaN to plot raw seismograms  (def: [1 5])
 % aligon    'etime': t=0 at event rupture time (def: etime)
 %           'atime': t=0 at theoretical first arrival
 %                    for every seismogram*
@@ -55,7 +55,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 06-Dec-2019, Version 2017b on GLNXA64
+% Last modified: 18-Feb-2020, Version 2017b on GLNXA64
 
 % Wish list:
 %
@@ -136,7 +136,7 @@ for i = 1:length(sac)
     if ~isnan(lohi)
         x{i} = detrend(x{i}, 'linear');
         taper = hanning(length(x{i}));
-        x{i} = bandpass(taper .* x{i}, 1/h{i}.DELTA, lohi(1), lohi(2));
+        x{i} = bandpass(taper .* x{i}, 1/h{i}.DELTA, lohi(1), lohi(2), 2, 2, 'butter');
 
     end
 
