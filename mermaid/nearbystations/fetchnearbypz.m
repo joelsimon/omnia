@@ -1,7 +1,11 @@
 function [nearbypz, pzfiles] = fetchnearbypz(txtfile, nearbydir)
 % [nearbypz, pzfiles] = FETCHNEARBYPZ(txtfile, nearbydir)
 %
-% Write SAC pole-zero response files.
+% Writes SAC pole-zero response in units of meters (displacement).*
+%
+% NB, SAC TRANSFER assumes units of nanometers.  Therefore, traces
+% TRANSFERred with SACPZ files fetched with FETCHNEARBYPZ must be
+% multiplied by 1e9 in SAC after the call to TRANSFER.
 %
 % FETCHNEARBYPZ requires the MERMAID python environment pymaid
 % (python 2.7 with ObsPy).
@@ -10,8 +14,8 @@ function [nearbypz, pzfiles] = fetchnearbypz(txtfile, nearbydir)
 % http://service.iris.edu/irisws/sacpz/1/query?
 %
 % For Raspberry Shake stations the station.xml files are queried from:
-% https://fdsnws.raspberryshakedata.com/fdsnws/station/1/query?
-% and converted to pole-zero files using ObsPy.  This occurs in the
+% https://fdsnws.raspberryshakedata.com/fdsnws/station/1/query?  and
+% converted to SACPZ pole-zero files using ObsPy.  This occurs in the
 % shell script wgetrasppz, which FETCHNEARBYPZ calls.
 %
 % Input:
@@ -29,6 +33,34 @@ function [nearbypz, pzfiles] = fetchnearbypz(txtfile, nearbydir)
 % N.B.: the wget call in the shell script wgetrasppz is known to hang
 % and/or incorrectly write .xml files, ergo, this function may require
 % a rerun due to the unreliability of fdsnws.raspberryshakedata.com.
+%
+% *The SEED standard is that SACPZ files are in terms of displacement.
+%  SAC also expects SACPZ files are in terms of displacement, such
+%  that a transfer to NONE produces an output in displacement.  This
+%  has indeed been verified many times over for these two procedures;
+%  both wget SACPZ from IRIS (which come as displacement in M if the
+%  SENSITIVITY is in M, M/S, or M/S/S, see note below), and XML from
+%  raspberryshakedata.com, which come in whatever units the response
+%  data are natively in (usually M/S), and then they are converted to
+%  displacement (M) with xml2pz.py (see
+%  $MERMAID/events/nearbystations/pz/examples/XML2PZ_example).
+%
+% Only when there is no SENSITIVITY UNIT associated with the file does
+% the proper INPUT UNIT not seem to be written, but at that point, you
+% don't know what you are recording anyway (I've only ever seen this
+% with volts (V) in accelerometers, e.g., C1.VA02.*.HNZ).
+%
+% From http://service.iris.edu/irisws/sacpz/docs/1/help/ --
+%
+% "The response will be converted to displacement when the original
+%  input units match known unit types for velocity or acceleration. The
+%  appropriate number of zeros will be added at the origin as part of
+%  the conversion to displacement. The input units string in the
+%  annotated comment field will be modified appropriately to match the
+%  units represented by the poles and zeros. Only the time dimension is
+%  modified when converting from velocity or acceleration to
+%  displacement, the length dimension is not modified (e.g. meters are
+%  not changed to nanometers)."
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
