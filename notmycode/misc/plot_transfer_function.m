@@ -40,6 +40,34 @@ function A0 = plot_transfer_function(sensortype, sensitivity_frequency, plt)
 %    A0d = PLOT_TRANSFER_FUNCTION('AFId', 0.02)
 %    A0d - (A0v/(2*pi*0.02))
 %
+% Ex3: see https://ds.iris.edu/ds/support/faq/24/what-are-the-fields-in-a-resp-file/
+%    figure
+%    sensitivity_vel = 9.630000E+08;
+%    f0 = 0.02;
+%    A0_vel = PLOT_TRANSFER_FUNCTION('RESPv', 0.02)
+%    figure
+%    A0_disp = PLOT_TRANSFER_FUNCTION('RESPd', 0.02)
+%    % CONST_disp = A0_disp * sensitivity_disp
+%    CONST_disp = A0_disp * sensitivity_vel * 2 * pi *  f0
+%    CONST_vel = A0_vel * sensitivity_vel
+%    CONST_disp - CONST_vel      % equal, within numerical error
+%
+% NB, in the third example, what I call the CONST_vel is the SACPZ
+% CONSTANT that would go at the very bottom of a VELOCITY (M/S) SACPZ
+% file, (which is not the SEED standard which states SACPZ files are
+% in terms of DISPLACEMENT, M), such that
+%
+%    transfer from polezero subtype SACPZ_vel.pz to none ==
+%    transfer from polezero subtype SACPZ_disp.pz to vel
+%
+% I.e., what I call the CONSTANT_vel ~= A0_vel, that latter of which
+% the webpage above loosely terms as the "poles-and-zeros constant for
+% the velocity poles-zeros in the RESP file."  All this is to say,
+% what is termed a "constant" in SACPZ and RESP files are not the same
+% thing.
+%
+% For more, see $MERMAID/events/cpptstations/pz/examples/PZ_vel_vs_PZ_disp/
+%
 % Written by Umair bin Waheed after information from GEOBit
 % Last modified by fjsimons-at-alum.mit.edu on 02/04/2020
 % Last modified by jdsimon@princeton.edu, 21-Feb-2020
