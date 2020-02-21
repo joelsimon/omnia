@@ -1,7 +1,7 @@
 function A0 = plot_transfer_function(sensortype, sensitivity_frequency, plt)
 % A0 = PLOT_TRANSFER_FUNCTION(sensortype, sensitivity_frequency, plt)
 %
-% Makes a transfer function plot.
+% Makes a transfer function plot and returns the A0 normalization factor.
 %
 % Note: no gain is applied.
 %
@@ -33,20 +33,36 @@ function A0 = plot_transfer_function(sensortype, sensitivity_frequency, plt)
 %    A0d = PLOT_TRANSFER_FUNCTION('PAEd', 1)
 %    A0d - (A0v/(2*pi*1))
 %
-% E2: see AFI.resp in $MERMAID/events/nearbystations/pz/examples/RESP_example/
+% E2: (comparing AFI_old.pz, AFI_new.pz, AFI_resp.pz CONSTANT)
+%     (see AFI.resp in $MERMAID/events/nearbystations/pz/examples/RESP_example/)
+%    % In the RESP file (in velocity, M/S) ...
+%    sensitivity_vel = 2.44780E+09;
+%    f0 = 0.02;
 %    figure
-%    A0v = PLOT_TRANSFER_FUNCTION('AFIv', 0.02)
+%    A0v = PLOT_TRANSFER_FUNCTION('AFIv', f0)
 %    figure
-%    A0d = PLOT_TRANSFER_FUNCTION('AFId', 0.02)
+%    A0d = PLOT_TRANSFER_FUNCTION('AFId', f0)
 %    A0d - (A0v/(2*pi*0.02))
+%    A0_resp_vel = +4.56729E+01;
+%    % Which does indeed equal what we found here, within numerical error.
+%    A0v - A0_resp_vel
+%    % And the CONSTANT in the associated SACPZ file (in displacement, M).
+%    CONST_sacpz_disp = 1.117977e+11;
+%    % Which should equal what we found here
+%    CONSTd = A0d * sensitivity_vel * 2 * pi * f0
+%    CONSTv = A0v * sensitivity_vel
+%    % The CONSTANT value from RESP (A0_resp_vel * sensitivity) = 1.1180e+11 (supplied)
+%    % The CONSTANT in AFI_old.pz = 1.117977e+11 (supplied)
+%    % The CONSTANT in AFI_new.pz = 1.117981e+11 (supplied)
+%    % And CONSTd and CONSTv = 1.1180e+11 (derived, using RESP poles and zeros)
 %
 % Ex3: see https://ds.iris.edu/ds/support/faq/24/what-are-the-fields-in-a-resp-file/
 %    figure
 %    sensitivity_vel = 9.630000E+08;
 %    f0 = 0.02;
-%    A0_vel = PLOT_TRANSFER_FUNCTION('RESPv', 0.02)
+%    A0_vel = PLOT_TRANSFER_FUNCTION('RESPv', f0)
 %    figure
-%    A0_disp = PLOT_TRANSFER_FUNCTION('RESPd', 0.02)
+%    A0_disp = PLOT_TRANSFER_FUNCTION('RESPd', f0)
 %    % CONST_disp = A0_disp * sensitivity_disp
 %    CONST_disp = A0_disp * sensitivity_vel * 2 * pi *  f0
 %    CONST_vel = A0_vel * sensitivity_vel
@@ -125,6 +141,8 @@ switch sensortype
     stype = 'Displacement'
 
   case 'AFIv' % Velocity
+    % Directly from
+    % $MERMAID/events/nearbystations/pz/examples/RESP_example/AFI.RESP
     Z = [+0.00000E+00+0.00000E+00i ...
          +0.00000E+00+0.00000E+00i ...
          -9.42478E+00+0.00000E+00i ...
@@ -141,6 +159,9 @@ switch sensortype
     stype = 'Velocity';
 
   case 'AFId' % Displacement
+    % Directly from
+    % $MERMAID/events/nearbystations/pz/examples/RESP_example/AFI.RESP,
+    % with an extra zero
     Z = [+0.00000E+00+0.00000E+00i ...
          +0.00000E+00+0.00000E+00i ...
          +0.00000E+00+0.00000E+00i ...  % (one extra zero)
