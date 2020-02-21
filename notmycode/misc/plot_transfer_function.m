@@ -129,7 +129,7 @@ switch sensortype
          -2.19911E+02+6.84867E+02i];
     stype = 'Velocity';
 
-  case 'ISOLAv' % $MERMAID/events/nearbystations/pz/notes/ISOLA.pz
+  case 'ISOLAv' % $MERMAID/events/nearbystations/pz/notes/ISOLA.doc
     Z = [0.0+0.0i ...
          0.0+0.0i ...
          51.5+0.0i];
