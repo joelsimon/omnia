@@ -28,10 +28,14 @@ function A0 = plot_transfer_function(sensortype, sensitivity_frequency, plt)
 %
 % Ex1:
 %    figure
-%    A0v = PLOT_TRANSFER_FUNCTION('PAEv', 1)
+%    f0 = 1; % Hz, supplied by Olivier Hyvernaud
+%    A0v = PLOT_TRANSFER_FUNCTION('PAEv', f0)
 %    figure
-%    A0d = PLOT_TRANSFER_FUNCTION('PAEd', 1)
-%    A0d - (A0v/(2*pi*1))
+%    A0d = PLOT_TRANSFER_FUNCTION('PAEd', f0)
+%    A0d - (A0v/(2*pi*1))  % these should equal
+%    sensitivity_vel = 0.5236 % nm/s/LSB, supplied by Olivier Hyvernaud
+%    sensitivity_vel = sensitivity_vel * 1e9 % counts/(m/s) ?
+%    CONSTd = A0d * sensitivity_vel * 2 * pi * f0
 %
 % E2: (comparing AFI_old.pz, AFI_new.pz, AFI_resp.pz CONSTANT)
 %     (see AFI.resp in $MERMAID/events/nearbystations/pz/examples/RESP_example/)
