@@ -48,7 +48,6 @@ for j = 1:length(otype)
         end
     end
 
-    fprintf('\nRemoving instrument response and writing %s SAC files...\n', ostr{j})
     fprintf('Total events:               %4i\n', length(id))
     fprintf('Events attempted:           %4i\n', attempted.(otype{j}))
     fprintf('Events corrected:           %4i\n', length(corrected.(otype{j})))
