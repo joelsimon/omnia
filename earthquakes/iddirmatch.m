@@ -12,7 +12,7 @@ function iddirmatch(ddir, id)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 05-Feb-2020, Version 2017b on GLNXA64
+% Last modified: 26-Feb-2020, Version 2017b on GLNXA64
 
 defval('ddir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('id', '10932551')
@@ -67,4 +67,4 @@ if ~isempty(acc)
     end
 end
 
-fprintf('SAC* and evt files match:\n    %s\n    %s\n', sacpath, evtpath)
+fprintf('Lists of SAC* and evt files match:\n    %s\n    %s\n', sacpath, evtpath)
