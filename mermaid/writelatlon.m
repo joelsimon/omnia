@@ -1,15 +1,42 @@
-function writelatlon
-% WRITELATLON
+function writelatlon(sacdir, evtdir, returntype)
+% WRITELATLON(sacdir, evtdir, returntype)
 %
-% Write station and event lat, lon, and depth to textfile.
+% Writes textfile of MERMAID and event latitudes and longitudes to
+% $MERMAID/events/reviewed/identified/txt/mermaid_latlon.txt
+%
+% Input:
+% sacdir       Directory where .sac files are kept
+%                  def($MERMAID/processed)
+% evtdir       Path to directory containing 'raw/' and 'reviewed'
+%                  subdirectories (def: $MERMAID/events/)
+% returntype   For third-generation+ MERMAID only:
+%              'ALL': both triggered and user-requested SAC files (def)
+%              'DET': triggered SAC files as determined by onboard algorithm
+%              'REQ': user-requested SAC files
+%
+% Output:
+% *N/A*        Text file with columns:
+%              (1) SAC filename
+%              (2) STLA (decimal degrees)
+%              (3) STLO (decimal degrees)
+%              (4) STDP (meters below sea surface, or NaN if STDP missing)
+%              (5) EVLA (decimal degrees)
+%              (6) EVLO (decimal degrees)
+%              (7) EVDP (kilometers)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 18-Jan-2020, Version 2017b on GLNXA64
+% Last modified: 26-Feb-2020, Version 2017b on GLNXA64
 
-s = revsac(1);
+% Defaults.
+defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
+defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
+defval('returntype', 'ALL')
 
-fid = fopen(fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified', 'txt', 'mermaid_latlon.txt'), 'w');
+% Fetch all identified SAC files matching the requested return type.
+s = revsac(1, sacdir, evtdir, returntype);
+
+% Text file format.
 fmt = ['%44s    ', ...
        '%8.4f    ' , ...
        '%9.4f    ' , ...
@@ -18,13 +45,16 @@ fmt = ['%44s    ', ...
        '%9.4f    ' , ...
        '%6.2f\n'];
 
+% Open new, or unlock existing, text file.
+filename = fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified', 'txt', 'mermaid_latlon.txt');
+writeaccess('unlock', filename);
+fid = fopen(filename, 'w');
 
-s = [s(1:10) ; getsac('10964158')];
-
+% For every SAC file; parse relevant details and write to file.
 for i = 1:length(s)
     sac = s{i};
     EQ = getevt(sac);
-    EQ(1).TaupTimes(1).phaseName
+    EQ(1).TaupTimes(1).phaseName;
 
     evla = EQ.PreferredLatitude;
     evlo = EQ.PreferredLongitude;
@@ -40,13 +70,18 @@ for i = 1:length(s)
 
     end
 
-    data = {strippath(sac),     ...
-            stla,  ...
-            stlo,  ...
-            stdp,  ...
+    data = {strippath(sac), ...
+            stla, ...
+            stlo, ...
+            stdp, ...
             evla, ...
             evlo, ...
             evdp};
 
     fprintf(fid, fmt, data{:});
+
 end
+
+% Restrict write access to filename, and print its name to screen.
+writeaccess('unlock', filename)
+disp(filename)
