@@ -1,7 +1,7 @@
 function writemermaidglobalcatalogall
 %  WRITEMERMAIDGLOBALCATALOGALL
 %
-% Executes writemermaidcatalog.m for magnitudes 4 though 9, assuming
+% Executes writemermaidglobalcatalog.m for magnitudes 4 though 9, assuming
 % JDS system defaults.
 %
 % Author: Joel D. Simon
