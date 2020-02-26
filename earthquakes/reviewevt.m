@@ -92,7 +92,7 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 25-Feb-2020, Version 2017b on GLNXA64
 
 % A note:
 %
@@ -111,7 +111,7 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 %% Recursive.
 
 % Defaults.
-defval('sac', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
+defval('sac', 'centcal.1.BHZ.SAC')
 defval('redo', false)
 defval('diro', fullfile(getenv('MERMAID'), 'events'))
 defval('viewr', 2)
