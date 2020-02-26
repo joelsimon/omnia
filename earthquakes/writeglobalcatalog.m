@@ -9,7 +9,7 @@ function writeglobalcatalog(minmag, maxmag, stime, etime, txtdir)
 % minmag        Minimum magnitude (def: 4), integer only
 % minmag        Maximum magnitude (def: 9), integer only
 % stime         Time to start query, in FDSN str format (not datetime)
-%                   (def: '2018-08-07T00:00:00.000')
+%                   (def: '2018-08-01T00:00:00.000')
 % etime         Time to end query, in FDSN str format (not datetime)
 %                   (def: present time)
 % txtdir        Directory to write M?.txt, where ? represents
@@ -24,12 +24,12 @@ function writeglobalcatalog(minmag, maxmag, stime, etime, txtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Jan-2020, Version 2017b on GLNXA64
+% Last modified: 26-Feb-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('minmag', 4);
 defval('maxmag', 9);
-defval('stime', '2018-08-07T00:00:00.000')
+defval('stime', '2018-08-01T00:00:00.000')
 defval('etime', fdsndate2str(datetime('now')))
 defval('txtdir', fullfile(getenv('MERMAID'), 'events', 'globalcatalog'));
 [~, foo]= mkdir(txtdir);
