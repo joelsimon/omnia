@@ -1,5 +1,5 @@
-function [mer_updated, nearby_updated, nearbyu_updated, failed] = updateidall(force)
-% [mer_updated, nearby_updated, nearbyu_updated, failed] = UPDATEIDALL(force)
+function [mer_updated, nearby_updated, nearbyu_updated, cppt_updated, failed] = updateidall(force)
+% [mer_updated, nearby_updated, nearbyu_updated, cppt_updated, failed] = UPDATEIDALL(force)
 %
 % Updates every MERMAID and 'nearby' .evt file associated with every
 % identified event, using updateid.m
@@ -9,7 +9,7 @@ function [mer_updated, nearby_updated, nearbyu_updated, failed] = updateidall(fo
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 01-Feb-2020, Version 2017b on GLNXA64
+% Last modified: 21-Feb-2020, Version 2017b on GLNXA64
 
 defval('force', false)
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
