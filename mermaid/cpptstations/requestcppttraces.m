@@ -6,7 +6,7 @@ function reqfile = requestcppttraces(id, reqdir, cpptfile, evtdir, model, ph)
 % Each textfile corresponds to a single instrument and has three columns:
 % (1) starttime: five minutes before first arrival
 % (2)   endtime: ten minutes after first arrival
-% (3)        ID: corresponding event id
+% (3)        ID: corresponding "Public Event ID" distributed by IRIS
 %
 % Input:
 % id       Cell array of IRIS public ID numbers as char
@@ -25,7 +25,7 @@ function reqfile = requestcppttraces(id, reqdir, cpptfile, evtdir, model, ph)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 21-Jan-2020, Version 2017b on GLNXA64
+% Last modified: 26-Feb-2020, Version 2017b on GLNXA64
 % Documented & verified: 2017.1 pg. 151; 2017.2 pg. 89
 
 % Defaults.
@@ -57,6 +57,7 @@ end
 [~, foo] = mkdir(reqdir);
 fmt = '%23s    %23s    %8s\n';
 pwt = fdsndate2str(datetime('now', 'TimeZone', 'UTC'));
+%pwt = '2020-01-21T17:22:48.525' % hack to overwrite JDS' original requests to check for diffs
 
 for i = 1:length(sta)
     % Generate textfile name as station name + current UTC time.
