@@ -5,9 +5,10 @@ function zmax = topz(lobj, ha)
 %
 % Simply adds 1 to the input axes' maximum ZData.  Defaults to use
 % parent axes ZData, but user may supply other container as input.
-% Stacks multiple line objects in order they are input.
+% Stacks multiple line objects in order they are input, with last
+% being on the top.
 %
-% Inputs:
+% Input:
 % lobj          Line handle(s) to send to top
 % ha            Axes handle whose ZData this queries (def: gca)
 %
