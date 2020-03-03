@@ -33,8 +33,9 @@ function A0 = plot_transfer_function(sensortype, sensitivity_frequency, plt)
 %    figure
 %    A0d = PLOT_TRANSFER_FUNCTION('PAEd', f0)
 %    A0d - (A0v/(2*pi*1))  % these should equal
-%    sensitivity_vel = 0.5236 % nm/s/LSB, supplied by Olivier Hyvernaud
-%    sensitivity_vel = sensitivity_vel * 1e9 % counts/(m/s) ?
+%    % sensitivity_vel = 0.5236 nm/s/LSB (==(nm/s)/COUNTS), supplied by
+%    % Olivier Hyvernaud, therefore take inverse and mul by 1e9 to convert to meters
+%    sensitivity_vel = (1/0.5236) * 1e9
 %    CONSTd = A0d * sensitivity_vel * 2 * pi * f0
 %
 % E2: (comparing AFI_old.pz, AFI_new.pz, AFI_resp.pz CONSTANT)
@@ -90,7 +91,7 @@ function A0 = plot_transfer_function(sensortype, sensitivity_frequency, plt)
 %
 % Written by Umair bin Waheed after information from GEOBit
 % Last modified by fjsimons-at-alum.mit.edu on 02/04/2020
-% Last modified by jdsimon@princeton.edu, 21-Feb-2020
+% Last modified by jdsimon@princeton.edu, 03-Mar-2020
 
 defval('sensitivity_frequency', 1)
 defval('plt', true)
