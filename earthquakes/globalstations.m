@@ -1,19 +1,21 @@
-function [s, f1, f2, f3] = globalstations(redo, plt)
-% [s, f1, f2, f3] = GLOBALSTATIONS(redo, plt)
+function [s, f1, f2, f3] = globalstations(redo, plt, nearbybox)
+% [s, f1, f2, f3] = GLOBALSTATIONS(redo, plt, nearbybox)
 %
 % GLOBALSTATIONS queries http://service.iris.edu/fdsnws/station/1/,
 % via irisFetch.Stations, the complete (for all time) global list of
 % seismic stations.
 %
 % Input:
-% redo   logical true to resent query and save new file (def: false)
-% plt    logical true to plot (def: true)
+% redo      logical true to resent query and save new file (def: false)
+% plt       logical true to plot (def: true)
+% nearbybox logical true to plot bounding box used for "nearby" stations search in paper20??
+%               (def: true)
 %
 % Output:
-% s     Struct of stations returned by irisFetch.Stations
-% f1    Labeled map of stations with outlines of coasts
-% f2    f1, with most recently-reported MERMAID locations also plotted
-% f3    Unlabeled map of stations
+% s         Struct of stations returned by irisFetch.Stations
+% f1        Labeled map of stations with outlines of coasts
+% f2        f1, with most recently-reported MERMAID locations also plotted
+% f3        Unlabeled map of stations
 %
 % If redo is false GLOBALSTATIONS will look for "globalstations.mat"
 % in the same folder where globalstations.m lives.
@@ -22,11 +24,15 @@ function [s, f1, f2, f3] = globalstations(redo, plt)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Dec-2019, Version 2017b on MACI64
+% Last modified: 02-Mar-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('redo', false)
 defval('plt', true)
+defval('nearbybox', 'true')
+f1 = [];
+f2 = [];
+f3 = [];
 
 % The savefile lives in the same folder of this mfilename.
 mfile = which(mfilename);
@@ -34,7 +40,7 @@ savefile = strrep(mfile, [mfilename '.m'], [mfilename '.mat']);
 
 if ~redo
     fprintf('\nLoading (large) %s...\n\n', strippath(savefile))
-    load(savefile)
+    load(savefile, 's')
 
 else
     % Search from 01-Jan-0000 to the present time.
@@ -65,7 +71,7 @@ if plt
     f1.f = figure;
     f1.ha = gca;
 
-    f1.pl = plot(f1.ha, lon, lat, '^', 'MarkerFaceColor', 'blue', ...
+    f1.pl = plot(f1.ha, lon, lat, 'v', 'MarkerFaceColor', 'blue', ...
                  'MarkerEdgeColor', 'blue', 'MarkerSize', 1);
 
     hold(f1.ha, 'on')
@@ -84,8 +90,8 @@ if plt
                         '30$^{\circ}$S' '0$^{\circ}$' '30$^{\circ}$N' ...
                         '60$^{\circ}$N' '90$^{\circ}$N'})
 
-    xlabel(f1.ha, 'longitude');
-    ylabel(f1.ha, 'latitude');
+    xlabel(f1.ha, 'Longitude');
+    ylabel(f1.ha, 'Latitude');
 
     latimes
     longticks(f1.ha, 2)
@@ -107,6 +113,16 @@ if plt
     % Split the text at newline characters and ditch the final (empty) string cell.
     str = splitlines(str);
     str = str(1:end-1);
+    str = sort(str);
+
+    % Assuming this file is sorted
+    P008_idx = cellstrfind(str, 'P008')'
+    P025_idx = cellstrfind(str, 'P025')'
+
+    Princeton_idx = P008_idx:P025_idx;
+    all_idx = 1:length(str);
+
+    other_idx = setdiff(all_idx, Princeton_idx);
 
     mlat = cellfun(@(xx) str2double(xx(31:40)), str);
     mlon = cellfun(@(xx) str2double(xx(43:53)), str);
@@ -114,9 +130,26 @@ if plt
     % Again, map longitudes to plotcont.m convention.
     mlon(find(mlon<0)) = mlon(find(mlon<0)) + 360;
 
+
     hold(f2.ha, 'on')
-    f2.pl = plot(f2.ha, mlon, mlat, '^', 'MarkerFaceColor', 'red', ...
-                 'MarkerEdgeColor', 'black', 'MarkerSize', 5);
+    if nearbybox
+        f2.pl_left = plot(f2.ha, [176 176], [4 -33], 'k', 'LineWidth', 1);
+        f2.pl_right = plot(f2.ha, [251 251], [4 -33], 'k', 'LineWidth', 1);
+        f2.pl_top = plot(f2.ha, [176 251], [4 4], 'k', 'LineWidth', 1);
+        f2.pl_bottom = plot(f2.ha, [176 251], [-33 -33], 'k', 'LineWidth', 1);
+        botz([f2.pl_left f2.pl_right f2.pl_top f2.pl_bottom]);
+
+    end
+
+    f2.pl_other = plot(f2.ha, mlon(other_idx), mlat(other_idx), ...
+                       'v', 'MarkerFaceColor', [0.6 0.6 0.6], 'MarkerEdgeColor', ...
+                       'k', 'MarkerSize', 5);
+    f2.pl_Princeton = plot(f2.ha, mlon(Princeton_idx), mlat(Princeton_idx), ...
+                           'v', 'MarkerFaceColor', [1 0.5 0]', 'MarkerEdgeColor', ...
+                           'k', 'MarkerSize', 6);
+
+    topz([f2.pl_other f2.pl_Princeton])
+
     hold(f2.ha, 'off')
     axesfs(f2.f, 7, 9)
     savepdf('globalstations_f2')
