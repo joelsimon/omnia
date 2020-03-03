@@ -70,7 +70,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %              window beginning at dat and ending wlen/2 later
 % W2       timewindow.m struct of length wlen/2 [s]
 %              beginning at dat -- all the data considered for maxc_y pick
-% winflag  Windlow flag (sentinel value)
+% winflag  Window flag (sentinel value)
 %          0: Both time windows complete
 %          1: W1 incomplete, W2 complete
 %          2: W1 complete, W2 incomplete
