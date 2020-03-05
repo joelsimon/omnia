@@ -117,14 +117,18 @@ for i = 1:length(sta)
 end
 
 % Concatenate the .pz files themselves so that a single pole-zero file
-% can be read into SAC for all subsequent calls to 'transfer'.
+% can be read into SAC for all subsequent calls to 'transfer', and
+% send those individual pz files to a subdirectory,
+% individualstations/.
 nearbypz = fullfile(pzdir, 'nearbystations.pz');
 system(sprintf('truncate -s 0 %s', nearbypz));  % Don't use touch -- does not empty existing file.
+[~, foo] = mkdir('individualstations')
 for i = 1:length(pzfiles)
     system(sprintf('cat %s >> %s', pzfiles{i}, nearbypz));
+    [~, foo] = movefile(pzfiles{i}, 'individualstations');
 
 end
 
-% Wrap up: deactivate python environment and return from whence you came.
+% Wrap up: deactivate python environment and return to the original calling directory.
 system('source deactivate');
-cd(stardir)
+cd(stardir
