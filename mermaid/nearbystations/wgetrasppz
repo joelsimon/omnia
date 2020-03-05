@@ -13,7 +13,7 @@
 # Raspberry Shake response data is only (so far as I can tell)
 # returned as station.xml (and possibly SEED?) files, not the
 # classical SAC pole-zero files.  At the very least (at the time of
-# writing) they are not queryable from
+# initial writing in Nov. 2019) they are not queryable from
 # http://service.iris.edu/irisws/sacpz/1/.  This script takes an xml
 # file and converts it to a pole-zero file, which necessitates a call
 # to xml2pz.m (which it expects to find in $MERMAID/earthquakes), as
@@ -22,10 +22,11 @@
 #
 # *N.B.: Raspberry stations only use location '00' --
 #        https://manual.raspberryshake.org/stationNamingConvention.html
+#        Regardless, I still wildcard the location parameter.
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 26-Nov-2019, Python 2.7.15 (pymaid env.)
+# Last modified: 04-Mar-2020, Python 2.7.15 (pymaid env.)
 
 # Input.
 sta=$1
@@ -35,7 +36,7 @@ xml=AM.$sta.Z.xml
 pz=AM.$sta.Z.pz
 
 # This fetches a station.xml response file.
-wget "https://fdsnws.raspberryshakedata.com/fdsnws/station/1/query?network=AM&station=$sta&loc=*&cha*Z&level=resp&start=2018-06-01T01:01:01&format=xml" -O $xml
+wget "https://fdsnws.raspberryshakedata.com/fdsnws/station/1/query?network=AM&station=$sta&location=*&channel=*Z&level=response&start=2018-06-01T01:01:01&format=xml" -O $xml
 
 # This converts the station.xml response file to a poles and zeros file for SAC.
 python $OMNIA/earthquakes/xml2pz.py $xml
