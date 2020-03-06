@@ -1,7 +1,7 @@
 function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
-                           evtdir, EQ, bathy)
+                           evtdir, EQ, bathy, wlen2)
 % WRITEFIRSTARRIVAL(s, redo, filename, fmt, wlen, lohi, sacdir, ...
-%                   evtdir, EQ, bathy)
+%                   evtdir, EQ, bathy, wlen2)
 %
 % WRITEFIRSTARRIVAL writes the output of firstarrival.m a text file.
 %
@@ -28,6 +28,9 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 %             (def: [] to retrieve reviewed EQ struct from evtdir with getevt.m)
 % bathy    logical true apply bathymetric travel time correction,
 %              computed with bathtime.m (def: true)
+% wlen2    Length of second window, starting at the 'dat', the time of
+%              the first arrival, in which to search for maxc_y [s]
+%              (def: lohi(2))
 %
 % Output:
 % Text file with the following columns (firstarrivals.m outputs in parentheses):
@@ -53,7 +56,7 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 17-Feb-2020, Version 2017b on MACI64
+% Last modified: 06-Mar-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('s', revsac(1))
@@ -80,6 +83,7 @@ defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
+defval('wlen2', lohi(2))
 
 % Sort out if deleting, appending to, or creating output file.
 file_exists = (exist(filename,'file') == 2);
@@ -129,7 +133,7 @@ parfor i = 1:length(s)
     end
 
     % Concatenate the write lines.
-    wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy);
+    wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2);
     wlines = [wlines wline];
 
 end
@@ -160,12 +164,12 @@ end
 fileattrib(filename, '-w')
 
 %_______________________________________________________________________________%
-function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy)
+function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2)
 % Local call to, and formatting of, firstarrival.m
 
 % Collect.
 [tres, dat, syn, tadj, ph, delay, twosd, ~, ~, ~, maxc_y, SNR, EQ, ~, ~, ~, winflag, tapflag, zerflag] = ...
-    firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy);
+    firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2);
 publicid = fx(strsplit(EQ(1).PublicId, '='),  2);
 tptime = EQ(1).TaupTimes(1).time;
 
