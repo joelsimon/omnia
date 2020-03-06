@@ -1,10 +1,15 @@
-function writefirstarrivalpressure(s, redo, filename, fmt, wlen, lohi, sacdir, ...
-                           evtdir, EQ, bathy)
+function writefirstarrivalpressure(s, redo, filename, fmt, wlen, ...
+                                   lohi, sacdir, evtdir, EQ, bathy, wlen2)
 % WRITEFIRSTARRIVALPRESSURE(s, redo, filename, fmt, wlen, lohi, sacdir, ...
-%                   evtdir, EQ, bathy)
+%                   evtdir, EQ, bathy, wlen2)
 %
 % WRITEFIRSTARRIVALPRESSURE writes the output of
-% firstarrivalpressure.m to a text file.
+% firstarrivalpressure.m to a text file.  This function differs from
+% writefirstarrival.m in a very important way in that it writes the
+% EQ.MbMlMagnitudeValue and EQ.MbMlType (as opposed to the
+% EQ.PreferredMagnitude*) because those are what is required to make
+% the reidpressure.m estimates.  So the output textfile may seem
+% redundant compared with that of writefirstarrival.m, but it is not.
 %
 % Input:
 % s        Cell array of identified SAC filenames (def: revsac(1))
@@ -25,6 +30,9 @@ function writefirstarrivalpressure(s, redo, filename, fmt, wlen, lohi, sacdir, .
 %             (def: [] to retrieve reviewed EQ struct from evtdir with getevt.m)
 % bathy    logical true apply bathymetric travel time correction,
 %              computed with bathtime.m (def: true)
+% wlen2    Length of second window, starting at the 'dat', the time of
+%              the first arrival, in which to search for maxc_y [s]
+%              (def: 1)
 %
 % Output:
 % Text file with the following columns (firstarrivalpressure.m outputs in parentheses):
@@ -41,14 +49,15 @@ function writefirstarrivalpressure(s, redo, filename, fmt, wlen, lohi, sacdir, .
 %    (11) Event latitude in decimal degrees
 %    (12) Event longitude in decimal degrees
 %    (13) IRIS event ID
-%    (14) Incomplete window flag: true for incomplete, false
-%        otherwise (see timewindow.m)
+%    (14) winflag (see firstarrival.m)
+%    (14) tapflag (see firstarrival.m)
+%    (14) zerflag (see firstarrival.m)
 %
 % See also: firstarrivalpressure.m, readfirstarrivalpressure.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 31-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 06-Mar-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('s', revsac(1))
@@ -68,13 +77,17 @@ defval('fmt', ['%44s    ' , ...
                '%7.3f    ' , ...
                '%8.3f    ' , ...
                '%8s   ',     ...
-               '%i\n'])
+               '%i    ', ...
+               '%3i    ', ...
+               '%i\n']);
+
 defval('wlen', 30)
 defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
+defval('wlen2', 1)
 
 % Sort out if deleting, appending to, or creating output file.
 file_exists = (exist(filename,'file') == 2);
@@ -124,7 +137,7 @@ parfor i = 1:length(s)
     end
 
     % Concatenate the write lines.
-    wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy);
+    wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2);
     wlines = [wlines wline];
 
 end
@@ -155,14 +168,20 @@ end
 fileattrib(filename, '-w')
 
 %_______________________________________________________________________________%
-function wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy)
+function wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2)
 % Local call to, and formatting of, firstarrivalpressure.m
 
 % Collect.
-[RMS, ph, P, ~, ~, ~, ~, ~, ~, EQ, incomplete] = ...
-    firstarrivalpressure(sac, wlen, lohi, sacdir, evtdir, single_EQ, bathy);
+[RMS, ph, P, ~, ~, ~, ~, ~, ~, EQ, winflag, tapflag, zerflag] = ...
+    firstarrivalpressure(sac, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2);
 
-[~, h] = readsac(fullsac(sac, sacdir));
+% Nab fullpath SAC file name, if not supplied.
+if isempty(fileparts(sac))
+    sac = fullsac(sac, sacdir);
+
+end
+[~, h] = readsac(sac);
+
 merlat = h.STLA;
 merlon = h.STLO;
 
@@ -203,7 +222,9 @@ data = {strippath(sac), ...
         evtlat,         ...
         evtlon,         ...
         publicid,       ...
-        incomplete};
+        winflag,        ...
+        tapflag,        ...
+        zerflag};
 
 % Format.
 wline = sprintf(fmt, data{:});

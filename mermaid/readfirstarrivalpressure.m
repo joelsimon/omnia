@@ -1,13 +1,13 @@
 function varargout = readfirstarrivalpressure(filename, fmt)
-% [s, ph, RMS, P, magval, magtype, depth, dist, merlat, merlon, evtlat, ...
-%     evtlon, ID, incomplete] = READFIRSTARRIVALPRESSURE(filename, fmt)
+% [s, ph, RMS, P, magval, magtype, depth, dist, merlat, merlon, ...
+%     evtlat, evtlon, ID, winflag, tapflag, zerflag] = READFIRSTARRIVALPRESSURE(filename, fmt)
 %
 % Reads and parses textfile output by writefirstarrivalpressure.m.
 % See there for I/0.
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 31-Oct-2019, Version 2017b on GLNXA64
+% Last modified: 06-Mar-2020, Version 2017b on GLNXA64
 
 % Default.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -26,7 +26,9 @@ defval('fmt', ['%44s    ' , ...
                '%7.3f    ' , ...
                '%8.3f    ' , ...
                '%8s   ',     ...
-               '%u\n'])
+               '%u    ', ...
+               '%3s    ', ...
+               '%u\n']);
 
 % Read.
 fid = fopen(filename, 'r');
@@ -47,9 +49,11 @@ merlon = lynes{10};
 evtlat = lynes{11};
 evtlon = lynes{12};
 ID = lynes{13};
-incomplete = lynes{14};
+winflag = double(lynes{14});
+tapflag = str2double(lynes{15});
+zerflag = double(lynes{16});
 
 % Collect.
 outargs = {s, ph, RMS, P, magval, magtype, depth, dist, merlat, ...
-           merlon, evtlat, evtlon, ID, incomplete};
+           merlon, evtlat, evtlon, ID, winflag, tapflag, zerflag};
 varargout = outargs(1:nargout);
