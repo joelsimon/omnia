@@ -1,12 +1,12 @@
-function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, incomplete] = ...
-        firstarrivalpressure(s, wlen, lohi, sacdir, evtdir, EQ, bathy)
-% [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, incomplete] = ...
-%       FIRSTARRIVALPRESSURE(s, wlen, lohi, sacdir, evtdir, EQ, bathy)
+function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zerflag] = ...
+        firstarrivalpressure(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2)
+% [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zerflag] = ...
+%       FIRSTARRIVALPRESSURE(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2)
 %
 % Extension of firstarrival.m (which deals with travel time residuals)
 % that computes the RMS value of the first arrival considering the
-% time window starting at the signal and extending until the maximum
-% value of the wavetrain (W2 in firstarrival.m) is reached.
+% time window starting at the first arrival of the signal (the AIC
+% pick), and extending until the 'wlen2' seconds.
 %
 % Input:
 % s        SAC filename '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -22,6 +22,9 @@ function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, incomplete] = ...
 %              getevt.m (def: [])
 % bathy    logical true apply bathymetric travel time correction,
 %              computed with bathtime.m (def: true)
+% wlen2    Length of second window, starting at the 'dat', the time of
+%              the first arrival, in which to search for maxc_y [s]
+%              (def: lohi(2))
 %
 % Output:
 % RMS      Root mean squared value of xw3: arrival to max. amplitude of wavetrain
@@ -38,15 +41,11 @@ function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, incomplete] = ...
 % W2       timewindow.m struct of length wlen/2 [s]
 %              beginning at dat
 % EQ       EQ structure, either input or retrieved with getevt.m
-% incomplete Flags from firstarrival.m (N.B., W3 is always complete)
-%            0: Both time windows complete
-%            1: W1 incomplete, W2 complete
-%            2: W1 complete, W2 incomplete
-%            3: Both time windows incomplete
+% win/tap/zerflag  Flag (sentinel) values from firstarrival.m, see there
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 01-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 06-Mar-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -56,10 +55,11 @@ defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
+defval('wlen2', lohi(2))
 
 % Run firstarrival to retrieve relevant statistics about the first-arriving phase.
-[~, ~, ~, ~, ph, delay, ~, ~, ~, ~, maxc_y, ~, EQ, ~, xw2, W2, ...
- incomplete] = firstarrival(s, false, wlen, lohi, sacdir, evtdir, EQ, bathy);
+[~, ~, ~, ~, ph, delay, ~, ~, ~, ~, maxc_y, ~, EQ, ~, xw2, W2, winflag, tapflag, zerflag] = ...
+    firstarrival(s, false, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2);
 
 % Find the new RMS time window which brackets just the time starting
 % at the AIC pick of the first arrival and extending 'delay' seconds,
