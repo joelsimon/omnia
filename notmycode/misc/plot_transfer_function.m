@@ -61,7 +61,7 @@ function A0 = plot_transfer_function(sensortype, sensitivity_frequency, plt)
 %    % The CONSTANT in AFI_new.pz = 1.117981e+11 (supplied)
 %    % And CONSTd and CONSTv = 1.1180e+11 (derived, using RESP poles and zeros)
 %
-% Ex3: see https://ds.iris.edu/ds/support/faq/24/what-are-the-fields-in-a-resp-file/
+% Ex3: (see https://ds.iris.edu/ds/support/faq/24/what-are-the-fields-in-a-resp-file/)
 %    figure
 %    sensitivity_vel = 9.630000E+08;
 %    f0 = 0.02;
@@ -72,6 +72,37 @@ function A0 = plot_transfer_function(sensortype, sensitivity_frequency, plt)
 %    CONST_disp = A0_disp * sensitivity_vel * 2 * pi *  f0
 %    CONST_vel = A0_vel * sensitivity_vel
 %    CONST_disp - CONST_vel      % equal, within numerical error
+%
+%
+% Ex4: (see cases 'R06CDv' and 'R06CDd' for full derivation and web links)
+%    %% Reading STATION XML file (M/S; 4 zeros) --
+%    % <NormalizationFrequency>5</NormalizationFrequency>
+%    figure
+%    f0 = 5;
+%    A0v = plot_transfer_function('R06CDv', 5, true)
+%    % This should equal <NormalizationFactor>0.00149803</NormalizationFactor>
+%    sprintf('NormalizationFactor = %.8f', A0v)
+%    % And the CONSTANTv is A0v * sensitivity [COUNTS/(m/s)]
+%    % <Value>469087000</Value>
+%    sensitivity_vel = 469087000;
+%    CONSTANTv = A0v * sensitivity_vel
+%    % CONSTANTv is the CONSTANT we would put at the bottom of a SACPZ
+%    % file with 4 ZEROS s.t. a SAC TRANSFER to NONE would actually
+%    % produce a velocity seismogram, and the same CONSTANT we would put
+%    % at the bottom of a SACPZ file with 5 ZEROS s.t. SAC TRANSFER to
+%    % NONE would produce the correct displacement seismogram.
+%
+%    %% Reading SACPZ file (M; 5 zeros)
+%    % I have already shown multiple times CONSTANTd = CONSTANTv, but to beat the dead horse...
+%    figure
+%    A0d = plot_transfer_function('R06CDd', 5, true)
+%    CONSTANTd = A0d * sensitivity_vel * 2 * pi * f0
+%    CONSTANTv - CONSTANTd
+%    % The CONSTANT in the SACPZ file equals 7.027064e+05
+%    sprintf('%.6e', CONSTANTd)
+%    % Which is different simply due to precision issues; if you use the numbers above
+%    % you get it exactly: sprintf('%.6e', 0.00149803 * 469087000.0),
+%    % the difference is ~1/10,000 of 1%: ((CONSTANTd - 7.027064e+05)/CONSTANTd)*100
 %
 % NB, in the third example, what I call the CONST_vel is the SACPZ
 % CONSTANT that would go at the very bottom of a VELOCITY (M/S) SACPZ
@@ -91,7 +122,7 @@ function A0 = plot_transfer_function(sensortype, sensitivity_frequency, plt)
 %
 % Written by Umair bin Waheed after information from GEOBit
 % Last modified by fjsimons-at-alum.mit.edu on 02/04/2020
-% Last modified by jdsimon@princeton.edu, 03-Mar-2020
+% Last modified by jdsimon@princeton.edu, 04-Mar-2020
 
 defval('sensitivity_frequency', 1)
 defval('plt', true)
@@ -193,6 +224,35 @@ switch sensortype
          -0.1111+0.1111i ...
          -0.1111-0.1111i];
     stype = 'Velocity';
+
+  case 'R06CDv'
+    % Station XML in velocity (M/S)
+    % https://fdsnws.raspberryshakedata.com/fdsnws/station/1/query?network=AM&station=R06CD&location=00&channel=*Z&level=response&start=2019-03-15&end=2019-03-15format=xml
+    % Normalization frequency: 5 Hz (f0)
+    % Normalization factor: (A0v)
+    % Look at <Stage number="1"> (<PzTransferFunctionType>LAPLACE (RADIANS/SECOND)</PzTransferFunctionType>)
+    Z = [-675.214+0i ...  % <Zero number="3">
+         0+0i ...         % <Zero number="4">
+         0+0i ...         % <Zero number="5">
+         0+0i];           % <Pole number="6">
+
+    P = [-4.21019+0i ...  % <Pole number="0">
+         -2.33332+0i ...  % <Pole number="1">
+         -1.29888+0i];    % <Pole number="2">
+    stype = 'Velocity';
+
+  case 'R06CDd'
+    % Compared to R06CDv, add one zero to convert to displacement.
+    % Look at AM.R06CD.pz, which was converted from STATION XML to SACPZ with xml2pz.py
+    Z = [-675.214+0i ...
+         0+0i ...
+         0+0i ...
+         0+0i ...
+         0+0i];
+    P = [-4.21019+0i ...
+         -2.33332+0i ...
+         -1.29888+0i];
+    stype = 'Displacement';
 
   otherwise
   error('Specify valid sensor type')
