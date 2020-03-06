@@ -36,20 +36,12 @@ function s = fullsac(singl, diro, returntype)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 20-Dec-2019, Version 2017b on GLNXA64
+% Last modified: 06-Mar-2020, Version 2017b on GLNXA64
 
 % Default is to return all SAC filenames in $MERMAID/processed.
 defval('singl', [])
 defval('diro', fullfile(getenv('MERMAID'), 'processed'))
 defval('returntype', 'ALL')
-
-% Sanity.
-if verLessThan('MATLAB','2017b')
-    foldercheck = @isdir;
-else
-    foldercheck = @isfolder;
-end
-assert(foldercheck(diro), 'Input ''diro'' must be a directory (folder).')
 
 % Main.
 if isempty(singl)
