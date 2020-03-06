@@ -68,7 +68,7 @@ end
     firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2);
 
 % Plot time series.
-plot(ax, xaxw1, xw1, '-o', 'LineWidth', 1, 'Color', 'Blue')
+plot(ax, xaxw1, xw1, 'LineWidth', 1, 'Color', 'Blue')
 ax.FontSize = FontSize(2);
 
 % Adjust title if travel-time residual uses corrected theoretical
