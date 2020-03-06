@@ -1,9 +1,9 @@
 function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
           maxc_y, SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag] ...
-        = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy)
+        = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2)
 % [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 %        SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag] = ...
-%        FIRSTARRIVAL(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy)
+%        FIRSTARRIVAL(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2)
 %
 % Computes the travel-time residual between the AIC-based arrival-time
 % estimate of Simon, J. D. et al., (2020), BSSA, doi:
@@ -16,19 +16,20 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % EQ(1).  This windowed segment of data may optionally be filtered
 % before the AIC pick is made if 'lohi' is specified.  In that case,
 % windowed segment of data twice the length of the requested window is
-% tapered with a Tukey window with a 0.5 cosine taper; i.e., if 'wlen'
-% is 30 s, the taper is flat in a 30 s window centered on the
+% tapered using a Tukey window with a 0.5 cosine taper; i.e., if
+% 'wlen' is 30 s, the taper is flat in a 30 s window centered on the
 % theoretical first arrival, then cosine-tapered over 15 seconds on
 % either end for a total of 60 seconds of nonzero data.  After the
-% data are tapered the entire time series is filtered, but only the 30
-% s window within the flat part of the taper is considered for
-% finding the AIC pick.
+% data are tapered the entire time series is filtered, but only the 30 s 
+% window within the flat part of the taper is considered for finding
+% the AIC pick.
 %
 % Input:
 % s        SAC filename (def: '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 % ci       true to estimate arrival time uncertainty via
 %              1000 realizations of M1 method (def: false)
-% wlen     Window length [s] (def: 30)
+% wlen     Window length [s] centered on the 'syn', the theoretical
+%              first arrival, to consider for AIC pick (def: 30)
 % lohi     1 x 2 array of corner frequencies [Hz], or NaN to skip
 %              bandpass and use raw data (def: [1 5]])***
 % sacdir   Directory containing (possibly subdirectories)
@@ -41,7 +42,9 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % bathy    logical true apply bathymetric travel time correction,
 %              computed with bathtime.m (def: true)
 %              [N.B: does not adjust EQ.TaupTimes]****
-%
+% wlen2    Length of second window, starting at the 'dat', the time of
+%              the first arrival, in which to search for maxc_y [s]
+%              (def: lohi(2))
 % Output:
 % tres     Travel time residual [s] w.r.t first phase arrival:
 %              estimated (cpest.m) - theoretical (taupTime.m)
@@ -57,9 +60,9 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % xaxw1    x-axis centered on syn at 0 seconds, i.e., compliment to xw1
 % maxc_x   Time at of maximum (or minimum) amplitude of signal [s]*
 % maxc_y   Amplitude (e.g., counts, nm) of maximum (or minimum) amplitude of
-%              signal within W2 -- window beginning at dat and ending wlen/2 later
+%              signal within W2 -- window beginning at dat and ending wlen2 later
 % twosd    2-standard deviation error estimation per M1 method [s]**
-%              (def NaN)
+ %              (def NaN)
 % SNR      SNR, defined as ratio of biased variance of signal and
 %              noise segments (see wtsnr.m)
 % EQ       Input EQ structure or reviewed EQ struct associated with SAC file
@@ -67,9 +70,9 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % W1       timewindow.m struct of length wlen [s] centered on theoretical
 %              first arrival-time -- all the data considered for AIC pick
 % xw2      Windowed segment of x (maybe filtered) contained in W2 --
-%              window beginning at dat and ending wlen/2 later
-% W2       timewindow.m struct of length wlen/2 [s]
-%              beginning at dat -- all the data considered for maxc_y pick
+%              window beginning at dat and ending wlen2 later
+% W2       timewindow.m struct of length wlen2 [s]
+%              beginning at 'dat' -- all the data considered for maxc_y pick
 % winflag  Window flag (sentinel value)
 %          0: Both time windows complete
 %          1: W1 incomplete, W2 complete
@@ -100,7 +103,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 18-Feb-2020, Version 2017b on GLNXA64
+% Last modified: 06-Mar-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -111,6 +114,7 @@ defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
+defval('wlen2', lohi(2))
 
 % Start with baseline assumption both time windows will be complete.
 incomplete1 = false;
@@ -285,7 +289,7 @@ xaxw1 = W1.xax - syn;
 cp = cpest(xw1, 'fast', false, true);
 
 % Signal-to-noise ratio considering window 1 (W1: centered on syn,
-% length wlen), not window 2 (W2: starting at dat, length wlen/2).
+% length wlen), not window 2 (W2: starting at dat, length wlen2).
 SNR = wtsnr({xw1}, cp, 1);
 
 % The data ('dat') arrival sample is 1 sample after the changepoint
@@ -308,8 +312,8 @@ if SNR > 1
     tres = dat - syn;
 
     % Maximum absolute amplitude (e.g., counts or nm) considering a window
-    % of length wlen/2 starting at the actual phase arrival.
-    [xw2, W2, incomplete2] = timewindow(x, wlen/2, dat, 'first', h.DELTA, h.B);
+    % of length wlen2 starting at the actual phase arrival.
+    [xw2, W2, incomplete2] = timewindow(x, wlen2, dat, 'first', h.DELTA, h.B);
 
     % Check if any two contiguous datum within the second time window == 0
     % (likely signals missing, filler values).
