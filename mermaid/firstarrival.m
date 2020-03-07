@@ -20,7 +20,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % 'wlen' is 30 s, the taper is flat in a 30 s window centered on the
 % theoretical first arrival, then cosine-tapered over 15 seconds on
 % either end for a total of 60 seconds of nonzero data.  After the
-% data are tapered the entire time series is filtered, but only the 30 s 
+% data are tapered the entire time series is filtered, but only the 30 s
 % window within the flat part of the taper is considered for finding
 % the AIC pick.
 %
@@ -145,7 +145,16 @@ end
 if isempty(EQ)
     EQ = getevt(s, evtdir);
 
+else
+    % Verify the filename in the supplied EQ structure matches the SAC file.
+    nopath_sac = strippath(s);
+    sac_idx = strfind(upper(nopath_sac), 'SAC');
+    if ~strcmp(nopath_sac(1:sac_idx), EQ(1).Filename(1:sac_idx))
+        error('Supplied EQ structure does not match SAC file')
+
+    end
 end
+
 
 % Sanity.
 if ~isstruct(EQ)
