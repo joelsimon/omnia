@@ -41,10 +41,10 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %              getevt.m (def: [])
 % bathy    logical true apply bathymetric travel time correction,
 %              computed with bathtime.m (def: true)
-%              [N.B: does not adjust EQ.TaupTimes]****
+%              [NB, does not adjust EQ.TaupTimes]****
 % wlen2    Length of second window, starting at the 'dat', the time of
 %              the first arrival, in which to search for maxc_y [s]
-%              (def: lohi(2))
+%              (def: 1)
 % Output:
 % tres     Travel time residual [s] w.r.t first phase arrival:
 %              estimated (cpest.m) - theoretical (taupTime.m)
@@ -114,7 +114,7 @@ defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
-defval('wlen2', lohi(2))
+defval('wlen2', 1)
 
 % Start with baseline assumption both time windows will be complete.
 incomplete1 = false;

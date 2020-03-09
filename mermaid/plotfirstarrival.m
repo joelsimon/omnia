@@ -27,7 +27,7 @@ function [f, ax, tx] = plotfirstarrival(s, ax, FontSize, EQ, ci, ...
 %              computed with bathtime.m (def: false)
 % wlen2    Length of second window, starting at the 'dat', the time of
 %              the first arrival, in which to search for maxc_y [s]
-%              (def: lohi(2))
+%              (def: 1)
 % Output:
 % f        Figure handle
 % ax       Axis handle
@@ -50,7 +50,7 @@ defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('bathy', true)
-defval('wlen2', lohi(2))
+defval('wlen2', 1)
 defval('hardcode_twosd', []) % hidden input -- see note at bottom
 
 % Generate new axis if one not supplied.

@@ -30,7 +30,7 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 %              computed with bathtime.m (def: true)
 % wlen2    Length of second window, starting at the 'dat', the time of
 %              the first arrival, in which to search for maxc_y [s]
-%              (def: lohi(2))
+%              (def: 1)
 %
 % Output:
 % Text file with the following columns (firstarrivals.m outputs in parentheses):
@@ -83,7 +83,7 @@ defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
-defval('wlen2', lohi(2))
+defval('wlen2', 1)
 
 % Sort out if deleting, appending to, or creating output file.
 file_exists = (exist(filename,'file') == 2);

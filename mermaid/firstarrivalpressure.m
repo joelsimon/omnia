@@ -24,7 +24,7 @@ function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zer
 %              computed with bathtime.m (def: true)
 % wlen2    Length of second window, starting at the 'dat', the time of
 %              the first arrival, in which to search for maxc_y [s]
-%              (def: lohi(2))
+%              (def: 1)
 %
 % Output:
 % RMS      Root mean squared value of xw3: arrival to max. amplitude of wavetrain
@@ -55,7 +55,7 @@ defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
-defval('wlen2', lohi(2))
+defval('wlen2', 1)
 
 % Run firstarrival to retrieve relevant statistics about the first-arriving phase.
 [~, ~, ~, ~, ph, delay, ~, ~, ~, ~, maxc_y, ~, EQ, ~, xw2, W2, winflag, tapflag, zerflag] = ...
