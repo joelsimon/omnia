@@ -1,5 +1,5 @@
-function [xunzip, idx] = unzipnan(x)
-% [xunzip, idx] = UNZIPNAN(x)
+function [xunzip, rm_idx, keep_idx] = unzipnan(x)
+% [xunzip, rm_idx, keep_idx] = UNZIPNAN(x)
 %
 % UNZIPNAN removes all nonfinite values (+-Inf, NaN) from the input
 % time series (or cell array) 'x' and returns the finite series and
@@ -12,25 +12,34 @@ function [xunzip, idx] = unzipnan(x)
 %
 % Outputs:
 % xunzip         Time series with non-finite values removed
-% idx            Indices of removed non-finite values
+% rm_idx         Indices of removed non-finite values
+% keep_idx       Indices of retained finite values,
+%                    xunzip = x(keep_idx)
 %
 % Ex: (remove, but hold onto indices, of nonfinite values in x)
 %    x = [1 2 3 NaN 4 -Inf Inf 5]
 %    [xunzip,idx] = unzipnan(x)
 %
 % See also zipnan.m
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 12-Jul-2018, Version 2017b
+% Last modified: 07-Mar-2020, Version 2017b on GLNXA64
 
 %% Recursive.
 
 if iscell(x)
     for i = 1:length(x)
-        [xunzip{i}, idx{i}] = unzipnan(x{i});
+
+        %% Recursive.
+
+        [xunzip{i}, rm_idx{i}, keep_idx{i}] = unzipnan(x{i});
+
     end
 else
     xunzip = x(:);
-    idx = find(~isfinite(xunzip));
-    xunzip(idx) = [];
+    rm_idx = find(~isfinite(xunzip));
+    xunzip(rm_idx) = [];
+    keep_idx = setdiff(1:length(x), rm_idx)';
+
 end
