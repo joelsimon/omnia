@@ -66,9 +66,8 @@ function [enk,esk,lnk,lsk,y,cnk,csk] = normlysmix(perc,trusigmas,normvars,npts,l
 % lnk          NOISE segment when changepoint LATE, same fields as above
 % lsk          SIGNAL segment when changepoint LATE, same fields as above
 % y            Every time series randomly generated herein
-% lnk          NOISE segment when changepoint CORRECT, same fields as above
-% lsk          SIGNAL segment when changepoint CORRECT, same fields as above
-%
+% cnk          NOISE segment when changepoint CORRECT, same fields as above
+% csk          SIGNAL segment when changepoint CORRECT, same fields as above
 %
 % * trusigmas is a 1x2 array of standard deviations, not
 % variances. normvars is a bracketed range of normalized variances to
