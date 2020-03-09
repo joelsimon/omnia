@@ -12,6 +12,11 @@ function [tadj, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
 % Therefore, the corrected travel time at MERMAID is the theoretical
 % travel time plus the time difference (adjustment) computed here.
 %
+%   <Station in water at depth>   <Station on rock at surface>
+%   ----------------------------------------------------------
+%     1D adjusted travel time   =    1D travel time + tadj
+%      1D adjusted residual     =     1D residual - tadj
+%
 % Input:
 % mod        Either 'ak135', 'iasp91', or 'prem' (def: 'ak135')
 % ph         Phase names allowed in TauP, e.g., 'P' or 'SKIKS';
