@@ -24,7 +24,7 @@ function cmap = bluewhiteredcmap(M)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 30-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 09-Mar-2020, Version 2017b on GLNXA64
 
 % Default.
 defval('M', 255)
@@ -42,22 +42,22 @@ end
 N = ceil(M/2);
 if mod(M,2) ~= 0
     zero_one = linspace(0, 1, N);
-    nine_one = linspace(0.999, 1, N);
+    one_one = ones(1, N);
 
     % If odd remove the repeated [1 1 1] (in the middle).
-    r = [zero_one flip(nine_one(1:end-1))];
+    r = [zero_one one_one(1:end-1)];
     g = [zero_one flip(zero_one(1:end-1))];
-    b = [nine_one flip(zero_one(1:end-1))];
+    b = [one_one flip(zero_one(1:end-1))];
 
 else
     zero_one = linspace(0, 1, N+1);
-    nine_one = linspace(0.999, 1, N+1);
+    one_one = ones(1, N+1);
 
     % If even remove the repeated [1 1 1] (in the middle), and chop off
     % the last extreme red value.
-    r = [zero_one flip(nine_one(2:end-1))];
+    r = [zero_one one_one(2:end-1)];
     g = [zero_one flip(zero_one(2:end-1))];
-    b = [nine_one flip(zero_one(2:end-1))];
+    b = [one_one flip(zero_one(2:end-1))];
 
 end
 cmap = [r(:) g(:) b(:)];
