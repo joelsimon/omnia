@@ -8,14 +8,14 @@ function [FA, idx, zerflag_idx, perc, FA_0, rm_idx] = winnowfirstarrival(filenam
 % See readfirstarrival.m for the meaning of the fields in FA.
 %
 % Input:
-% filename     File name of file written by readfirstarrival.m
+% filename     File name of file written by writefirstarrival.m
 %                  (def: $MERMAID/.../firstarrival.txt)
 % max_tres     QC parameter: tres(idx) <= max_tres (def; realmax)
 % max_twosd    QC parameter: twosd(idx) <= max_twosd (def; realmax)
 % min_snr      QC parameter: SNR(idx) >= max_twosd (def: realmin)
 %
 % Output:
-% FA           Structure of winnowed first arrival data 
+% FA           Structure of winnowed first-arrival data
 %                  s.t. isequaln(FA.s, FA_0.s(idx))
 % idx          Indices that fall within winnowing criteria
 % zerflag_idx  Indices of where zerflag is true
