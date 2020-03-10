@@ -73,13 +73,12 @@ function A0 = plot_transfer_function(sensortype, sensitivity_frequency, plt)
 %    CONST_vel = A0_vel * sensitivity_vel
 %    CONST_disp - CONST_vel      % equal, within numerical error
 %
-%
 % Ex4: (see cases 'R06CDv' and 'R06CDd' for full derivation and web links)
 %    %% Reading STATION XML file (M/S; 4 zeros) --
 %    % <NormalizationFrequency>5</NormalizationFrequency>
 %    figure
 %    f0 = 5;
-%    A0v = plot_transfer_function('R06CDv', 5, true)
+%    A0v = PLOT_TRANSFER_FUNCTION('R06CDv', 5, true)
 %    % This should equal <NormalizationFactor>0.00149803</NormalizationFactor>
 %    sprintf('NormalizationFactor = %.8f', A0v)
 %    % And the CONSTANTv is A0v * sensitivity [COUNTS/(m/s)]
@@ -93,16 +92,17 @@ function A0 = plot_transfer_function(sensortype, sensitivity_frequency, plt)
 %    % NONE would produce the correct displacement seismogram.
 %
 %    %% Reading SACPZ file (M; 5 zeros)
-%    % I have already shown multiple times CONSTANTd = CONSTANTv, but to beat the dead horse...
+%    % I have already shown multiple times CONSTANTd = CONSTANTv,
+%    % but to beat the dead horse...
 %    figure
-%    A0d = plot_transfer_function('R06CDd', 5, true)
+%    A0d = PLOT_TRANSFER_FUNCTION('R06CDd', 5, true)
 %    CONSTANTd = A0d * sensitivity_vel * 2 * pi * f0
 %    CONSTANTv - CONSTANTd
 %    % The CONSTANT in the SACPZ file equals 7.027064e+05
 %    sprintf('%.6e', CONSTANTd)
 %    % Which is different simply due to precision issues; if you use the numbers above
 %    % you get it exactly: sprintf('%.6e', 0.00149803 * 469087000.0),
-%    % the difference is ~1/10,000 of 1%: ((CONSTANTd - 7.027064e+05)/CONSTANTd)*100
+%    % the difference is ~1/10,000 of 1%: ((CONSTANTd - 7.027064e+05)/7.027064e+05)*100
 %
 % NB, in the third example, what I call the CONST_vel is the SACPZ
 % CONSTANT that would go at the very bottom of a VELOCITY (M/S) SACPZ
@@ -122,7 +122,7 @@ function A0 = plot_transfer_function(sensortype, sensitivity_frequency, plt)
 %
 % Written by Umair bin Waheed after information from GEOBit
 % Last modified by fjsimons-at-alum.mit.edu on 02/04/2020
-% Last modified by jdsimon@princeton.edu, 04-Mar-2020
+% Last modified by jdsimon@princeton.edu, 10-Mar-2020
 
 defval('sensitivity_frequency', 1)
 defval('plt', true)
