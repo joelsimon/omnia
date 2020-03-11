@@ -1,5 +1,5 @@
 function [col, cbticks, cbticklabels, cmap, idx] = x2color(x, xmin, xmax, cmap, within)
-% [col, cbticks, cbticklabels, cmap, idx] = X2COLOR(x, xmin, xmax, within)
+% [col, cbticks, cbticklabels, cmap, idx] = X2COLOR(x, xmin, xmax, cmap, within)
 %
 % Linearly map data vector to an RGB colormap.
 %
@@ -62,7 +62,7 @@ function [col, cbticks, cbticklabels, cmap, idx] = x2color(x, xmin, xmax, cmap, 
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 30-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 11-Mar-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('xmin', min(x))
