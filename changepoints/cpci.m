@@ -3,12 +3,16 @@ function [M1, M2] = cpci(x, cptype, iters, alphas, algo, dtrnd, bias, ...
 % [M1, M2] = CPCI(x, cptype, iters, alphas, algo, dtrnd, bias,
 %                 dists, stdnorm)
 %
-% Changepoint Estimate Confidence Interval of simon??
+% Changepoint uncertainty and confidence interval estimation.
 %
-% Computes confidence intervals for a single cpest.m changepoint
-% estimate ('kw' or 'km') via Method 1 (sample errors) & Method 2
-% (alpha hypothesis tests). M2 is much more computationally expensive;
-% if only 1 output (M1) requested code is much faster.
+% Cite: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
+%
+% Computes uncertainty estimates and confidence intervals for a
+% single cpest.m changepoint estimate ('kw' or 'km') via Method 1
+% (sample errors) & Method 2 (alpha hypothesis tests).
+%
+% NB, M2 is much more computationally complex than M1; request only a
+% single output to skip M2 computation to speed up execution.
 %
 % Inputs:
 % x             The time series (double or cell)
@@ -43,7 +47,7 @@ function [M1, M2] = cpci(x, cptype, iters, alphas, algo, dtrnd, bias, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Nov-2019, Version 2017b on GLNXA64
+% Last modified: 11-Mar-2020, Version 2017b on GLNXA64
 
 %% Recursive.
 
@@ -190,13 +194,10 @@ else
 
 end
 M1.twostd = 2 * M1.onestd;
+M1 = orderfields(M1, {'ave' 'onestd' 'twostd' 'raw'});
 
-% Skip the alpha summary if not requested; exit the function.
-if skip_alphas
-    return
-
-else
-    % Method 2.
+% Method 2.
+if ~skip_alphas
     % Average spread of samples spanned by each alpha test.
     M2.restricted.span = M2.restricted.span ./ iters;
     M2.unrestricted.span = M2.unrestricted.span ./ iters;
@@ -231,14 +232,8 @@ else
 
         end
     end
-end
-
-% Cleanup output.
-M1 = orderfields(M1, {'ave' 'onestd' 'twostd' 'raw'});
-if ~skip_alphas
     M2.restricted  = orderfields(M2.restricted, {'six8' 'nine5' ...
                         'h1' 'span'});
     M2.unrestricted  = orderfields(M2.unrestricted, {'six8' ...
                         'nine5' 'h1' 'span'});
-
 end
