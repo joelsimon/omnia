@@ -1,9 +1,10 @@
 function  CP = changepoint(domain, x, n, delta, pt0, snrcut, inputs, conf, fml)
 % CP = CHANGEPOINT(domain, x, n, delta, pt0, snrcut, inputs, conf, fml)
 %
-% Multiscale time series changepoint and arrival time detector with
-% error estimations.  See xaxis.m / wtxaxis.m to understand how
-% CHANGEPOINT handles time.
+% Multiscale changepoint and arrival time detector with uncertainty
+% and confidence interval estimates.
+%
+% Cite: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % Input:
 % domain     'time' or 'time-scale' (def: 'time')
@@ -14,7 +15,7 @@ function  CP = changepoint(domain, x, n, delta, pt0, snrcut, inputs, conf, fml)
 % snrcut     Cutoff above which the SNR must be to to be considered
 %                an "arrival" (def: 1)
 %                (use NaN or -inf, NOT [], to ignore this input)
-% inputs     Structure of other, less commonly adjusted inputs, 
+% inputs     Structure of other, less commonly adjusted inputs,
 %                e.g., wavelet type (def:  cpinputs, see there)
 % conf      -1: skip confidence interval estimation with cpci.m (def)
 %            0  compute confidence interval with cpci.m
@@ -54,7 +55,7 @@ function  CP = changepoint(domain, x, n, delta, pt0, snrcut, inputs, conf, fml)
 %
 % For example, the time-scale domain changepoint coefficient index at
 % the first scale in example 1, below, is,
-%                   
+%
 %                   CP.outputs.cp(1) = 208.
 %
 % The time domain changepoint sample indices are
@@ -80,7 +81,7 @@ function  CP = changepoint(domain, x, n, delta, pt0, snrcut, inputs, conf, fml)
 %    figure; plot(CP.outputs.xax, CP.x); vertline(CP.cpsecs{1});
 %    xlabel('time (s)'); ylabel('amplitude')
 %
-% Ex3: Changepoint estimation made in time-scale domain and plotted at scale 3, 
+% Ex3: Changepoint estimation made in time-scale domain and plotted at scale 3,
 %      note time domain smear of changepoint detail at scale 3 (see CP.dbe{3}).
 %    CP = CHANGEPOINT('time-scale', x, 3, h.DELTA, h.B)
 %    figure; plot(CP.x); vertline(CP.cpsamp{3});
@@ -120,7 +121,7 @@ end
 % of calculation itself) make x an even length array by removing the
 % last sample.
 x = x(:);
-if mod(length(x), 2) 
+if mod(length(x), 2)
     x = x(1:end-1);
 
 end
@@ -143,7 +144,7 @@ e2 = [de2 ae2];
 %coefficients set to NaN
 
 % If requested, smooth time-scale domain coefficient time smears.
-if strcmp(domain, 'time-scale') && ~isempty(fml) 
+if strcmp(domain, 'time-scale') && ~isempty(fml)
     dabe = smoothscale(dabe, fml);
 
 end
@@ -152,7 +153,7 @@ end
 switch inputs.cptype
   case 'kw'
     [cp, ~, aicj, weights] = cpest(da, inputs.algo, inputs.dtrnd, inputs.bias);
-    
+
   case 'km'
     [~, cp, aicj, weights] = cpest(da, inputs.algo, inputs.dtrnd, inputs.bias);
 
@@ -170,12 +171,12 @@ wtxax = wtxaxis(dabe, lx, delta, pt0);
 
 % The two methods differ in how the changepoint and arrival SAMPLES
 % are found....
-for i = 1:length(cp)    
+for i = 1:length(cp)
     if ~isnan(cp(i))
         if strcmp(domain, 'time-scale')
             cpsamp{i} = dabe{i}(cp(i), :);
             arsamp{i} = dabe{i}(cp(i) + 1, :); % *See note below.
-            
+
         else
             cpsamp{i} = cp(i);
             arsamp{i} = cpsamp{i} + 1;
@@ -197,7 +198,7 @@ for i = 1:length(cp)
     if ~isnan(cp(i))
         cpsecs{i} = xax(cpsamp{i})';
         arsecs{i} = xax(arsamp{i})';
-        
+
     else
         cpsecs{i} = NaN;
         arsecs{i} = NaN;
@@ -216,7 +217,7 @@ for i = 1:length(cp)
     if SNRj(i) <= snrcut
         arsamp{i} = NaN;
         arsecs{i} = NaN;
-            
+
     end
 end
 
@@ -229,12 +230,12 @@ if conf ~= -1
                        inputs.algo, inputs.dtrnd, inputs.bias, ...
                        inputs.dists, inputs.stdnorm);
         ci.M2 = [];
-        
+
     elseif conf == 0
         [ci.M1, ci.M2] = cpci(da, inputs.cptype, inputs.iters, ...
                               inputs.alphas, inputs.algo, inputs.dtrnd, ...
                               inputs.bias, inputs.dists, inputs.stdnorm);
-        
+
     else
         error('Specify one of -1, 0, or 1 for input: conf')
 
@@ -242,20 +243,28 @@ if conf ~= -1
 
     % Save domain-specific ci in 'rawci' output.
     rawci = ci;
-    
+
     % Output of cpci.m is domain specific, and not in seconds.
     % If domain = 'time', cpci.m is in time domain samples (k)
     % If domain = 'time-scale', cpci.m is in time scale-domain
     %             coefficient indices (l)
     for i = 1:length(cp)
         if ~isnan(cp(i))
-            if strcmp(domain, 'time-scale') 
+            if strcmp(domain, 'time-scale')
                 % Time domain sample span of time-scale changepoint estimate
                 % coefficient index.  Multiplying the confidence
                 % interval by this smear converts from time-scale
-                % domain to time domain sample indices, below.
+                % domain indices (l) to time domain sample indices (k),
+                % (add one sample because diff is not a length).
                 %
-                % Add one sample because diff is not a length.
+                % This is equation (53) of Simon, J. D. et al.,
+                % (2020), BSSA, doi: 10.1785/0120190173.  Note that
+                % smear (kstar) is ALWAYS > 1; the time smear
+                % associated with 1 time-scale coefficient index (l)
+                % is at minimum 2 time domain sample indices (k) for
+                % the Haar wavelet. For this reason M2 spans (below)
+                % can never represent 0 seconds in time -- every
+                % coefficient index l represents a time smear!
                 smear = diff(dabe{i}(cp(i), :)) + 1;
 
             else
@@ -293,7 +302,7 @@ if conf ~= -1
                         ([ci.M2(i).(j{:}).span * smear] - 1) * delta;
 
                 end
-            end 
+            end
         end
     end
 end
