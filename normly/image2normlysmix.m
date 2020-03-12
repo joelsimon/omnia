@@ -1,5 +1,6 @@
 function [f1, f2, f3, maxly, nMLE, sMLE] = image2normlysmix(perc, trusigmas,  lx, cp, axlim, npts, ntests, tinc, cmap)
-% [f1, f2, f3. maxly, nMLE, sMLE] = IMAGE2NORMLYSMIX(perc, trusigmas, lx, cp, axlim, npts, ntests, cmap)
+% [f1, f2, f3. maxly, nMLE, sMLE] = ...
+%      IMAGE2NORMLYSMIX(perc, trusigmas, lx, cp, axlim, npts, ntests, cmap)
 %
 % IMAGE2NORMLYSMIX plots the summed log-likelihood surface in two
 % variance coordinates.  It identifies the MLE variances and the
@@ -42,7 +43,7 @@ function [f1, f2, f3, maxly, nMLE, sMLE] = image2normlysmix(perc, trusigmas,  lx
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 09-Jan-2020, Version 2017b on GLNXA64
+% Last modified: 29-Feb-2020, Version 2017b on GLNXA64
 
 % Defaults.
 defval('perc', 10)
@@ -199,3 +200,44 @@ set(f.ax2, 'YTick', tickpos, 'YTickLabels', f.ylab2(tickpos));
 set(f.ax1, 'YDir', 'normal')
 
 set([f.ax1 f.ax2 f.cf], 'TickDir', 'out')
+
+return
+
+%_________________________________________________________________%
+% Notes about simon+2020.pdf section: Expected Behavior.
+
+% FOR CHANGEPOINT EARLY
+
+% For Figure 3a, corresponding to Figure 2d: summing along a diagonal
+% where the normalized variance of BOTH = 0.875
+diag_idx = nearestidx(nk.xaxis, 0.875); % or sk.xaxis; these are both normalized and the same, within error
+
+%% Incorrect: summing along 1:1 diagonal.
+noi_diag = noi(diag_idx);
+sig_diag = sig(diag_idx);
+
+% This is like the mean summed log-likelihood of Figure 2d, which is
+% less likely than if we appropriately summed at the respective MLEs
+% of the variances.
+sum_diag = noi_diag + sig_diag % == f.sumly(diag_idx, diag_idx) BUT SEE NOTE BELOW*
+
+%% Correct: summing along at respective MLEs of variances.
+% Note that the actual correct value is not on this 1:1 diagonal and
+% must therefore be GREATER (less negative) than that value just quoted.
+noi_MLE_idx = nearestidx(nk.xaxis, 1);
+sig_MLE_idx = nearestidx(sk.xaxis, 5/6); % 0.833
+
+% In paper we say -355.
+noi_MLE = noi(noi_MLE_idx)
+
+% In paper we say -1256.
+sig_MLE = sig(sig_MLE_idx)
+
+% In paper we say -1611.
+sum_MLE = noi_MLE + sig_MLE
+
+% And the correct MLE sum is greater (more likely) than the sum along a 1:1 diagonal.
+sum_MLE > sum_diag
+
+% *NB: this is not equal to f.sumly(noi_MLE_idx, sig_MLE_idx) because the image axis is flipped.
+f.sumly(sig_MLE_idx, noi_MLE_idx) == sum_MLE
