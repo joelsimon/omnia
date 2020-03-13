@@ -34,10 +34,13 @@
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 24-Jul-2019, Version 2017b
+% Last modified: 13-Mar-2020, Version 2017b on MACI64
 
 % For my code, and code my code requires.
 addpath(genpath(getenv('OMNIA')))
+
+% Remove the paper-specific path, with generic "fig*.m" names.
+rmpath(genpath(fullfile(getenv('OMNIA'), 'BSSA2020')))
 
 % For MatTaup.
 javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', ...
