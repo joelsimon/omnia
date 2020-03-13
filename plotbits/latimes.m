@@ -5,13 +5,11 @@ function latimes(fig, degs)
 % figure(s) to 'Times', and set the interpreter to 'Latex', where
 % applicable.
 %
-% WISHLIST: COLORBARS
-%
 % Input:
 % fig         Figure object handle (def: gaf)
 % degs        Figure includes text degree ('^{\circ}') symbols (def: false)
 %
-% Output: 
+% Output:
 % All fonts set to 'Times' and Interpreters 'Latex' where
 % applicable. N.B. axes don't have an interpreter field.
 %
@@ -22,7 +20,7 @@ function latimes(fig, degs)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 02-Jan-2019, Version 2017b
+% Last modified: 12-Mar-2020, Version 2017b on MACI64
 
 % Default to use current figure(s).
 defval('fig', gaf)
@@ -38,11 +36,12 @@ for i = 1:length(fig)
     tx = findall(fig(i), 'type', 'text');
     ax = findall(fig(i), 'type', 'axes');
     lg = findall(fig(i), 'type', 'legend');
+    cb = findall(fig(i), 'type', 'colorbar');
 
     % This should work, but does not for unknown reasons.
-    %findobj(gcf, 'type', 'text', '-depth', inf) 
+    %findobj(gcf, 'type', 'text', '-depth', inf)
 
-    if degs 
+    if degs
         % Put dollar signs ('$') around degrees (^{\circ}) so they compile
         % correctly in LaTeX.
         for j = 1:length(tx)
@@ -50,8 +49,7 @@ for i = 1:length(fig)
 
         end
     end
-    set([tx(:) ; lg(:)], 'Interpreter', 'Latex', 'FontName', 'Times');
-    set(ax, 'TickLabelInterpreter', 'Latex', 'FontName', 'Times')
-    set(ax, 'FontName', 'Times')
+    set([tx(:) ;  lg(:)], 'Interpreter', 'Latex', 'FontName', 'Times');
+    set([ax(:) ;  cb(:)], 'TickLabelInterpreter', 'Latex', 'FontName', 'Times')
 
 end
