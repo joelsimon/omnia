@@ -103,7 +103,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 06-Mar-2020, Version 2017b on GLNXA64
+% Last modified: 15-Mar-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -239,18 +239,38 @@ if ~isnan(lohi)
      hanwin = hanning(length(xw1));
      hanwin_middle = length(hanwin) / 2;
 
-     % This ensures: isequal(left_taper,flip(right_taper)) is true
-     % regardless whether x is length even or odd because hanning is
-     % exactly 1 in the middle of an odd length array (which is
-     % skipped here), or it never reaches 1, and no indices are skipped.
+     % This ensures isequal(left_taper,flip(right_taper)) is true
+     % regardless whether x is length even or odd because hanning has
+     % two repeated values in the middle for even length arrays, or a
+     % unique, non repeated value (which is skipped here) for odd
+     % length arrays (see hanning(3), hanning(4), hanning(5), etc.)
+     %
+     % x is even: (e.g., firstarrival([], [], 30.0000)
+     % hanwin_middle = 301
+     % left taper indices = 1:301
+     % right taper indices = 302:602,
+     % isequal(hanwin(301), hanwin(302))
+     % isequal(left_taper,flip(right_taper))
+     %
+     % x is odd (firstarrival([], [], 29.9897):
+     % hanwin_middle = 300.5
+     % left taper indices = 1:300
+     % right taper indices = 302:601 % skipped 301!
+     % isequal(hanwin(300), hanwin(302))
+     % isequal(left_taper,flip(right_taper))
      left_taper = hanwin(1:floor(hanwin_middle));
      right_taper = hanwin(ceil(hanwin_middle)+1:end);
 
-     % Construct taper.
+     % Construct taper: unity within time window.
      taper = zeros(size(x));
      taper(W1.xlsamp:W1.xrsamp) = 1;
 
+     % Taper from 0 to the full taper amplitude, ending at 1 sample index
+     % before the untapered time window.
      left_taper_idx = [W1.xlsamp-length(left_taper) : W1.xlsamp-1];
+
+     % Taper from full taper amplitude to 0, beginning at one sample index
+     % after the untapered time window.
      right_taper_idx = [W1.xrsamp+1 : W1.xrsamp+length(right_taper)];
 
      % Only apply taper if it completely exists within the bounds of the
