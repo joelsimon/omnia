@@ -1,7 +1,6 @@
-function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
+function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
                            evtdir, EQ, bathy, wlen2)
-% WRITEFIRSTARRIVAL(s, redo, filename, fmt, wlen, lohi, sacdir, ...
-%                   evtdir, EQ, bathy, wlen2)
+% WRITEFIRSTARRIVAL(s, redo, filename, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2)
 %
 % WRITEFIRSTARRIVAL writes the output of firstarrival.m a text file.
 %
@@ -15,8 +14,6 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 %          false: append new lines to the existing text file unless
 %              that SAC file name already exists in the text file (def)
 % filename Output text file name (def: $MERMAID/.../firstarrival.txt)
-% fmt      Line format, e.g., set if using SAC files with names
-%              longer than 44 chars (see default internally)
 % wlen     Window length [s] (def: 30)
 % lohi     1x2 array of corner frequencies (def: [1 5]])
 % sacdir   Directory containing (possibly subdirectories)
@@ -36,27 +33,30 @@ function writefirstarrival(s, redo, filename, fmt, wlen, lohi, sacdir, ...
 % Text file with the following columns (firstarrivals.m outputs in parentheses):
 %    (1) SAC filename
 %    (2) Theoretical 1st-arriving phase name (ph)
-%    (3) Travel time residual: dat - syn (tres)
-%    (4) Theoretical travel time in seconds of (2), according to taupTime.m
-%    (5) Time difference between reference model and one with bathymetry (tadj)
-%    (6) Time delay between cpest.m arrival time estimate and
+%    (3) AIC arrival-time pick, in seconds into seismogram with
+%        xaxis = xax(h.NPTS, h.DELTA, h.B)
+%    (4) Travel time residual: dat - syn (tres)
+%    (5) Theoretical travel time in seconds of (2), according to taupTime.m
+%    (6) Time difference between reference model with bathymetry and
+%        reference model w/o bathymetry (tadj)
+%    (7) Time delay between cpest.m arrival time estimate and
 %        maximum absolute amplitude (delay)
-%    (7) 2-standard deviation error estimation per M1 method (twosd)
-%    (8) Maximum +-amplitude in counts in the time window starting at
+%    (8) 2-standard deviation error estimation per M1 method (twosd)
+%    (9) Maximum +-amplitude in counts in the time window starting at
 %        "dat" and extending 1/2 the length of the input window (maxc_y)
-%    (9) Signal-to-noise ratio of "dat" in a time window centered on "syn"
+%    (10) Signal-to-noise ratio of "dat" in a time window centered on "syn"
 %        (SNR), defined as ratio of biased variance of signal/noise
 %        (see wtsnr.m)
-%    (10) IRIS event ID
-%    (11) Incomplete window flag (sentinel value: 'winflag')
-%    (12) Taper flag (sentinel value: 'tapflag')
-%    (13) *Likely* null-value flag, x = 0 (sentinel value: 'zerflag')
+%    (11) IRIS event ID
+%    (12) Incomplete window flag (sentinel value: 'winflag')
+%    (13) Taper flag (sentinel value: 'tapflag')
+%    (14) Potential null-value flag, x = 0 (sentinel value: 'zerflag')
 %
 % See also: firstarrival.m, readfirstarrival.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 06-Mar-2020, Version 2017b on GLNXA64
+% Last modified: 15-Mar-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('s', revsac(1))
@@ -65,6 +65,7 @@ defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'firstarrival.txt'))
 defval('fmt', ['%44s    ' , ...
                '%5s    ' ,  ...
+               '%7.2f   ' , ...
                '%6.2f   ' , ...
                '%8.2f    ', ...
                '%6.2f   ' , ...
@@ -84,6 +85,22 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
 defval('wlen2', 1)
+
+% Textfile format.
+fmt = ['%44s    ' , ...
+       '%5s    ' ,  ...
+       '%7.2f   ' , ...
+       '%6.2f   ' , ...
+       '%8.2f    ', ...
+       '%6.2f   ' , ...
+       '%6.2f   ' , ...
+       '%5.2f   ' , ...
+       '%+19.12E    ' , ...
+       '%18.12E    '  , ...
+       '%8s    ' , ...
+       '%i    ', ...
+       '%3i    ', ...
+       '%i\n'];
 
 % Sort out if deleting, appending to, or creating output file.
 file_exists = (exist(filename,'file') == 2);
@@ -133,7 +150,7 @@ parfor i = 1:length(s)
     end
 
     % Concatenate the write lines.
-    wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2);
+    wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fmt);
     wlines = [wlines wline];
 
 end
@@ -164,11 +181,11 @@ end
 fileattrib(filename, '-w')
 
 %_______________________________________________________________________________%
-function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2)
+function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fmt)
 % Local call to, and formatting of, firstarrival.m
 
 % Collect.
-[tres, dat, syn, tadj, ph, delay, twosd, ~, ~, ~, maxc_y, SNR, EQ, ~, ~, ~, winflag, tapflag, zerflag] = ...
+[tres, dat, ~, tadj, ph, delay, twosd, ~, ~, ~, maxc_y, SNR, EQ, ~, ~, ~, winflag, tapflag, zerflag] = ...
     firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2);
 publicid = fx(strsplit(EQ(1).PublicId, '='),  2);
 tptime = EQ(1).TaupTimes(1).time;
@@ -176,6 +193,7 @@ tptime = EQ(1).TaupTimes(1).time;
 % Parse.
 data = {strippath(sac), ...
         ph,             ...
+        dat,            ...
         tres,           ...
         tptime,         ...
         tadj,           ...

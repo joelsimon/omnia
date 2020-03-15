@@ -51,7 +51,7 @@ high_twosd = [];
 low_snr = [];
 
 % Read the file.
-[s, ph, tres, tptime, tadj, delay, twosd, maxc_y, SNR, ID, winflag, tapflag, zerflag] = ...
+[s, ph, dat, tres, tptime, tadj, delay, twosd, maxc_y, SNR, ID, winflag, tapflag, zerflag] = ...
     readfirstarrival(filename);
 
 % Find parameters that pass quality criteria.  Here I chose to remove
@@ -92,6 +92,7 @@ perc = (length(idx)/length(all_idx))*100;
 FA_0.filename = filename;
 FA_0.s = s;
 FA_0.ph = ph;
+FA_0.dat = dat;
 FA_0.tres = tres;
 FA_0.tptime = tptime;
 FA_0.tadj = tadj;
@@ -108,6 +109,7 @@ FA_0.zerflag = zerflag;
 FA.filename = filename;
 FA.s = s(idx);
 FA.ph = ph(idx);
+FA.dat = dat(idx);
 FA.tres = tres(idx);
 FA.tptime = tptime(idx);
 FA.tadj =  tadj(idx);
