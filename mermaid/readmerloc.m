@@ -1,4 +1,23 @@
 function mer = readmerloc(locdir)
+% mer = READMERLOC(locdir)
+%
+% Return structure of Princeton-owned MERMAID locations and their
+% datetimes.
+%
+% Input:
+% locdir     Directory to individual MERMAID textfiles,
+%                written by fetchmerloc.m
+%                (defval: $MERMAID/locations/)
+%
+% Output:
+% mer        Structure of GPS fix latitudes, longitudes,
+%                and their datetimes
+%
+% See also: fetchmerloc.m
+%
+% Author: Joel D. Simon
+% Contact: jdsimon@princeton.edu
+% Last modified: 17-Mar-2020, Version 2017b on MACI64
 
 % Default.
 defval('locdir', fullfile(getenv('MERMAID'), 'locations'));
@@ -7,7 +26,7 @@ defval('locdir', fullfile(getenv('MERMAID'), 'locations'));
 floatstr = {'008' '009' '010' '011' '012' '013' '016' '017' '018' ...
             '019' '020' '021' '022' '023' '024' '025'};
 
-% Datime format for time of GPS point.
+% Datetime format for time of GPS point.
 locdate_fmt = 'dd-MMM-uuuuHH:mm:ss';
 
 for i = 1:length(floatstr)
@@ -32,7 +51,7 @@ for i = 1:length(floatstr)
                                             'TimeZone', 'UTC');
     end
     mer.(mername).locdate = mer.(mername).locdate';
-    
+
     % Tack on the latitudes and longitudes.
     mer.(mername).lat = c{4}(:);
     mer.(mername).lon = c{5}(:);
@@ -76,4 +95,3 @@ fupl_fmt    ='%3d\n';
 fmt=[stname_fmt,stdt_fmt,stti_fmt,STLA_fmt,STLO_fmt,hdop_fmt,vdop_fmt, ...
      Vbat_fmt,minV_fmt, Pint_fmt,Pext_fmt,Prange_fmt,cmdrcd_fmt,f2up_fmt, ...
      fupl_fmt];
-
