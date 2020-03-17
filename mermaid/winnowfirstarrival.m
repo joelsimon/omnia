@@ -1,6 +1,7 @@
-function [FA, idx, zerflag_idx, perc, FA_0, rm_idx] = winnowfirstarrival(filename, max_tres, max_twosd, min_snr)
+function [FA, idx, zerflag_idx, perc, FA_0, rm_idx] = ...
+    winnowfirstarrival(filename, max_tres, max_twosd, min_snr, rmsac)
 % [FA, idx, zerflag_idx, perc, FA_0, rm_idx] = ...
-%      WINNOWFIRSTARRIVAL(filename, max_tres, max_twosd, min_snr)
+%      WINNOWFIRSTARRIVAL(filename, max_tres, max_twosd, min_snr, rmsac)
 %
 % Winnows output of readfirstarrival.m based on input winnowing
 % parameters.  E.g., use this to return a quality-controlled subset.
@@ -13,6 +14,7 @@ function [FA, idx, zerflag_idx, perc, FA_0, rm_idx] = winnowfirstarrival(filenam
 % max_tres     QC parameter: tres(idx) <= max_tres (def; realmax)
 % max_twosd    QC parameter: twosd(idx) <= max_twosd (def; realmax)
 % min_snr      QC parameter: SNR(idx) >= max_twosd (def: realmin)
+% rmsac        Cell of any other SAC files to remove, for whatever reason
 %
 % Output:
 % FA           Structure of winnowed first-arrival data
@@ -38,7 +40,7 @@ function [FA, idx, zerflag_idx, perc, FA_0, rm_idx] = winnowfirstarrival(filenam
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 06-Mar-2020, Version 2017b on GLNXA64
+% Last modified: 17-Mar-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -46,6 +48,8 @@ defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
 defval('max_tres', realmax)
 defval('max_twosd', realmax)
 defval('min_snr', realmin)
+defval('rmsac', [])
+
 high_tres = [];
 high_twosd = [];
 low_snr = [];
@@ -72,13 +76,31 @@ bad_win = find(winflag);
 bad_tap = find(unzipnan(tapflag));
 zerflag_idx = find(zerflag);
 
+% Identify the indices other SAC which are marked for removal (by
+% input request, not due to some quality criteria -- e.g., these could
+% be the ones verified to be zero-filled after inspecting the true
+% 'zerflag_idx').
+%
+% NB, I use cellstrfind and not, e.g., intersect, because the SAC
+% files marked for removal may not have an otype (like 'none', or
+% 'vel') appended, but the files loaded here may.  Therefore only a
+% partial SAC filename match without is required (not met with
+% intersect).
+rmsac_idx = [];
+for i = 1:length(rmsac)
+    rmsac_idx(i)  = cellstrfind(s, rmsac(i));
+
+end
+rmsac_idx = rmsac_idx(:);
+
 % Concatenate all removals indices.
 rm_idx = unique([high_tres ;
                  high_twosd ;
                  low_snr ;
                  snr_leq1 ;
                  bad_win ;
-                 bad_tap]);
+                 bad_tap ;
+                 rmsac_idx]);
 
 
 % The indices to keep are thus those with aren't slated for removal.

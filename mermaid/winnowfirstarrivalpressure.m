@@ -1,7 +1,7 @@
 function [FAP, idx, zerflag_idx, perc, FAP_0, rm_idx] = ...
-    winnowfirstarrivalpressure(filename1, filename2, max_tres, max_twosd, min_snr)
+    winnowfirstarrivalpressure(filename1, filename2, max_tres, max_twosd, min_snr, rmsac)
 % [FAP, idx, zerflag_idx, perc, FAP_0, rm_idx] = ...
-%      WINNOWFIRSTARRIVALPRESSURE(filename1, filename2, max_tres, max_twosd, min_snr)
+%      WINNOWFIRSTARRIVALPRESSURE(filename1, filename2, max_tres, max_twosd, min_snr, rmsac)
 %
 % Winnows output of readfirstarrivalpressure.m based on input
 % winnowing parameters send to winnowfirstarrival.m.
@@ -16,6 +16,7 @@ function [FAP, idx, zerflag_idx, perc, FAP_0, rm_idx] = ...
 % max_tres     QC parameter: tres(idx) <= max_tres (def; realmax)
 % max_twosd    QC parameter: twosd(idx) <= max_twosd (def; realmax)
 % min_snr      QC parameter: SNR(idx) >= max_twosd (def: realmin)
+% rmsac        Cell of any other SAC files to remove, for whatever reason
 %
 % Output:
 % FAP           Structure of winnowed first-arrival pressure data
@@ -43,7 +44,7 @@ function [FAP, idx, zerflag_idx, perc, FAP_0, rm_idx] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 07-Mar-2020, Version 2017b on GLNXA64
+% Last modified: 17-Mar-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('filename1', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -53,6 +54,7 @@ defval('filename2', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
 defval('max_tres', realmax)
 defval('max_twosd', realmax)
 defval('min_snr', realmin)
+defval('rmsac', [])
 high_tres = [];
 high_twosd = [];
 low_snr = [];
@@ -62,7 +64,8 @@ low_snr = [];
     = readfirstarrivalpressure(filename1);
 
 % Find the relevant lines to keep using winnowfirstarrival.m
-[~, idx, zerflag_idx, perc, FA_0, rm_idx] = winnowfirstarrival(filename2, max_tres, max_twosd, min_snr);
+[~, idx, zerflag_idx, perc, FA_0, rm_idx] = ...
+    winnowfirstarrival(filename2, max_tres, max_twosd, min_snr, rmsac);
 
 % Find the SAC files in the winnowed first arrival file that are also in the LLNL file.
 [~, inter_idx] = intersect(s, FA_0.s);
