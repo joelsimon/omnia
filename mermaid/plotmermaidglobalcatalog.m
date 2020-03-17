@@ -40,7 +40,7 @@ function [F1, ha1, F2, ha2] = plotmermaidglobalcatalog(ha1, ha2, mercatfile, sta
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 13-Jan-2020, Version 2017b on GLNXA64
+% Last modified: 17-Mar-2020, Version 2017b on MACI64
 
 % Default.
 defval('ha1', [])
@@ -187,7 +187,7 @@ end
 
 % Generate the histogram.
 F2.h = histogram(ha2, all_nums, 'BinMethod', 'Integer', 'FaceColor', 'k');
-F2.xl = xlabel(ha2, 'MERMAID (excluding `P-'' prefx)');
+F2.xl = xlabel(ha2, 'MERMAID');
 F2.yl = ylabel(ha2, sprintf('Events identified'));
 
 % Update the x-axis in case labels need to be remapped after adjusting
