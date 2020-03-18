@@ -6,7 +6,7 @@
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 18-May-2019, Version 2017b
+% Last modified: 18-Mar-2020, Version 2017b on MACI64
 
 clear
 close all
@@ -129,7 +129,7 @@ f.lg = legend(ax, lg_entries, lg_str, 'Location', 'SW', 'Interpreter', ...
 
 
 % Labels, limits, cosmetics.
-f.xl2 = xlabel(ax, 'sample index $k$', 'Interpreter', 'Latex');
+f.xl2 = xlabel(ax, 'Sample index $k$', 'Interpreter', 'Latex');
 f.yl1 = ylabel('$x$', 'Interpreter', 'Latex');
 f.yl2 = ylabel(ax, '$\mathcal{A}$', 'Interpreter', 'Latex');
 finx = aicx(isfinite(aicx));
