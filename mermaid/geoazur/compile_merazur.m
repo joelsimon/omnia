@@ -2,8 +2,7 @@
 % for all GeoAzur identified SAC files to the rematched directory,
 % assuming JDS system defaults.
 %
-% Writes 'compile_merazur.mat', read by fig20.m of simon+2019 (travel
-% time residual histograms).
+% Writes 'compile_merazur.mat', read by $OMNIA/BSSA2020/fig18.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
@@ -12,7 +11,7 @@
 clear
 close all
 
-% Load data. 
+% Load data.
 defval('sac_diro', getenv('MERAZUR'));
 defval('rematch_diro', fullfile(getenv('MERAZUR'), 'rematch'));
 defval('redo', false)
@@ -23,7 +22,7 @@ for i = 1:length(s)
     [~, h{i}] = readsac(s{i});
     [~, ~, seis_datenum] = seistime(h{i});
     first_sample(i) = seis_datenum.B;
-    
+
 end
 [first_sample, idx] = sort(first_sample);
 s = s(idx);
@@ -42,15 +41,15 @@ for i = 1:length(s)
     if fs(i) == 20
         padd_double = [];
         padd_cell = {};
-        
+
     else
         padd_double = [NaN NaN];
         padd_cell = {NaN NaN};
-        
+
     end
     tres_time(i, :) = [padd_double temp_tres_time];
     twostd(i, :) = [padd_double CP(i).ci.M1.twostd];
-    tres_phase(i, :) = [padd_cell temp_tres_phase];    
+    tres_phase(i, :) = [padd_cell temp_tres_phase];
     snrj(i, :) = [padd_double CP(i).SNRj];
 
 end
