@@ -1,7 +1,6 @@
 function [FAP, idx, zerflag_idx, perc, FAP_0, rm_idx] = ...
-    winnowfirstarrivalpressure(filename1, filename2, max_tres, max_twosd, min_snr, rmsac)
-% [FAP, idx, zerflag_idx, perc, FAP_0, rm_idx] = ...
-%      WINNOWFIRSTARRIVALPRESSURE(filename1, filename2, max_tres, max_twosd, min_snr, rmsac)
+    winnowfirstarrivalpressure(filename1, filename2, max_tres, max_twosd, min_snr, ph, rmsac)
+% [FAP, idx, zerflag_idx, perc, FAP_0, rm_idx] = WINNOWFIRSTARRIVALPRESSURE(filename1, filename2, max_tres, max_twosd, min_snr, ph, rmsac)
 %
 % Winnows output of readfirstarrivalpressure.m based on input
 % winnowing parameters send to winnowfirstarrival.m.
@@ -16,6 +15,8 @@ function [FAP, idx, zerflag_idx, perc, FAP_0, rm_idx] = ...
 % max_tres     QC parameter: tres(idx) <= max_tres (def; realmax)
 % max_twosd    QC parameter: twosd(idx) <= max_twosd (def; realmax)
 % min_snr      QC parameter: SNR(idx) >= max_twosd (def: realmin)
+% ph           Cell of phase names to keep, e.g. {'p' 'P' 'PKP'},
+%                  or 'all' to keep all phases (def: 'all)
 % rmsac        Cell of any other SAC files to remove, for whatever reason
 %
 % Output:
@@ -44,7 +45,7 @@ function [FAP, idx, zerflag_idx, perc, FAP_0, rm_idx] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 17-Mar-2020, Version 2017b on MACI64
+% Last modified: 20-Mar-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('filename1', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -65,7 +66,7 @@ low_snr = [];
 
 % Find the relevant lines to keep using winnowfirstarrival.m
 [~, idx, zerflag_idx, perc, FA_0, rm_idx] = ...
-    winnowfirstarrival(filename2, max_tres, max_twosd, min_snr, rmsac);
+    winnowfirstarrival(filename2, max_tres, max_twosd, min_snr, ph, rmsac);
 
 % Find the SAC files in the winnowed first arrival file that are also in the LLNL file.
 [~, inter_idx] = intersect(s, FA_0.s);

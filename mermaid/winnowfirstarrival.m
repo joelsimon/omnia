@@ -1,7 +1,7 @@
 function [FA, idx, zerflag_idx, perc, FA_0, rm_idx] = ...
-    winnowfirstarrival(filename, max_tres, max_twosd, min_snr, rmsac)
+    winnowfirstarrival(filename, max_tres, max_twosd, min_snr, ph, rmsac)
 % [FA, idx, zerflag_idx, perc, FA_0, rm_idx] = ...
-%      WINNOWFIRSTARRIVAL(filename, max_tres, max_twosd, min_snr, rmsac)
+%      WINNOWFIRSTARRIVAL(filename, max_tres, max_twosd, min_snr, ph, rmsac)
 %
 % Winnows output of readfirstarrival.m based on input winnowing
 % parameters.  E.g., use this to return a quality-controlled subset.
@@ -14,6 +14,8 @@ function [FA, idx, zerflag_idx, perc, FA_0, rm_idx] = ...
 % max_tres     QC parameter: tres(idx) <= max_tres (def; realmax)
 % max_twosd    QC parameter: twosd(idx) <= max_twosd (def; realmax)
 % min_snr      QC parameter: SNR(idx) >= max_twosd (def: realmin)
+% ph           Cell of phase names to keep, e.g. {'p' 'P' 'PKP'},
+%                  or 'all' to keep all phases (def: 'all)
 % rmsac        Cell of any other SAC files to remove, for whatever reason
 %
 % Output:
@@ -40,7 +42,7 @@ function [FA, idx, zerflag_idx, perc, FA_0, rm_idx] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 17-Mar-2020, Version 2017b on MACI64
+% Last modified: 20-Mar-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -48,11 +50,17 @@ defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
 defval('max_tres', realmax)
 defval('max_twosd', realmax)
 defval('min_snr', realmin)
+defval('ph', 'all')
 defval('rmsac', [])
 
 high_tres = [];
 high_twosd = [];
 low_snr = [];
+
+% Overwrite the variable name for the input phase list to differentiate it from
+% the firstarrival phase list, read next.
+ph2keep = ph;
+clear('ph')
 
 % Read the file.
 [s, ph, dat, tres, tptime, tadj, delay, twosd, maxc_y, SNR, ID, winflag, tapflag, zerflag] = ...
@@ -88,7 +96,7 @@ zerflag_idx = find(zerflag);
 % intersect).
 rmsac_idx = [];
 for i = 1:length(rmsac)
-    rmsac_idx(i)  = cellstrfind(s, rmsac(i));
+    rmsac_idx(i)  = cellstrfind(s, rmsac(i));  % don't change -- we want partial matches
 
 end
 rmsac_idx = rmsac_idx(:);
@@ -106,6 +114,24 @@ rm_idx = unique([high_tres ;
 % The indices to keep are thus those with aren't slated for removal.
 all_idx = 1:length(s);
 idx = setdiff(all_idx, rm_idx);
+
+% After removal of what we DON'T want, identify what we DO want.
+if ~strcmpi(ph2keep, 'all')
+    ph_idx = [];
+
+    for i = 1:length(ph2keep)
+        % NB, cannot use cellstrind here because we want exact matches.
+        ph_idx = [ph_idx ; find(strcmp(ph, ph2keep{i}))];
+
+    end
+    % The final list is the intersection of idx (found by removing what we don't
+    % want) and ph_idx (found by keeping what we do want).
+    idx = intersect(idx, ph_idx);
+
+    % Recompute the list of removed indices.
+    rm_idx = setdiff(all_idx, idx)';
+
+end
 
 % Compute the percentage of data kept.
 perc = (length(idx)/length(all_idx))*100;
