@@ -124,6 +124,8 @@ if ~strcmpi(ph2keep, 'all')
         ph_idx = [ph_idx ; find(strcmp(ph, ph2keep{i}))];
 
     end
+    ph_idx = sort(ph_idx);
+
     % The final list is the intersection of idx (found by removing what we don't
     % want) and ph_idx (found by keeping what we do want).
     idx = intersect(idx, ph_idx);
