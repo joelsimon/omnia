@@ -96,7 +96,7 @@ zerflag_idx = find(zerflag);
 % intersect).
 rmsac_idx = [];
 for i = 1:length(rmsac)
-    rmsac_idx(i)  = cellstrfind(s, rmsac(i));  % don't change -- we want partial matches
+    rmsac_idx  = [rmsac_idx ; cellstrfind(s, rmsac(i))];
 
 end
 rmsac_idx = rmsac_idx(:);
