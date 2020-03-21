@@ -42,8 +42,8 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 %    (7) Time delay between cpest.m arrival time estimate and
 %        maximum absolute amplitude (delay)
 %    (8) 2-standard deviation error estimation per M1 method (twosd)
-%    (9) Maximum +-amplitude in counts in the time window starting at
-%        "dat" and extending 1/2 the length of the input window (maxc_y)
+%    (9) Maximum abs. amplitude in the time window starting at
+%        "dat" and extending wlen2 seconds (maxc_y)
 %    (10) Signal-to-noise ratio of "dat" in a time window centered on "syn"
 %        (SNR), defined as ratio of biased variance of signal/noise
 %        (see wtsnr.m)
