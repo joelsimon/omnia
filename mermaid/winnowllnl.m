@@ -60,12 +60,17 @@ high_tres = [];
 high_twosd = [];
 low_snr = [];
 
+% Overwrite the variable name for the input phase list to differentiate it from
+% the firstarrival phase list.
+ph2keep = ph;
+clear('ph')
+
 % Read the LLNL-G3Dv3 textfile.
 [s, d3_d1, d1_tptime, d3_tptime, gcdiff, d1gc, watercorr, ph] = readllnl(filename1);
 
 % Find the relevant lines to keep using winnowfirstarrival.m
 [~, idx, zerflag_idx, perc, FA_0, rm_idx] = ...
-    winnowfirstarrival(filename2, max_tres, max_twosd, min_snr, ph, rmsac);
+    winnowfirstarrival(filename2, max_tres, max_twosd, min_snr, ph2keep, rmsac);
 
 % Find the SAC files in the winnowed first arrival file that are also in the LLNL file.
 [~, inter_idx] = intersect(s, FA_0.s);
