@@ -134,6 +134,7 @@ for i = 1:length(sac)
 
     % Taper and filter.
     if ~isnan(lohi)
+        x{i} = detrend(x{i}, 'constant');        
         x{i} = detrend(x{i}, 'linear');
         taper = hanning(length(x{i}));
         x{i} = bandpass(taper .* x{i}, 1/h{i}.DELTA, lohi(1), lohi(2), 2, 2, 'butter');

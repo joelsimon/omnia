@@ -180,6 +180,7 @@ for i = 1:length(nearby_EQ)
     % Taper and filter.
     if ~isnan(lohi)
         taper = hanning(length(abbrev_x{i}));
+        abbrev_x{i} = detrend(abbrev_x{i}, 'constant');
         abbrev_x{i} = detrend(abbrev_x{i}, 'linear');
         abbrev_x{i} = taper .* abbrev_x{i};
         abbrev_x{i} = bandpass(abbrev_x{i}, 1/h{i}.DELTA, lohi(1), lohi(2), 2, 2, 'butter');
