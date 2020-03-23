@@ -5,14 +5,14 @@ function cls=ls2cell(ddir,fullpath)
 %
 % INPUT:
 %
-% ddir A directory name string, (some) wildcards possible
-% fullpath 1 if you would like the full file path output [default: 0]
-% in this case include the filespe in the directory name
-% 0 returns just the file names
+% ddir      A directory name string, (some) wildcards possible
+% fullpath  1 if you would like the full file path output
+%             in this case include the filespe in the directory name
+%           0 returns just the file names [default]
 %
 % OUTPUT:
 %
-% cls Cell structure with file names, with full file path if you want
+% cls     Cell structure with file names, with full file path if you want
 %
 % NOTE: Remember that directories end with a "filesep" and files do not.
 % So if you want a fullpath and submit a directory, it needs to end in
@@ -27,30 +27,45 @@ function cls=ls2cell(ddir,fullpath)
 %
 % Last modified by fjsimons-at-alum.mit.edu, 09/10/2014
 % Last modified by charig-at-princeton.edu, 09/23/2014
+
 defval('fullpath',0);
+
 % Get the directory-content information
 d=dir(ddir);
+
 if ~prod(size(d))
-error('This directory or file does not exist')
+    error('This directory or file does not exist')
 end
-files=str2mat(d.name);
+
+% Depending on Matlab version we need to use char instead of str2mat
+date2016a=datetime(2016,2,11);
+[~,dateme]=version;
+if dateme<date2016a
+    files=str2mat(d.name);
+else
+    files=char(d.name);
+end
+
 mino=3;
 % When using a wildcard that refers directly to a file
 if findstr(ddir,'*')
-mino=1;
+    mino=1;
 end
+
 % Full file paths
 if fullpath
-if strcmp(ddir(end),filesep)
+    if strcmp(ddir(end),filesep)
 % It's really a directory
 dpath = ddir;
-else
+    else
 % It's really some filename wildcard. Get the actual path.
 dpath = [fileparts(ddir) filesep];
-end
-for index=mino:size(files,1)
-cls{index-mino+1}=[dpath deblank(files(index,:))];
-end
+    end
+    for index=mino:size(files,1)
+        cls{index-mino+1}=[dpath deblank(files(index,:))];
+    end
 else % Just filenames
-for index=mino:size(files,1)
-cls{index-m
+    for index=mino:size(files,1)
+        cls{index-mino+1}=deblank(files(index,:));
+    end
+end
