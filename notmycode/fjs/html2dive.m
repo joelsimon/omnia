@@ -7,19 +7,25 @@ function [x,y]=html2dive(serial,seq,diro)
 %
 % serial     A Mermaid's serial number
 % seq        A sequential indexing the file list
-% diro       The directory in which to find the html files     
+% diro       The directory in which to find the html files
 %
 % OUTPUT:
 %
 % x          A cell with a datetime array
 % y          A cell depth in meters for those dates
-% 
+%
 % TESTED ON:
 %
 % 9.0.0.341360 (R2016a)
 %
 % Last modified by fjsimons-at-alum.mit.edu, 03/12/2020
 % Last modified by jdsimon@princeton.edu, 23-Mar-2020.
+
+% Does not work properly on Mac.
+if contains(computer, 'MAC')
+    error('System calls produce unexpected results on Mac computer')
+
+end
 
 defval('diro',fullfile(getenv('MERMAID'), 'processed'))
 defval('seq',1:5)
@@ -49,4 +55,3 @@ end
 
 % Return to where you were
 cd(oldpath)
-
