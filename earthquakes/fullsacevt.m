@@ -23,7 +23,7 @@ function [s, EQ, evtpath] = fullsacevt(s, sdiro, evtdiro)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 27-Feb-2020, Version 2017b on GLNXA64
+% Last modified: 22-Mar-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('s', '20180810T055938.09_5B6F01F6.MER.DET.WLT5.sac')
@@ -32,12 +32,15 @@ defval('evtdiro', sdiro)
 EQ = [];
 evtpath = [];
 
+% Ensure this filename follows naming scheme used to locate its corresponding
+% .evt file (by swapping .SAC for .evt).
 if ~contains(s, {'sac' 'SAC'})
     error('Input ''s'' must contain ''sac'' or ''SAC''')
 
 end
 
-s = fullsac(s, sdiro);
+% Get the fullpath SAC filename.
+s = fullsac(strippath(s), sdiro);
 
 if ~isempty(s)
 
