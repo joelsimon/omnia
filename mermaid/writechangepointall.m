@@ -7,7 +7,7 @@ function writechangepointall
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 29-Jan-2020, Version 2017b on GLNXA64
+% Last modified: 25-Mar-2020, Version 2017b on MACI64
 
 diro = fullfile(getenv('MERMAID'), 'events', 'changepoints');
 s = fullsac;
@@ -28,7 +28,9 @@ parfor i = 1:length(s)
             n = str2double(n);
 
         end
+        fprintf('Writing changepoint file for %s....\n', strippath(s{i}))
         writechangepoint(sans_sac, diro, 'time', x, n, h.DELTA, h.B, 1, cpinputs, 1);
+        fprintf('Done.\n\n', strippath(s{i}))
 
     end
 end
