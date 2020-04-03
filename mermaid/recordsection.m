@@ -19,9 +19,9 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 % procdir   Path to 'processed' directory
 %                (def: $MERMAID/processed/)
 % normlize  true: normalize each seismogram against itself (def: true)
-%                 (removes 1/sqrt(dist) amplitude decay)
+%                 (removes 1/dist amplitude decay)
 %           false: normalize each seismogram against ensemble
-%                 (preserves 1/sqrt(dist) amplitude decay)
+%                 (preserves 1/dist amplitude decay)
 % returntype   For third-generation+ MERMAID only:
 %              'ALL': both triggered and user-requested SAC files
 %              'DET': triggered SAC files as determined by onboard algorithm (def)
