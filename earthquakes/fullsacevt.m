@@ -1,5 +1,5 @@
-function [s, EQ, evtpath] = fullsacevt(s, sdiro, evtdiro)
-% [s, EQ, evtpath] = FULLSACEVT(sac, sdiro, evtdiro)
+function [s, EQ, evtpath] = fullsacevt(s, sdiro, evtdiro, ofuse)
+% [s, EQ, evtpath] = FULLSACEVT(sac, sdiro, evtdiro, ofuse)
 %
 % Return fullpath SAC filename and EQ structure assuming they live
 % somewhere (possibly multiple directories deep) in their respective
@@ -13,6 +13,8 @@ function [s, EQ, evtpath] = fullsacevt(s, sdiro, evtdiro)
 %               (def: '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
 % sdiro     Directory where SAC file lives (def: $MERMAID)
 % evtdiro   Directory where evt file lives (def: sdiro)
+% ofuse     String which may be of use to find filename in
+%               fullsac.m (see there)
 %
 % Output:
 % s         Single SAC filename with full path appended
@@ -21,14 +23,17 @@ function [s, EQ, evtpath] = fullsacevt(s, sdiro, evtdiro)
 % evtpath   Full path to evtfile containing EQ structure
 %               (def: [])
 %
+% See also: fullsac.m
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 22-Mar-2020, Version 2017b on MACI64
+% Last modified: 02-Apr-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('s', '20180810T055938.09_5B6F01F6.MER.DET.WLT5.sac')
 defval('sdiro', getenv('MERMAID'))
 defval('evtdiro', sdiro)
+defval('ofuse', []);
 EQ = [];
 evtpath = [];
 
@@ -40,7 +45,7 @@ if ~contains(s, {'sac' 'SAC'})
 end
 
 % Get the fullpath SAC filename.
-s = fullsac(strippath(s), sdiro);
+s = fullsac(strippath(s), sdiro, [], ofuse);
 
 if ~isempty(s)
 
@@ -50,7 +55,7 @@ if ~isempty(s)
     idx = strfind(lower(nopath_s), 'sac');
     evtname = nopath_s(1:idx-1);
     evtname = [evtname 'evt'];
-    evtpath = fullsac(evtname, evtdiro);
+    evtpath = fullsac(evtname, evtdiro, [], ofuse);
 
     if ~isempty(evtpath)
         tmp = load(evtpath, '-mat');
