@@ -1,7 +1,7 @@
 function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zerflag] = ...
-        firstarrivalpressure(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2)
+        firstarrivalpressure(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs)
 % [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zerflag] = ...
-%       FIRSTARRIVALPRESSURE(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2)
+%       FIRSTARRIVALPRESSURE(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs)
 %
 % Extension of firstarrival.m (which deals with travel time residuals)
 % that computes the RMS value of the first arrival considering the
@@ -25,6 +25,8 @@ function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zer
 % wlen2    Length of second window, starting at the 'dat', the time of
 %              the first arrival, in which to search for maxc_y [s]
 %              (def: 1)
+% fs       Re-sampled frequency (Hz) after decimation, or []
+%              to skip decimation (def: [])
 %
 % Output:
 % RMS      Root mean squared value of xw3: arrival to max. amplitude of wavetrain
@@ -45,7 +47,7 @@ function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zer
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 06-Mar-2020, Version 2017b on GLNXA64
+% Last modified: 04-Apr-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -56,10 +58,11 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
 defval('wlen2', 1)
+defval('fs', [])
 
 % Run firstarrival to retrieve relevant statistics about the first-arriving phase.
 [~, ~, ~, ~, ph, delay, ~, ~, ~, ~, maxc_y, ~, EQ, ~, xw2, W2, winflag, tapflag, zerflag] = ...
-    firstarrival(s, false, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2);
+    firstarrival(s, false, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs);
 
 % Find the new RMS time window which brackets just the time starting
 % at the AIC pick of the first arrival and extending 'delay' seconds,

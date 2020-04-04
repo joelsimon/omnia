@@ -1,6 +1,6 @@
 function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
-                                   evtdir, EQ, bathy, wlen2)
-% WRITEFIRSTARRIVALPRESSURE(s, redo, filename, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2)
+                                   evtdir, EQ, bathy, wlen2, fs)
+% WRITEFIRSTARRIVALPRESSURE(s, redo, filename, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs)
 %
 % WRITEFIRSTARRIVALPRESSURE writes the output of
 % firstarrivalpressure.m to a text file.  This function differs from
@@ -30,7 +30,8 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 % wlen2    Length of second window, starting at the 'dat', the time of
 %              the first arrival, in which to search for maxc_y [s]
 %              (def: 1)
-%
+% fs       Re-sampled frequency (Hz) after decimation, or []
+%              to skip decimation (def: [])
 % Output:
 % Text file with the following columns (firstarrivalpressure.m outputs in parentheses):
 %    (1) SAC filename
@@ -54,7 +55,7 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 20-Mar-2020, Version 2017b on MACI64
+% Last modified: 04-Apr-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('s', revsac(1))
@@ -68,6 +69,7 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
 defval('wlen2', 1)
+defval('fs', 20)
 
 % Textfile format.
 fmt = ['%44s    ' , ...
@@ -135,7 +137,7 @@ parfor i = 1:length(s)
     end
 
     % Concatenate the write lines.
-    wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2);
+    wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2, fs);
     wlines = [wlines wline];
 
 end
@@ -158,7 +160,7 @@ end
 % Use a system call to sort the new entries.
 [status, result] = system(sprintf('sort -k1 -n -o %s %s', filename, filename));
 if status ~= 0
-    warning('unable to sort %s\nflags may differ on non-Linux machines', filename)
+    warning('Unable to sort %s\nFlags may differ on non-Linux machines', filename)
 
 end
 
@@ -166,12 +168,12 @@ end
 fileattrib(filename, '-w')
 
 %_______________________________________________________________________________%
-function wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2)
+function wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2, fs)
 % Local call to, and formatting of, firstarrivalpressure.m
 
 % Collect.
 [RMS, ph, P, ~, ~, ~, ~, ~, ~, EQ, winflag, tapflag, zerflag] = ...
-    firstarrivalpressure(sac, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2);
+    firstarrivalpressure(sac, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs);
 
 % Nab fullpath SAC file name, if not supplied.
 if isempty(fileparts(sac))

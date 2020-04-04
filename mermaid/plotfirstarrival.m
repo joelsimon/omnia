@@ -1,8 +1,8 @@
 function [f, ax, tx] = plotfirstarrival(s, ax, FontSize, EQ, ci, ...
                                         wlen, lohi, sacdir, evtdir, ...
-                                        bathy, wlen2, hardcode_twosd) % hidden last input
+                                        bathy, wlen2, fs, hardcode_twosd) % hidden last input
 % [f, ax, tx] = ...
-%     PLOTFIRSTARRIVAL(s, ax, FontSize, EQ, ci, wlen, lohi, sacdir, evtdir, bathy, wlen2)
+%     PLOTFIRSTARRIVAL(s, ax, FontSize, EQ, ci, wlen, lohi, sacdir, evtdir, bathy, wlen2, fs)
 %
 % Plots the output of firstarrival.m, with a time-axis centered on
 % theoretical first-phase-arrival time.
@@ -28,6 +28,9 @@ function [f, ax, tx] = plotfirstarrival(s, ax, FontSize, EQ, ci, ...
 % wlen2    Length of second window, starting at the 'dat', the time of
 %              the first arrival, in which to search for maxc_y [s]
 %              (def: 1)
+% fs       Re-sampled frequency (Hz) after decimation, or []
+%              to skip decimation (def: [])
+%
 % Output:
 % f        Figure handle
 % ax       Axis handle
@@ -37,7 +40,7 @@ function [f, ax, tx] = plotfirstarrival(s, ax, FontSize, EQ, ci, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 17-Feb-2020, Version 2017b on MACI64
+% Last modified: 04-Apr-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -51,6 +54,7 @@ defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('bathy', true)
 defval('wlen2', 1)
+defval('fs', [])
 defval('hardcode_twosd', []) % hidden input -- see note at bottom
 
 % Generate new axis if one not supplied.
@@ -65,7 +69,7 @@ end
 
 % Compute first-arrival statistics.
 [tres, ~, syn, ~, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ, W1] = ...
-    firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2);
+    firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs);
 
 % Plot time series.
 plot(ax, xaxw1, xw1, 'LineWidth', 1, 'Color', 'Blue')

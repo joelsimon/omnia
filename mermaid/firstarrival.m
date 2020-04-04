@@ -1,9 +1,9 @@
 function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
           maxc_y, SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag] ...
-        = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2)
+        = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs)
 % [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 %        SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag] = ...
-%        FIRSTARRIVAL(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2)
+%        FIRSTARRIVAL(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs)
 %
 % Computes the travel-time residual between the AIC-based arrival-time
 % estimate of Simon, J. D. et al., (2020), BSSA, doi:
@@ -45,6 +45,9 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % wlen2    Length of second window, starting at the 'dat', the time of
 %              the first arrival, in which to search for maxc_y [s]
 %              (def: 1)
+% fs       Re-sampled frequency (Hz) after decimation, or []
+%              to skip decimation (def: [])
+%
 % Output:
 % tres     Travel time residual [s] w.r.t first phase arrival:
 %              estimated (cpest.m) - theoretical (taupTime.m)
@@ -103,7 +106,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 15-Mar-2020, Version 2017b on MACI64
+% Last modified: 04-Apr-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -115,6 +118,7 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
 defval('wlen2', 1)
+defval('fs', [])
 
 % Start with baseline assumption both time windows will be complete.
 incomplete1 = false;
@@ -138,6 +142,26 @@ if isempty(fileparts(s))
 end
 [x, h] = readsac(s);
 
+% Decimate, if requested.
+if ~isempty(fs)
+    old_fs = round(1 / h.DELTA);
+    if fs > old_fs
+        error('Requested downsampled frequency greater than native sampling frequency')
+    end
+
+    % Decimate.
+    R = floor(old_fs / fs);
+    x = decimate(x, R);
+
+    % Very important: adjust the appropriate SAMPLE header variables .NPTS and
+    % .DELTA.  The absolute (SECONDS) timing variables (B, E) won't change
+    % (except by maybe a sample-interval...see seistime.m, where it is properly
+    % accounted for).  The length of a decimated array is: ceil(length(x)/r).
+    h.NPTS = length(x);
+    h.DELTA = h.DELTA * R;
+
+end
+
 % Nab EQ structure, if not supplied (assuming MERMAID data here;
 % getevt.m at this time assumes MERMAID event directory structure.
 % If, for example, you want to use this function for a 'nearby' EQ you
@@ -154,7 +178,6 @@ else
 
     end
 end
-
 
 % Sanity.
 if ~isstruct(EQ)

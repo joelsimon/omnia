@@ -1,6 +1,6 @@
 function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
-                           evtdir, EQ, bathy, wlen2)
-% WRITEFIRSTARRIVAL(s, redo, filename, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2)
+                           evtdir, EQ, bathy, wlen2, fs)
+% WRITEFIRSTARRIVAL(s, redo, filename, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs)
 %
 % WRITEFIRSTARRIVAL writes the output of firstarrival.m a text file.
 %
@@ -28,6 +28,8 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 % wlen2    Length of second window, starting at the 'dat', the time of
 %              the first arrival, in which to search for maxc_y [s]
 %              (def: 1)
+% fs       Re-sampled frequency (Hz) after decimation, or []
+%              to skip decimation (def: [])
 %
 % Output:
 % Text file with the following columns (firstarrivals.m outputs in parentheses):
@@ -56,7 +58,7 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 15-Mar-2020, Version 2017b on MACI64
+% Last modified: 04-Apr-2020, Version 2017b on MACI64
 
 % Defaults.
 defval('s', revsac(1))
@@ -85,6 +87,7 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
 defval('wlen2', 1)
+defval('fs', [])
 
 % Textfile format.
 fmt = ['%44s    ' , ...
@@ -150,7 +153,7 @@ parfor i = 1:length(s)
     end
 
     % Concatenate the write lines.
-    wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fmt);
+    wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs, fmt);
     wlines = [wlines wline];
 
 end
@@ -181,12 +184,12 @@ end
 fileattrib(filename, '-w')
 
 %_______________________________________________________________________________%
-function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fmt)
+function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs, fmt)
 % Local call to, and formatting of, firstarrival.m
 
 % Collect.
 [tres, dat, ~, tadj, ph, delay, twosd, ~, ~, ~, maxc_y, SNR, EQ, ~, ~, ~, winflag, tapflag, zerflag] = ...
-    firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2);
+    firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs);
 publicid = fx(strsplit(EQ(1).PublicId, '='),  2);
 tptime = EQ(1).TaupTimes(1).time;
 
