@@ -20,7 +20,7 @@ function [seisdate, seiststr, seisertime, refdate, evtdate] = seistime(h)
 % First three outputs are same data in three formats: a datetime array
 % via datetime.m, a PDE/ISC-formatted string via datestr.m, and a
 % serial date number via datenum.m.  Note datetime uses 'SSS' for
-% milliseconds format, while datestr.m uses 'FFF' for fractional
+% milliseconds format, while datestr.m uses 'BUFF' for fractional
 % seconds (same if precision is 3, which it is in SAC headers).
 %
 % datetime -- useful for arithmetic between points in time
@@ -32,7 +32,7 @@ function [seisdate, seiststr, seisertime, refdate, evtdate] = seistime(h)
 %
 % Outputs:
 % seisdate    Datetime structure of seismogram GMT start (.B) and end times (.E)
-%                 seisdate.B == absolute time of first sample in seismogram, or 
+%                 seisdate.B == absolute time of first sample in seismogram, or
 %                 the reference time in header plus the offset time (B) in header
 %                 seisdate.E == absolute time of last sample in seismogram, or
 %                 the reference time in header plus the offset time (E) in header
@@ -43,24 +43,24 @@ function [seisdate, seiststr, seisertime, refdate, evtdate] = seistime(h)
 % evtdate     Time of event (origin), if h.O field filled (def: [])
 %                evtdate = refdate + seconds(h.O)
 % _____________________
-% 
+%
 % N.B.: Datetime, by default, does not show millisecond
 % precision (but it does store it).
 %
 % >> foo = datetime('2014 987', 'InputFormat', 'uuuu SSS') - ...
 %          datetime('2014 986', 'InputFormat', 'uuuu SSS')
-% foo = 
+% foo =
 %       duration
 %       00:00:00
 %
 % >> milliseconds(foo)
 %
-% ans = 
+% ans =
 %      1
 %
 % Also: "The symbolic identifiers describing date and time formats are
 % different from those that describe the display formats of datetime
-% arrays." 
+% arrays."
 %
 % https://www.mathworks.com/help/matlab/ref/datestr.html#btenptl-1-formatOut
 %
@@ -72,14 +72,14 @@ function [seisdate, seiststr, seisertime, refdate, evtdate] = seistime(h)
 %    [seisdate, seiststr, seisertime, refdate] = SEISTIME(h)
 %
 % See also: arrivaltime.m, readsac.m
-% 
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
-% Last modified: 26-Aug-2019, Version 2017b
+% Last modified: 04-Apr-2020, Version 2017b on MACI64
 % Documented 2017.2 pg. 45
 
 % NOTES ABOUT TIMING IN SAC
-% From https://ds.iris.edu/files/sac-manual/manual/tutorial.html -- 
+% From https://ds.iris.edu/files/sac-manual/manual/tutorial.html --
 %
 % "How SAC Handles Time:
 %
@@ -99,38 +99,43 @@ function [seisdate, seiststr, seisertime, refdate, evtdate] = seistime(h)
 % Generate date formats, pull times from SAC header, feed to datetime.m
 nullval = -12345;
 tims = [h.NZYEAR h.NZJDAY h.NZHOUR h.NZMIN h.NZSEC h.NZMSEC];
+
+% Check for missing data.
 if any(tims == nullval)
     error('Null value (-12345): h.NZ*')
 
 end
-headertimes = num2str(tims);
-
-% Use ISO year (u) not Gregorian year (y) per MATLAB 2017b warning.
-datefmt = ['uuuu DDD HH mm ss SSS'];
-refdate = datetime(headertimes, 'InputFormat', datefmt, 'TimeZone', 'UTC');
-
-% From SAC manual -- "All other times are offsets in seconds from this
-% reference time and are stored as floating point values in the
-% header."
 if h.B == nullval;
     error('Null value (-12345): h.B')
 
 end
-seisdate.B = refdate + seconds(h.B);
-
-if h.E == nullval
-    if h.NPTS == nullval
-        error('Null value (-12345): h.NPTS')    
-        
-    end
-    if h.DELTA == nullval
-        error('Null value (-12345): h.DELTA')    
-
-    end
-    xax = xaxis(h.NPTS, h.DELTA, h.B);
-    h.E = xax(end);
+if h.NPTS == nullval
+    error('Null value (-12345): h.NPTS')
 
 end
+if h.DELTA == nullval
+    error('Null value (-12345): h.DELTA')
+
+end
+headertimes = num2str(tims);
+
+% I choose to NOT use h.E (even if it is included in the header, which it is not
+% always) because the data may have been decimated, and it is common to then
+% update the header-timing variables h.NPTS, and h.DETLA, however the updated
+% h.E (which may only vary by a sample...) may not have been overwritten. Just
+% to be safe...
+xax = xaxis(h.NPTS, h.DELTA, h.B);
+h.E = xax(end);
+
+% Use ISO year (u) not Gregorian year (y) per MATLAB 2017b warning.  The refdate
+% is the reference time in the SAC header -- it doesn't necessarily correspond to
+% anything (an event, the first sample, etc.).
+datefmt = ['uuuu DDD HH mm ss SSS'];
+refdate = datetime(headertimes, 'InputFormat', datefmt, 'TimeZone', 'UTC');
+
+% From SAC manual -- "All other times are offsets in seconds from this reference
+% time and are stored as floating point values in the header."
+seisdate.B = refdate + seconds(h.B);
 seisdate.E = refdate + seconds(h.E);
 
 % Put into serial time.
@@ -143,11 +148,10 @@ seiststr.E = pdetime2str(seisdate.E);
 
 % Grab the event time, if h.O (event rupture time, offset in seconds
 % from reference time) is filled.
-if exist('h.O') || h.O ~= -12345 
+if exist('h.O') || h.O ~= -12345
     evtdate = refdate + seconds(h.O);
 
 else
     evtdate = [];
 
 end
-
