@@ -208,7 +208,6 @@ for i = 1:length(abbrev_x)
     if normlize
         % Normalize this seismogram with itself, thereby removing distance
         % decay.
-        %       abbrev_x{i} = abbrev_x{i} / max(abs(abbrev_x_first{i}));
         abbrev_x{i} = norm2max(abbrev_x{i});
 
     else
