@@ -29,7 +29,7 @@ function A0 = transfunc(sensortype, fs)
 % simply added one extra zero, here.
 %
 % In the following examples, sensitivity_vel is Sd ("sensitivity or gain
-% constant at fs"), for a set of velocity poles and zeros (SEED manual v2.5
+% constant at fs"), for a set of velocity poles and zeros (SEED manual v2.4
 % pg. 157), and sensitivity_disp Sd for a displacement set of poles and zeros.
 %
 % Ex1: (computing the CONSTANT for a displacement SACPZ file)
