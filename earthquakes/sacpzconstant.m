@@ -3,18 +3,18 @@ function [CONSTANT, A0] = sacpzconstant(Sd, fs, P, Z)
 %
 % Return the SACPZ CONSTANT in units of counts/m.
 %
-% In SEED manual v2.4 parlance, this corresponds to the gain constant for the
-% analog stages.  In the example on pg. 166, the first stage is the seismometer
-% [V/(m/s^2)] and the second stage is the digitizer [counts/V].  These two gains
-% are multiplied in stage 0 to quote the entire gain of the system (we are
-% ignoring other digital stages that go the total gain at stage 0, like
-% decimation, which is fine, because they are negligible).  Ultimately, the
-% total gain (Sd) of the analog system is quoted in something like
-% [counts/(m/s^2)], though here it must be in terms of counts/m.
+% In the parlance of the SEED Manual v2.4 , this corresponds to the gain
+% constant for the analog stages.  In the example on pg. 166, the first stage is
+% the seismometer [V/(m/s^2)], and the second stage is the digitizer [counts/V].
+% These two gains are multiplied in stage 0 to represent the total gain of the
+% system (we are ignoring other digital stages (3+; FIR filters etc.), that also
+% contribute to the stage 0 gain, but negligibly).  Ultimately, the total gain
+% (or "sensitivity," Sd) of the analog system is quoted in units like
+% [counts/(m/s^2)], though here it must be in input in terms of counts/m.
 %
-% Using, eq. (6) Pg. 159, "...at any frequency f (in Hz) the response is:"
+% Using, eq. (6) pg. 159, "...at any frequency f (in Hz) the response is:"
 %
-%                G(f) = Sd * A0 * Hp(s)
+%                G(f) =  Sd * A0 * Hp(s)
 %                     = CONSTANT * Hp(s)  (author's interpretation)
 %
 % And pg. 158, "...Hp(s) represents the transfer function ratio of polynomials
@@ -28,8 +28,7 @@ function [CONSTANT, A0] = sacpzconstant(Sd, fs, P, Z)
 %     https://ds.iris.edu/ds/support/faq/24/what-are-the-fields-in-a-resp-file/
 % (3) Verified through personal communication with Olivier Hyvernaud at Reseau
 %     Sismique Polynesien
-% (4) Finally, it only makes sense given the definition of the definition of the
-%     gain G(f), above
+% (4) Finally, it only makes sense given the definition of the gain, G(f)
 %
 % SACPZCONSTANT assumes the input poles and zeros correspond to a a "Transfer
 % function type: A", i.e., "Laplace transform analog response, in rad/sec"
