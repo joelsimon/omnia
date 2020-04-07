@@ -1,7 +1,10 @@
-function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, normlize, nearbydir, returntype, otype)
-% F = NEARBYRECORDSECTION(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, normlize, nearbydir, returntype, otype)
+function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
+                                 mer_sacdir, normlize, nearbydir, returntype, ...
+                                 otype, includeCPPT)
+% F = NEARBYRECORDSECTION(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, ...
+%         normlize, nearbydir, returntype, otype, includeCPPT)
 %
-%% NEED TO ADD nearby_sacu; nearby_EQu;
+%% NEED TO ADD nearby_sacu; nearby_EQu -- no: merged traces is fine here.
 %
 % NEEDS HEADER AND WORKING 'ATIME' OPTION
 % returntype   For third-generation+ MERMAID only:
@@ -12,11 +15,13 @@ function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, mer_sacd
 %              'none': return displacement time series (nm)
 %              'vel': return velocity time series (nm/s)
 %              'acc': return acceleration time series (nm/s/s) (def)
-%
+% includeCPPT  true to include CPPT traces (NB, if true, the path to CPPT data
+%                  must mirror exactly 'nearbydir', except that "nearby" in the
+%                  former is replaced with "cppt" in the latter) (def: true)
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 18-Feb-2020, Version 2017b on GLNXA64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 07-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('id', '10948555')
 defval('lohi', [1 5]);
@@ -27,7 +32,8 @@ defval('mer_sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('normlize', true)
 defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('returntype', 'DET')
-defval('otype', 'acc')
+defval('otype', 'none')
+defval('includeCPPT', true)
 
 if strcmpi(alignon, 'atime')
     error('alignon = ''atime'' not yet coded')
@@ -48,7 +54,19 @@ evtdate = datetime(irisstr2date(mer_EQ{1}(1).PreferredTime));
 
 % Get the nearby SAC files and EQ structures.
 [~, ~, nearby_sac, nearby_EQ] = ...
-    getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir, true, returntype);
+    getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir, true, returntype, otype);
+
+% Fetch the similar CPPT data, if requested.
+if includeCPPT
+    cpptdir = strrep(nearbydir, 'nearby', 'cppt');
+    [~, ~, cppt_sac, cppt_EQ] = ...
+        getcpptsacevt(id, mer_evtdir, mer_sacdir, cpptdir, true, returntype, otype);
+
+    % Concatenate with the "nearby" stations' data.
+    nearby_sac = [nearby_sac ; cppt_sac];
+    nearby_EQ = [nearby_EQ ; cppt_EQ];
+
+end
 
 % Remove nearby EQ structures with no phase arrivals (empty
 % .TaupTimes, e.g., in the case of incomplete or merged data).
@@ -90,7 +108,7 @@ if strcmpi(alignon, 'etime')
     nearby_first = cellfun(@(xx) xx(1).TaupTimes(1).arrivaldatetime, nearby_EQ);
     all_first = [mer_first ; nearby_first];
     min_first = min(all_first);
-    F.ax.XLim(1) = round(seconds(min_first - evtdate) -  100, -2);
+    F.ax.XLim(1) = round(seconds(min_first - evtdate) - 100, -2);
 
     % Expand the y-axis by 10 degrees beyond the min and max distances.
     mer_dists = cellfun(@(xx) xx(1).TaupTimes(1).distance, mer_EQ);
@@ -247,6 +265,10 @@ for i = 1:length(abbrev_x)
     F.pltr2(i).Color = nearby_color;
 
 
+    % CPPT SAC file names start with  number; "nearby" start with a letter.
+    sta_name = strippath(nearby_sac{i});
+
+    % For "nearby stations:"
     % This unique network.station.location.channel name may be found by
     % keeping all characters up to the fourth period ('.')
     % delimiter. DO NOT USE strsplit because it ignores
@@ -255,10 +277,18 @@ for i = 1:length(abbrev_x)
     % location is missing).
     % station_info = strsplit(strippath(nearby_sac{i}), '.');
     % floatnum = cell2commasepstr(station_info(1:4), '.');
-
-    sta_name = strippath(nearby_sac{i});
     delims = strfind(sta_name, '.');
-    sta = sta_name(1:delims(4)-1);
+
+    if isempty(str2num(sta_name(1)))
+        % "nearby"
+        sta = sta_name(1:delims(4)-1);
+
+    else
+        % CPPT (RSP network)
+        ntwk = 'RSP';
+        sta = [ntwk '.' sta_name(delims(4)+1:delims(5)-1)]
+
+    end
     F.pltx2(i) = text(F.ax, 0, dist(i), sprintf('%14s', sta));
     F.pltx2(i).Color = nearby_color;
 
