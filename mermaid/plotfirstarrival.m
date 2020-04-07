@@ -145,7 +145,7 @@ end
 % Circle the maximum counts if it is within the time window plotted
 % (W2 and thus the time of the maximum counts may extend beyond W1).
 if maxc_x <=  W1.xrsecs
-    pl.maxc = plot(ax, maxc_x - syn, maxc_y, 'ko', 'MarkerSize', 5)
+    pl.maxc = plot(ax, maxc_x - syn, maxc_y, 'ko', 'MarkerSize', 5);
 
 end
 hold(ax, 'off')
