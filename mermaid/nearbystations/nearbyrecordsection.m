@@ -1,8 +1,8 @@
 function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
-                                 mer_sacdir, normlize, nearbydir, returntype, ...
+                                 mer_sacdir, normlize, nearbydir, returntype, ph, ...
                                  otype, includeCPPT)
 % F = NEARBYRECORDSECTION(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, ...
-%         normlize, nearbydir, returntype, otype, includeCPPT)
+%         normlize, nearbydir, returntype, ph, otype, includeCPPT)
 %
 %% NEED TO ADD nearby_sacu; nearby_EQu -- no: merged traces is fine here.
 %
@@ -32,6 +32,7 @@ defval('mer_sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('normlize', true)
 defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('returntype', 'DET')
+defval('ph', [])
 defval('otype', 'none')
 defval('includeCPPT', true)
 
@@ -42,7 +43,7 @@ end
 
 % Plot the baseline MERMAID record section.
 [F, mer_EQ] = recordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
-                            mer_sacdir, normlize, returntype);
+                            mer_sacdir, normlize, returntype, ph);
 if isempty(mer_EQ)
     return
 
@@ -286,7 +287,7 @@ for i = 1:length(abbrev_x)
     else
         % CPPT (RSP network)
         ntwk = 'RSP';
-        sta = [ntwk '.' sta_name(delims(4)+1:delims(5)-1)]
+        sta = [ntwk '.' sta_name(delims(4)+1:delims(5)-1)];
 
     end
     F.pltx2(i) = text(F.ax, 0, dist(i), sprintf('%14s', sta));
@@ -313,12 +314,20 @@ else
     last_time = evt_xax{furthest}(end);
     F.ax.XLim(2) = round(last_time +  100, -2);
 
-    % Compute travel time curves for the phases present.
-    phase_cell = [F.lg.String phase_cell];
-    phase_cell = unique(phase_cell);
-    delete(F.ph);
+    % Travel-time curves
+    if isempty(ph)
+        % All phases potentially present.
+        phase_cell = [F.lg.String phase_cell];
+        phase_cell = unique(phase_cell);
+        phase_str = cell2commasepstr(phase_cell, ', ');
 
-    phase_str = cell2commasepstr(phase_cell, ', ');
+    else
+        % Just those requested.
+        phase_str = ph;
+        phase_cell = commasepstr2cell(ph, ',')
+
+    end
+    delete(F.ph);
     tc = taupCurve('ak135', nearby_EQ{1}(1).PreferredDepth, phase_str);
 
     % Overlay travel time curves.
