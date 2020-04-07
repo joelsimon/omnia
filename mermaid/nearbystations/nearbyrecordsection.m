@@ -287,10 +287,11 @@ for i = 1:length(abbrev_x)
     else
         % CPPT (RSP network)
         ntwk = 'RSP';
-        sta = [ntwk '.' sta_name(delims(4)+1:delims(5)-1)];
+        sta = [ntwk '.' sta_name(delims(4)+1:delims(7)-1)];
 
     end
-    F.pltx2(i) = text(F.ax, 0, dist(i), sprintf('%14s', sta));
+
+    F.pltx2(i) = text(F.ax, 0, dist(i), sprintf('%14s', sta), 'HorizontalAlignment', 'Right');
     F.pltx2(i).Color = nearby_color;
 
 end
@@ -324,7 +325,7 @@ else
     else
         % Just those requested.
         phase_str = ph;
-        phase_cell = commasepstr2cell(ph, ',')
+        phase_cell = commasepstr2cell(ph, ',');
 
     end
     delete(F.ph);
@@ -371,7 +372,7 @@ for i = 1:length(F.pltx)
 end
 
 for i = 1:length(F.pltx2)
-    F.pltx2(i).Position(1) = F.ax.XLim(2) + shiftx;
+    F.pltx2(i).Position(1) = F.ax.XLim(2) - shiftx;
 
 end
 
