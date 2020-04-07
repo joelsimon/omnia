@@ -54,12 +54,10 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 % See also: evt2txt.m, getevt.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 18-Feb-2020, Version 2017b on GLNXA64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 07-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Wish list:
-%
-% Input phase name option, to compute only requested travel time curves.
 %
 % Overlaid travel time curves for 'atime' option.  Compute differences
 % between all phases and first-arriving phase at every distance.  Then
@@ -134,7 +132,7 @@ for i = 1:length(sac)
 
     % Taper and filter.
     if ~isnan(lohi)
-        x{i} = detrend(x{i}, 'constant');        
+        x{i} = detrend(x{i}, 'constant');
         x{i} = detrend(x{i}, 'linear');
         taper = hanning(length(x{i}));
         x{i} = bandpass(taper .* x{i}, 1/h{i}.DELTA, lohi(1), lohi(2), 2, 2, 'butter');
@@ -184,9 +182,9 @@ grid(F.ax, 'on')
 % same event.
 EQ1 = EQ{1}(1);
 evttime = EQ1.PreferredTime;
-magtype = [upper(EQ1.PreferredMagnitudeType(1)) ...
-           lower(EQ1.PreferredMagnitudeType(2:end))];
-magstr = sprintf('M%2.1f %s', EQ1.PreferredMagnitudeValue, magtype);
+magtype = EQ1.PreferredMagnitudeType;
+magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', upper(magtype(1)), lower(magtype(2)), ...
+                 EQ1.PreferredMagnitudeValue);
 depthstr = sprintf('%2.1f km depth', EQ1.PreferredDepth);
 locstr = sprintf('%s', EQ1.FlinnEngdahlRegionName);
 F.tl = title([magstr ' ' locstr ' at ' depthstr]);
