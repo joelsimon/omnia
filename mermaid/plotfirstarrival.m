@@ -1,7 +1,7 @@
-function [f, ax, tx] = plotfirstarrival(s, ax, FontSize, EQ, ci, ...
+function [f, ax, tx, pl] = plotfirstarrival(s, ax, FontSize, EQ, ci, ...
                                         wlen, lohi, sacdir, evtdir, ...
                                         bathy, wlen2, fs, hardcode_twosd) % hidden last input
-% [f, ax, tx] = ...
+% [f, ax, tx, pl] = ...
 %     PLOTFIRSTARRIVAL(s, ax, FontSize, EQ, ci, wlen, lohi, sacdir, evtdir, bathy, wlen2, fs)
 %
 % Plots the output of firstarrival.m, with a time-axis centered on
@@ -35,12 +35,13 @@ function [f, ax, tx] = plotfirstarrival(s, ax, FontSize, EQ, ci, ...
 % f        Figure handle
 % ax       Axis handle
 % tx       textpatch.m handles where, e.g., tx.ul is 'upper left'
+% pl       Handels to various lines plotted
 %
-% See: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
+% AIC picker from Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 04-Apr-2020, Version 2017b on MACI64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 07-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -66,17 +67,30 @@ else
     f = ax.Parent;
 
 end
+hold(ax, 'on')
 
 % Compute first-arrival statistics.
 [tres, ~, syn, ~, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ, W1] = ...
     firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs);
 
-% Plot time series.
-plot(ax, xaxw1, xw1, 'LineWidth', 1, 'Color', 'Blue')
+% Overwrite the uncertainty estimate, if one supplied as hidden input.
+if ~isempty(hardcode_twosd)
+    twosd = hardcode_twosd;
+
+end
+
+
+% Plot time series (noise in gray).
+% This is the ARRIVAL sample; not CHANGEPOINT sample (last sample of noise)
+arsamp = find(xaxw1 == tres);
+
+% Connect the noise to the arrival -- make the first sample of the arrival colored.
+pl.noise = plot(ax, xaxw1(1:arsamp), xw1(1:arsamp), 'LineWidth', 1, 'Color', [0.6 0.6 0.6]);
+pl.signal = plot(ax, xaxw1(arsamp:end), xw1(arsamp:end), 'LineWidth', 1, 'Color', 'blue');
 ax.FontSize = FontSize(2);
 
-% Adjust title if travel-time residual uses corrected theoretical
-% (tstar) phase arrival time.
+% Adjust title if travel-time residual uses corrected theoretical (tstar) phase
+% arrival time.
 if bathy
     tstr = '$t^{\star}_\mathrm{res}$';
 
@@ -106,14 +120,32 @@ numticks(ax, 'x', 5);
 ax.YTick = [ax.YTick(1) median(ax.YTick) ax.YTick(end)];
 
 % Vertical lines marking theoretical and actual arrival times.
-hold(ax, 'on')
-plot(ax, zeros(1, 2), ylim, 'k', 'LineStyle', '--');
-plot(ax, repmat(tres, 1, 2), ylim, 'r', 'LineStyle', '-');
+pl.syn = plot(ax, zeros(1, 2), ylim, 'k', 'LineStyle', '--', 'LineWidth', 0.1);
+
+% Sampling interval.
+DELTA = xaxw1(2) - xaxw1(1);
+
+if ~isnan(twosd) && twosd > DELTA
+    % Plus/minus twosd from the theoretical arrival time.
+    pl.dat_minus = plot(ax, repmat(tres-twosd, 1, 2), ylim, 'r', 'LineStyle', '--', 'LineWidth', 0.1);
+    pl.dat_plus = plot(ax, repmat(tres+twosd, 1, 2), ylim, 'r', 'LineStyle', '--', 'LineWidth', 0.1);
+    pl.dat = plot(ax, repmat(tres, 1, 2), ylim, 'r', 'LineStyle', '-', 'LineWidth', 0.1);
+
+    % As a patch.
+    % yy = ylim;
+    % px = [tres-twosd tres+twosd tres-twosd tres+twosd];
+    % py = [yy(1) yy(1) yy(2) yy(2)]
+    % pl.dat = patch(ax, px, py, 'red', 'FaceColor', 'red', 'EdgeColor', 'red');
+
+else
+    pl.dat = plot(ax, repmat(tres, 1, 2), ylim, 'r', 'LineStyle', '-', 'LineWidth', 0.1);
+
+end
 
 % Circle the maximum counts if it is within the time window plotted
 % (W2 and thus the time of the maximum counts may extend beyond W1).
 if maxc_x <=  W1.xrsecs
-    plot(ax, maxc_x - syn, maxc_y, 'ko', 'MarkerSize', 5)
+    pl.maxc = plot(ax, maxc_x - syn, maxc_y, 'ko', 'MarkerSize', 5)
 
 end
 hold(ax, 'off')
@@ -139,20 +171,21 @@ tx.ur = textpatch(ax, 'NorthEast',  [depthstr ', ' diststr], FontSize(2), ...
 tx.ll = textpatch(ax, 'SouthWest', sprintf('SNR = %.1e', SNR), ...
                  FontSize(2), 'Times', 'LaTeX');
 
-% Uncertainty estimate.
-if ~isempty(hardcode_twosd)
-    twosd = hardcode_twosd;
+if twosd >= DELTA
+    tx.lr = textpatch(ax, 'SouthEast', sprintf('2$\\cdot{\\mathrm{SD}}_\\mathrm{err}$ = %.2f s', ...
+                                               twosd), FontSize(2), 'Times', 'LaTeX');
+else
+    tx.lr = textpatch(ax, 'SouthEast', '2$\cdot{\mathrm{SD}}_\mathrm{err}$ $<$ 1/$f_s$', FontSize(2), 'Times', 'LaTeX');
 
 end
-tx.lr = textpatch(ax, 'SouthEast', sprintf('2$\\cdot{\\mathrm{SD}}_\\mathrm{err}$ = %.2f s', ...
-                                          twosd), FontSize(2), ...
-                 'Times', 'LaTeX');
 
 pause(0.01)
 tack2corner(ax, tx.ul, 'NorthWest')
 tack2corner(ax, tx.ur, 'NorthEast')
 tack2corner(ax, tx.ll, 'SouthWest')
 tack2corner(ax, tx.lr, 'SouthEast')
+
+topz([pl.noise pl.signal])
 
 latimes
 f = gcf;
