@@ -6,8 +6,8 @@
 % annotations and some formatting.
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 06-Nov-2019, Version 2017b on GLNXA64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 08-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 clear
@@ -93,7 +93,7 @@ for i = 1:length(s)
 
     % Add note to unlikely PKiKP phase (actually: PKIKP)
     if strcmp(strippath(sac), 'm13.20130524T060205.sac')
-        Ft.tx{1}{1}.String =  sprintf('likely \\textit{PKIKP}\n(reported as \\textit{PKiKP})');
+        Ft.tx{1}{1}.String =  sprintf('Likely \\textit{PKIKP}\n(reported as \\textit{PKiKP})');
         Ft.tx{1}{1}.Position(2) = 2;
 
     end
@@ -271,17 +271,9 @@ hold(ax, 'off')
 
 %% Annotate the seismogram with the largest event info.
 
-% Capitalize only the first character of the magnitude string.
-magtype = lower(EQ(1).PreferredMagnitudeType);
-magtype(1) = upper(magtype(1));
-
-% Set Mww to generic Mw notation.
-if strcmp(magtype, 'Mww')
-    magtype = 'Mw';
-
-end
-
-magstr = sprintf('%.1f~%s', EQ(1).PreferredMagnitudeValue, magtype);
+magtype = EQ(1).PreferredMagnitudeType;
+magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', upper(magtype(1)), lower(magtype(2)), ...
+                 EQ(1).PreferredMagnitudeValue);
 depthstr = sprintf('%.2f~km', EQ(1).PreferredDepth);
 diststr = sprintf('%.2f$^{\\circ}$', EQ(1).TaupTimes(1).distance);
 
