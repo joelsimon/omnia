@@ -2,7 +2,7 @@ function [danger, dates, stdp, ocdp] = intoodeep(s, mbuffer, vers)
 % [danger, dates, stdp, ocdp] = INTOODEEP(s, mbuffer, vers)
 %
 % Returns list of SAC files whose station depth is less than (deeper) the GEBCO
-% depth at that location plus a variable depth-buffer.
+% depth at that location plus a variable depth buffer.
 %
 % Input:
 % s          Cell array of fullpath SAC files (def: fullsac)
