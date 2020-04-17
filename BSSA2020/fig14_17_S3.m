@@ -46,7 +46,7 @@ filename = {'fig14', ...
 
 % end
 
-diro = '/home/jdsimon/mermaid/geoazur/rematch';
+diro = '~/mermaid/geoazur/rematch';
 for i = 1:length(s)
     sac = mermaid_sacf(s{i});
     [x, h] = readsac(sac);
@@ -176,7 +176,7 @@ for i = 1:length(s)
     end
 
     if strcmp(strippath(sac), 'm13.20130524T060205.sac')
-        Fts.tx{1}{1}.String =  sprintf('likely \\textit{PKIKP}\n(reported as \\textit{PKiKP})');
+        Fts.tx{1}{1}.String =  sprintf('Likely \\textit{PKIKP}\n(reported as \\textit{PKiKP})');
         Fts.tx{1}{1}.Position(2) = 2;
 
     end
