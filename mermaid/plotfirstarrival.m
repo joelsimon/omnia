@@ -41,7 +41,7 @@ function [f, ax, tx, pl] = plotfirstarrival(s, ax, FontSize, EQ, ci, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 07-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 17-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -171,12 +171,19 @@ tx.ur = textpatch(ax, 'NorthEast',  [depthstr ', ' diststr], FontSize(2), ...
 tx.ll = textpatch(ax, 'SouthWest', sprintf('SNR = %.1e', SNR), ...
                  FontSize(2), 'Times', 'LaTeX');
 
-if twosd >= DELTA
-    tx.lr = textpatch(ax, 'SouthEast', sprintf('2$\\cdot{\\mathrm{SD}}_\\mathrm{err}$ = %.2f s', ...
-                                               twosd), FontSize(2), 'Times', 'LaTeX');
-else
-    tx.lr = textpatch(ax, 'SouthEast', '2$\cdot{\mathrm{SD}}_\mathrm{err}$ $<$ 1/$f_s$', FontSize(2), 'Times', 'LaTeX');
+if ~ci
+    tx.lr = textpatch(ax, 'SouthEast', '2$\cdot{\mathrm{SD}}_\mathrm{err}$ = NaN');
 
+else
+    if twosd >= DELTA
+        tx.lr = textpatch(ax, 'SouthEast', sprintf(['2$\\cdot{\\mathrm{SD}}_\' ...
+                            '\mathrm{err}$ = %.2f s'], twosd), FontSize(2), ...
+                          'Times', 'LaTeX');
+    else
+        tx.lr = textpatch(ax, 'SouthEast', ['2$\cdot{\mathrm{SD}}_\mathrm{err}$ ' ...
+                            '$<$ 1/$f_s$'], FontSize(2), 'Times', 'LaTeX');
+
+    end
 end
 
 pause(0.01)
