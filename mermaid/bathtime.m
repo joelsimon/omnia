@@ -53,8 +53,8 @@ function [tadj, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
 %    [tadj, theta2] = BATHTIME('prem', 's', 89.9, -4000, -1500)
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 17-Oct-2019, Version 2017b on GLNXA64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 17-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 % Documented pp. 73-75, 2017.2
 
 % Defaults.
@@ -212,7 +212,7 @@ z_mermaid = abs(z_mermaid);
 beta1 = z_ocean / cosd(theta1);
 t1 = beta1 / v1;
 
-% Use Snell's law to compute the incidence angle of the converted phase in the water column.
+% Use Snel's law to compute the incidence angle of the converted phase in the water column.
 v2 = 1500;
 if z_mermaid ~= z_ocean,
     theta2 = asind((sind(theta1) / v1) * v2);
@@ -231,3 +231,24 @@ t2 = beta2 / v2;
 
 % Total correction.
 tadj = t2 - t1;
+
+%%______________________________________________________________________________________%%
+
+% NB, in the notation of equation 6 of paper??
+% * Z_w is z_ocean
+% * Z_MER is z_mermaid
+%
+% The "first" segement here is the rock (standard; no water layer) segment:
+% * v_r is v1
+% * \theta_r is theta1
+%
+% The "second" segement here is the adjusted segment with a water layer and
+% submerged reciever:
+% * v_w is v2
+% * \theta_w is theta2
+%
+% Therefore, as described here:
+% tadj = t2 - t1
+%      = (z_ocean-z_mermaid)/[v2*cosd(theta2)] - z_ocean/[v1*cosd(theta1)]  % this file
+%      = (Z_w-Z_MER)/[v_w*cos(\theta_w)] - z_w/[v_r*cos(\theta_r)]          % Eq. 6
+
