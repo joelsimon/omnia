@@ -45,7 +45,7 @@ function [x, y, dvar, rvar] = normlysmixvals(k, trusigmas, N, ko)
 % Ex2: (changepoint late; we expect increased MLE of "noise" variance)
 %    [x, y] = NORMLYSMIXVALS(950, [1 sqrt(2)], 1000, 500)
 %
-% Citation: paper??
+% Cite: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % See also: normly.m, normlysmix.m, plot2normlysmix.m,
 %

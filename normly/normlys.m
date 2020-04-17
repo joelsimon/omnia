@@ -23,7 +23,7 @@ function [lys, mu, sigma] = normlys(mus, sigmas, x)
 %     sigmas = [0.1:0.1:4];         % test sigma range 0.1:4
 %     [lys,mu,sigma] = NORMLYS(mus,sigmas,x)
 %
-% Citation: ??
+% Cite: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % See also: normlystest.m, normly.m
 %

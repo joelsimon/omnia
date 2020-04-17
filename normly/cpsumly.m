@@ -38,7 +38,7 @@ function [km, sumly, dvar, rvar] = cpsumly(x, verify)
 %    legend('time series', 'summed log-likelihood', ...
 %           'max. summed log-likelihood')
 %
-% Citation: ??
+% Cite: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % See also: cpest.m, normly.m
 %

@@ -1,7 +1,8 @@
 function [kw, km, aicx, weights] = cpest(x, algo, dtrnd, bias)
 % [kw, km, aicx, weights] = CPEST(x, algo, dtrnd, bias)
 %
-% Changepoint Estimation via the Akaike Information Criterion of paper??
+% Changepoint Estimation via the Akaike Information Criterion of
+% Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % CPEST calculates an Akaike Information Criterion value for each
 % sample, and estimates the changepoint(s) (e.g., arrival of seismic
@@ -38,8 +39,7 @@ function [kw, km, aicx, weights] = cpest(x, algo, dtrnd, bias)
 % ** bias = false: var(k) = 1/(length(k)-1)*sum((k-mean(k)).^2)
 %    bias = true: var(k) = 1/length(k)*sum((k-mean(k)).^2)
 %
-% Citations:
-% paper??
+% Inspired by:
 % H. Akaike (1998), doi: 10.1007/978-1-4612-1694-0_15
 % C. Li et al. (2009), doi: 10.1016/j.ultras.2008.05.005
 % N. Maeda (1985), doi: 10.4294/zisin1948.38.3_365
@@ -156,7 +156,7 @@ else
             end
         end
     end
-    % Slide any NaNs removed (above in unzipNaN) back into their proper index.
+    % Slide any NaNs removed (above in unzipnan) back into their proper index.
     if isempty(idx) == false
         aicx = zipnan(aicx, idx);
 
@@ -182,7 +182,7 @@ else
         % Update length of time series since it's been zipped back up.
         N = length(aicx);
 
-        % Compute Akaike weights (equations 2-4 in li+2009).
+        % Compute Akaike weights (equations 2-4 in Li+2009).
         delta_k = aicx - ykm;
         numerator = exp(-delta_k./2);
         denominator = nansum(numerator);

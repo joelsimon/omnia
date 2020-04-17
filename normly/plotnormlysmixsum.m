@@ -188,8 +188,8 @@ hold(f.ha,'off')
 axis(f.ha,'tight')
 box(f.ha,'on')
 
-% Add a crosshair for the DATA -- use biased statistical estimates in
-% keeping with paper??.
+% Add a crosshair for the DATA -- use biased statistical estimates in keeping with
+% the definitions of Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173.
 f.meanx = mean([f.MLE.XData]);
 f.stdx = std([f.MLE.XData], 1);
 f.varx = var([f.MLE.XData], 1);

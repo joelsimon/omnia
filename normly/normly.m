@@ -30,7 +30,7 @@ function ly = normly(mu, sigma, x)
 %    matlab_ly = -normlike([0 mu],x);
 %    fprintf('difference from builtin normlike.m = %e\n', ly - matlab_ly)
 %
-% Citation: ??
+% Cite: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 % 
 % See also: normlys.m, normlystest.m, normlike.m
 %
