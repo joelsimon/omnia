@@ -98,9 +98,8 @@ function [CONSTANT, A0] = sacpzconstant(SD, fs, P, Z)
 fs = 2*pi*fs;
 
 % Compute the complex frequency response of the transfer function, which
-% requires at least two frequencies as input, so supply three with the
-% sensitivity frequency of interest in the middle.  We don't have to multiply
-% 'w' by complex 'i' (or 'j') because freqs.m takes care of that for us.
+% requires at least two frequencies as input. Don't multiply 'w' by complex 'i'
+% (or 'j') because freqs.m does that internally with the frequency vector.
 w = [fs-pi, fs, fs+pi];
 Hp = freqs(b, a, w);
 

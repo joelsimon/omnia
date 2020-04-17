@@ -24,8 +24,6 @@ function [CONSTANT1, CONSTANT2] = cpptsacpzconstant
 %
 % Hi Joel,
 %
-% Here are the links for other seismic data.
-%
 % Sensitivity :
 %
 % 0.5236 nm/s/LSB  at 1 Hz for PAE, TVO
