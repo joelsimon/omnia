@@ -171,8 +171,9 @@ tx.ur = textpatch(ax, 'NorthEast',  [depthstr ', ' diststr], FontSize(2), ...
 tx.ll = textpatch(ax, 'SouthWest', sprintf('SNR = %.1e', SNR), ...
                  FontSize(2), 'Times', 'LaTeX');
 
-if ~ci
-    tx.lr = textpatch(ax, 'SouthEast', '2$\cdot{\mathrm{SD}}_\mathrm{err}$ = NaN');
+if isnan(twosd)
+    tx.lr = textpatch(ax, 'SouthEast', ['2$\cdot{\mathrm{SD}}_\mathrm{err}$ = ' ...
+                        'NaN'], FontSize(2), 'Times', 'LaTeX');
 
 else
     if twosd >= DELTA
@@ -186,6 +187,11 @@ else
     end
 end
 
+% Adjust YAxis TickLabels so that they have a field length at most of 2.
+max_ylim = max(abs(ax.YLim));
+ax.YAxis.Exponent = log10(max_ylim) - 1;
+
+% Tack textboxes to corners.
 pause(0.01)
 tack2corner(ax, tx.ul, 'NorthWest')
 tack2corner(ax, tx.ur, 'NorthEast')
