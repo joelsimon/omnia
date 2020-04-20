@@ -88,6 +88,8 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %             taper extends beyond start/end time of time series
 % zerflag  Null-value flag (sentinel value), to catch if e.g.,
 %              if gaps in data were filled with zeros
+%          NaN: Data are decimated and thus zero-values averaged,
+%               rendering this sentinel is meaningless
 %          0: No two contiguous datum == 0 in W1, W2,
 %             or taper (if the latter exists)
 %          1: At least two contiguous datum == 0 in W1, W2,
@@ -105,8 +107,8 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % then it is assumed to be 1500 m below the sea surface
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 04-Apr-2020, Version 2017b on MACI64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 20-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -435,6 +437,16 @@ if incomplete2
 end
 if incomplete1 && incomplete2
     winflag = 3;
+
+end
+
+% Decimation averages values, so if the original seismogram contains contiguous
+% zeros (what is marked by the zerflag) the decimated seismogram does
+% not. Rather than a major refactor of this function at this point (to check
+% zero-values in all the windows before decimation) I will note that if data are
+% decimated the zerflag is meaningless.
+if ~isempty(fs)
+    zerflag = NaN;
 
 end
 
