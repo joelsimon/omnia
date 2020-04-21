@@ -101,7 +101,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %
 % **See cpci.m Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
-% ***2 pole, 2 pass Butterworth filter
+% ***2 pole, 1 pass Butterworth filter
 %
 % ****If MERMAID depth is not contained in the header ('STDP' field),
 % then it is assumed to be 1500 m below the sea surface
@@ -327,7 +327,7 @@ if ~isnan(lohi)
      end
 
      % Bandpass entire (maybe tapered) time series.
-     x = bandpass(x, 1/h.DELTA, lohi(1), lohi(2), 2, 2, 'butter');
+     x = bandpass(x, 1/h.DELTA, lohi(1), lohi(2), 2, 1, 'butter');
 
      % Remove the relevant window from the tapered and filtered time series.
      [xw1, W1, incomplete1] = timewindow(x, wlen, syn, 'middle', h.DELTA, h.B);
