@@ -1,8 +1,8 @@
-function [f, ax, tx, pl] = plotfirstarrival(s, ax, FontSize, EQ, ci, ...
-                                        wlen, lohi, sacdir, evtdir, ...
-                                        bathy, wlen2, fs, hardcode_twosd) % hidden last input
-% [f, ax, tx, pl] = ...
-%     PLOTFIRSTARRIVAL(s, ax, FontSize, EQ, ci, wlen, lohi, sacdir, evtdir, bathy, wlen2, fs)
+function [f, ax, tx, pl] = plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, ...
+                                            lohi, sacdir, evtdir, bathy, wlen2, ...
+                                            fs, popas, hardcode_twosd) % last input hidden
+% [f, ax, tx, pl] = PLOTFIRSTARRIVAL(s, ax, FontSize, EQ, ci, wlen, lohi, ...
+%                                    sacdir, evtdir, bathy, wlen2, fs, popas)
 %
 % Plots the output of firstarrival.m, with a time-axis centered on
 % theoretical first-phase-arrival time.
@@ -13,7 +13,7 @@ function [f, ax, tx, pl] = plotfirstarrival(s, ax, FontSize, EQ, ci, ...
 % EQ       EQ structure against which to compute travel time residuals,
 %              or [] if event is reviewed and to be retrieved with
 %              getevt.m (def: [])
-% ci       true to estimate arrival time uncertainty via
+% ci       logical true to estimate arrival time uncertainty via
 %              1000 realizations of M1 method (def: false)*
 % wlen     Window length [s] centered on the 'syn', the theoretical
 %              first arrival, to consider for AIC pick (def: 30)
@@ -30,6 +30,8 @@ function [f, ax, tx, pl] = plotfirstarrival(s, ax, FontSize, EQ, ci, ...
 %              (def: 1)
 % fs       Re-sampled frequency (Hz) after decimation, or []
 %              to skip decimation (def: [])
+% popas    1 x 2 array of number of poles and number of passes for bandpass
+%              (def: [4 1])
 %
 % Output:
 % f        Figure handle
@@ -37,11 +39,12 @@ function [f, ax, tx, pl] = plotfirstarrival(s, ax, FontSize, EQ, ci, ...
 % tx       textpatch.m handles where, e.g., tx.ul is 'upper left'
 % pl       Handels to various lines plotted
 %
-% AIC picker from Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
+% *AIC picker and uncertainty estimator from
+% Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 22-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -56,6 +59,7 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('bathy', true)
 defval('wlen2', 1)
 defval('fs', [])
+defval('popas', [4 1])
 defval('hardcode_twosd', []) % hidden input -- see note at bottom
 
 % Generate new axis if one not supplied.
@@ -71,14 +75,13 @@ hold(ax, 'on')
 
 % Compute first-arrival statistics.
 [tres, ~, syn, ~, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ, W1] = ...
-    firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs);
+    firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas);
 
 % Overwrite the uncertainty estimate, if one supplied as hidden input.
 if ~isempty(hardcode_twosd)
     twosd = hardcode_twosd;
 
 end
-
 
 % Plot time series (noise in gray).
 % This is the ARRIVAL sample; not CHANGEPOINT sample (last sample of noise)

@@ -1,9 +1,9 @@
 function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
           maxc_y, SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag] ...
-        = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs)
+        = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas)
 % [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
-%        SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag] = ...
-%        FIRSTARRIVAL(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs)
+%  SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag] = ...
+%  FIRSTARRIVAL(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas)
 %
 % Computes the travel-time residual between the AIC-based arrival-time
 % estimate of Simon, J. D. et al., (2020), BSSA, doi:
@@ -30,8 +30,8 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %              1000 realizations of M1 method (def: false)
 % wlen     Window length [s] centered on the 'syn', the theoretical
 %              first arrival, to consider for AIC pick (def: 30)
-% lohi     1 x 2 array of corner frequencies [Hz], or NaN to skip
-%              bandpass and use raw data (def: [1 5]])***
+% lohi     1 x 2 array of corner frequencies [Hz] for Butterworth bandpass,
+%              or NaN to skip filtering and use raw data (def: [1 5]])
 % sacdir   Directory containing (possibly subdirectories)
 %              of .sac files (def: $MERMAID/processed)
 % evtdir   Directory containing (possibly subdirectories)
@@ -41,12 +41,14 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %              getevt.m (def: [])
 % bathy    logical true apply bathymetric travel time correction,
 %              computed with bathtime.m (def: true)
-%              [NB, does not adjust EQ.TaupTimes]****
+%              [NB, does not adjust EQ.TaupTimes]***
 % wlen2    Length of second window, starting at the 'dat', the time of
 %              the first arrival, in which to search for maxc_y [s]
 %              (def: 1)
 % fs       Re-sampled frequency (Hz) after decimation, or []
 %              to skip decimation (def: [])
+% popas    1 x 2 array of number of poles and number of passes for bandpass
+%              (def: [4 1])
 %
 % Output:
 % tres     Travel time residual [s] w.r.t first phase arrival:
@@ -101,14 +103,12 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %
 % **See cpci.m Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
-% ***2 pole, 1 pass Butterworth filter
-%
-% ****If MERMAID depth is not contained in the header ('STDP' field),
+% ***If MERMAID depth is not contained in the header ('STDP' field),
 % then it is assumed to be 1500 m below the sea surface
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 20-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 22-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -121,6 +121,7 @@ defval('EQ', [])
 defval('bathy', true)
 defval('wlen2', 1)
 defval('fs', [])
+defval('popas', [4 1])
 
 % Start with baseline assumption both time windows will be complete.
 incomplete1 = false;
@@ -327,7 +328,7 @@ if ~isnan(lohi)
      end
 
      % Bandpass entire (maybe tapered) time series.
-     x = bandpass(x, 1/h.DELTA, lohi(1), lohi(2), 2, 1, 'butter');
+     x = bandpass(x, 1/h.DELTA, lohi(1), lohi(2), popas(1), popas(2), 'butter');
 
      % Remove the relevant window from the tapered and filtered time series.
      [xw1, W1, incomplete1] = timewindow(x, wlen, syn, 'middle', h.DELTA, h.B);
