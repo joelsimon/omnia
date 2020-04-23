@@ -1,6 +1,7 @@
 function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
-                                   evtdir, EQ, bathy, wlen2, fs)
-% WRITEFIRSTARRIVALPRESSURE(s, redo, filename, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs)
+                                   evtdir, EQ, bathy, wlen2, fs, popas)
+% WRITEFIRSTARRIVALPRESSURE(s, redo, filename, wlen, lohi, sacdir, evtdir, ...
+%                           EQ, bathy, wlen2, fs, popas)
 %
 % WRITEFIRSTARRIVALPRESSURE writes the output of
 % firstarrivalpressure.m to a text file.  This function differs from
@@ -32,6 +33,9 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 %              (def: 1)
 % fs       Re-sampled frequency (Hz) after decimation, or []
 %              to skip decimation (def: [])
+% popas    1 x 2 array of number of poles and number of passes for bandpass
+%              (def: [4 1])
+%
 % Output:
 % Text file with the following columns (firstarrivalpressure.m outputs in parentheses):
 %    (1) SAC filename
@@ -54,8 +58,8 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 % See also: firstarrivalpressure.m, readfirstarrivalpressure.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 04-Apr-2020, Version 2017b on MACI64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 23-Apr-2020, Version 9.3.0.713579 (R2017b) on GLNXA64
 
 % Defaults.
 defval('s', revsac(1))
@@ -70,6 +74,7 @@ defval('EQ', [])
 defval('bathy', true)
 defval('wlen2', 1)
 defval('fs', 20)
+defval('popas', [4 1])
 
 % Textfile format.
 fmt = ['%44s    ' , ...
@@ -137,7 +142,7 @@ parfor i = 1:length(s)
     end
 
     % Concatenate the write lines.
-    wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2, fs);
+    wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2, fs, popas);
     wlines = [wlines wline];
 
 end
@@ -168,12 +173,12 @@ end
 fileattrib(filename, '-w')
 
 %_______________________________________________________________________________%
-function wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2, fs)
+function wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2, fs, popas)
 % Local call to, and formatting of, firstarrivalpressure.m
 
 % Collect.
 [RMS, ph, P, ~, ~, ~, ~, ~, ~, EQ, winflag, tapflag, zerflag] = ...
-    firstarrivalpressure(sac, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs);
+    firstarrivalpressure(sac, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs, popas);
 
 % Nab fullpath SAC file name, if not supplied.
 if isempty(fileparts(sac))

@@ -1,7 +1,7 @@
 function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zerflag] = ...
-        firstarrivalpressure(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs)
+        firstarrivalpressure(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas)
 % [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zerflag] = ...
-%       FIRSTARRIVALPRESSURE(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs)
+%       FIRSTARRIVALPRESSURE(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas)
 %
 % Extension of firstarrival.m (which deals with travel time residuals)
 % that computes the RMS value of the first arrival considering the
@@ -27,6 +27,8 @@ function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zer
 %              (def: 1)
 % fs       Re-sampled frequency (Hz) after decimation, or []
 %              to skip decimation (def: [])
+% popas    1 x 2 array of number of poles and number of passes for bandpass
+%              (def: [4 1])
 %
 % Output:
 % RMS      Root mean squared value of xw3: arrival to max. amplitude of wavetrain
@@ -46,8 +48,8 @@ function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zer
 % win/tap/zerflag  Flag (sentinel) values from firstarrival.m, see there
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 04-Apr-2020, Version 2017b on MACI64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 23-Apr-2020, Version 9.3.0.713579 (R2017b) on GLNXA64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -59,10 +61,11 @@ defval('EQ', [])
 defval('bathy', true)
 defval('wlen2', 1)
 defval('fs', [])
+defval('popas', [4 1])
 
 % Run firstarrival to retrieve relevant statistics about the first-arriving phase.
 [~, ~, ~, ~, ph, delay, ~, ~, ~, ~, maxc_y, ~, EQ, ~, xw2, W2, winflag, tapflag, zerflag] = ...
-    firstarrival(s, false, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs);
+    firstarrival(s, false, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas);
 
 % Find the new RMS time window which brackets just the time starting
 % at the AIC pick of the first arrival and extending 'delay' seconds,
