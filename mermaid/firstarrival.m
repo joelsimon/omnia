@@ -91,7 +91,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % zerflag  Null-value flag (sentinel value), to catch if e.g.,
 %              if gaps in data were filled with zeros
 %          NaN: Data are decimated and thus zero-values averaged,
-%               rendering this sentinel is meaningless
+%               rendering this sentinel value meaningless
 %          0: No two contiguous datum == 0 in W1, W2,
 %             or taper (if the latter exists)
 %          1: At least two contiguous datum == 0 in W1, W2,
