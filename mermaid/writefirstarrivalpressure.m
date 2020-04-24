@@ -59,7 +59,7 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 23-Apr-2020, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Last modified: 24-Apr-2020, Version 9.3.0.713579 (R2017b) on GLNXA64
 
 % Defaults.
 defval('s', revsac(1))
@@ -73,7 +73,7 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
 defval('wlen2', 1)
-defval('fs', 20)
+defval('fs', [])
 defval('popas', [4 1])
 
 % Textfile format.
