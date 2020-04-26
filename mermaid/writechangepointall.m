@@ -1,14 +1,16 @@
 function writechangepointall
-% Function to run writechangepoint.m on all identified SAC files
-% assuming JDS' system configuration.
+% WRITECHANGEPOINTALL
 %
-% Compute M1 error estimation for every SAC file using 1000
-% iterations.
+% Function to run writechangepoint.m on all identified SAC files assuming JDS'
+% system configuration.
+%
+% Compute M1 error estimation for every SAC file using 1000 iterations.
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 25-Mar-2020, Version 2017b on MACI64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 26-Apr-2020, Version 9.3.0.713579 (R2017b) on GLNXA64
 
+fprintf('Searching for SAC files without corresponding changepoint files...\n')
 diro = fullfile(getenv('MERMAID'), 'events', 'changepoints');
 s = fullsac;
 pool = gcp;
@@ -35,3 +37,4 @@ parfor i = 1:length(s)
     end
 end
 delete(pool)
+fprintf('Done writing changepoint files\n')
