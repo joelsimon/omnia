@@ -1,14 +1,15 @@
-function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
-                                      evtdir, procdir, normlize, returntype, ph)
-% [F, EQ, sac] = ...
-%     RECORDSECTION(id, lohi, alignon, ampfac, evtdir, procdir, normlize, returntype, ph)
+function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, evtdir, ...
+                                      procdir, normlize, returntype, ph, popas, ...
+                                      taper)
+% [F, EQ, sac] = RECORDSECTION(id, lohi, alignon, ampfac, evtdir, procdir, ...
+%                              normlize, returntype, ph, popas, taper)
 %
 % Plots a record section of all MERMAID seismograms that recorded the
 % same event, according to 'identified.txt' (output of evt2txt.m)
 %
 % Input:
 % id        Event identification number (def: 10948555)
-% lohi      Bandpass (2 pole, 2 pass Butterworth) corner frequenies [Hz],
+% lohi      Bandpass corner frequencies [Hz] (Butterworth filter),
 %               or NaN to plot raw seismograms  (def: [1 5])
 % aligon    'etime': t=0 at event rupture time (def: etime)
 %           'atime': t=0 at theoretical first arrival
@@ -24,26 +25,28 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 %                 (preserves 1/dist amplitude decay)
 % returntype   For third-generation+ MERMAID only:
 %              'ALL': both triggered and user-requested SAC files
-%              'DET': triggered SAC files as determined by onboard algorithm (def)
+%              'DET': triggered SAC files as determined by onboard algo. (def)
 %              'REQ': user-requested SAC files
-% ph        Comma separated list of phases whose travel time curves are to be overlain
+% ph        Comma separated list of phases to overlay travel time curves
 %               (def: the phases present in the corresponding .evt files)
+% popas     1 x 2 array of number of poles and number of passes for bandpass
+%               (def: [4 1])
+% taper     logical true to apply Hanning window (before filtering, if any)
+%               (def: true)
 %
 % Output:
 % F        Structure with figure handles and bits
 % EQ       EQ structure returned by cpsac2evt.m
 % sac      SAC files whose traces are plotted
 %
-% *Theoretical travel time curves are not plotted if alignon =
-% 'atime'.  Also note that a vertical line at 0 seconds does not
-% necessarily correspond to the same phase / phase branch across
-% different seismograms.  I.e., the 0 time for each seismogram is
-% individually set to its first arrival, even if that first-arriving
-% phase is different from the first-arriving phase of other
-% seismograms plotted.  In the vast majority of cases the
-% first-arriving phase be the same across all seismograms, but this is
-% something to be aware of. Overlaid travel time curves for 'atime'
-% option are on the wish list.
+% *Theoretical travel time curves are not plotted if alignon = 'atime'.  Also
+% note that a vertical line at 0 seconds does not necessarily correspond to the
+% same phase / phase branch across different seismograms.  I.e., the 0 time for
+% each seismogram is individually set to its first arrival, even if that
+% first-arriving phase is different from the first-arriving phase of other
+% seismograms plotted.  In the vast majority of cases the first-arriving phase
+% be the same across all seismograms, but this is something to be aware
+% of. Overlaid travel time curves for 'atime' option are on the wish list.
 %
 % Ex:
 % RECORDSECTION(10948555, [], 'etime');
@@ -55,20 +58,19 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 07-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 26-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Wish list:
 %
-% Overlaid travel time curves for 'atime' option.  Compute differences
-% between all phases and first-arriving phase at every distance.  Then
-% set first-arriving phase at every distance to 0 seconds and all
-% subsequent phase arrival times as those differences just computed.
-% Will not be trivial because tt(?).distances may not intersect and
-% thus would require interpolation between distances and times for
-% different phases.  Alternatively, could compute travel times
-% discretely for one phase given the tt(?).distance vector of another
-% phase of interest, such that you are directly computing phase travel
-% times at the same distances. This would be inefficient.
+% Overlaid travel time curves for 'atime' option.  Compute differences between
+% all phases and first-arriving phase at every distance.  Then set
+% first-arriving phase at every distance to 0 seconds and all subsequent phase
+% arrival times as those differences just computed.  Will not be trivial because
+% tt(?).distances may not intersect and thus would require interpolation between
+% distances and times for different phases.  Alternatively, could compute travel
+% times discretely for one phase given the tt(?).distance vector of another
+% phase of interest, such that you are directly computing phase travel times at
+% the same distances. This would be inefficient.
 
 % Defaults.
 defval('id', '10948555')
@@ -80,6 +82,8 @@ defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('normlize', true)
 defval('returntype', 'DET')
 defval('ph', []);
+defval('popas', [4 1]);
+defval('taper', true)
 
 % Find all the SAC files that match this event ID.
 id = num2str(id);
@@ -130,15 +134,23 @@ for i = 1:length(sac)
     % Generate an x-axis.
     xax{i} = xaxis(length(x{i}), h{i}.DELTA, pt0);
 
-    % Taper and filter.
-    if ~isnan(lohi)
-        x{i} = detrend(x{i}, 'constant');
-        x{i} = detrend(x{i}, 'linear');
-        taper = hanning(length(x{i}));
-        x{i} = bandpass(taper .* x{i}, 1/h{i}.DELTA, lohi(1), lohi(2), 2, 2, 'butter');
+    % Remove mean and trend from data.
+    x{i} = detrend(x{i}, 'constant');
+    x{i} = detrend(x{i}, 'linear');
+
+    % Taper, maybe.
+    if taper
+        windowfunc = hanning(length(x{i}));
+        x{i} = windowfunc.*x{i};
 
     end
 
+    % Filter, maybe.
+    if ~isnan(lohi)
+        x{i} = bandpass(x{i}, 1/h{i}.DELTA, lohi(1), lohi(2), popas(1), popas(2), ...
+                        'butter');
+
+    end
 end
 EQ = EQ(:);
 
@@ -183,8 +195,15 @@ grid(F.ax, 'on')
 EQ1 = EQ{1}(1);
 evttime = EQ1.PreferredTime;
 magtype = EQ1.PreferredMagnitudeType;
-magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', upper(magtype(1)), lower(magtype(2)), ...
-                 EQ1.PreferredMagnitudeValue);
+if ~strcmpi(magtype(1:2), 'mb')
+    magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', upper(magtype(1)), ...
+                     lower(magtype(2)), EQ1.PreferredMagnitudeValue);
+
+else
+    magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', lower(magtype(1)), ...
+                     lower(magtype(2:end)), EQ1.PreferredMagnitudeValue);
+
+end
 depthstr = sprintf('%2.1f km depth', EQ1.PreferredDepth);
 locstr = sprintf('%s', EQ1.FlinnEngdahlRegionName);
 F.tl = title([magstr ' ' locstr ' at ' depthstr]);
@@ -241,8 +260,8 @@ set(F.ax, 'YLim', current_ylim);
 
 % Annotate figure with bandpass corner frequencies.
 if ~isnan(lohi)
-    [F.lghz, F.txhz] = textpatch(F.ax, 'SouthEast', sprintf(['%.2f~-~%.2f ' ...
-                        'Hz'], lohi), F.xl.FontSize, 'Times', true);
+    [F.lghz, F.txhz] = textpatch(F.ax, 'SouthEast', sprintf('%.2f--%.2f Hz', ...
+                                 lohi), F.xl.FontSize, 'Times', true);
 
 end
 

@@ -1,27 +1,27 @@
 function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
-                                 mer_sacdir, normlize, nearbydir, returntype, ph, ...
-                                 otype, includeCPPT)
+                                 mer_sacdir, normlize, nearbydir, returntype, ...
+                                 ph, popas, taper, otype, includeCPPT)
 % F = NEARBYRECORDSECTION(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, ...
-%         normlize, nearbydir, returntype, ph, otype, includeCPPT)
+%         normlize, nearbydir, returntype, ph, popas, taper, otype, includeCPPT)
 %
-%% NEED TO ADD nearby_sacu; nearby_EQu -- no: merged traces is fine here.
+% Plots a record section with MERMAID and "nearby" stations' data.
 %
-% NEEDS HEADER AND WORKING 'ATIME' OPTION
-% returntype   For third-generation+ MERMAID only:
-%              'ALL': both triggered and user-requested SAC files
-%              'DET': triggered SAC files as determined by onboard algorithm (def)
-%              'REQ': user-requested SAC files
-% otype        []: (empty) return raw time series
-%              'none': return displacement time series (nm)
-%              'vel': return velocity time series (nm/s)
-%              'acc': return acceleration time series (nm/s/s) (def)
-% includeCPPT  true to include CPPT traces (NB, if true, the path to CPPT data
-%                  must mirror exactly 'nearbydir', except that "nearby" in the
-%                  former is replaced with "cppt" in the latter) (def: true)
+% Input:
+% id, ..., taper   Input to recordsection.m, see there
+% otype            []: (empty) return raw time series
+%                  'none': return displacement time series (nm)
+%                  'vel': return velocity time series (nm/s)
+%                  'acc': return acceleration time series (nm/s/s) (def)
+% includeCPPT      true to include CPPT traces (NB, if true, the path to CPPT data
+%                      must mirror exactly 'nearbydir', except that "nearby" in the
+%                      former is replaced with "cppt" in the latter) (def: true)
+% Output:
+% F                Output of recordsection.m, with added "nearby" and possibly
+%                      CPPT traces
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 07-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 26-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('id', '10948555')
 defval('lohi', [1 5]);
@@ -42,8 +42,8 @@ if strcmpi(alignon, 'atime')
 end
 
 % Plot the baseline MERMAID record section.
-[F, mer_EQ] = recordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
-                            mer_sacdir, normlize, returntype, ph);
+[F, mer_EQ] = recordsection(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, ...
+                            normlize, returntype, ph, popas, taper);
 if isempty(mer_EQ)
     return
 
@@ -173,7 +173,7 @@ for i = 1:length(nearby_EQ)
     %
     % N.B: here we don't use tt(1) we use tt(first_phase_idx(1))
     % because we want to compare the phase in nearby_EQ that most
-    % closesly matches the first arriving phase(s) in MERMAID data;
+    % closely matches the first arriving phase(s) in MERMAID data;
     % e.g., if tt(1).phaseName = 'Pdiff' and the first phase in
     % MERMAID is 'PKIKP' then we don't want to use tt(1).
     full_offset = tt(first_phase_idx(i)).truearsecs - tt(first_phase_idx(i)).pt0;
@@ -196,12 +196,19 @@ for i = 1:length(nearby_EQ)
                                              'first', h{i}.DELTA, full_pt0(i));
     abbrev_xax{i} = abbrev_W(i).xax;
 
-    % Taper and filter.
+    % Remove mean and trend.
+    abbrev_x{i} = detrend(abbrev_x{i}, 'constant');
+    abbrev_x{i} = detrend(abbrev_x{i}, 'linear');
+
+    % Taper, maybe.
+    if taper
+        windowfunc = hanning(length(abbrev_x{i}));;
+        abbrev_x{i} = windowfunc.*abbrev_x{i};
+
+    end
+
+    % Filter, maybe.
     if ~isnan(lohi)
-        taper = hanning(length(abbrev_x{i}));
-        abbrev_x{i} = detrend(abbrev_x{i}, 'constant');
-        abbrev_x{i} = detrend(abbrev_x{i}, 'linear');
-        abbrev_x{i} = taper .* abbrev_x{i};
         abbrev_x{i} = bandpass(abbrev_x{i}, 1/h{i}.DELTA, lohi(1), lohi(2), 2, 2, 'butter');
 
     end
