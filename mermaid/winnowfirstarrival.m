@@ -17,6 +17,7 @@ function [FA, idx, zerflag_idx, perc, FA_0, rm_idx] = ...
 % ph           Cell of phase names to keep, e.g. {'p' 'P' 'PKP'},
 %                  or 'all' to keep all phases (def: 'all)
 % rmsac        Cell of any other SAC files to remove, for whatever reason
+%                  (def: {})
 %
 % Output:
 % FA           Structure of winnowed first-arrival data
@@ -51,7 +52,7 @@ defval('max_tres', realmax)
 defval('max_twosd', realmax)
 defval('min_snr', realmin)
 defval('ph', 'all')
-defval('rmsac', [])
+defval('rmsac', {})
 
 high_tres = [];
 high_twosd = [];

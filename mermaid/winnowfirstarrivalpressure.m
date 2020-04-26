@@ -3,8 +3,8 @@ function [FAP, idx, zerflag_idx, perc, FAP_0, rm_idx] = ...
 % [FAP, idx, zerflag_idx, perc, FAP_0, rm_idx] = ...
 %       WINNOWFIRSTARRIVALPRESSURE(filename1, filename2, max_tres, max_twosd, min_snr, ph, rmsac)
 %
-% Winnows output of readfirstarrivalpressure.m based on input
-% winnowing parameters send to winnowfirstarrival.m.
+% Winnows output of readfirstarrivalpressure.m based on input winnowing
+% parameters send to winnowfirstarrival.m.
 %
 % See readfirstarrivalpressure.m for the meaning of the fields in FAP.
 %
@@ -19,6 +19,7 @@ function [FAP, idx, zerflag_idx, perc, FAP_0, rm_idx] = ...
 % ph           Cell of phase names to keep, e.g. {'p' 'P' 'PKP'},
 %                  or 'all' to keep all phases (def: 'all)
 % rmsac        Cell of any other SAC files to remove, for whatever reason
+%                  (def: {})
 %
 % Output:
 % FAP           Structure of winnowed first-arrival pressure data
@@ -45,8 +46,8 @@ function [FAP, idx, zerflag_idx, perc, FAP_0, rm_idx] = ...
 % note they are also included in idx so be careful.
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 20-Mar-2020, Version 2017b on MACI64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 26-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('filename1', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -56,7 +57,9 @@ defval('filename2', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
 defval('max_tres', realmax)
 defval('max_twosd', realmax)
 defval('min_snr', realmin)
-defval('rmsac', [])
+defval('ph', 'all')
+defval('rmsac', {})
+
 high_tres = [];
 high_twosd = [];
 low_snr = [];
