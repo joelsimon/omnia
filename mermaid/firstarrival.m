@@ -5,24 +5,22 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %  SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag] = ...
 %  FIRSTARRIVAL(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas)
 %
-% Computes the travel-time residual between the AIC-based arrival-time
-% estimate of Simon, J. D. et al., (2020), BSSA, doi:
-% 10.1785/0120190173, and the theoretical arrival time of the
-% first-arriving phase in the associated EQ structure (the latter may
-% be generated with cpsac2evt.m, and reviewed with reviewevt.m)
+% Computes the travel-time residual between the AIC-based arrival-time estimate
+% of Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173, and the
+% theoretical arrival time of the first-arriving phase in the associated EQ
+% structure (the latter may be generated with cpsac2evt.m, and reviewed with
+% reviewevt.m)
 %
-% The AIC arrival-time estimate is made in a time window of the length
-% specified as input, which is centered on the first-arriving phase in
-% EQ(1).  This windowed segment of data may optionally be filtered
-% before the AIC pick is made if 'lohi' is specified.  In that case,
-% windowed segment of data twice the length of the requested window is
-% tapered using a Tukey window with a 0.5 cosine taper; i.e., if
-% 'wlen' is 30 s, the taper is flat in a 30 s window centered on the
-% theoretical first arrival, then cosine-tapered over 15 seconds on
-% either end for a total of 60 seconds of nonzero data.  After the
-% data are tapered the entire time series is filtered, but only the 30 s
-% window within the flat part of the taper is considered for finding
-% the AIC pick.
+% The AIC arrival-time estimate is made in a time window of the length specified
+% as input, which is centered on the first-arriving phase in EQ(1).  This
+% windowed segment of data may optionally be filtered before the AIC pick is
+% made if 'lohi' is specified.  In that case, windowed segment of data twice the
+% length of the requested window is tapered using a Tukey window with a 0.5
+% cosine taper; i.e., if 'wlen' is 30 s, the taper is flat in a 30 s window
+% centered on the theoretical first arrival, then cosine-tapered over 15 seconds
+% on either end for a total of 60 seconds of nonzero data.  After the data are
+% tapered the entire time series is filtered, but only the 30 s window within
+% the flat part of the taper is considered for finding the AIC pick.
 %
 % Input:
 % s        SAC filename (def: '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -63,7 +61,8 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %              the entire segment of (maybe filtered) data considered
 %              for the AIC pick
 % xaxw1    x-axis centered on syn at 0 seconds, i.e., compliment to xw1
-% maxc_x   Time at of maximum (or minimum) amplitude of signal [s]*
+% maxc_x   Time at of maximum (or minimum) amplitude of signal [s]*; if
+%              multiple, only the first occurence of this max. value is returned
 % maxc_y   Amplitude (e.g., counts, nm) of maximum (or minimum) amplitude of
 %              signal within W2 -- window beginning at dat and ending wlen2 later
 % twosd    2-standard deviation error estimation per M1 method [s]**
@@ -108,7 +107,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 22-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 26-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -392,6 +391,9 @@ if SNR > 1
     % Find the time on the original x-axis of the (first occurrence of)
     % the maximum counts value.
     maxc_x = W2.xax(find(xw2 == maxc_y));
+
+    % If that maximum value is reached multiple times keep only the first occurence.
+    maxc_x = maxc_x(1);
 
     % delay is then the time difference between the arrival time and the
     % time of the largest amplitude within the signal segment.
