@@ -1,7 +1,7 @@
 function [s, PKIKP, PKPbc, PKiKP, PKPab, gcarc] = readcorepreds(mod)
 % [s, PKIKP, PKPbc, PKiKP, PKPab, gcarc] = READCOREPREDS(mod)
 %
-% Reads textfiles of travel times for various core phases written by
+% Reads text files of travel times for various core phases written by
 % Jessica C.E. Irving.
 %
 % Input:
@@ -74,3 +74,50 @@ else
     gcarc = NaN(size(s));
 
 end
+
+return
+
+%%______________________________________________________________________________________%%
+% Extra verification to ensure my ak135 numbers computed in MatTaup match (for my notes).
+[s, PKIKP, PKPbc, PKiKP, PKPab, gcarc] = readcorepreds('ak135');
+
+for i = 1:length(s)
+    EQ = getevt(s{i}); EQ = EQ(1);
+    isbc = true;
+
+    for j = 1:length(EQ.TaupTimes)
+        ph_name = EQ.TaupTimes(j).phaseName;
+        tr_time = EQ.TaupTimes(j).time;
+
+        switch ph_name
+          case 'PKIKP'
+            jPKIKP(i) = tr_time;
+
+          case 'PKP'
+            if isbc
+                jPKPbc(i) = tr_time;
+                isbc = false;
+
+            else
+                jPKPab(i) = tr_time;
+
+            end
+
+          case 'PKiKP'
+            jPKiKP(i) = tr_time;
+
+        end
+    end
+    dgcarc(i) = EQ(1).TaupTimes(1).distance - gcarc(i);
+
+end
+dPKIKP = jPKIKP(:) - PKIKP;
+dPKPbc = jPKPbc(:) - PKPbc;
+dPKiKP = jPKiKP(:) - PKiKP;
+dPKPab = jPKPab(:) - PKPab;
+
+fprintf('Max. PKIKP difference: %.3f s\n', max(abs(dPKIKP)))
+fprintf('Max. PKPbc difference: %.3f s\n', max(abs(dPKPbc)))
+fprintf('Max. PKiKP difference: %.3f s\n', max(abs(dPKiKP)))
+fprintf('Max. PKPab difference: %.3f s\n', max(abs(dPKPab)))
+fprintf('Max. dist. difference: %.3f km\n', deg2km(max(abs(dgcarc))))
