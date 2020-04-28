@@ -79,6 +79,7 @@ hold(ax, 'on')
 
 % Overwrite the uncertainty estimate, if one supplied as hidden input.
 if ~isempty(hardcode_twosd)
+    warning(sprintf('\n\n!! using hardcoded two-standard deviation error estimate !!\n\n'))
     twosd = hardcode_twosd;
 
 end
