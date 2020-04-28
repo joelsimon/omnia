@@ -107,7 +107,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 28-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -155,10 +155,16 @@ if ~isempty(fs)
     R = floor(old_fs / fs);
     x = decimate(x, R);
 
+    if R > 1
+        fprintf('\nDecimated from %i Hz to %i Hz\n', old_fs, round(1 / (h.DELTA*R)));
+
+    end
+
     % Very important: adjust the appropriate SAMPLE header variables .NPTS and
     % .DELTA.  The absolute (SECONDS) timing variables (B, E) won't change
     % (except by maybe a sample-interval...see seistime.m, where it is properly
     % accounted for).  The length of a decimated array is: ceil(length(x)/r).
+    % If R == 1 these are unchanged.
     h.NPTS = length(x);
     h.DELTA = h.DELTA * R;
 
