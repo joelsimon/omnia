@@ -58,7 +58,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, evtdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 28-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Wish list:
 %
@@ -213,9 +213,7 @@ current_xlim = get(F.ax, 'XLim');
 current_ylim = get(F.ax, 'YLim');
 if strcmpi(alignon, 'atime')
     % XLabel specific to aligning on first-arrival.
-    F.xl = xlabel(sprintf(['Time relative to first arrival(s)\n[origin: ' ...
-                        '%s UTC]'], evttime));
-
+    F.xl = xlabel(sprintf('Time relative to first-arriving phase'));
     warning(['Theoretical first arrival may not be the same phase ' ...
              'or phase branch across different seismograms'])
 
@@ -244,8 +242,7 @@ else
     end
 
     % XLabel specific to aligning on event-rupture time.
-    F.xl = xlabel(sprintf('Time relative to %s UTC (s)', evttime));
-    %F.xl = xlabel(sprintf('time relative to %s UTC (s)\n[%s]', evttime, id));
+    F.xl = xlabel(sprintf('Time relative to %s UTC (s)', datestr(evttime)));
     F.lg = legend(F.ph, phases_plotted, 'AutoUpdate', 'off', 'Location', ...
                   'NorthWest', 'FontSize', F.xl.FontSize);
 
