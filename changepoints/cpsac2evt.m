@@ -1,8 +1,8 @@
-function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
-                               ph, conf, fml, diro, baseurl, varargin)
+function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ph, conf, ...
+                               fml, diro, baseurl, varargin)
 % [EQ, CP, rawevt, rawpdfc, rawpdfw, F] = ...
-%    CPSAC2EVT(sac, redo, domain, n, inputs, model, ph, ...
-%              conf, fml, diro, baseurl, [param, value])
+%  CPSAC2EVT(sac, redo, domain, n, inputs, model, ph, conf, fml, diro, ...
+%            baseurl, [param, value])
 %
 % CPSAC2EVT.m combines changepoint.m and sac2evt.m, and plots
 % sac2evt.m theoretical arrival times on the wavelet-decomposed input
@@ -72,8 +72,8 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ...
 % See also: sac2evt.m, reviewevt.m, getevt.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 06-Dec-2019, Version 2017b on GLNXA64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 28-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -208,7 +208,7 @@ for i = 1:2
                             tparr <= CP(i).outputs.xax(end)
                     F(i).tp{j}{k} = plot(ax, repmat(tparr, [1, 2]), ...
                                          ax.YLim, 'k--', 'LineWidth', LineWidth);
-                    phstr = sprintf('%s$_{%i}$', tp.phaseName, j);
+                    phstr = sprintf('\\textit{%s}$_{%i}$', tp.phaseName, j);
                     F(i).tx{j}{k} = text(ax, tparr, 0, phstr, ...
                                          'HorizontalAlignment', 'Center');
                     F(i).tx{j}{k}.Position(2) = ax.YLim(2) + 0.2*range(ax.YLim);
@@ -233,22 +233,27 @@ for i = 1:2
 
         end
 
-        % Capitalize only the first character of the magnitude string.
+        % Make the magnitude string.
         magtype = lower(EQ(1).PreferredMagnitudeType);
-        magtype(1) = upper(magtype(1));
-
-        % Set Mww to generic Mw notation.
         if strcmp(magtype, 'Mww')
             magtype = 'Mw';
 
         end
-        magstr = sprintf('%.1f~%s', EQ(1).PreferredMagnitudeValue, magtype);
+        if ~strcmpi(magtype(1:2), 'mb')
+            magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', upper(magtype(1)), ...
+                             lower(magtype(2)), EQ(1).PreferredMagnitudeValue);
 
+        else
+            magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', lower(magtype(1)), ...
+                             lower(magtype(2:end)), EQ(1).PreferredMagnitudeValue);
+
+        end
         depthstr = sprintf('%.2f~km', EQ(1).PreferredDepth);
         diststr = sprintf('%.2f$^{\\circ}$', EQ(1).TaupTimes(1).distance);
 
         [F(i).f.lgmag, F(i).f.lgmagtx] = textpatch(ax, 'NorthWest', magstr);
         [F(i).f.lgdist, F(i).lgdisttx] = textpatch(ax, 'SouthWest', [diststr ', ' depthstr]);
+
     end
     % This time is w.r.t. the reference time in the SAC header, NOT
     % seisdate.B. CP.xax has the time of the first sample (input:
@@ -257,7 +262,7 @@ for i = 1:2
     % header).  The time would be relative to seisdate.B if I had
     % input pt0 = 0, because seisdate.B is EXACTLY the time at the
     % first sample, i.e., we start counting from 0 at that time.
-    F(i).f.ha(end).XLabel.String = sprintf('time relative to %s UTC (s)\n[%s]', ...
+    F(i).f.ha(end).XLabel.String = sprintf('Time relative to %s UTC (s)\n[%s]', ...
                                            datestr(refdate), ...
                                            strippath(strrep(sac, '_', '\_')));
     longticks(F(i).f.ha, 3);
