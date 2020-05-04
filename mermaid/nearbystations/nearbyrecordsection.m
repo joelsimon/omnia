@@ -21,7 +21,7 @@ function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 04-May-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('id', '10948555')
 defval('lohi', [1 5]);
@@ -209,7 +209,8 @@ for i = 1:length(nearby_EQ)
 
     % Filter, maybe.
     if ~isnan(lohi)
-        abbrev_x{i} = bandpass(abbrev_x{i}, 1/h{i}.DELTA, lohi(1), lohi(2), 2, 2, 'butter');
+        abbrev_x{i} = bandpass(abbrev_x{i}, 1/h{i}.DELTA, lohi(1), lohi(2), ...
+                               popas(1), popas(2), 'butter');
 
     end
 
@@ -388,3 +389,25 @@ latimes
 axesfs(F.f, 13, 13)
 set(F.pltx2, 'FontSize', 9)
 movev(F.tl, 1)
+
+% Finally, print the added station names and their distance (degrees; YAxis),
+% along with their indices in the output because you may want to delete
+% overlapping traces.
+txidx = 1:length(F.pltx2);
+for i = 1:length(txidx)
+    txdist(i) = F.pltx2(i).Position(2);
+    txstr{i} = F.pltx2(i).String;
+
+end
+
+% It's easier to decide which overlapping traces to remove if they are sorted by distance.
+[~, s_idx] = sort(txdist, 'ascend');
+txidx = txidx(s_idx);
+txdist = txdist(s_idx);
+txstr = txstr(s_idx);
+
+fprintf('\nHere is a list of the added stations and their traces [F.pltx2(index): degree -- name]\n')
+for i = 1:length(txidx)
+    fprintf('%i: %2f -- %s\n', txidx(i), txdist(i), txstr{i})
+
+end
