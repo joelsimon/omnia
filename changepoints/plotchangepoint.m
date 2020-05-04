@@ -40,8 +40,8 @@ function F = plotchangepoint(CP, scales, cpar, normaleyes, symmetric)
 % See also: changepoint.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 21-Oct-2019, Version 2017b on MACI64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 04-May-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('scales', 'all')
@@ -347,7 +347,7 @@ for i = scales
     tack2corner(ha2(ax_idx), lgSNR(sc_idx), 'SouthWest');
 
     for j = 1:length(pl.vl{sc_idx})
-        pl.vl{sc_idx}(j).YData = ha2(ax_idx).YLim;
+        pl.vl{sc_idx}(j).YData = pl.vl{sc_idx}(j).Parent.YLim;
 
     end
 end

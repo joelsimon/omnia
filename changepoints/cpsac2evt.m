@@ -73,7 +73,7 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ph, conf, ..
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 28-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 04-May-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -186,7 +186,7 @@ for i = 1:2
                 CP(i).n, plurals('scale', CP.n))
 
     end
-    %keyboard
+
     % Remove x-tick labels from all but last plot and label the lower x-axis.
     set(F(i).f.ha(1:end-1), 'XTickLabel', '')
 
@@ -279,6 +279,15 @@ for i = 1:length(F)
     for l = 1:length(F(i).f.ha)
         F(i).f.ha2(l).Position = F(i).f.ha(l).Position;
         F(i).f.ha2(l).YAxis.TickLabelFormat = '%#.2g';
+        numticks(F(i).f.ha(l), 'y', 3);
+        numticks(F(i).f.ha2(l), 'y', 3);
+
+    end
+
+    % Ensure vertical lines extend minmax adjusted axes (don't wrap into loop above;
+    % there is one less .vl than axes handle, ha).
+    for j = 1:length(F(i).f.pl.vl)
+        F(i).f.pl.vl{j}.YData = F(i).f.pl.vl{j}.Parent.YLim;
 
     end
 
