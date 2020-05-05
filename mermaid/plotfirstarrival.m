@@ -37,7 +37,7 @@ function [f, ax, tx, pl] = plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, ...
 % f        Figure handle
 % ax       Axis handle
 % tx       textpatch.m handles where, e.g., tx.ul is 'upper left'
-% pl       Handels to various lines plotted
+% pl       Handles to various lines plotted
 %
 % *AIC picker and uncertainty estimator from
 % Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
