@@ -44,7 +44,7 @@ function [f, ax, tx, pl] = plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 22-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 07-May-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -158,9 +158,18 @@ longticks(ax, 1.5);
 
 %% Annotations (clockwise from top left).
 % Magnitude.
-magtype = lower(EQ(1).PreferredMagnitudeType);
-magtype(1) = upper(magtype(1)); % Capitalize only first letter of magnitude type.
-magstr = sprintf('%s %.1f', magtype, EQ(1).PreferredMagnitudeValue);
+evttime = EQ(1).PreferredTime;
+magtype = EQ(1).PreferredMagnitudeType;
+if ~strcmpi(magtype(1:2), 'mb')
+    magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', upper(magtype(1)), ...
+                     lower(magtype(2)), EQ(1).PreferredMagnitudeValue);
+
+else
+    magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', lower(magtype(1)), ...
+                     lower(magtype(2:end)), EQ(1).PreferredMagnitudeValue);
+
+end
+
 tx.ul = textpatch(ax, 'NorthWest',  magstr, FontSize(2), 'Times', 'LaTeX');
 
 
