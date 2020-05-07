@@ -1,12 +1,20 @@
 function fetchsacpz(tr, wdir)
+% FETCHSACPZ(tr, wdir)
+%
+% Fetch SACPZ file from http://service.iris.edu/irisws/sacpz/1/query for single
+% trace from irisFetch.Traces.
+%
+% Input:
+% tr       Trace structure from irisFetch.Traces
+% wdir     Write directory to save .pz file (def: pwd)
+%
+% Author: Joel D. Simon
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 07-May-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-
-try
 defval('wdir', pwd);
 [~, foo] = mkdir(wdir);
-
 baseurl = 'http://service.iris.edu/irisws/sacpz/1/query?';
-
 
 for i = 1:length(tr)
     % Station parameters.
@@ -34,10 +42,15 @@ for i = 1:length(tr)
                                net, sta, loc, cha, yr, dy, hr, mi, se));
 
     % Make the request.
-    [a,b] = system(sprintf('wget ''%s'' -O %s', [baseurl query], fname));
-end
+    switch computer
+      case 'GLNXA64'
+        [a, b] = system(sprintf('wget ''%s'' -O %s', [baseurl query], fname));
 
-catch ME
+      case 'MACI64'
+        [a, b] = system(sprintf('curl ''%s'' -o %s', [baseurl query], fname));
 
-keyboard
+      otherwise
+        error('Unrecognized computer type')
+
+    end
 end
