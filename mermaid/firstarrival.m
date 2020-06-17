@@ -53,6 +53,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %              estimated (cpest.m) - theoretical (taupTime.m)
 % dat      AIC arrival-time estimate computed with cpest.m [s]*
 % syn      Theoretical arrival time computed with taupTime.m [s]*
+%              NB, if 'bathy' is true this includes the (additive) tadj
 % tadj     Time adjustment for bathymetry, if 'bathy' is true [s]
 % ph       Phase name associated with tres
 % delay    Time delay between true arrival time and time at largest
@@ -60,13 +61,12 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % xw1      Windowed segment of x (maybe filtered) contained in W1 --
 %              the entire segment of (maybe filtered) data considered
 %              for the AIC pick
-% xaxw1    x-axis centered on syn at 0 seconds, i.e., compliment to xw1
+% xaxw1    x-axis centered on syn at 0 seconds, i.e., complement to xw1
 % maxc_x   Time at of maximum (or minimum) amplitude of signal [s]*; if
-%              multiple, only the first occurence of this max. value is returned
+%              multiple, only the first occurrence of this max. value is returned
 % maxc_y   Amplitude (e.g., counts, nm) of maximum (or minimum) amplitude of
 %              signal within W2 -- window beginning at dat and ending wlen2 later
-% twosd    2-standard deviation error estimation per M1 method [s]**
- %              (def NaN)
+% twosd    2-standard deviation error estimation per M1 method [s]** (def NaN)
 % SNR      SNR, defined as ratio of biased variance of signal and
 %              noise segments (see wtsnr.m)
 % EQ       Input EQ structure or reviewed EQ struct associated with SAC file
@@ -97,8 +97,8 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %             or taper (if the latter exists)
 %
 % *The x-axis here is w.r.t to original, NOT windowed, seismogram,
-% i.e. xaxis(h.NPTS, h.DELTA, h.B), where h is the SAC header
-% structure from readsac.m
+% i.e. xaxis(h.NPTS, h.DELTA, h.B), where h is the SAC header structure
+% from readsac.m
 %
 % **See cpci.m Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
@@ -106,8 +106,8 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % then it is assumed to be 1500 m below the sea surface
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 28-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 17-Jun-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -345,17 +345,17 @@ end
 %        xaxw1: places xw1 such that it is centered on the theoretical first arrival at 0 s
 xaxw1 = W1.xax - syn;
 
-% Changepoint estimate sample considering only the windowed portion centered on the theoretical first arrival.
+% Changepoint estimate sample considering only the windowed portion centered on
+% the theoretical first arrival.
 cp = cpest(xw1, 'fast', false, true);
 
 % Signal-to-noise ratio considering window 1 (W1: centered on syn,
 % length wlen), not window 2 (W2: starting at dat, length wlen2).
 SNR = wtsnr({xw1}, cp, 1);
 
-% The data ('dat') arrival sample is 1 sample after the changepoint
-% estimate, which is an estimate of the last sample of the noise,
-% unless SNR <=1, at which point the arrival does not exist ("noise"
-% has more power than the "signal")
+% The data ('dat') arrival sample is 1 sample after the changepoint estimate,
+% which is an estimate of the last sample of the noise, unless SNR <= 1, at
+% which point the arrival does not exist ("noise" has more power than the "signal")
 if SNR > 1
     dat_samp = cp + 1;
 
@@ -398,7 +398,7 @@ if SNR > 1
     % the maximum counts value.
     maxc_x = W2.xax(find(xw2 == maxc_y));
 
-    % If that maximum value is reached multiple times keep only the first occurence.
+    % If that maximum value is reached multiple times keep only the first occurrence.
     maxc_x = maxc_x(1);
 
     % delay is then the time difference between the arrival time and the
