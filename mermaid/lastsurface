@@ -1,14 +1,25 @@
-#! /bin/bash
+#! /bin/zsh
 #
-# Print date of last surfacing for each Princeton MERMAID, 
-# as read from ESO website textfile.
+# Print date of last surfacing for each Princeton MERMAID, as read from ESO
+# website textfile.
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 10-Jan-2020
+# Last modified: 18-Jun-2020
 
-wget 'http://geoweb.princeton.edu/people/simons/SOM/all.txt' -qO last_surface.txt  # -q for 'quiet', to suppress output
-printf '\nLast surfacing:\n'
-sed -n '08,23p' last_surface.txt | awk '{print $1,$2}'
-printf '\n'
-rm last_surface.txt
+computer=$(uname -s)
+
+if [ $computer = Linux ]; then
+    # The output filename (hyphen) means print to stdout. 
+    dates=$(wget -qO - 'http://geoweb.princeton.edu/people/simons/SOM/all.txt')
+
+elif [ $computer = Darwin ]; then
+    dates=$(curl -s 'http://geoweb.princeton.edu/people/simons/SOM/all.txt')
+
+else
+    echo "Error: lastsurface script only tested on Linux and Mac computers"
+    exit 1
+
+fi
+printf 'Last surfacing:\n'
+echo $dates | sed -n '08,23p' | awk '{print $1,$2}'
