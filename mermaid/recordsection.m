@@ -57,8 +57,8 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, evtdir, ...
 % See also: evt2txt.m, getevt.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 28-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 19-Jun-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Wish list:
 %
@@ -205,7 +205,7 @@ else
 
 end
 depthstr = sprintf('%2.1f km depth', EQ1.PreferredDepth);
-locstr = sprintf('%s', EQ1.FlinnEngdahlRegionName);
+locstr = titlecase(EQ1.FlinnEngdahlRegionName, {'of'});
 F.tl = title([magstr ' ' locstr ' at ' depthstr]);
 
 % Add labels.
