@@ -25,7 +25,7 @@ function str = titlecase(str, exceptions)
 defval('exceptions', [])
 assert(ischar(str), '''str'' must be char')
 
-% Base case with no exceptions.
+% Basic title case with no exceptions.
 words = cellfun(@(xx) [upper(xx(1)) lower(xx(2:end))], strsplit(str), ...
                 'UniformOutput', false);
 
@@ -50,3 +50,6 @@ for i = 1:length(hyphens)
 
     end
 end
+
+% Ensure first letter capitalized (it may be in the list of exceptions).
+str(1) = upper(str(1));
