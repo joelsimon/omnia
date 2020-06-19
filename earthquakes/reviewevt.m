@@ -3,14 +3,13 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 %
 % REVIEWEVT is the smart SAC file to event matching tool.
 %
-% After running cpsac2evt.m run REVIEWEVT to hand-review all potential
-% matches and save only the true event matches, and allows the smart
-% re-review and movement of .evt between identified and unidentified
-% folders.  Further, REVIEWEVT checks to see if a file being moved
-% from one folder to another is being tracked by git, and if so,
-% properly removes and adds them such that git history is maintained
-% (though it does not commit them, you will have to do yourself; nor
-% does it rm staged files already added but not committed).
+% After running cpsac2evt.m run REVIEWEVT to hand-review all potential matches
+% and save only the true event matches, or to re-review events and potentially
+% move their .evt files between identified and unidentified folders.  Further,
+% REVIEWEVT checks to see if a file being moved from one folder to another is
+% being tracked by git, and if so, properly removes and adds them such that git
+% history is maintained (though it does not commit them, you will have to do
+% yourself; nor does it 'git rm' staged files already added but not committed).
 %
 % Input:
 % sac       SAC filename
