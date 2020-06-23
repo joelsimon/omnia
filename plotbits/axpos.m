@@ -1,29 +1,29 @@
 function pos = axpos(ha)
 % pos = AXPOS(ha)
 %
-% Returns struct containing (x,y) corners and midpoints of an input
-% axes, in reference to the CONTAINER (figure or uipanel). 
+% Returns struct containing (x,y) corners and midpoints of a graphics object
+% (e.g., an axes or colorbar) in reference to the CONTAINER (figure or uipanel).
 %
 % Input:
-% ha            Axes handle (def: gca)
+% ha            Graphics object handle (def: gca)
 %
 % Output:
 % pos           Axes position struct with fields:
-%                .ll: lower left corner
-%                .ul: upper left corner
-%                .lr: lower right corner
-%                .ur: upper right corner
-%                .bottommid: bottom middle point
-%                .topmid: top middle point
-%                .leftmid: left middle point
-%                .rightmid: right middle point.
+%               .ll: lower left corner
+%               .ul: upper left corner
+%               .lr: lower right corner
+%               .ur: upper right corner
+%               .bottommid: bottom middle point
+%               .topmid: top middle point
+%               .leftmid: left middle point
+%               .rightmid: right middle point.
 %
 % Ex: (ll corner of small red axes hits all corners/midpoints of larger axes)
 %    pos = AXPOS('demo')
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 11-Aug-2017, Version 2017b
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 23-Jun-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default.
 defval('ha',gca)
@@ -34,10 +34,6 @@ if isstr(ha)
     return
 
 end
-
-% Sanity check.
-assert(all(isgraphics(ha,'axes')), ...
-       'Please supply axes handle as input.')
 
 % Parse.
 left = ha.Position(1);
@@ -74,4 +70,3 @@ function pos = demo
     ha2.Position(1:2) = pos.bottommid; pause(1)
     ha2.Position(1:2) = pos.ll; pause(1)
     ha2.Position(1:2) = pos.leftmid; pause(1)
-
