@@ -1,4 +1,4 @@
-function pdfout = savepdf(fname, figs, diro, transdpi)
+function varargout = savepdf(fname, figs, diro, transdpi)
 % pdfout = SAVEPDF(fname, figs, diro, transdpi)
 %
 % Save(s) figure(s) as PDF(s).
@@ -9,7 +9,7 @@ function pdfout = savepdf(fname, figs, diro, transdpi)
 %
 % SAVEPDF appends a number to end the end of 'fname' for each figure
 % if multiple figures are input
-% 
+%
 % Input:
 % fname          Name of PDF to be saved (def: 'test')
 % figs           Array of figure handles (def: gcf)
@@ -21,13 +21,13 @@ function pdfout = savepdf(fname, figs, diro, transdpi)
 %
 % * By default, the figure is assumed not to include transparent
 % features. If it does, the user must supply a double, e.g. 300, to
-% specify the dpi of the output. 
-% 
+% specify the dpi of the output.
+%
 % Ex1: (common usage -- just supply output filename)
 %    figure
 %    x = linspace(0, 2*pi, 1e3);
 %    plot(x, sin(x));
-%    pdfout = SAVEPDF('sin_wave')
+%    SAVEPDF('sin_wave')
 %
 % Ex2: (figure includes transparency, save in ~/savepdf_test/)
 %    fig = figure; ax = gca;
@@ -36,11 +36,11 @@ function pdfout = savepdf(fname, figs, diro, transdpi)
 %    hold(ax, 'on');
 %    x = normrnd(1, 2, 1e3, 1);
 %    h2 = histogram(ax, x, 40, 'BinWidth', 0.4);
-%    pdfout = SAVEPDF('histograms', fig, '~/savepdf_test', 400)
+%    SAVEPDF('histograms', fig, '~/savepdf_test', 400)
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 25-Feb-2019, Version 2017b
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 22-Jun-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults
 defval('fname', 'test')
@@ -66,9 +66,9 @@ for i = 1:length(figs)
         outname = outname(1:end-4);
 
     end
-    
+
     if length(figs) > 1
-        outname = [outname num2str(i)];    
+        outname = [outname num2str(i)];
 
     end
 
@@ -77,10 +77,10 @@ for i = 1:length(figs)
 
     % Use painters for higher quality if no transparency.
     if isempty(transdpi)
-        print(figs(i), '-depsc', epsout, '-painters');        
-        
+        print(figs(i), '-depsc', epsout, '-painters');
+
     else
-        print(figs(i), '-depsc', epsout, '-opengl', sprintf('-r%i', transdpi));        
+        print(figs(i), '-depsc', epsout, '-opengl', sprintf('-r%i', transdpi));
 
     end
 
@@ -89,17 +89,20 @@ for i = 1:length(figs)
     if stat ~= 0
         error('Unable to convert ''%s.eps'' to a .pdf with epstopdf.', fname)
 
-    end 
+    end
 
     % Return output .pdf file name.
     pdfout{i} = strrep(epsout, 'eps', 'pdf');
 
     % And then remove the .eps file.
     stat = system(sprintf('/bin/rm %s', epsout));
-    if stat ~= 0
+    if stat == 0
+        fprintf('Wrote: %s\n', pdfout{i})
+
+    else
         error('Unable to rm ''%s.eps'' with /bin/rm.', fname)
 
     end
 end
-
-
+outargs = {pdfout};
+varargout = outargs(1:nargout);
