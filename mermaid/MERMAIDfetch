@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/zsh
 #
 # Simple shell script to:
 # 1) retrieve MERMAID data
@@ -10,94 +10,103 @@
 # Switches to master branch in MERMAID server, processed, and event
 # directories before proceeding.
 #
-# No I/0 and requires internal editing as it was built for JDS' system
-# defaults.
+# No I/O and therefore may require internal editing as it was built for JDS'
+# system defaults.
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@princeton.edu
-# Last modified: 14-Jan-2020
+# Last modified: 25-Jun-2020
+
+# Source conda so that 'conda activate pymaid' works within this shell script.
+computer=$(uname -s)
+if [ $computer = Linux ]; then
+    source /usr/local/anaconda3/etc/profile.d/conda.sh
+
+elif [ $computer = Darwin ]; then
+    source /Users/joelsimon/anaconda3/etc/profile.d/conda.sh
+
+else
+    echo "Error: MERMAIDfetch only tested on Linux and Mac computers"
+    exit 1
+
+fi
+
+# Ensure we were able to source the conda script.
+if [ $? -ne 0 ]; then
+    echo "Error: unable to source conda.sh -- update path in MERMAIDfetch"
+    exit 1
+
+fi
 
 # Keep track of starting directory.
 start_dir=`pwd`
 
 # Ensure you are in master (and not some dev) branch in the three relevant directories.
 printf '\n\n!!!!! Switching to master branch in dirs $MERMAID: server, locations, processed, and events !!!!!\n\n'
-
 cd $MERMAID
-
 cd server
 git checkout master  >& /dev/null
 cd ..
-
 cd locations
 git checkout master  >& /dev/null
 cd ..
-
 cd processed
 git checkout master  >& /dev/null
 cd ..
-
 cd events
 git checkout master  >& /dev/null
 cd ..
 
 # Pull most recent data.
-echo -e 'Copying server...\n'
-~/github/omnia/mermaid/servercopy > server_out
-echo -e '\n...completed server copy\n'
+print 'Copying server...\n'
+$OMNIA/mermaid/servercopy >& server_out
+print '\n...completed server copy\n'
 
 # Remove 25.vit
 cd server
-git checkout -- 452.020-P-25.vit
-git rm -- 452.020-P-25.vit
-echo "Removed 452.020-P-25.vit from server"
+git checkout -- 452.020-P-25.vit  >& /dev/null
+git rm -- 452.020-P-25.vit  >& /dev/null
+print 'Removed 452.020-P-25.vit from server'
 cd ..
 
 # Exit if no new data.
-nosac=$(grep 'nothing to commit' server_out | wc -l)
+#nosac=$(grep 'nothing to commit' server_out | wc -l)
 rm -f server_out
 # if [ $nosac -eq 1 ]; then
-#     echo -e '\nNo new files. Exiting MERMAIDfetch.'
+#     print '\nNo new files. Exiting MERMAIDfetch.'
 #     exit;
 # fi
 
-
 # Generate SAC files.
-echo -e 'Writing SAC files...\n'
-source activate pymaid
+print 'Writing SAC files...\n'
+conda activate pymaid
 python scripts/main.py
-source deactivate
-echo -e '\n...completed writing SAC files\n'
+conda deactivate
+print '\n...completed writing SAC files\n'
 
-# # Generate raw matches to the IRIS catalog.  Note that upon exiting
-# # MATLAB you may get the following message.
-# #
-# #    Identifier: 'MATLAB:connector:connector:ConnectorNotRunning'
-# #     Arguments: {}
-# #
-# # I have only noticed this since adding the parallel
-# # writechangepointall.m to matchall.m.  I assume it has something to
-# # do with MATLAB closing before the parallel pool is completely shut
-# # down.  Doesn't seem to affect the output of this code, however.
-# echo -e '\nMatching to the seismic catalog...\n'
-# /usr/local/MATLAB/R2017b/bin/matlab -r "run matchall.m; run fetchmerloc.m; exit" >& /dev/null
-
-## 28-Jun-2019
-## -nodisplay does not work with updated plotchangepoint.m, which sets
-## -the interpreter to LaTeX, which MATLAB does not like unless the
-## -GUI is opened interactively, unfortunately.
-#/usr/local/MATLAB/R2017b/bin/matlab -nodisplay -r "run ~/github/omnia/mermaid/matchall.m; run exit"
+# Generate raw matches to the IRIS catalog.  Note that upon exiting MATLAB you
+# may get the following message.
+#
+#    Identifier: 'MATLAB:connector:connector:ConnectorNotRunning'
+#     Arguments: {}
+#
+# I have only noticed this since adding the parallel writechangepointall.m to
+# matchall.m.  I assume it has something to do with MATLAB closing before the
+# parallel pool is completely shut down.  Doesn't seem to affect the output of
+# this code, however.
+print '\nMatching to the seismic catalog...\n'
+/Applications/MATLAB_R2017b.app/bin/matlab -r "run matchall.m; run fetchmerloc.m; exit" >& /dev/null
 
 # Display current count.
-echo -e '\nHere is the complete list:\n'
+print '\nHere is the complete list:\n'
 $OMNIA/mermaid/countsac
 
-# Add 25.vit back.
+# Add faulty *25.vit back to server (and suppress git output)
 cd server
-git reset HEAD -- 452.020-P-25.vit
-git checkout -- 452.020-P-25.vit
-echo "Added 452.020-P-25.vit back to server"
+git reset HEAD -- 452.020-P-25.vit >& /dev/null
+git checkout -- 452.020-P-25.vit >& /dev/null
+print 'Added 452.020-P-25.vit back to server\n'
 cd ..
 
 # Return from whence you came.
-/usr/bin/cd $start_dir
+cd $start_dir
