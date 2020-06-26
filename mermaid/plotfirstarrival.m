@@ -1,8 +1,8 @@
-function [f, ax, tx, pl] = plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, ...
+function [f, ax, tx, pl, FA] = plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, ...
                                             lohi, sacdir, evtdir, bathy, wlen2, ...
                                             fs, popas, hardcode_twosd) % last input hidden
-% [f, ax, tx, pl] = PLOTFIRSTARRIVAL(s, ax, FontSize, EQ, ci, wlen, lohi, ...
-%                                    sacdir, evtdir, bathy, wlen2, fs, popas)
+% [f, ax, tx, pl, FA] = PLOTFIRSTARRIVAL(s, ax, FontSize, EQ, ci, wlen, lohi, ...
+%                                        sacdir, evtdir, bathy, wlen2, fs, popas)
 %
 % Plots the output of firstarrival.m, with a time-axis centered on
 % theoretical first-phase-arrival time.
@@ -37,7 +37,10 @@ function [f, ax, tx, pl] = plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, ...
 % f        Figure handle
 % ax       Axis handle
 % tx       textpatch.m handles where, e.g., tx.ul is 'upper left'
-% pl       Handles to various lines plotted
+% pl       Handles to various lines and labels
+% FA       Structure that organizes output of firstarrival.m
+%
+% See also: firstarrival.m
 %
 % *AIC picker and uncertainty estimator from
 % Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
@@ -74,8 +77,10 @@ end
 hold(ax, 'on')
 
 % Compute first-arrival statistics.
-[tres, ~, syn, ~, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ, W1] = ...
-    firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas);
+[tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ, ...
+ W1, xw2, W2, winflag, tapflag, zerflag] = firstarrival(s, ci, wlen, lohi, ...
+                                                  sacdir, evtdir, EQ, bathy, ...
+                                                  wlen2, fs, popas);
 
 % Overwrite the uncertainty estimate, if one supplied as hidden input.
 if ~isempty(hardcode_twosd)
@@ -104,12 +109,12 @@ else
 end
 
 % Label the axis.
-title(sprintf('%s = %.2f s [max. %.2f s later]', tstr, tres, delay), ...
-      'FontWeight', 'Normal', 'FontSize', FontSize(1))
+pl.tl = title(sprintf('%s = %.2f s [max. %.2f s later]', tstr, tres, delay), ...
+              'FontWeight', 'Normal', 'FontSize', FontSize(1));
 sacname = strippath(strrep(s, '_', '\_'));
-ylabel(sprintf('Amplitude\n[max. %.1e]', maxc_y), 'FontSize', FontSize(1))
-xlabel(sprintf('Time relative to \\textit{%s} phase (s)\n[%s]', ph, ...
-               sacname), 'FontSize', FontSize(1))
+pl.xl = xlabel(sprintf('Time relative to \\textit{%s} phase (s)\n[%s]', ph, ...
+                       sacname), 'FontSize', FontSize(1));
+pl.yl = ylabel(sprintf('Amplitude\n[max. %.1e]', maxc_y), 'FontSize', FontSize(1));
 
 % Adjust the axis.
 xlim([-wlen/2 wlen/2])
@@ -216,12 +221,32 @@ topz([pl.noise pl.signal])
 latimes
 f = gcf;
 
+% From firstarrival.m
+FA.tres = tres;
+FA.dat = dat;
+FA.syn = syn;
+FA.tadj = tadj;
+FA.ph = ph;
+FA.delay = delay;
+FA.xw1 = xw1;
+FA.xaxw1 = xaxw1;
+FA.maxc_x = maxc_x;
+FA.maxc_y = maxc_y;
+FA.twosd = twosd;
+FA.SNR = SNR;
+FA.EQ = EQ;
+FA.W1 = W1;
+FA.xw2 = xw2;
+FA.W2 = W2;
+FA.winflag = winflag;
+FA.tapflag = tapflag;
+FA.zerflag = zerflag;
+
 %_________________________________________________________________________________%
 % hardcode_twosd
 %
-% Hidden input to supply a HARDCODED 2*std. dev. value, e.g., to
-% ensure it is identical to a textfile matched to these seismograms.
-% This is necessary because the random nature of the M1 method can
-% result in minor differences in uncertainties, and the hackish nature
-% of textpatch.m does not always allow string editing with the LaTeX
-% interpreter.
+% Hidden input to supply a HARDCODED 2*std. dev. value, e.g., to ensure it is
+% identical to a textfile matched to these seismograms.  This is necessary
+% because the random nature of the M1 method can result in minor differences in
+% uncertainties, and the hackish nature of textpatch.m does not always allow
+% string editing with the LaTeX interpreter.
