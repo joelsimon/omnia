@@ -94,7 +94,7 @@ end
 
 
 % Preliminaries: determine the velocity of the last leg of the phase
-% s.t. we may use Snell's law to determine the incidence angle of the
+% s.t. we may use Snel's law to determine the incidence angle of the
 % converted acoustic phase in the water column
 %__________________________________________________________________________________%
 % Ensure phase names in line with what is expected in taupTime.
@@ -251,4 +251,3 @@ tadj = t2 - t1;
 % tadj = t2 - t1
 %      = (z_ocean-z_mermaid)/[v2*cosd(theta2)] - z_ocean/[v1*cosd(theta1)]  % this file
 %      = (Z_w-Z_MER)/[v_w*cos(\theta_w)] - z_w/[v_r*cos(\theta_r)]          % Eq. 6
-
