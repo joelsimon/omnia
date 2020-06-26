@@ -33,7 +33,7 @@ function [f, ax, tx, pl, FA] = plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, .
 % popas    1 x 2 array of number of poles and number of passes for bandpass
 %              (def: [4 1])
 %
-% Output:
+% Output: (all empty if no arrival identified)
 % f        Figure handle
 % ax       Axis handle
 % tx       textpatch.m handles where, e.g., tx.ul is 'upper left'
@@ -81,6 +81,16 @@ hold(ax, 'on')
  W1, xw2, W2, winflag, tapflag, zerflag] = firstarrival(s, ci, wlen, lohi, ...
                                                   sacdir, evtdir, EQ, bathy, ...
                                                   wlen2, fs, popas);
+if isnan(tres)
+    warning('No arrival identified')
+    f = [];
+    ax = [];
+    tx = [];
+    pl = [];
+    FA = [];
+    return
+
+end
 
 % Overwrite the uncertainty estimate, if one supplied as hidden input.
 if ~isempty(hardcode_twosd)
