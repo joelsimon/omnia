@@ -1,7 +1,7 @@
 function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 % tt = ARRIVALTIME(h, evtdate, [evla evlo], mod, evdp, phases, pt0)
 %
-% ARRIVALTIME returns the arrival time(s) of seismic phase(s) in a
+% ARRIVALTIME returns the theoretical arrival time(s) of seismic phase(s) in a
 % seismogram.
 %
 % All travel times (that exist) are computed for every phase
@@ -68,8 +68,8 @@ function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 %    vertline(ttB.arsecs); title('pt0 = -120.6810 s'); shg
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 19-Sep-2019, Version 2017b on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 03-Jul-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('evtloc', [h.EVLA h.EVLO])
@@ -84,6 +84,7 @@ staloc = [h.STLA h.STLO];
 % Error checking.
 if any(staloc == -12345)
     error('Null value (-12345) in header station location.')
+
 end
 if ~strcmp(evtdate.TimeZone, 'UTC') || isempty(evtdate.TimeZone)
     error('Input argument evtdate must be datetime format with ''UTC'' timezone.')
@@ -91,6 +92,10 @@ if ~strcmp(evtdate.TimeZone, 'UTC') || isempty(evtdate.TimeZone)
 end
 if evdp < 0
     error('Event depth (evdp) must be positive')
+
+end
+if any(evtloc == -12345)
+    error('Null value (-12345) in event location.')
 
 end
 
