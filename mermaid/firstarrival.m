@@ -215,7 +215,7 @@ syn = EQ(1).TaupTimes(1).truearsecs;
 % Correct the travel time for bathymetry.
 ph = EQ(1).TaupTimes(1).phaseName;
 if bathy
-    z_ocean = gebco(h.STLO, h.STLA);
+    z_ocean = gebco(h.STLO, h.STLA, '2014');
     if h.STDP == -12345 || isnan(h.STDP)
         warning('MERMAID depth not contained in header -- using 1500 m below sea surface')
         z_mermaid = -1500;
