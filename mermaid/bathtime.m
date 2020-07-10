@@ -55,7 +55,7 @@ function [tadj, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
 % Last modified: 17-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
-% Documented pp. 73-75, 2017.2
+% Documented pp. 73-75, 127 2017.2
 
 % Defaults.
 defval('mod', 'ak135')
