@@ -5,8 +5,8 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 %
 % Input:
 % sac             SAC filename
-% model           Taup model (def: 'ak135')
-% ph              Taup phases (def: taup_defaultphases)
+% model           TauP model (def: 'ak135')
+% ph              TauP phases (def: taup_defaultphases)
 % baseurl         1: 'http://service.iris.edu/fdsnws/event/1/' (def)
 %                 2: 'https://earthquake.usgs.gov/fdsnws/event/1/'
 %                 3: 'http://isc-mirror.iris.washington.edu/fdsnws/event/1/'
@@ -56,11 +56,11 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 %                 5, 'includeallmagnitudes', false)
 %    EQ.Params    % Note time and other parameters overwritten from defaults
 %
-% See also: cpsac2evt.m
+% See also: cpsac2evt.m, http://service.iris.edu/fdsnws/event/docs/1/help/
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 16-Sep-2019, Version 2017b on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 01-Jul-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default I/O.
 defval('sac', 'centcal.1.BHZ.SAC')
@@ -256,11 +256,11 @@ function [magauthor, magtype, magval] = getmbml(quake)
 % magnitude types.
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 16-Sep-2019, Version 2017b on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 01-Jul-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-magauthor = [];
-magtype = [];
+magauthor = '';
+magtype = '';
 magval = [];
 
 if isempty(quake.Magnitudes)
