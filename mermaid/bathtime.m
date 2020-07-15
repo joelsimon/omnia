@@ -1,9 +1,12 @@
 function [tadj, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
 % [tadj, theta2] = BATHTIME(mod, ph, theta1, z_ocean, z_mermaid)
 %
-% Computes the travel time correction due to bathymetry and the depth
-% of MERMAID at the time of recording.  It assumes an acoustic
-% velocity of 1500 m/s in water.
+% Computes the travel time correction due to bathymetry and the depth of MERMAID
+% at the time of recording.  It assumes a hydroacoustic velocity of 1500 m/s.
+%
+% tadj is the travel-time difference between the adjusted and standard models:
+%
+%                 tadj = adjusted_model - standard_model
 %
 % BATHTIME timing convention:
 % positive tadj: adjusted theoretical arrival at MERMAID late compared to model
@@ -53,8 +56,8 @@ function [tadj, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
 %    [tadj, theta2] = BATHTIME('prem', 's', 89.9, -4000, -1500)
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 11-Jul-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 % Documented pp. 73-75, 127 2017.2
 
 % Defaults.
@@ -210,7 +213,7 @@ z_mermaid = abs(z_mermaid);
 % triangle determined by the depth of the layer and the first
 % incidence angle).
 beta1 = z_ocean / cosd(theta1);
-t1 = beta1 / v1;
+t1 = beta1 / v1;                        %% standard model
 
 % Use Snel's law to compute the incidence angle of the converted phase in the water column.
 v2 = 1500;
@@ -227,7 +230,7 @@ end
 
 % Time it takes a P wave to travel from the ocean floor to mermaid.
 beta2 = (z_ocean - z_mermaid) / cosd(theta2);
-t2 = beta2 / v2;
+t2 = beta2 / v2;                        %% adjusted model
 
 % Total correction.
 tadj = t2 - t1;
