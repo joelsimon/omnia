@@ -1,20 +1,20 @@
 function tf = isint(x)
 % ISINT(x)
 %
-% Returns true if x is a real integer (mod(x,1) == 0; NOT x is of type
-% integer.  Use isinteger.m for that).  Accepts arrays.
+% Returns true if x is a real integer (mod(x,1) == 0; NOT x is of type integer--
+% use isinteger.m for that).  Accepts arrays.
 %
 % Ex:
 %    ISINT([1 3 4 5 .6 4.7 6])
 %
-% Ex2: 
+% Ex2:
 %    ISINT('hello world')
-% 
+%
 % See also: intstr.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 10-Oct-2018, Version 2017b
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 10-Oct-2018, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Numbers only.
 if any(~isnumeric(x)) || any(isempty(x)) || any(~isfinite(x))
