@@ -1,12 +1,12 @@
-function varargout=vit2tbl(fname,foutname)
-% jentry=VIT2TABL(fname,foutname)
+function varargout=vit2tbl(fname,foutpath)
+% jentry=VIT2TABL(fname,foutpath)
 %
-% Reads a Mermaid *vit file and parses the content, and writes it out
+% Reads a Mermaid *vit file and parses the content, and writes it out to *tbl
 %
 % INPUT:
 %
 % fname     A full filename string (e.g. '/u/fjsimons/MERMAID/server/452.112-N-01.vit')
-% foutname  An output file for the reformatted data
+% foutpath  Path to file for the reformatted data (def: path to 'fname')
 %
 % OUTPUT:
 %
@@ -27,18 +27,15 @@ function varargout=vit2tbl(fname,foutname)
 % 20180409-08h34mn44: <<<<<<<<<<<<<<< Bye >>>>>>>>>>>>>>>
 %
 % Last modified by fjsimons-at-alum.mit.edu, 05/17/2018
+% Last modified by jdsimon-at-alumni.princeton.edu, 07/23/2020
 
 % Default filename, which MUST end in .vit
 defval('fname','/u/fjsimons/MERMAID/server/452.112-N-01.vit')
+defval('foutpath', fileparts(fname))
 
-% Open output for writing
-fnout=fname;
-% Old extension, with the dot
-oldext='.vit';
-% New extension, must be same length
-newext='.tbl';
-% Change extension from oldext to newext
-fnout(strfind(fname,oldext):strfind(fname,oldext)+length(oldext)-1)=newext;
+% Change extension from .vit to .tbl
+[~, name] = fileparts(fname);
+fnout = fullfile(foutpath, [name '.tbl'])
 % Always write a whole new file, always process the entire file (for now)
 fout=fopen(fnout,'w+');
 
@@ -89,17 +86,17 @@ while lred~=-1
 
   % If an entry is corrupted, it could have too many lines, or too few
   if size(jentry,1)==nrlines & index==10
-      % Format conversion 
+      % Format conversion
     [stdt,STLA,STLO,hdop,vdop,Vbat,minV,Pint,Pext,Prange,cmdrcd,f2up,fupl]=...
         formconv(jentry);
-    
+
     % Write one line in the new file
     fprintf(fout,fmtout,...
                 stdt,STLA,STLO,hdop,vdop,Vbat,minV,Pint,Pext,Prange,cmdrcd,f2up,fupl);
   end
-    
+
   % Read the prescribed number of blanks and reset or comparison will fail
-  % for index=1:nrblank; lred=fgetl(fin); end; lred=0; 
+  % for index=1:nrblank; lred=fgetl(fin); end; lred=0;
 end
 
 % Optional output
@@ -145,10 +142,10 @@ vitdat=jentry{1}(33:51); % Check this is like: 2018-04-09T08:33:02
                          % SECOND LINE: latitude and longitude
 vitlat=jentry{2}(21:34); % Check this is like: N34deg43.118mn
 vitlon=jentry{2}(37:51); % Check this is like: E135deg17.443mn
- 
+
 % Convert these already
 [stdt,STLA,STLO]=vit2loc(vitdat,vitlat,vitlon);
- 
+
 % THIRD LINE: horizontal and vertical dilution of precision
 vitdop=textscan(jentry{3},'%*s %*s %f %*s %*s %f');
 hdop=vitdop{1}; % Check this is like: 1.27
@@ -163,9 +160,9 @@ Pint=cell2mat(textscan(jentry{5},'%*s %*s %f'));
 vitext=textscan(jentry{6},'%*s %*s %f %*s %*s %f');
 Pext=vitext{1};
 Prange=vitext{2};
-% SEVENTH LINE: 
+% SEVENTH LINE:
 cmdrcd=cell2mat(textscan(jentry{7},'%*s %f'));
-% EIGHT LINE: 
+% EIGHT LINE:
 f2up=cell2mat(textscan(jentry{8},'%*s %f'));
-% NINTH LINE: 
+% NINTH LINE:
 fupl=cell2mat(textscan(jentry{9},'%*s %f'));
