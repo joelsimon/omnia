@@ -23,7 +23,7 @@ if len < 8
 end
 
 % The non-empty ascii set spans char indices 33 through 126.
-rng('shuffle')
+%rng('shuffle')
 ascii_idx = randi([33 126], 1, len);
 
 % Ensure no two successive chars are the same.
