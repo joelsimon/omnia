@@ -194,7 +194,7 @@ for i = 1:2
         % Title the seismogram (first subplot).
         ax = F(i).f.ha(1);
         hold(ax, 'on')
-        F(i).tl = title(ax, EQ(1).FlinnEngdahlRegionName, 'FontSize', ...
+        F(i).tl = title(ax, titlecase(EQ(1).FlinnEngdahlRegionName), 'FontSize', ...
                         17, 'FontWeight', 'normal');
         F(i).tl.Position(2) = ax.YLim(2) + 0.4*range(ax.YLim);
 
