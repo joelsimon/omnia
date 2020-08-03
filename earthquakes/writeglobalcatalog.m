@@ -1,5 +1,5 @@
-function writeglobalcatalog(minmag, maxmag, stime, etime, txtdir)
-% WRITEGLOBALCATALOG(minmag, maxmag, stime, etime, txtdir)
+function ev = writeglobalcatalog(minmag, maxmag, stime, etime, txtdir)
+% ev = WRITEGLOBALCATALOG(minmag, maxmag, stime, etime, txtdir)
 %
 % WRITEGLOBALCATALOG queries irisFetch.Events for events within the
 % specific magnitude (integer) and date ranges, and writes separate
@@ -22,9 +22,9 @@ function writeglobalcatalog(minmag, maxmag, stime, etime, txtdir)
 %
 % See also: readglobalcatalog.m
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 26-Feb-2020, Version 2017b on GLNXA64
+% Author: Dr. Joel D. Simon
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 27-Jul-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('minmag', 4);
