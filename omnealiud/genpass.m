@@ -3,9 +3,9 @@ function password = genpass(len)
 %
 % Generate a random password of the desired length (min. 8; def: 16)
 %
-% Author: Joel D. Simon
+% Author: Dr. Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 20-Jul-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 03-Aug-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% Recursive.
 
@@ -23,7 +23,7 @@ if len < 8
 end
 
 % The non-empty ascii set spans char indices 33 through 126.
-%rng('shuffle')
+rng('shuffle')
 ascii_idx = randi([33 126], 1, len);
 
 % Ensure no two successive chars are the same.
