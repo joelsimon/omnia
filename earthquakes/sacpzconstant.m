@@ -86,7 +86,7 @@ function [CONSTANT, A0] = sacpzconstant(SD, fs, P, Z)
 % For myriad verifications,
 % see also: transfunc.m
 %
-% Author: Joel D. Simon
+% Author: Dr. Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
 % Last modified: 07-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 

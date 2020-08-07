@@ -2,7 +2,7 @@ function [CONSTANT1, CONSTANT2] = cpptsacpzconstant
 % [CONSTANT1, CONSTANT2] = CPPTSACPZCONSTANT
 %
 % Returns the displacement SACPZ CONSTANT for six stations in the Reseau
-% Sismique Polynesien (RSP) network.
+% Sismique Polynesien (RSP).
 %
 % Input:
 % --none--
@@ -13,7 +13,7 @@ function [CONSTANT1, CONSTANT2] = cpptsacpzconstant
 %
 % See also: sacpzconstant.m
 %
-% Author: Joel D. Simon
+% Author: Dr. Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
 % Last modified: 07-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
