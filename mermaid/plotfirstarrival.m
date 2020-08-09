@@ -45,9 +45,9 @@ function [f, ax, tx, pl, FA] = plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, .
 % *AIC picker and uncertainty estimator from
 % Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 07-May-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Author: Dr. Joel D. Simon
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 09-Aug-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -185,31 +185,31 @@ else
 
 end
 
-tx.ul = textpatch(ax, 'NorthWest',  magstr, FontSize(2), 'Times', 'LaTeX');
+[tx.ul, tx.ulth] = textpatch(ax, 'NorthWest',  magstr, FontSize(2), 'Times', 'LaTeX');
 
 
 % Depth & Distance.
 depthstr = sprintf('%.1f km', EQ(1).PreferredDepth);
 diststr = sprintf('%.1f$^{\\circ}$', EQ(1).TaupTimes(1).distance);
-tx.ur = textpatch(ax, 'NorthEast',  [depthstr ', ' diststr], FontSize(2), ...
-                 'Times', 'LaTeX');
+[tx.ur, tx.urth] = textpatch(ax, 'NorthEast',  [depthstr ', ' diststr], ...
+                             FontSize(2), 'Times', 'LaTeX');
 
 
 % SNR.
-tx.ll = textpatch(ax, 'SouthWest', sprintf('SNR = %.1e', SNR), ...
-                 FontSize(2), 'Times', 'LaTeX');
+[tx.ll, tx.llth] = textpatch(ax, 'SouthWest', sprintf('SNR = %.1e', SNR), ...
+                             FontSize(2), 'Times', 'LaTeX');
 
 if isnan(twosd)
-    tx.lr = textpatch(ax, 'SouthEast', ['2$\cdot{\mathrm{SD}}_\mathrm{err}$ = ' ...
-                        'NaN'], FontSize(2), 'Times', 'LaTeX');
+    [tx.lr, tx.lrth] = textpatch(ax, 'SouthEast', ['2${\mathrm{SD}}_\mathrm{err}$ ' ...
+                        '=  NaN'], FontSize(2), 'Times', 'LaTeX');
 
 else
     if twosd >= DELTA
-        tx.lr = textpatch(ax, 'SouthEast', sprintf(['2$\\cdot{\\mathrm{SD}}_\' ...
-                            '\mathrm{err}$ = %.2f s'], twosd), FontSize(2), ...
-                          'Times', 'LaTeX');
+         [tx.lr, tx.lrth] = textpatch(ax, 'SouthEast', sprintf(['2${\\mathrm{SD}}_\' ...
+                             '\mathrm{err}$ = %.2f s'], twosd), FontSize(2), ...
+                                      'Times', 'LaTeX');
     else
-        tx.lr = textpatch(ax, 'SouthEast', ['2$\cdot{\mathrm{SD}}_\mathrm{err}$ ' ...
+        [tx.lr, tx.lrth] = textpatch(ax, 'SouthEast', ['2${\mathrm{SD}}_\mathrm{err}$ ' ...
                             '$<$ 1/$f_s$'], FontSize(2), 'Times', 'LaTeX');
 
     end
