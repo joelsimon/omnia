@@ -114,7 +114,10 @@ for i = 1:length(sac)
     [x{i}, h{i}] = readsac(sac{i});
     seisdate{i} = seistime(h{i});
 
-    % First arrival, in seconds offset from first sample of the seismogram.
+    % First arrival, in seconds offset from the first sample of the seismogram (also
+    % called the "arrival time" in paper?? because this removes any time shift
+    % from .pt0; i.e. this is measured in seconds from the start of the
+    % seismogram when the first sample is timestamped with 0 s).
     offset = EQ{i}(1).TaupTimes(1).truearsecs - EQ{i}(1).TaupTimes(1).pt0;
 
     switch lower(alignon)
