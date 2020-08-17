@@ -11,6 +11,10 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 % history is maintained (though it does not commit them, you will have to do
 % yourself; nor does it 'git rm' staged files already added but not committed).
 %
+% If viewr=3 (Mac Preview) an attempt is made to throw away the savedState cache
+% so that previously-opened .pdfs are not opened with fresh pdfs.  The path to
+% that file may differ by machine; YMMV.
+%
 % Input:
 % sac       SAC filename
 %               (def: '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
@@ -22,7 +26,7 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 % viewr     Preferred .pdf viewer  --
 %           1: xpdf (Linux/Unix)
 %           2: evince (Linux/Unix) (def)
-%           3: Preview (Mac)
+%           3: Preview (Mac) (attempts to throw away cache)
 %           4: [currently throws error, but add your favorite here!]
 %
 % Output:
@@ -89,23 +93,9 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 %
 % See also: cpsac2evt.m
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 25-Feb-2020, Version 2017b on GLNXA64
-
-% A note:
-%
-% If using viewr = 3 (Preview) on Mac:
-%
-% It may be hard to close all the windows with every new earthquake
-% review if running this code recursively. May need this; though I'm
-% unsure of its efficacy:
-%
-% defaults write com.apple.Preview NSQuitAlwaysKeepsWindows -bool false
-%
-% Basically I have not had luck consistently killing Preview and
-% having it open fresh without all the old windows.  Instead I use
-% command-W to clear the window when closing.
+% Author: Dr. Joel D. Simon
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 17-Aug-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% Recursive.
 
@@ -177,6 +167,14 @@ switch viewr
     % always work and is annoying.
     open_pdf = 'open -F %s';
     close_pdf = 'Preview';
+
+    % Delete the Preview cache so that old pdfs are not reopened.
+    cache = ['~/Library/Containers/com.apple.Preview/Data/Library/Saved ' ...
+             'Application State/com.apple.Preview.savedState'];
+    if isfolder(cache)
+        delete(fullfile(cache, '*'))
+
+    end
 
   otherwise
     error('Input one of 1, 2, or 3 for input: ''viewr''')
