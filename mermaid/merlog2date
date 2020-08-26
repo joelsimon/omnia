@@ -1,0 +1,31 @@
+#! /bin/zsh
+#
+# Print UTC time, in iso-8601 format, of UNIX Epoch time in .MER or .LOG
+# file name, represented there as hex string.
+#
+# Examples:
+#    merlog2date 25_5F159884.MER
+#    merlog2date 25_5F0A658B.LOG
+#
+# Author: Dr. Joel D. Simon
+# Contact: jdsimon@princeton.edu
+# Last modified: 27-Aug-2020
+
+fname_no_ext="${1%.*}"
+hextime=$(cut -d'_' -f2 <<< $fname_no_ext)
+dectime=$(( 16#$hextime ))
+
+computer=$(uname -s)
+fmt=+%Y-%m-%dT%H:%M:%SZ
+
+if [ $computer = Linux ]; then
+    date -ud @$dectime $fmt
+
+elif [ $computer = Darwin ]; then
+    date -ur $dectime $fmt
+
+else
+    echo "Error: $0 only tested on Linux and Mac computers"
+    exit 1
+
+fi
