@@ -1,11 +1,11 @@
 #! /bin/zsh
 #
-# Print UTC time, in iso-8601 format, of UNIX Epoch time in .MER or .LOG
+# Print UTC time, in ISO 8601 format, of UNIX Epoch time in .MER or .LOG
 # file name, represented there as hex string.
 #
 # Examples:
-#    merlog2date 25_5F159884.MER
-#    merlog2date 25_5F0A658B.LOG
+#    merlog2date 10_5F3F99FF.LOG
+#    merlog2date 10_5F4444FC.MER
 #
 # Author: Dr. Joel D. Simon
 # Contact: jdsimon@princeton.edu
