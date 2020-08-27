@@ -2,23 +2,24 @@
 #
 # Counts MERMAID .evt files.
 #
-# Author: Joel D. Simon
-# Contact: jdsimon@princeton.edu
-# Last modified: 05-Oct-2019
+# Author: Dr. Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 27-Aug-2020
 
 set MERMAID = $MERMAID
 
 # Count only Princeton SAC files
 set floatnum = (08 09 10 11 12 13 16 17 18 19 20 21 22 23 24 25)
 set evt_count = 0
-set allevt = `find $MERMAID/events/reviewed -iname '*.evt'`
-set idevt = `find $MERMAID/events/reviewed/identified -iname '*.evt'`
-set nullevt = `find $MERMAID/events/reviewed/unidentified -iname '*.evt'`
+
+find $MERMAID/events/reviewed -iname '*.evt' > $MERMAID/all_evt
+find $MERMAID/events/reviewed/identified -iname '*.evt' > $MERMAID/id_evt
+find $MERMAID/events/reviewed/unidentified -iname '*.evt' > $MERMAID/null_evt
 
 printf "\n             All          ID    DET_ID    REQ_ID      NULL  DET_NULL  REQ_NULL\n"
 foreach float ($floatnum[*])
     # This tallies all the .evt files.
-    ls $allevt | awk '/'\.$float\_'/' > $MERMAID/temp
+    grep .${float}_ $MERMAID/all_evt > $MERMAID/temp
     set total = `cat $MERMAID/temp | wc -l`
     set det =  `grep .DET. $MERMAID/temp  | wc -l`
     set req =  `grep .REQ. $MERMAID/temp  | wc -l`
@@ -29,7 +30,7 @@ foreach float ($floatnum[*])
     @ req_count += $req
 
     # This tallies the identified .evt files.
-    ls $idevt | awk '/'\.$float\_'/' > $MERMAID/temp
+    grep .${float}_ $MERMAID/id_evt > $MERMAID/temp
     set id = `cat $MERMAID/temp | wc -l`
     set det_id = `grep .DET. $MERMAID/temp  | wc -l`
     set req_id = `grep .REQ. $MERMAID/temp  | wc -l`
@@ -41,7 +42,7 @@ foreach float ($floatnum[*])
 
 
     # This tallies the unidentified .evt files.
-    ls $nullevt | awk '/'\.$float\_'/' > $MERMAID/temp
+    grep .${float}_ $MERMAID/null_evt > $MERMAID/temp
     set null = `cat $MERMAID/temp | wc -l`
     set det_null = `grep .DET. $MERMAID/temp  | wc -l`
     set req_null = `grep .REQ. $MERMAID/temp  | wc -l`
@@ -54,5 +55,9 @@ foreach float ($floatnum[*])
     printf "Float %s : %5i   |   %5i     %5i     %5i  |  %5i     %5i     %5i\n" $float $total $id $det_id $req_id $null $det_null $req_null
 
 end
+rm $MERMAID/all_evt
+rm $MERMAID/id_evt
+rm $MERMAID/null_evt
+
 printf -- "------------------------------------------------------------------------------\n"
 printf "Total :    %5i   |   %5i     %5i     %5i  |  %5i     %5i     %5i\n\n" $total_count $total_id $total_det_id $total_req_id $total_null $total_det_null $total_req_null
