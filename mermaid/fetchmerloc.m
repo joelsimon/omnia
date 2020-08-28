@@ -8,11 +8,11 @@ function fetchmerloc(locdir)
 %
 % Input:
 % locdir   Directory to individual MERMAID textfiles
-%              (defval: $MERMAID/locations/)
+%              (default: $MERMAID/locations/)
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 13-Jan-2020, Version 2017b on GLNXA64
+% Author: Dr. Joel D. Simon
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 28-Aug-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('locdir', fullfile(getenv('MERMAID'), 'locations'));
 
@@ -26,7 +26,9 @@ for i = 1:length(floatstr)
     url = sprintf('http://geoweb.princeton.edu/people/simons/SOM/P%s_all.txt', floatstr{i});
 
     writeaccess('unlock', filename, false)
-    websave(filename, url)
+    websave(filename, url);
     writeaccess('lock', filename, false)
+
+    fprintf('Updated %s\n', filename)
 
 end
