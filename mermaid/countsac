@@ -4,7 +4,7 @@
 # and .pdf files, and changepoint (.cp) files.
 #
 # Last modified by fjsimons-at-alum.mit.edu, 02/12/2019
-# Last modified by jdsimon@princeton.edu, 27-Aug-2020
+# Last modified by jdsimon@princeton.edu, 02-Sep-2020
 
 set MERMAID = $MERMAID
 find $MERMAID/processed/ -maxdepth 3 -type f -name '*sac' > $MERMAID/all_sac
@@ -12,6 +12,7 @@ find $MERMAID/processed/ -maxdepth 3 -type f -name '*sac' > $MERMAID/all_sac
 # Count only Princeton SAC files
 set floatnum = (08 09 10 11 12 13 16 17 18 19 20 21 22 23 24 25)
 set sac_count = 0
+printf "\n                ...Tallying the SAC files...                \n"
 printf "\n             All      DET       LAST DET      REQ       LAST REQ\n"
 
 # OSX does not have the standard date formatting commands.  Must use a
