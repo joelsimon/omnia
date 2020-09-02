@@ -16,6 +16,7 @@ find $MERMAID/events/reviewed -iname '*.evt' > $MERMAID/all_evt
 find $MERMAID/events/reviewed/identified -iname '*.evt' > $MERMAID/id_evt
 find $MERMAID/events/reviewed/unidentified -iname '*.evt' > $MERMAID/null_evt
 
+printf "\n                     ...Tallying the event (.evt) files...                    \n"
 printf "\n             All          ID    DET_ID    REQ_ID      NULL  DET_NULL  REQ_NULL\n"
 foreach float ($floatnum[*])
     # This tallies all the .evt files.
