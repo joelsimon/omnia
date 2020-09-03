@@ -1,8 +1,8 @@
-function [] = plotraypaths(idfile, fafile, fapfile, starttime, endtime, returntype)
-% PLOTRAYPATHS(f1, f2, f3)
+function plotraypaths(idfile, fafile, fapfile, starttime, endtime, bindepth, returntype)
+% PLOTRAYPATHS(idfile, fafile, fapfile, starttime, endtime, bindepth, returntype)
 %
 % Inspired by Fig. 8 in paper??
-% 
+%
 % Input:
 % idfile       Textfile name, output by evt2txt.m
 %                  (def: $MERMAID/events/reviewed/identified/txt/identified.txt)
@@ -14,6 +14,8 @@ function [] = plotraypaths(idfile, fafile, fapfile, starttime, endtime, returnty
 %                  (def: start at first SAC file in catalog)
 % endtime      Inclusive end time (latest SAC file time to consider), as datetime
 %                  (def: end current datetime)
+% bindepth     false: plot rapyaths from all EQs on single map (def)
+%              true: bin raypaths by EQ depth (shallow, intermediate, deep)
 % returntype   'ALL': both triggered and user-requested SAC files (def)
 %              'DET': triggered SAC files as determined by onboard algorithm
 %              'REQ': user-requested SAC file
@@ -31,9 +33,9 @@ defval('fafile', fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified',
 defval('fapfile', fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified', 'txt', 'firstarrivalpressure.txt'))
 defval('starttime', []) % [] = first SAC file
 defval('endtime', []) % [] = last SAC file
+defval('bindepth', false)
 defval('returntype', 'ALL')
 
-keyboard
 %% This is for the "preferred" event values (Mw magnitude, etc.)
 [s1, ~, eqlat, eqlon, ~, eqdepth, eqdist, eqmag, ~, eqid] = ...
     readidentified(idfile, starttime, endtime, 'SAC', returntype);
@@ -68,8 +70,8 @@ ha = gca;
 h.FaceColor = 'k';
 xlim([0 180])
 xticks([0:60:180])
-ylim([0 160])
-yticks([0:40:160])
+%ylim([0 160])
+%yticks([0:40:160])
 h.NumBins = 23;
 ha = gca;
 xlabel('Epicentral distance (degrees)')
@@ -79,10 +81,10 @@ longticks(ha, 2)
 axesfs(gcf, fs, fs)
 latimes
 
-[~, th] = labelaxes(gca, 'ul', true, 'FontSize', lbfs, 'Interpreter', 'LaTeX', 'FontName', 'Times');
-th.String = strrep(th.String, 'a', 'b');
-movev(th, 56);
-moveh(th, -100);
+% [~, th] = labelaxes(gca, 'ul', true, 'FontSize', lbfs, 'Interpreter', 'LaTeX', 'FontName', 'Times');
+% th.String = strrep(th.String, 'a', 'b');
+% movev(th, 56);
+% moveh(th, -100);
 
 [lg, tx] = textpatch(ha, 'NorthEast', sprintf('[N: %i]', sum(h.Values)), fs)
 lg.Box = 'off';
@@ -100,8 +102,8 @@ h.FaceColor = 'k';
 
 xlim([4 8.5])
 xticks([4:8.5])
-ylim([0 100])
-yticks([0:25:100])
+%ylim([0 100])
+%yticks([0:25:100])
 
 xlabel('Magnitude')
 ylabel('Count')
@@ -110,9 +112,10 @@ longticks(ha, 2)
 axesfs(gcf, fs, fs)
 latimes
 
-[~, th] = labelaxes(gca, 'ul', true, 'FontSize', lbfs, 'Interpreter', 'LaTeX', 'FontName', 'Times');
-movev(th, 56);
-moveh(th, -100);
+% [~, th] = labelaxes(gca, 'ul', true, 'FontSize', lbfs, 'Interpreter', 'LaTeX', 'FontName', 'Times');
+% movev(th, 56);
+% moveh(th, -100);
+
 [lg, tx] = textpatch(ha, 'NorthEast', sprintf('[N: %i]', sum(h.Values)), fs)
 lg.Box = 'off';
 
@@ -187,10 +190,10 @@ tack2corner(ax, lg, 'lr')
 
 warning('requires adjustment of SNR box, likely')
 
-[~, th] = labelaxes(gca, 'ul', true, 'FontSize', lbfs/2, 'Interpreter', 'LaTeX', 'FontName', 'Times');
-th.String = strrep(th.String, 'a', 'c');
-movev(th, 25);
-moveh(th, -55);
+% [~, th] = labelaxes(gca, 'ul', true, 'FontSize', lbfs/2, 'Interpreter', 'LaTeX', 'FontName', 'Times');
+% th.String = strrep(th.String, 'a', 'c');
+% movev(th, 25);
+% moveh(th, -55);
 
 [lg2, tx] = textpatch(ax, 'NorthEast', sprintf('[N: %i]', length(sc.SizeData)), fs/2);
 lg2.Box = 'off'
@@ -250,9 +253,15 @@ for i = length(s1):-1:1
 
 end
 
-makemap([realmin 70], eqdepth, trla, trlo, merlat, merlon, evtlat, evtlon, 'shallow')
-makemap([70 300],  eqdepth, trla, trlo, merlat, merlon, evtlat, evtlon, 'intermediate')
-makemap([300 realmax], eqdepth, trla, trlo, merlat, merlon, evtlat, evtlon, 'deep')
+if bindepth
+    makemap([min(eqdepth) 70], eqdepth, trla, trlo, merlat, merlon, evtlat, evtlon, 'shallow')
+    makemap([70 300],  eqdepth, trla, trlo, merlat, merlon, evtlat, evtlon, 'intermediate')
+    makemap([300 max(eqdepth)], eqdepth, trla, trlo, merlat, merlon, evtlat, evtlon, 'deep')
+
+else
+    makemap([min(eqdepth)-1 max(eqdepth)+1], eqdepth, trla, trlo, merlat, merlon, evtlat, evtlon, [])
+
+end
 
 %%______________________________________________________________________________________%%
 function makemap(minmaxdepth, eqdepth, trla, trlo, merlat, merlon, evtlat, ...
@@ -263,8 +272,8 @@ maxdepth = minmaxdepth(2);
 
 fs = 22;
 lbfs = 30;
-%skip_map = false;
-skip_map = true;
+skip_map = false;
+%skip_map = true;
 
 if ~skip_map
 % Set up map axes.
@@ -286,11 +295,11 @@ lw = 0.5;
 % % Plot great-circle ray paths.
 count = 0;
 hold(gca, 'on')
-for i = 1:length(eqdepth)
+for i = length(eqdepth):-1:1
     if  eqdepth(i) <= maxdepth && eqdepth(i) > mindepth
-        pltr = plotm(trla{i}, trlo{i}, 'Color', 'k', 'LineWidth', lw);
-        plevt = plotm(evtlat(i), evtlon(i), 'pr', 'MarkerFaceColor', 'r', 'MarkerSize', 12);
-        plmer = plotm(merlat(i), merlon(i), 'v', 'MarkerFaceColor', porange, ...
+        pltr(i) = plotm(trla{i}, trlo{i}, 'Color', 'k', 'LineWidth', lw);
+        plevt(i) = plotm(evtlat(i), evtlon(i), 'pr', 'MarkerFaceColor', 'r', 'MarkerSize', 12);
+        plmer(i) = plotm(merlat(i), merlon(i), 'v', 'MarkerFaceColor', porange, ...
                       'MarkerEdgeColor', porange, 'MarkerSize', 10);
         count = count + 1;
 
@@ -298,31 +307,38 @@ for i = 1:length(eqdepth)
 end
 hold(gca, 'off')
 shg
+if ~isempty(dtype)
+    switch lower(dtype)
+      case 'shallow'
+        tl = title(gca, sprintf('event depth $\\leq$ 70 km [N: %i]', count), 'FontSize', fs)
+        labstr = '(a)';
 
-switch lower(dtype)
-  case 'shallow'
-    tl = title(gca, sprintf('event depth $\\leq$ 70 km [N: %i]', count), 'FontSize', fs)
-    labstr = '(a)';
+      case 'intermediate'
+        tl = title(gca, sprintf('70 km $<$ event depth $\\leq$ 300 km [N: %i]', count), 'FontSize', fs)
+        labstr = '(b)';
 
-  case 'intermediate'
-    tl = title(gca, sprintf('70 km $<$ event depth $\\leq$ 300 km [N: %i]', count), 'FontSize', fs)
-    labstr = '(b)';
+      case 'deep'
+        tl = title(gca, sprintf('event depth $>$ 300 km [N: %i]', count), 'FontSize', fs)
+        labstr = '(c)';
 
-  case 'deep'
-    tl = title(gca, sprintf('event depth $>$ 300 km [N: %i]', count), 'FontSize', fs)
-    labstr = '(c)';
-
+    end
+    movev(tl, 0.0075);
 end
-movev(tl, 0.0075);
 
 tightmap
 latimes
 axis off
 
 % Label.
-text(-2.75, 1.5, labstr, 'FontSize', lbfs, 'FontName', 'Time', 'Interpreter', 'LaTeX');
+if ~isempty(dtype)
+    text(-2.75, 1.5, labstr, 'FontSize', lbfs, 'FontName', 'Time', 'Interpreter', 'LaTeX');
+    savepdf(sprintf('rays_%s', dtype))
 
-savepdf(sprintf('rays_%s', dtype))
+else
+    savepdf('rays')
+
+end
+keyboard
 close
 
 end
