@@ -14,9 +14,9 @@ function reviewall(writecp, floatnum)
 % N/A       Writes reviewed .evt files, updates .txt files,
 %               writes .cp files with uncertainty estimation
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 02-Nov-2019, Version 2017b on GLNXA64
+% Author: Dr. Joel D. Simon
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 03-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('writecp', false)
@@ -75,6 +75,7 @@ fprintf('Manual review complete...\n')
 
 fprintf('Updating event text files...\n')
 evt2txt;
+writelatlon;
 
 fprintf('Updating first arrival text files...\n')
 writefirstarrival;
