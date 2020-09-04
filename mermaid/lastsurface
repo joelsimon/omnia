@@ -1,25 +1,62 @@
 #! /bin/zsh
 #
-# Print date of last surfacing for each Princeton MERMAID, as read from ESO
-# website textfile.
+# Print date of last time at surface as recorded in *vit file.
 #
-# Author: Joel D. Simon
-# Contact: jdsimon@princeton.edu
-# Last modified: 18-Jun-2020
+# Author: Dr. Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 04-Sep-2020, Darwin Kernel Version 18.7.0
 
+# Set time zone local to JDS.
+export TZ="America/Los_Angeles"
+
+# Specify output format.
+out_fmt="%d-%b-%Y (%a @ %H:%M:%S %Z)"
 computer=$(uname -s)
 
-if [ $computer = Linux ]; then
-    # The output filename (hyphen) means print to stdout. 
-    dates=$(wget -qO - 'http://geoweb.princeton.edu/people/simons/SOM/all.txt')
+# Loop over all .vit files in the server.
+for vit_file in $MERMAID/server/*.vit; do
+    # Parse the float name from the vital file name.
+    float_name=$(basename $vit_file)
+    float_name=$(cut -c9-12 <<< $float_name)
+    float_name=$(sed 's/-/0/' <<< $float_name)
 
-elif [ $computer = Darwin ]; then
-    dates=$(curl -s 'http://geoweb.princeton.edu/people/simons/SOM/all.txt')
+    # The vital file usually ends with empty newline(s). Loop backwards until
+    # you reach a line that includes text.
+    idx=1
+    line=$(tail -$idx $vit_file)
+    while [ -z $line ]; do
+	((idx++)) # ((X)) is for arithmetic evaluation
+	line=$(tail -$idx $vit_file)
 
-else
-    echo "Error: lastsurface script only tested on Linux and Mac computers"
-    exit 1
+    done
 
-fi
-printf 'Last surfacing:\n'
-echo $dates | sed -n '08,23p' | awk '{print $1,$2}'
+    # Parse the UTC time from the last line of the .vit file.
+    vit_time=$(cut -c1-18 <<< $line)
+
+    # Print the output.
+    if [ $computer = Darwin ]; then
+	# In OSX "date" commmand you may specify both an input and output date
+	# string.  Use %z in the format and append the corresponding +0000 (the
+	# input time is in UTC) to the vit time to alert of the timezone
+	# conversion.
+	date -jf "%Y%m%d-%Hh%Mmn%S%z" $vit_time+0000 +"$float_name: $out_fmt"
+
+    elif [ $computer = Linux ]; then
+	# Cannot(?) specify input date string fromat in POSIX "date"
+	# command. Convert vit time to iso-8601 format that it recognizes.
+	Y=$(cut -c1-4 <<< $vit_time)
+	m=$(cut -c5-6 <<< $vit_time)
+	d=$(cut -c7-8 <<< $vit_time)
+	H=$(cut -c10-11 <<< $vit_time)
+	M=$(cut -c13-14 <<< $vit_time)
+	S=$(cut -c17-18 <<< $vit_time)
+
+	date_string="$Y-$m-${d}T$H:$M:${S}Z"
+	date -d $date_string +"$float_name: $out_fmt"
+
+    else
+	echo "Error: $0 only tested on Linux and Mac computers"
+	exit 1
+
+    fi
+done
