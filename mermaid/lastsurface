@@ -1,4 +1,5 @@
 #! /bin/zsh
+# Usage: lastsurface
 #
 # Print date of MERMAIDs' last surfacing as recorded in the *.vit files.
 #
@@ -6,8 +7,18 @@
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 # Last modified: 04-Sep-2020, Darwin Kernel Version 18.7.0
 
+# Print help doc.
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    sed -ne '/^#/!q;s/^#$/# /;/^# /s/^# //p' < "$0" |
+	awk -v f="${1#-h}" '!f && /^Usage:/ || u { u=!/^\s*$/; if (!u) exit } u || f'
+    exit 1
+fi
+
 # Set time zone local to JDS.
 export TZ="America/Los_Angeles"
+
+# Get current Unix Epoch time (-u is redundant, but left here).
+current_epoch=$(date -u +%s)
 
 # Specify output format.
 output_fmt="%d-%b-%Y (%a @ %H:%M:%S %Z)"
@@ -29,9 +40,6 @@ for vit_file in $MERMAID/server/*.vit; do
 	line=$(tail -$idx $vit_file)
 
     done
-
-    # Get current Unix Epoch time (-u is redundant, but left here).
-    current_epoch=$(date -u +%s)
 
     # Parse the UTC time of the last surfacing from the last non-empty line of
     # the .vit file.
