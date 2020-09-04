@@ -1,0 +1,25 @@
+#! /bin/zsh
+#
+# Prints date of MERMAIDs' last surfacing as recorded on EarthScopeOceans.org.
+#
+# See also: lastsurface for the same metric as recorded in the *vit files.
+#
+# Author: Dr. Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 04-Sep-2020, Darwin Kernel Version 18.7.0
+
+computer=$(uname -s)
+if [ $computer = Linux ]; then
+    # The output filename (hyphen) means print to stdout.
+    dates=$(wget -qO - 'http://geoweb.princeton.edu/people/simons/SOM/all.txt')
+
+elif [ $computer = Darwin ]; then
+    dates=$(curl -s 'http://geoweb.princeton.edu/people/simons/SOM/all.txt')
+
+else
+    echo "Error: lastsurface script only tested on Linux and Mac computers"
+    exit 1
+
+fi
+printf 'Last surfacing:\n'
+echo $dates | sed -n '08,23p' | awk '{print $1,$2}'
