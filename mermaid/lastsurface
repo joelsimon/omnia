@@ -1,6 +1,6 @@
 #! /bin/zsh
 #
-# Print date of last time at surface as recorded in *vit file.
+# Print date of MERMAIDs' last surfacing as recorded in the *.vit files.
 #
 # Author: Dr. Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
@@ -10,7 +10,7 @@
 export TZ="America/Los_Angeles"
 
 # Specify output format.
-out_fmt="%d-%b-%Y (%a @ %H:%M:%S %Z)"
+output_fmt="%d-%b-%Y (%a @ %H:%M:%S %Z)"
 computer=$(uname -s)
 
 # Loop over all .vit files in the server.
@@ -30,33 +30,55 @@ for vit_file in $MERMAID/server/*.vit; do
 
     done
 
-    # Parse the UTC time from the last line of the .vit file.
+    # Get current Unix Epoch time (-u is redundant, but left here).
+    current_epoch=$(date -u +%s)
+
+    # Parse the UTC time of the last surfacing from the last non-empty line of
+    # the .vit file.
     vit_time=$(cut -c1-18 <<< $line)
 
-    # Print the output.
+    # Parse date specifiers (year, month, day etc.) from UTC time.
+    Y=$(cut -c1-4 <<< $vit_time)
+    m=$(cut -c5-6 <<< $vit_time)
+    d=$(cut -c7-8 <<< $vit_time)
+    H=$(cut -c10-11 <<< $vit_time)
+    M=$(cut -c13-14 <<< $vit_time)
+    S=$(cut -c17-18 <<< $vit_time)
+
+    # Convert vit time into ISO 8601 format date string.
+    date_string="$Y-$m-${d}T$H:$M:${S}Z"
+    input_fmt="%Y-%m-%dT%H:%M:%SZ"
+
+    # Log the Unix Epoch time of the date string.
     if [ $computer = Darwin ]; then
-	# In OSX "date" commmand you may specify both an input and output date
-	# string.  Use %z in the format and append the corresponding +0000 (the
-	# input time is in UTC) to the vit time to alert of the timezone
-	# conversion.
-	date -jf "%Y%m%d-%Hh%Mmn%S%z" $vit_time+0000 +"$float_name: $out_fmt"
+	last_surface_epoch=$(date -ujf $input_fmt $date_string +%s) # UTC
 
     elif [ $computer = Linux ]; then
-	# Cannot(?) specify input date string fromat in POSIX "date"
-	# command. Convert vit time to iso-8601 format that it recognizes.
-	Y=$(cut -c1-4 <<< $vit_time)
-	m=$(cut -c5-6 <<< $vit_time)
-	d=$(cut -c7-8 <<< $vit_time)
-	H=$(cut -c10-11 <<< $vit_time)
-	M=$(cut -c13-14 <<< $vit_time)
-	S=$(cut -c17-18 <<< $vit_time)
-
-	date_string="$Y-$m-${d}T$H:$M:${S}Z"
-	date -d $date_string +"$float_name: $out_fmt"
+	last_surface_epoch=$(date -ud $date_string +%s) # UTC
 
     else
 	echo "Error: $0 only tested on Linux and Mac computers"
 	exit 1
+
+    fi
+
+    # Compute the number of days elapsed since the last transmission.
+    # WARNING: ignores leap seconds.
+    day_diff=$(bc <<< "scale=2; ($current_epoch - $last_surface_epoch) / (60*60*24)")
+    day_diff=$(printf '%6.2f\n' $day_diff) # left pad with spaces
+
+    # Print the output.
+    if [ $computer = Darwin ]; then
+	# In the OSX "date" command you may specify both an input and output
+	# date format.  Use %z in the input format and append +0000 to the date
+	# string to properly handle the timezone conversion from UTC.
+	date -jf $input_fmt%z $date_string+0000 +"$float_name: $output_fmt --> $day_diff days ago"
+
+    elif [ $computer = Linux ]; then
+	# Cannot(?) specify and input format in POSIX "date" command.  However,
+	# by default it does recognize the ISO 8601 format and properly handles
+	# the timezone conversion from UTC under the hood.
+	date -d $date_string +"$float_name: $output_fmt --> $day_diff days ago"
 
     fi
 done
