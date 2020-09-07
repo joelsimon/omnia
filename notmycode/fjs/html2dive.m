@@ -19,15 +19,8 @@ function [x,y]=html2dive(serial,seq,diro)
 % 9.0.0.341360 (R2016a)
 %
 % Last modified by fjsimons-at-alum.mit.edu, 03/12/2020
-% Last modified by jdsimon@princeton.edu, 23-Mar-2020.
 
-% Does not work properly on Mac.
-if contains(computer, 'MAC')
-    error('System calls produce unexpected results on Mac computer')
-
-end
-
-defval('diro',fullfile(getenv('MERMAID'), 'processed'))
+defval('diro','/u/fjsimons/MERMAID/processed')
 defval('seq',1:5)
 defval('serial','452.020-P-12')
 
@@ -38,17 +31,38 @@ files=files(seq);
 % Work locally
 oldpath=pwd;
 
+% Processing suites, remember to double-quote
+pone=['sed ''s/ //g'' ??_????????.html'];
+ptwo=['sed ''s/\"lines+markers\",\"y":\[/ /g'''];
+ptri=['awk ''{print $2}'''];
+% Divergence for the two cases
+pfoa=['sed ''s/],"x\"/ /g'''];
+pfob=['sed ''s/\],\"x\"\:\[/ /'''];
+pfva=['awk ''/ / {print $1}'''];
+pfvb=['awk ''{print $2}'''];
+psxa=['sed ''s/\,/\n/g'''];
+psxb=['sed ''s/\]/ /'''];
+% The last bits
+psvb=['awk ''/ / {print $1}'''];
+patb=['sed ''s/\,/\n/g'''];
+pnnb=['sed ''s/\"//g'''];
+ptnb=['sed ''s/-//g'''];
+plvb=['sed ''s/://g'''];
+
 % For each of those, grab the dive cycle
 for index=1:length(files)
   cd(files{index})
   % Parse the files using sed, awk, and regexp to temporary files
-  !sed 's/ //g' ??_????????.html | sed 's/\"lines+markers\",\"y":\[/ /g' | awk '{print $2}' | sed 's/],"x\"/ /g' | awk '/ / {print $1}' | sed 's/\,/\n/g' >! y
-  !sed 's/ //g' ??_????????.html | sed 's/\"lines+markers\",\"y":\[/ /g' | awk '{print $2}' | sed 's/\],\"x\"\:\[/ /' | awk '{print $2}' | sed 's/\]/ /' | awk '/ / {print $1}' | sed 's/\,/\n/g' | sed 's/\"//g' | sed 's/-//g' | sed 's/://g' >! x
+  system(sprintf('%s | %s | %s | %s | %s | %s >! y',pone,ptwo,ptri,pfoa,pfva, ...
+                 psxa));
+  system(sprintf(['%s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s>! ' ...
+                  'x'],pone,ptwo,ptri,pfob,pfvb,psxb,psvb,patb,pnnb,ptnb,plvb));
   % Now load the files
   y{index}=load('y');
   x{index}=load('x');
   % Now turn them into date strings
-  x{index}=datetime(datevec(datenum(reshape(sprintf('%14.14i',x{index}),14,[])','yyyymmddHHMMSS')));
+  x{index}=datetime(datevec(datenum(reshape(sprintf('%14.14i',x{index}),14, ...
+                                            [])','yyyymmddHHMMSS')));
   % Now remove the files
   system('rm -f x y');
 end
