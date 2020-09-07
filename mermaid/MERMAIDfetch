@@ -1,21 +1,24 @@
 #! /bin/zsh
+# Usage: MERMAIDfetch
 #
-# Simple shell script to:
-# 1) retrieve MERMAID data
-# 2) write new SAC (.sac) files
-# 3) write changepoint (.cp) files with uncertainty estimates
-# 4) generate preliminary match to the seismic catalog and write
-#    corresponding .evt and .pdf files
+# Updates local MERMAID server and handles preliminary matching to EQ catalogs.
 #
-# Switches to master branch in MERMAID server, processed, and event
-# directories before proceeding.
+# NB: switches to master branch in MERMAID server/, locations/, processed/, and
+# event/ directories before proceeding.
 #
 # No I/O and therefore may require internal editing as it was built for JDS'
 # system defaults.
 #
-# Author: Joel D. Simon
-# Contact: jdsimon@princeton.edu
-# Last modified: 25-Jun-2020
+# Author: Dr. Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 03-Sep-2020, Darwin Kernel Version 18.7.0
+
+# Print help with '-h' or '--help'.
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    sed -ne '/^#/!q;s/^#$/# /;/^# /s/^# //p' < "$0" |
+	awk -v f="${1#-h}" '!f && /^Usage:/ || u { u=!/^\s*$/; if (!u) exit } u || f'
+    exit 1
+fi
 
 # Source conda so that 'conda activate pymaid' works within this shell script.
 computer=$(uname -s)
@@ -84,6 +87,13 @@ python scripts/main.py
 conda deactivate
 print '\n...completed writing SAC files\n'
 
+# Add faulty *25.vit back to server (and suppress git output)
+cd server
+git reset HEAD -- 452.020-P-25.vit >& /dev/null
+git checkout -- 452.020-P-25.vit >& /dev/null
+print 'Added 452.020-P-25.vit back to server\n'
+cd ..
+
 # Generate raw matches to the IRIS catalog.  Note that upon exiting MATLAB you
 # may get the following message.
 #
@@ -94,19 +104,22 @@ print '\n...completed writing SAC files\n'
 # matchall.m.  I assume it has something to do with MATLAB closing before the
 # parallel pool is completely shut down.  Doesn't seem to affect the output of
 # this code, however.
-print '\nMatching to the seismic catalog...\n'
-/Applications/MATLAB_R2017b.app/bin/matlab -r "run matchall.m; run fetchmerloc.m; exit" >& /dev/null
+print '\nGenerating preliminary match to global seismic catalogs...\n'
+/Applications/MATLAB_R2017b.app/bin/matlab -r \
+   "run matchall.m; run fetchmerloc.m; run lastdive.m; run exit" >& /dev/null
+print '\n..done with preliminary match to the seismic catalogs\n'
+
+# Print the last surfacing of each float.
+print '\nHere are the dates each float last surfaced:\n'
+$OMNIA/mermaid/lastsurface
+
+# Display contents of *.out file with errors in last dive.
+print '\nHere are any errors in the *.out files:\n'
+cat $MERMAID/processed/lastdive_error.txt
 
 # Display current count.
 print '\nHere is the complete list:\n'
 $OMNIA/mermaid/countsac
-
-# Add faulty *25.vit back to server (and suppress git output)
-cd server
-git reset HEAD -- 452.020-P-25.vit >& /dev/null
-git checkout -- 452.020-P-25.vit >& /dev/null
-print 'Added 452.020-P-25.vit back to server\n'
-cd ..
 
 # Return from whence you came.
 cd $start_dir
