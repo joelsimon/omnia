@@ -80,7 +80,7 @@ if isempty(singl)
     end
 
     % Narrow down SAC file list with useful (sub)string, if supplied.
-    if length(s) > 1 && ~isempty('ofuse')
+    if length(s) > 1 && ~isempty(ofuse)
         idx = find(contains(s, ofuse));
         s = s(idx);
 
