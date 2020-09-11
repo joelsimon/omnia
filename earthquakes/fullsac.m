@@ -24,9 +24,11 @@ function s = fullsac(singl, diro, returntype, ofuse)
 %              'ALL': both triggered and user-requested SAC files (def)
 %              'DET': triggered SAC files as determined by onboard algorithm
 %              'REQ': user-requested SAC files
-% ofuse        A string which you expect in the fullpath filename,
+% ofuse        A string which you expect in the fullpath filename, e.g.,
 %                  to differentiate among multiple matching SAC filenames
-%                  (for example, an event ID number) (def: [])
+%                  if a single SAC file is requested, or to winnow a larger
+%                  list of SAC files if an entire directory is requested
+%                  (for example, an event ID number or MERMAID name) (def: [])
 %
 % Output:
 % s            Full-path SAC file(s) names, either:
@@ -47,11 +49,16 @@ function s = fullsac(singl, diro, returntype, ofuse)
 %    ofuse = '11143029';  % Event ID
 %    s = FULLSAC(singl, diro, [], ofuse)
 %
+% Ex4: (retrieve all MERMAID SAC files that were inverted using 5 wavelet scales)
+%    diro = fullfile(getenv('OMNIA'), 'exfiles');
+%    ofuse = 'WLT5';
+%    s = FULLSAC([], diro, [], ofuse)
+%
 % See also: mermaid_sacf.m
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 02-Apr-2020, Version 2017b on MACI64
+% Author: Dr. Joel D. Simon
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 11-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default is to return all SAC filenames in $MERMAID/processed.
 defval('singl', [])
@@ -70,6 +77,17 @@ if isempty(singl)
         s = [];
         warning('No .sac files found in %s', diro)
 
+    end
+
+    % Narrow down SAC file list with useful (sub)string, if supplied.
+    if length(s) > 1 && ~isempty('ofuse')
+        idx = find(contains(s, ofuse));
+        s = s(idx);
+
+        if isempty(s)
+            warning('No .sac files containing (sub)string %s found in %s', ofuse, diro)
+
+        end
     end
     s = s(:);
 
@@ -97,7 +115,7 @@ else
 
                 end
             else
-                error('Non-unique filename  -- try including ''ofuse'' string to narrow results to one')
+                error('Non-unique filename -- try including ''ofuse'' string to narrow results to one')
 
             end
         end
