@@ -2,7 +2,7 @@ function writesac(SeisData,HdrData,filename)
 % WRITESAC(SeisData,HdrData,filename)
 %
 % Writes a SAC file -- FJS function with a few bits added by jdsimon.
-% 
+%
 % INPUT:
 %
 % SeisData      The samples of the seismogram
@@ -10,13 +10,13 @@ function writesac(SeisData,HdrData,filename)
 % filename      The name of the file that will be written
 %
 % See also: READSAC, MAKEHDR
-% 
-% Last modified by fjsimons-at-alum.mit.edu, 10/16/2011
-% Last modified in Ver. 2017b by jdsimon@princeton.edu, 19-Aug-2018.
-
-% Change log - 
 %
-% 19-Aug-208: added HdrF(43)=HdrData.USER2
+% Last modified by fjsimons-at-alum.mit.edu, 10/16/2011
+% Last modified in Ver. 2017b by jdsimon@princeton.edu, 17-Sep-2020
+
+% Change log -
+% 17-Sep-2020: added HdrF(44)=HdrData.USER3
+% 19-Aug-2018: added HdrF(43)=HdrData.USER2
 % 03-Aug-2016: HdrF(41)=HdrData.USER0 and HdrF(42)=HdrData.USER1
 
 
@@ -86,6 +86,7 @@ HdrF(14)=HdrData.T3;
 HdrF(41)=HdrData.USER0;
 HdrF(42)=HdrData.USER1;
 HdrF(43)=HdrData.USER2;
+HdrF(44)=HdrData.USER3;
 
 % Finally, proceed to writing this
 fid=fopen(filename,'w','l');
@@ -96,5 +97,3 @@ fwrite(fid',HdrL,'int32');
 fwrite(fid,HdrK','char');
 fwrite(fid,SeisData,'float32');
 fclose(fid);
-
-
