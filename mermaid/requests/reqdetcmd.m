@@ -1,5 +1,5 @@
-function cmd = reqdet(sac)
-% cmd = REQDET(sac)
+function cmd = reqdetcmd(sac)
+% cmd = REQDETCMD(sac)
 %
 % Return formatted MERMAID command to request a detected SAC file.
 %
@@ -13,11 +13,11 @@ function cmd = reqdet(sac)
 %
 % Ex: (request detected file '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
-%    cmd = REQDET(sac)
+%    cmd = REQDETCMD(sac)
 %
 % Author: Dr. Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 07-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 17-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default.
 defval('sac', '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac')
