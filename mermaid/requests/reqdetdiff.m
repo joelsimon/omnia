@@ -1,12 +1,11 @@
 function reqdetdiff(s_req, s_det, diro)
 % REQDETDIFF(s_req, s_det, diro)
 %
-% NB: the max correlation is forced to 1 for plotting purposes; does not imply
-% the data are exactly correlated.
+% Compares requested and detected MERMAID files.
 %
 % Author: Dr. Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 19-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('diro', fullfile(getenv('MERMAID'), 'processed'))
@@ -33,6 +32,7 @@ det_date = seisdate_det.B;
 xax_req = xaxis(h_req.NPTS, h_req.DELTA, 0);
 seisdate_req = seistime(h_req);
 req_date = seisdate_req.B;
+start_time_diff = seconds(req_date - det_date);
 
 % Request: command
 req_cmd_datestr = reqdate(seisdate_det.B);
@@ -41,6 +41,7 @@ req_cmd_date = datetime(strrep(req_cmd_datestr, 'T', ''), ...
                         'TimeZone', 'UTC');
 
 %%______________________________________________________________________________________%%
+%% PLOT UTC TIME
 % Plot them on a common UTC datetime axis to see the offset between them.
 xax_date_det = linspace(seisdate_det.B, seisdate_det.E, h_det.NPTS);
 xax_date_req = linspace(seisdate_req.B, seisdate_req.E, h_req.NPTS);
@@ -49,53 +50,80 @@ figure
 hold on
 plot(xax_date_det, x_det, 'k')
 plot(xax_date_req, x_req, 'r')
+% minmax.m does not accept datetime arrays.
+xl1 = min([xax_date_det(1) xax_date_det(end) xax_date_req(1) xax_date_req(end)]);
+xl2 = max([xax_date_det(1) xax_date_det(end) xax_date_req(1) xax_date_req(end)]);
+xlim([xl1 xl2])
 lg = legend( 'DET', 'REQ');
 box on
 hold off
-title('DET and REQ plotted in terms of absolute UTC time')
+title('DET and REQ in UTC time')
 
 %%______________________________________________________________________________________%%
-% Plot the two time series on top of one another, with a pt0 = 0 s reference (so
-% we are ignoring their absolute UTC start time), and compute their cross
-% correlation. If everything were perfect that time would be the time shift
-% between their start times.
+%% PLOT IN ARBITARY TIME
+
 figure
 
 % Seismograms.
-[~, ha1] = krijetem(subnum(2,1));
+[~, ha1] = krijetem(subnum(3,1));
 pl_det = plot(ha1(1), xax_det, x_det, 'k');
 hold(ha1(1), 'on')
 pl_req = plot(ha1(1), xax_req, x_req, 'r');
-xlim(ha1(1), [95 105])
-xlabel(ha1(1), 'seconds into seismogram (arbitrary start time; DET != REQ)')
+xlim(ha1(1), [1 max([xax_det(end) xax_req(end)])])
+xlabel(ha1(1), 'Seconds into DET and REQ seismograms')
 ylabel(ha1(1), 'Counts')
 lg1 = legend(ha1(1), [pl_det pl_req], 'DET', 'REQ');
 
-% Cross correlations: REQ is shifted w.r.t to DET.
-[xcorr_raw, lags] = xcorr(x_det, x_req);
-xcorr_norm = norm2max(xcorr_raw);
 
-xax_xcorr = lags*h_det.DELTA;
-[max_xcorr, max_xcorr_idx] = max(abs(xcorr_norm));
-max_xcorr_time_shift = xax_xcorr(max_xcorr_idx);
+%% PLOT ALIGNED AND TRUNCATED
 
-plot(ha1(2), xax_xcorr, xcorr_norm, 'r');
+% Compute their cross correlation.
+[xcorr_norm, max_xcorr, xat_det, xat_req, dx_det, dx_req, px_det, px_req] = ...
+    alignxcorr(x_det, x_req);
+
+
+%% PLOT
+% Delays form alignxcorr.m are always positive.
+if dx_det > 0
+    % REQ is advanced w.r.t. DET.
+    delay_time = (dx_det-1) * h_det.DELTA;
+    delay_time = -delay_time;
+
+elseif dx_req > 0
+    % REQ is delayed w.r.t. DET.
+    delay_time = (dx_req-1) * h_req.DELTA;
+
+else
+    delay_time = 0;
+
+end
+
+% Generate x-axis for aligned and truncated DET and REQ signals where they
+% are w.r.t. to DET; i.e., the signals are aligned at DET = 0 s.
+xax_req_delayed = xax_req + delay_time;
+
+pl2_det = plot(ha1(2), xax_det, x_det, 'k');
 hold(ha1(2), 'on')
-plot(ha1(2), [max_xcorr_time_shift max_xcorr_time_shift], [0 1], 'r');
-xlim(ha1(2), [max_xcorr_time_shift-1 max_xcorr_time_shift+1])
-ylim(ha1(2), [0 1])
-xlabel(ha1(2), 'Time shift of REQ w.r.t. DET (s)')
-ylabel(ha1(2), 'X-corr (arbitrarily scale)') % max correlation forced to 1
-lgtx = textpatch(ha1(2), 'NorthEast', sprintf('max shift = %0.2f s', max_xcorr_time_shift));
-lgtx.Box = 'off';
+pl2_req = plot(ha1(2), xax_req_delayed, x_req, 'r');
+xlabel(ha1(2), 'Time shift of REQ  w.r.t DET required for alignment (s)')
+ylabel(ha1(2), 'Counts')
+xlim(ha1(2), minmax([xax_det' xax_req_delayed']))
+lg2 = legend(ha1(2), [pl2_det pl2_req], 'DET', 'REQ');
 
-%%______________________________________________________________________________________%%
-% Ideally the time shift at the max correlation would equal the start time difference.
+%% Plot the aligned traces on top of one another.
+xax_xat_det = xaxis(length(xat_det), h_det.DELTA, 0);
+xax_xat_req = xaxis(length(xat_req), h_req.DELTA, 0);
 
-start_time_diff = seconds(req_date - det_date);
-total_time_offset = start_time_diff - max_xcorr_time_shift;
+pl3_det = plot(ha1(3), xax_xat_det, xat_det, 'k');
+hold(ha1(3), 'on')
+pl3_req = plot(ha1(3), xax_xat_req, xat_req, 'r');
+xlim(ha1(3), minmax([0 xax_xat_det' xax_xat_req']))
+lg1 = legend(ha1(3), [pl3_det pl3_req], 'DET', 'REQ');
+xlabel(ha1(3), 'Aligned and truncated')
+ylabel(ha1(3), 'Counts')
 
-% Finish with printouts.
+% Format plots.
+latimes
 
 %%______________________________________________________________________________________%%
 fprintf('\nAccording to the SAC headers:\n')
@@ -130,30 +158,13 @@ if isequal(x_det, x_req)
     fprintf('* REQ and DET data are exactly equal\n');
 
 else
-    fprintf('* REQ and DET data are not exactly equal\n')%: their max corr is %.3f%s\n', max_xcorr*100, '%');
-
-end
-if max_xcorr_time_shift == 0
-    fprintf('* REQ and DET data are unshifted w.r.t to each other\n');
-
-elseif max_xcorr_time_shift < 0
-    fprintf('* REQ is delayed w.r.t. DET by %.2f s\n', -max_xcorr_time_shift);
-
-else
-    fprintf('* REQ precedes DET by %.2f s\n', max_xcorr_time_shift);
+    fprintf('* REQ is delayed w.r.t to DET %.2f s\n', delay_time);
 
 end
 
 fprintf('\n---------------------------------------------------------------------\n')
 
-fprintf('Therefore, assuming the DET start time is exactly correct:\n')
-if total_time_offset== 0
-    fprintf('* in absolute UTC time the REQ and DET seismograms have the same start time\n')
-
-else
-    fprintf('* in absolute UTC time the start time in the REQ header should be adjusted by %.2f s\n', total_time_offset)
-
-end
-
-% Format plots.
-latimes
+fprintf('Aftering aligning DET and REQ,  and truncating them to be equal length:\n')
+fprintf('* their normalized max cross correlation is %.2f %s\n', 100*max_xcorr, '%')
+fprintf('* %.2f %s of DET was cut to match the signal common to REQ\n', px_det, '%')
+fprintf('* %.2f %s of REQ was cut to match the signal common to DET\n\n', px_req, '%')
