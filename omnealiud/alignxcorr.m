@@ -5,7 +5,9 @@ function [c, mc, xat, yat, dx, dy, px, py] = alignxcorr(x, y)
 % signals so they are equal length, and reports their normalized cross
 % correlations.
 %
-% Delays dx and dy are given in terms of postive samples, not lags, where:
+% ALIGNXCORR is convenient because delays are always given as positive integers.
+%
+% Delays dx and dy are given in terms of postive samples where:
 % * dx ~= 0, dy == 0 means that x must be delayed by dx to align with y
 % * dx == 0, dy ~= 0 means that y must be delayed by dy to align with x
 %
@@ -25,8 +27,10 @@ function [c, mc, xat, yat, dx, dy, px, py] = alignxcorr(x, y)
 % mc       Maximum absolute value of the normalized [0:1] cross correlation
 % xat      Aligned and truncated x
 % xat      Aligned and truncated y
-% dx       Samples that x must be delayed to match the "same" signal in y (or 0)
-% dy       Samples that y must be delayed to match the "same" signal in x (or 0)
+% dx       Samples that x must be delayed to match the "same" signal in y (or 0),
+%              or, how delayed y is w.r.t x
+% dy       Samples that y must be delayed to match the "same" signal in x (or 0),
+%              or, how delayed x is w.r.t. y
 % px       Percentage that x was tuncated to generate xat (or 0)
 % px       Percentage that y was tuncated to generate yat (or 0)
 %
@@ -56,7 +60,7 @@ function [c, mc, xat, yat, dx, dy, px, py] = alignxcorr(x, y)
 %
 % Author: Dr. Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 18-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 19-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Align them, the easy way -- alignsignals.m runs xcorr.m in the background, so
 % there is some redundancy in this script that could be worked out...
