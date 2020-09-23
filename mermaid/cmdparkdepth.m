@@ -22,7 +22,7 @@ function cmdparkdepth(park_depth, dive_duration, descent_speed, ascent_speed, ..
 % park_depth        Parking depth [dbar (~m)] (def: 1500)
 % dive_duration     Approximate total dive time [min] (def: 12500)
 % descent_speed     Approximate descent speed in [mbar/s (~0.01 m/s)] (def: 2.5)*
-%                       (NB, 2.5 mbar/s ~ 0.025 m/s ~ 90 m/hr;
+%                       (NB, 2.5 mbar/s ~ 0.025 m/s ~ 90. m/hr ;
 %                        or, ~ 40.0 s/m, ~ 1.1 hr/100 m)
 % ascent_speed      Approximate descent speed in [mbar/s (~0.01 m/s)] (def: 8)
 %                       (NB, 8.0 mbar/s ~ 0.080 m/s ~ 288 m/hr ;
@@ -104,7 +104,7 @@ stage2_time_elapsed = stage1_time_elapsed + stage2_duration;
 
 % Validate rounding did not upset timing.
 if ~isequal(stage2_time_elapsed, stage1_time_elapsed+stage2_duration)
-    error('Stage 2 time elapsed does not equal Stage1 time elapsed plus stage2 park duration')
+    error('Stage 2 time elapsed does not equal stage 1 time elapsed plus stage 2 park duration')
 
 end
 
