@@ -1,5 +1,5 @@
-function [c, mc, xat, yat, dx, dy, px, py] = alignxcorr(x, y)
-% [c, mc, xat, yat, dx, dy, px, py] = ALIGNXCORR(x, y)
+function [c, mc, xat, yat, dx, dy, px, py, sx, sy] = alignxcorr(x, y)
+% [c, mc, xat, yat, dx, dy, px, py, tx, ty, sx, sy] = ALIGNXCORR(x, y)
 %
 % Aligns common signals in x and y, reports their delays, truncates the aligned
 % signals so they are equal length, and reports their normalized cross
@@ -27,17 +27,19 @@ function [c, mc, xat, yat, dx, dy, px, py] = alignxcorr(x, y)
 % mc       Maximum absolute value of the normalized [0:1] cross correlation
 % xat      Aligned and truncated x
 % xat      Aligned and truncated y
-% dx       Samples that x must be delayed to match the "same" signal in y (or 0),
+% dx       Samples that x must be delayed to match the "same" signal in y,
 %              or, how delayed y is w.r.t x
-% dy       Samples that y must be delayed to match the "same" signal in x (or 0),
+% dy       Samples that y must be delayed to match the "same" signal in x,
 %              or, how delayed x is w.r.t. y
-% px       Percentage that x was tuncated to generate xat (or 0)
-% px       Percentage that y was tuncated to generate yat (or 0)
+% px       Percentage of samples cut from x to generate xat
+% px       Percentage of samples cut from y to generate yat
+% sx       Number of samples cut from x to generate xat
+% sy       Number of samples cut from y to generate yat
 %
 % Ex1:
 %    x = [1 2];
 %    y = [0 0 1 2 0 0];
-%    [c, mc, xat, yat, dx, dy, px, py] = ALIGNXCORR(x, y)
+%    [c, mc, xat, yat, dx, dy, px, py, sx, sy] = ALIGNXCORR(x, y)
 %
 % Ex2: (find the signal y, a pure sine wave, in x, which includes it plus noise)
 %    % Generate pure sin wave.
@@ -45,7 +47,7 @@ function [c, mc, xat, yat, dx, dy, px, py] = alignxcorr(x, y)
 %    % Delay the signal in x by 100 samples, append 100 more, and add noise.
 %    x = [zeros(1,100) x zeros(1,100)]; x = x + 0.1*randn(1,length(x));
 %    % Compute aligned cross correlation.
-%    [c, mc, xat, yat, dx, dy, px, py] = ALIGNXCORR(x, y);
+%    c = ALIGNXCORR(x, y)
 %    % Plot inputs.
 %    subplot(3,1,1); plot(x, 'k'); legend('x'); xlim([1 length(x)]);
 %    yl = get(gca, 'YLim');
@@ -87,7 +89,7 @@ end
 % the same time (one of them was zero padded to account for the extra signal
 % contained in the non-padded time series).
 D = abs(delay);
-xat = xa(D+1:end);
+xat = xa(D+1:end); % sig starts at d+1 because alignsignals.m appends d zeros
 yat = ya(D+1:end);
 
 % Truncate the end of the longer time series so that their lengths match.
@@ -95,15 +97,23 @@ len_xat = length(xat);
 len_yat = length(yat);
 if len_xat < len_yat
     yat = yat(1:len_xat);
+    len_yat = length(yat);
 
 elseif len_xat > len_yat
     xat = xat(1:len_yat);
+    len_xat = length(xat);
 
 end
 
-% Compute percentage cut from each time series.
-px = (1 - length(xat)/length(x)) * 100;
-py = (1 - length(yat)/length(y)) * 100;
+% Compute number of samples and total percentage cut from each time series.
+len_x = length(x);
+len_y = length(y);
+
+sx = len_x - len_xat;
+sy = len_y - len_yat;
+
+px = (1 - len_xat/len_x) * 100;
+py = (1 - len_yat/len_y) * 100;
 
 % Compute normalized cross correlation of the aligned and truncated signals.
 [c, lags] = xcorr(xat, yat, 'coeff');
