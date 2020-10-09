@@ -71,9 +71,9 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ph, conf, ..
 %
 % See also: sac2evt.m, reviewevt.m, getevt.m
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 04-May-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Author: Dr. Joel D. Simon
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 25-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -87,7 +87,6 @@ defval('conf', -1)
 defval('fml', [])
 defval('diro', fullfile(getenv('MERMAID'), 'events'))
 defval('baseurl', 1)
-F = [];
 
 % Separate filename from extension and determine if output files
 % already exist.
@@ -107,6 +106,7 @@ if ~redo && all([exist(rawevt, 'file') exist(rawpdfc, 'file') ...
     EQ = tmp.EQ;
     CP = tmp.CP;
     clear tmp;
+    F = [];
 
     outargs = {EQ, CP, rawevt, rawpdfc, rawpdfw, F};
     varargout = outargs(1:nargout);
@@ -123,7 +123,6 @@ EQ = sac2evt(sac, model, ph, baseurl, varargin{:});
 % Generate a changepoint (arrival time) structure considering the
 % entire seismogram.
 [x, h] = readsac(sac);
-[~, ~, ~, refdate] = seistime(h);
 CP(1) = changepoint(domain, x, n, h.DELTA, h.B, 1, inputs, conf, fml);
 
 % Window the seismogram such that it is 100 seconds long centered on
@@ -147,170 +146,20 @@ CP(2) = changepoint(domain, xw, n, h.DELTA, W.xlsecs, 1, inputs, conf, fml);
 
 % Plot the arrivals theoretical arrivals on top of the seismogram and
 % the wavelet-AIC arrivals at every scale.
-for i = 1:2
-
-    % Some plotting defaults.
-    LineWidth = 1;
-
-    % Plot arrival times for all scales -- in case of time-scale domain,
-    % smooth by setting abe/dbe to central point of the time smear.
-    F(i).fig = figure;
-    F(i).f = plotchangepoint(CP(i), 'all', 'ar', false, true);
-
-    % Shrink the distance between each subplot -- 'multiplier' is adjusted
-    % depending on the number of subplots (the number of wavelet scales
-    % plotted).
-    multiplier = 0;
-    switch CP(i).inputs.n
-      case 3
-        shrink(F(i).f.ha, 1, 1.53)
-        for l = 1:length(F(i).f.ha)
-            multiplier = multiplier + 1;
-            movev(F.f.ha(l), multiplier * 0.08)
-
-        end
-        movev(F(i).f.ha, -0.1)
-
-      case 5
-        for l = 1:length(F(i).f.ha)
-            multiplier = multiplier + 1;
-            movev(F(i).f.ha(l), multiplier * 0.015)
-
-        end
-        movev(F(i).f.ha, -0.1)
-
-      otherwise
-        % Add to this list with trial and error given more examples with
-        % differing sampling frequencies.
-        warning('No figure formatting scheme available for %i %s', ...
-                CP(i).n, plurals('scale', CP.n))
-
-    end
-
-    % Remove x-tick labels from all but last plot and label the lower x-axis.
-    set(F(i).f.ha(1:end-1), 'XTickLabel', '')
-
-    if ~isempty(EQ)
-        % Title the seismogram (first subplot).
-        ax = F(i).f.ha(1);
-        hold(ax, 'on')
-        F(i).tl = title(ax, titlecase(EQ(1).FlinnEngdahlRegionName), 'FontSize', ...
-                        17, 'FontWeight', 'normal');
-        F(i).tl.Position(2) = ax.YLim(2) + 0.4*range(ax.YLim);
-
-        % Mark all arrivals on the seismogram (first subplot).
-        for j = 1:length(EQ)
-            for k = 1:length(EQ(j).TaupTimes)
-                tp = EQ(j).TaupTimes(k);
-                tparr = tp.truearsecs;
-
-                if tparr >= CP(i).outputs.xax(1) && ...
-                            tparr <= CP(i).outputs.xax(end)
-                    F(i).tp{j}{k} = plot(ax, repmat(tparr, [1, 2]), ...
-                                         ax.YLim, 'k--', 'LineWidth', LineWidth);
-                    phstr = sprintf('\\textit{%s}$_{%i}$', tp.phaseName, j);
-                    F(i).tx{j}{k} = text(ax, tparr, 0, phstr, ...
-                                         'HorizontalAlignment', 'Center');
-                    F(i).tx{j}{k}.Position(2) = ax.YLim(2) + 0.2*range(ax.YLim);
-
-                else
-                    F(i).tp{j}{k} = [];
-                    F(i).tx{j}{k} = [];
-
-                end
-            end
-        end
-        hold(ax, 'off')
-
-        % Highlight the first-arriving phase associated with the largest event.
-        if ~isempty(F(i).tp{1}{1})
-            F(i).tp{1}{1}.Color = 'r';
-            F(i).tp{1}{1}.LineStyle = '-';
-            F(i).tp{1}{1}.LineWidth = 2*LineWidth;
-            F(i).tx{1}{1}.Position(2) = ax.YLim(2) + 0.3*range(ax.YLim);
-            F(i).tx{1}{1}.FontSize = 25;
-            F(i).tx{1}{1}.FontWeight = 'bold';
-
-        end
-
-        % Make the magnitude string.
-        magtype = lower(EQ(1).PreferredMagnitudeType);
-        if strcmp(magtype, 'Mww')
-            magtype = 'Mw';
-
-        end
-        if ~strcmpi(magtype(1:2), 'mb')
-            magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', upper(magtype(1)), ...
-                             lower(magtype(2)), EQ(1).PreferredMagnitudeValue);
-
-        else
-            magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', lower(magtype(1)), ...
-                             lower(magtype(2:end)), EQ(1).PreferredMagnitudeValue);
-
-        end
-        depthstr = sprintf('%.2f~km', EQ(1).PreferredDepth);
-        diststr = sprintf('%.2f$^{\\circ}$', EQ(1).TaupTimes(1).distance);
-
-        [F(i).f.lgmag, F(i).f.lgmagtx] = textpatch(ax, 'NorthWest', magstr);
-        [F(i).f.lgdist, F(i).lgdisttx] = textpatch(ax, 'SouthWest', [diststr ', ' depthstr]);
-
-    end
-    % This time is w.r.t. the reference time in the SAC header, NOT
-    % seisdate.B. CP.xax has the time of the first sample (input:
-    % pt0) assigned to h.B, meaning it is an offset from some
-    % reference (in this case, the reference time in the SAC
-    % header).  The time would be relative to seisdate.B if I had
-    % input pt0 = 0, because seisdate.B is EXACTLY the time at the
-    % first sample, i.e., we start counting from 0 at that time.
-    F(i).f.ha(end).XLabel.String = sprintf('Time relative to %s UTC (s)\n[%s]', ...
-                                           datestr(refdate), ...
-                                           strippath(strrep(sac, '_', '\_')));
-    longticks(F(i).f.ha, 3);
-end
-
-% Set interpreter to LaTeX and fonts to Times.
-latimes
-
-% Save the complete and windowed pdf.
 corw = {'complete', 'windowed'};
-for i = 1:length(F)
-    % The axes have been shifted -- need to adjust the second (AIC) adjust
-    % and re-tack2corner the annotations.
-    for l = 1:length(F(i).f.ha)
-        F(i).f.ha2(l).Position = F(i).f.ha(l).Position;
-        F(i).f.ha2(l).YAxis.TickLabelFormat = '%#.2g';
-        numticks(F(i).f.ha(l), 'y', 3);
-        numticks(F(i).f.ha2(l), 'y', 3);
-
-    end
-
-    % Ensure vertical lines extend minmax adjusted axes (don't wrap into loop above;
-    % there is one less .vl than axes handle, ha).
-    for j = 1:length(F(i).f.pl.vl)
-        F(i).f.pl.vl{j}.YData = F(i).f.pl.vl{j}.Parent.YLim;
-
-    end
-
-    if ~isempty(EQ)
-        tack2corner(F(i).f.ha(1), F(i).f.lgmag, 'NorthWest');
-        tack2corner(F(i).f.ha(1), F(i).f.lgdist, 'SouthWest');
-
-        for l = 1:length(F(i).f.lgSNR)
-            tack2corner(F(i).f.ha(l+1), F(i).f.lgSNR(l), 'SouthWest');
-
-        end
-    end
+for i = 1:length(CP)
+    % Plot annotated traces.
+    F(i) = ploteqcp(EQ, CP(i), h);
 
     % Save em.
     pdfname = sprintf([strrep(strippath(sac), 'sac', '') '%s'], ...
                       [corw{i} '.raw']);
     rawpdf{i} = savepdf(pdfname, F(i).fig, fullfile(diro, 'raw', 'pdf'));
-    fprintf('Saved:\n %s\n', rawpdf{i}{:});
 
 end
 
 % Save the .evt file with the EQ structure(s).
 save(rawevt, 'EQ', 'CP', '-mat')
-fprintf('Saved:\n %s\n', rawevt);
+fprintf('Wrote: %s\n', rawevt);
 outargs = {EQ, CP, rawevt, rawpdfc, rawpdfw, F};
 varargout = outargs(1:nargout);
