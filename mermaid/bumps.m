@@ -5,7 +5,7 @@ function [s, dates] = bumps(plotit)
 %
 % Author: Dr. Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 22-Jul-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 09-Oct-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('plotit', false)
 
@@ -457,6 +457,7 @@ s = {'20181231T114420.20_5C2A50AD.MER.DET.WLT5.sac', ...
      '20200105T142624.12_5E143E16.MER.DET.WLT5.sac', ...
      '20200111T195241.12_5E1A8CB2.MER.DET.WLT5.sac', ...
      '20200206T060320.23_5E3FC2C0.MER.DET.WLT5.sac', ... % All motions up; odd
+     '20201003T185233.16_5F78E771.MER.DET.WLT5.sac', ...
     };
 
 s = unique(s);
