@@ -3,15 +3,12 @@
 #
 # Updates local MERMAID server and handles preliminary matching to EQ catalogs.
 #
-# NB: switches to master branch in MERMAID server/, locations/, processed/, and
-# event/ directories before proceeding.
-#
 # No I/O and therefore may require internal editing as it was built for JDS'
 # system defaults.
 #
 # Author: Dr. Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 03-Sep-2020, Darwin Kernel Version 18.7.0
+# Last modified: 15-Sep-2020, Darwin Kernel Version 18.7.0
 
 # Print help with '-h' or '--help'.
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -43,34 +40,27 @@ fi
 
 # Keep track of starting directory.
 start_dir=`pwd`
+cd $MERMAID
 
 # Ensure you are in master (and not some dev) branch in the three relevant directories.
-printf '\n\n!!!!! Switching to master branch in dirs $MERMAID: server, locations, processed, and events !!!!!\n\n'
-cd $MERMAID
-cd server
-git checkout master  >& /dev/null
-cd ..
-cd locations
-git checkout master  >& /dev/null
-cd ..
-cd processed
-git checkout master  >& /dev/null
-cd ..
-cd events
-git checkout master  >& /dev/null
-cd ..
+# printf '\n\n!!!!! Switching to master branch in dirs $MERMAID: server, locations, processed, and events !!!!!\n\n'
+# cd server
+# git checkout master  >& /dev/null
+# cd ..
+# cd locations
+# git checkout master  >& /dev/null
+# cd ..
+# cd processed
+# git checkout master  >& /dev/null
+# cd ..
+# cd events
+# git checkout master  >& /dev/null
+# cd ..
 
 # Pull most recent data.
 print 'Copying server...\n'
 $OMNIA/mermaid/servercopy >& server_out
 print '\n...completed server copy\n'
-
-# Remove 25.vit
-cd server
-git checkout -- 452.020-P-25.vit  >& /dev/null
-git rm -- 452.020-P-25.vit  >& /dev/null
-print 'Removed 452.020-P-25.vit from server'
-cd ..
 
 # Exit if no new data.
 #nosac=$(grep 'nothing to commit' server_out | wc -l)
@@ -83,16 +73,9 @@ rm -f server_out
 # Generate SAC files.
 print 'Writing SAC files...\n'
 conda activate pymaid
-python scripts/main.py
+python $AUTOMAID/scripts/main.py
 conda deactivate
 print '\n...completed writing SAC files\n'
-
-# Add faulty *25.vit back to server (and suppress git output)
-cd server
-git reset HEAD -- 452.020-P-25.vit >& /dev/null
-git checkout -- 452.020-P-25.vit >& /dev/null
-print 'Added 452.020-P-25.vit back to server\n'
-cd ..
 
 # Generate raw matches to the IRIS catalog.  Note that upon exiting MATLAB you
 # may get the following message.
