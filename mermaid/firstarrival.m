@@ -105,9 +105,9 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % ***If MERMAID depth is not contained in the header ('STDP' field),
 % then it is assumed to be 1500 m below the sea surface
 %
-% Author: Joel D. Simon
+% Author: Dr. Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Jun-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 14-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -235,6 +235,13 @@ end
 
 % Window the time series.
 [xw1, W1, incomplete1] = timewindow(x, wlen, syn, 'middle', h.DELTA, h.B);
+
+% Print the parameters of the time window.
+time_middle_hB = mean([W1.xlsecs W1.xrsecs]); % xaxis with pt0 = h.B s
+time_middle_0 = time_middle_hB - h.B;         % xaxis with pt0 = 0 s
+fprintf('\n    Using %5.2f s time window centered at:\n', W1.wlensecs)
+fprintf('    %5.2f s with x-axis whose first sample is set at h.B (in this case, %5.2f s), or\n', time_middle_hB, h.B)
+fprintf('    %5.2f s with x-axis whose first sample is set at 0 s (seconds into seismogram)\n\n', time_middle_0)
 
 % Check if any two contiguous datum within first time window == 0
 % (likely signals missing, filler values).
