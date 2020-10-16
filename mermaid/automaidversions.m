@@ -1,30 +1,42 @@
- function automaidversions(mustequate)
-% AUTOMAIDVERSIONS(musteqate)
+function automaidversions(mustequate, old, new, fname)
+% AUTOMAIDVERSIONS(mustequate, old, new, fname)
 %
 % Compares SAC files compiled with different automaid versions.
 %
+% Input:
+% mustequate    true: data/location values must be exactly the same
+%               false: data/location values must be same within sensible range
+% old           Directory containing old SAC files (def: $MERMAID/processed)
+% new           Directory containing new SAC files (def: $MERMAID/test_processed)
+% fname         Output file name (def: '~/old_new_diff[full/light].txt')
+%
 % Author: Dr. Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 11-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 16-Oct-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-sac_old = fullsac([], fullfile(getenv('MERMAID'), 'processed'));
-sac_new = fullsac([], fullfile(getenv('MERMAID'), 'test_processed'));
+defval('old', fullfile(getenv('MERMAID'), 'processed'))
+defval('new', fullfile(getenv('MERMAID'), 'test_processed'))
+defval('fname', fullfile(getenv('HOME'), 'old_new_diff'))
+
+sac_old = fullsac([], old);
+sac_new = fullsac([], new);
 
 [~, idx_old, idx_new] = intersect(strippath(sac_old), strippath(sac_new));
 sac_old = sac_old(idx_old);
-sac_new = sac_new(idx_new);
+sac_new = sac_new(idx_new)
 
 if mustequate
-    fid = fopen('~/old_new_diff_full.txt', 'w');
+    fname = [fname '_full.txt'];
     allowed_date_diff = 0;
     allowed_dist_diff = 0;
 
 else
-    fid = fopen('~/old_new_diff_light.txt', 'w');
+    fname = [fname '_light.txt'];
     allowed_date_diff = 1e-3; % milliseconds
     allowed_dist_diff = 1e-5; % ~1 m
 
 end
+fid = fopen(fname, 'w');
 fmt = '%s\n';
 
 for i = 1:length(sac_old)
@@ -66,4 +78,6 @@ for i = 1:length(sac_old)
         fprintf(fid, fmt, sprintf('%s       lon     %15.6f deg', strippath(sac_old{i}), actual_lon_diff));
 
     end
+
 end
+fprintf('Wrote %s\n', fname)
