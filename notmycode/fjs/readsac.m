@@ -176,7 +176,7 @@ HdrData.LCALDA = HdrL(4);
 % Skip HdrL(5) (unused)
 
 %%______________________________________________________________________________________%%
-% Words 110-148, in SAC parlance --> "K type" (char)
+% Words 110-157, in SAC parlance --> "K type" (char)
 %
 % Recall: each SAC "word" is 32-bits (4 char). Each "K" field is 2 words
 % (8 char, 64 bit), except for KEVNM, which is 4 words (16 char, 128 bit).
