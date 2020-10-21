@@ -1,13 +1,14 @@
 function [SeisData, HdrData] = readsac(filename, endianness)
-% SeisData, HdrData = READSAC(filename, endianness)
+% [SeisData, HdrData] = READSAC(filename, endianness)
 %
 % Reads binary (alphanumeric not allowed) SAC-formatted data.
 %
-% Does not perform conversion of "enumerated" types from int to char, e.g.,
-% READSAC does not convert IZTYPE=9 to "IB", or IFTYPE=1 to "ITIME", etc.
+% Does not perform conversion of "enumerated" types from int to char,
+% e.g., READSAC does not convert IZTYPE=9 to "BEGIN TIME",
+% or IFTYPE=1 to "TIME SERIES FILE", etc.
 %
 % Input:
-% filename        The filename, full path included
+% filename        SAC file name
 % endianness      'l': little-endian (default)
 %                 'b': big-endian
 %
@@ -18,7 +19,7 @@ function [SeisData, HdrData] = readsac(filename, endianness)
 % See also: writesac.m
 %
 % Originally written and last modified by fjsimons-at-alum.mit.edu, 10/16/2011
-% Last modified in Ver. 2017b by jdsimon@princeton.edu, 20-Sep-2020
+% Last modified in Ver. 2017b by jdsimon@princeton.edu, 21-Oct-2020
 
 %%  Edits made here must be mirrored in writesac.m and makehdr.m
 

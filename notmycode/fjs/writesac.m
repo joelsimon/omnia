@@ -3,13 +3,14 @@ function writesac(SeisData, HdrData, filename, endianness)
 %
 % Writes binary (not alphanumeric) SAC file.
 %
-% Does not perform conversion of "enumerated" types from char to int, e.g.,
-% WRITESAC does not convert IZTYPE="IB" to 9, or IFTYPE="ITIME" to 1.
+% Does not perform conversion of "enumerated" types from int to char,
+% e.g., READSAC does not convert IZTYPE="BEGIN TIME" to 9,
+% or IFTYPE"TIME SERIES FILE" to 1, etc.
 %
 % Input:
-% SeisData      The samples of the seismogram
-% HdrData       Optional header structure array, with updated information
-% filename      The name of the file that will be written
+% SeisData      Dependent data (e.g., time series or spectral data)
+% HdrData       Header structure formatted to SAC standard
+% filename      Output SAC file name
 % endianness    'l': little-endian (default)
 %               'b': big-endian
 %
