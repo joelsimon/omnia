@@ -22,7 +22,7 @@ function reviewall(writecp, floatnum)
 defval('writecp', false)
 defval('floatnum', [])
 
-% Swtich the .pdf viewer depending on the platform.
+% Switch the .pdf viewer depending on the platform.
 switch computer
   case 'MACI64'
     viewr = 3;
@@ -32,42 +32,21 @@ otherwise
 
 end
 
-% Grab directory containing the raw .evt files.  Loop over each
-% .raw.evt file below and check if there is a corresponding reviewed
-% .evt file; if not, review it.
-if isempty(floatnum)
-    d = skipdotdir(dir(fullfile(getenv('MERMAID'), 'events', 'raw', 'evt')));
-
-else
-    % Review only those .evt files associated with a specific floatnum.
-    if isnumeric(floatnum)
-        floatnum = num2str(floatnum);
-
-    end
-    floats = sprintf('*.%s_*evt', floatnum);
-    d = skipdotdir(dir(fullfile(getenv('MERMAID'), 'events', 'raw', 'evt', floats)));
-
-end
-
 clc
 fprintf('Searching for unreviewed SAC files...\n')
-% Events are are sorted with earliest first.  Work backwards.
-for i = length(d):-1:1
-    sac = strrep(d(i).name, '.raw.evt', '.sac');
-    previously = getevt(sac);
-    if isstruct(previously) || isempty(previously)
-        % Output of getevt either a structure or isempty; in either case the
-        % SAC file has been previously reviewed (otherwise, getevt
-        % returns NaN).
-        continue
 
-    else
-        clc
-        reviewevt(sac, [], [], viewr);
+% Compile list of reviewed SAC files by inspecting the list of reviewed .evt files.
+d = recursivedir(dir(fullfile(getenv('MERMAID'), 'events', 'reviewed', '**/*.evt')));
+evt = strrep(strippath(d), 'evt', 'sac');
 
-    end
+% Compile list of all SAC files and compare their differences.
+sac = fullsac([], fullfile(getenv('MERMAID'), 'processed'));
+[~, idx] = setdiff(strippath(sac), evt);
+sac = sac(idx);
+
+for i = 1:length(sac)
+    reviewevt(sac{i}, [], [], viewr);
     clc
-    fprintf('Searching for unreviewed SAC files...\n')
 
 end
 clc
