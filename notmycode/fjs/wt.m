@@ -123,8 +123,7 @@ try
         an(index)=length(a);
     end
 catch ME
-    
-    warning(['\Input x may be too short to iterate lowpass branch to ' ...
+    warning(['\nInput x may be too short to iterate lowpass branch to ' ...
              '%i scales.\nNeeds updated error handling.\nPaused wt.m for ' ...
              'inspection.'], n)
     keyboard
