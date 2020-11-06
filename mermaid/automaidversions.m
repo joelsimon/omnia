@@ -12,7 +12,7 @@ function [max_lat_diff, max_lon_diff] = automaidversions(mustequate, old, new, f
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 03-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 05-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('old', fullfile(getenv('MERMAID'), 'processed'))
 defval('new', fullfile(getenv('MERMAID'), 'test_processed'))
@@ -32,12 +32,15 @@ if mustequate
 
 else
     fname = [fname '_light.txt'];
-    allowed_date_diff = 0.009 % seconds
-    allowed_dist_diff = 0.00009 % degrees
+    allowed_date_diff = 0.009; % seconds
+    allowed_dist_diff = 0.00009; % degrees
 
 end
 fid = fopen(fname, 'w');
 fmt = '%s\n';
+
+fprintf('Allowed time difference: %.6f s\n', allowed_date_diff)
+fprintf('Allowed (absolute) distance difference: %.8f deg\n\n', allowed_dist_diff)
 
 max_lat_diff = 0;
 max_lon_diff = 0;
@@ -92,10 +95,7 @@ for i = 1:length(sac_old)
     end
 
 end
-fprintf('Wrote %s\n', fname)
+fprintf('Wrote %s\n\n', fname)
 
-max_lat_diff
-max_lat_sac
-
-max_lon_diff
-max_lon_sac
+fprintf('Max lat: %+.8f deg or %+i m (%s)\n', max_lat_diff, round(deg2km(max_lat_diff)*1000), strippath(max_lat_sac))
+fprintf('Max lon: %+.8f deg or %+i m (%s)\n', max_lon_diff, round(deg2km(max_lon_diff)*1000), strippath(max_lon_sac))
