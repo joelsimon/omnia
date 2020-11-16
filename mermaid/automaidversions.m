@@ -25,6 +25,8 @@ sac_new = fullsac([], new);
 sac_old = sac_old(idx_old);
 sac_new = sac_new(idx_new);
 
+fprintf('Comparing %i SAC files common to:\n\t%s (old)\n\t%s (new)\n', length(idx_old), old, new)
+
 if mustequate
     fname = [fname '_full.txt'];
     allowed_date_diff = 0;
