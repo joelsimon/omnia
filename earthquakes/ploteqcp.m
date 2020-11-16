@@ -21,12 +21,9 @@ function  F = ploteqcp(EQ, CP, h)
 %    CP = getcp(s);
 %    F = PLOTEQCP(EQ, CP, h)
 %
-% Author: Dr. Joel D. Simon
+% Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 09-Oct-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
-
-% Potentially dangerous...but latimes.m and textpatch.m can be a real pain...
-warning('off','all')
+% Last modified: 16-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Some plotting defaults.
 LineWidth = 1;
@@ -61,8 +58,8 @@ switch CP.inputs.n
   otherwise
     % Add to this list with trial and error given more examples with
     % differing sampling frequencies.
-    warning('No figure formatting scheme available for %i %s', ...
-            CP.n, plurals('scale', CP.n))
+    warning('No figure formatting scheme available for %i %s', CP.n, ...
+            plurals('scale', CP.n))
 
 end
 
@@ -172,5 +169,3 @@ if ~isempty(EQ)
 
     end
 end
-
-warning('on','all')
