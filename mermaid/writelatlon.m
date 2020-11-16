@@ -1,5 +1,5 @@
-function writelatlon(sacdir, evtdir, returntype)
-% WRITELATLON(sacdir, evtdir, returntype)
+function writelatlon(sacdir, evtdir, returntype, filename)
+% WRITELATLON(sacdir, evtdir, returntype, filename)
 %
 % Writes textfile of MERMAID and event latitudes and longitudes to
 % $MERMAID/events/reviewed/identified/txt/mermaid_latlon.txt
@@ -13,6 +13,7 @@ function writelatlon(sacdir, evtdir, returntype)
 %              'ALL': both triggered and user-requested SAC files (def)
 %              'DET': triggered SAC files as determined by onboard algorithm
 %              'REQ': user-requested SAC files
+% filename     Fullpath output filename (def: $MERMAID/events/.../mermaid_latlon.txt)
 %
 % Output:
 % *N/A*        Text file with columns:
@@ -25,13 +26,15 @@ function writelatlon(sacdir, evtdir, returntype)
 %              (7) EVDP (kilometers)
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 26-Feb-2020, Version 2017b on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 12-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
-defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
-defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
+merpath = getenv('MERMAID');
+defval('sacdir', fullfile(merpath, 'processed'))
+defval('evtdir', fullfile(merpath, 'events'))
 defval('returntype', 'ALL')
+defval('filename',  fullfile(merpath, 'events', 'reviewed', 'identified', 'txt', 'mermaid_latlon.txt'))
 
 % Fetch all identified SAC files matching the requested return type.
 s = revsac(1, sacdir, evtdir, returntype);
@@ -46,7 +49,6 @@ fmt = ['%44s    ', ...
        '%6.2f\n'];
 
 % Open new, or unlock existing, text file.
-filename = fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified', 'txt', 'mermaid_latlon.txt');
 writeaccess('unlock', filename);
 fid = fopen(filename, 'w');
 
