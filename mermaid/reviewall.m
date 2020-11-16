@@ -14,9 +14,9 @@ function reviewall(writecp, floatnum)
 % N/A       Writes reviewed .evt files, updates .txt files,
 %               writes .cp files with uncertainty estimation
 %
-% Author: Dr. Joel D. Simon
+% Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 03-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 05-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('writecp', false)
@@ -44,6 +44,8 @@ sac = fullsac([], fullfile(getenv('MERMAID'), 'processed'));
 [~, idx] = setdiff(strippath(sac), evt);
 sac = sac(idx);
 
+% Loop over in sequential (time) order.
+sac = sort(strippath(sac));
 for i = 1:length(sac)
     reviewevt(sac{i}, [], [], viewr);
     clc
