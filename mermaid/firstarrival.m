@@ -105,9 +105,9 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % ***If MERMAID depth is not contained in the header ('STDP' field),
 % then it is assumed to be 1500 m below the sea surface
 %
-% Author: Dr. Joel D. Simon
+% Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 14-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 16-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -145,6 +145,7 @@ end
 [x, h] = readsac(s);
 
 % Decimate, if requested.
+decimated = false;
 if ~isempty(fs)
     old_fs = round(1 / h.DELTA);
     if fs > old_fs
@@ -156,18 +157,18 @@ if ~isempty(fs)
     x = decimate(x, R);
 
     if R > 1
+        decimated = true
         fprintf('\nDecimated from %i Hz to %i Hz\n', old_fs, round(1 / (h.DELTA*R)));
 
+        % Very important: adjust the appropriate SAMPLE header variables .NPTS and
+        % .DELTA.  The absolute (SECONDS) timing variables (B, E) won't change
+        % (except by maybe a sample-interval...see seistime.m, where it is properly
+        % accounted for).  The length of a decimated array is: ceil(length(x)/r).
+        % If R == 1 these are unchanged.
+        h.NPTS = length(x);
+        h.DELTA = h.DELTA * R;
+
     end
-
-    % Very important: adjust the appropriate SAMPLE header variables .NPTS and
-    % .DELTA.  The absolute (SECONDS) timing variables (B, E) won't change
-    % (except by maybe a sample-interval...see seistime.m, where it is properly
-    % accounted for).  The length of a decimated array is: ceil(length(x)/r).
-    % If R == 1 these are unchanged.
-    h.NPTS = length(x);
-    h.DELTA = h.DELTA * R;
-
 end
 
 % Nab EQ structure, if not supplied (assuming MERMAID data here;
@@ -461,7 +462,7 @@ end
 % not. Rather than a major refactor of this function at this point (to check
 % zero-values in all the windows before decimation) I will note that if data are
 % decimated the zerflag is meaningless.
-if ~isempty(fs)
+if decimated
     zerflag = NaN;
 
 end
