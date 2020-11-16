@@ -164,7 +164,7 @@ end
 
 fprintf('\n---------------------------------------------------------------------\n')
 
-fprintf('Aftering aligning DET and REQ,  and truncating them to be equal length:\n')
+fprintf('After aligning DET and REQ, and truncating them to be equal length:\n')
 fprintf('* their normalized max cross correlation is %.2f %s\n', 100*max_xcorr, '%')
 fprintf('* %.2f %s of DET was cut to match the signal common to REQ\n', px_det, '%')
 fprintf('* %.2f %s of REQ was cut to match the signal common to DET\n\n', px_req, '%')
