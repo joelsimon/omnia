@@ -10,8 +10,8 @@ function matchall
 % empty if all successfully matched).
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 06-Aug-2019, Version 2017b
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 30-Oct-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Find only those SAC files which have not been preliminary matched.
 allsac = fullsac;
@@ -27,16 +27,16 @@ s = allsac(idx);
 fprintf('Searching for unmatched SAC files...\n')
 for i = 1:length(s)
     [x, h] = readsac(s{i});
-    switch efes(h)
-      case 20
-        n = 5;
+
+    % Get wavelet scale
+    scale_idx = strfind(s{i}, 'WLT');
+    if ~isempty(scale_idx)
+        n = str2double(s{i}(scale_idx + 3));
         
-      case 5
-        n = 3;
-        
-      otherwise
-        error('Unrecognized sampling frequency')
-        
+    else
+        % It's a raw signal, which is sampled at 6 scales
+        n = 6
+
     end
 
     % Write raw event (.raw.evt) files).
@@ -44,7 +44,7 @@ for i = 1:length(s)
         cpsac2evt(s{i}, false, 'time', n);
         new = [new + 1];
 
-    catch
+    catch ME
         fail = [fail i];
 
     end
