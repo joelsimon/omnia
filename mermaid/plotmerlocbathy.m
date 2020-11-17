@@ -15,24 +15,22 @@ evtdir = fullfile(merpath, 'events')
 nearbytbl = fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystations.tbl');
 
 
-xlim([176 251])
-ylim([-33 4])
+latlim = [-33 4];
+lonlim = [176 251];
+deplim = [-7000 1500];
 
 clc
 close all
 %%______________________________________________________________________________________%%
 %% Plot bathymetric basemap
 %%______________________________________________________________________________________%%
-[ax_bathy, cb_bathy] = plotsouthpacificbathy();
-
-%% Cosmetics to bathymetric basemap.
-xlim([176 251])
-ylim([-33 4])
-
+[ax_bathy, cb_bathy] = plotsouthpacificbathy(latlim, lonlim, deplim);
 fig2print(gcf, 'flandscape')
 
-xlim([176 251])
-ylim([-33 4])
+%% Cosmetics to bathymetric basemap.
+ax_mer.XLim = lonlim;
+ax_mer.YLim = latlim;
+
 ax = gca;
 hold(ax, 'on')
 
@@ -44,7 +42,7 @@ cb_bathy.Label.Interpreter = 'latex';
 
 movev(gca, 0.1)
 movev(cb_bathy, 0.1)
-cb_bathy.Ticks(9) = [];
+cb_bathy.Ticks = [-7000:1000:0 1500];
 
 ax.XTick = [180:10:250];
 ax.XTickLabel = {'-180$^{\circ}$'  ...
@@ -68,7 +66,7 @@ cb_bathy.TickLength = 0.015;
 cb_bathy.TickDirection = 'out';
 
 axesfs(gcf, fs, fs+3)
-latimes
+%latimes
 cb_bathy.Location = 'EastOutside';
 
 %%______________________________________________________________________________________%%
@@ -88,7 +86,6 @@ axesfs(gcf, fs, fs)
 
 scsize = 10;
 tsize = fs - 2;
-keyboard
 %______________________________________________________________________________%
 
 % Plot MERMAID tracks.
@@ -210,14 +207,14 @@ end
 %% Cosmetics
 
 % Edges of "nearby" stations bouding box.
-maxlat = 4;
-maxlon = 251;
-minlat = -33;
-minlon = 176;
-ax_mer.XLim = [minlon maxlon];
-ax_mer.YLim = [minlat maxlat];
-%ax_mer.XLim = xlim;
-%ax_mer.YLim = ylim;
+% maxlat = 4;
+% maxlon = 251;
+% minlat = -33;
+% minlon = 176;
+% ax_mer.XLim = [minlon maxlon];
+% ax_mer.YLim = [minlat maxlat];
+ax_mer.XLim = lonlim;
+ax_mer.YLim = latlim;
 box on
 
 cb.Label.Interpreter = 'latex';
@@ -291,7 +288,7 @@ lg = legend(nb_pl(kpr((1))), patch_str, 'Interpreter', 'LaTeX');
 lg.Color = 'None';
 %lg.Position(4) = 0.2;
 
-latimes
+%latimes
 set(ax_mer, 'Color', 'None', 'Position', ax_bathy.Position)
 %tx = text(ax_mer, 170, 5, '(a)', 'FontSize', 18, 'FontName', 'Helvetica', 'Interpreter', 'LaTex');
 
@@ -299,6 +296,7 @@ ax_mer.XTick = [];
 ax_mer.YTick = [];
 movev(cb, -0.06)
 
+latimes(gaf)
 savepdf('merlocbathy')
 keyboard
 
