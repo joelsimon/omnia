@@ -1,12 +1,9 @@
 function plotmerlocbathy
-% Originally: $SIMON2020_CODE/SIMON2020_PLOTMERLOC_BATHY
-%
-% Combines simon2020_plotmerloc.m and simon2020_bathy.m to plot MERMAID drift
-% trajectories on a GEBCO 2019 basemap.
+% PLOTMERLOCBATHY
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 17-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -24,12 +21,12 @@ lonlim = [176 251];
 deplim = [-7000 1500];
 
 %%______________________________________________________________________________________%%
-%% (1) Plot bathymetric basemap
+%% (1) Plot bathymetric base map
 %%______________________________________________________________________________________%%
 [ax_bathy, cb_bathy] = plotsouthpacificbathy(latlim, lonlim, deplim);
 fig2print(gcf, 'flandscape')
 
-%% Cosmetics to bathymetric basemap.
+%% Cosmetics to bathymetric base map.
 ax_mer.XLim = lonlim;
 ax_mer.YLim = latlim;
 
@@ -72,7 +69,7 @@ cb_bathy.Location = 'EastOutside';
 %% (2) Plot MERMAID tracks in secondary (transparent) axis
 %%______________________________________________________________________________________%%
 
-% Genereate secondary (transparent) axes in same location as base map.
+% Generate secondary (transparent) axes in same location as base map.
 ax_mer = axes;
 set(ax_mer, 'Color', 'None', 'Position', ax_bathy.Position, ...
             'DataAspectRatio', ax_bathy.DataAspectRatio)
@@ -92,15 +89,14 @@ days_deployed = structfun(@(xx) days(xx.duration), mer, 'UniformOutput', false);
 % MERMAID will reach the maximum color saturation in terms of deployment length).
 longest_deployment = max(structfun(@(xx) xx(end), days_deployed));
 
+% Define colormap and add colorbar.
 cbdata = [0:ceil(longest_deployment)];
 cmap = jet(length(cbdata));
 colormap(ax_mer, cmap)
 [~, cbticks, cbticklabels] = x2color(cbdata, [], [], cmap, false);
+cb_mer = colorbar(ax_mer, 'Location', 'SouthOutside');
 
-cb = colorbar(ax_mer, 'Location', 'SouthOutside');
-cb.Ticks = cbticks(1:20:end);
-cb.TickLabels = cbticklabels(1:20:end);
-
+% Plot all drift tracks.
 name = fieldnames(mer);
 for i = 1:length(name)
     sta = mer.(name{i});
@@ -108,7 +104,7 @@ for i = 1:length(name)
     lon(find(lon<0)) = lon(find(lon<0)) + 360; % convert longitudes from GPS coordinates to 0:360
     lat = sta.lat;
     drift_time = days_deployed.(name{i});
-    
+
     % Mark for removal the location taken while on the ship(?),
     % 17-Aug-2019 03:26:55 -- represents huge jump in location.
     if strcmp(name{i}, 'P023')
@@ -126,7 +122,7 @@ for i = 1:length(name)
 
     end
 
-    % Generate a colobar that saturates at the longest deployement date, so that the colors are in
+    % Generate a colorbar that saturates at the longest deployment date, so that the colors are in
     % reference to each other (only a single GPS track will reach the saturation color).
     col = x2color(drift_time, [], longest_deployment, cmap, false);
     col(end,:)
@@ -134,9 +130,9 @@ for i = 1:length(name)
     mer_tx(i) = text(ax_mer, lon(1), lat(1)+1, name{i}(3:4), 'FontSize', tsize);
 
 end
-keyboard()
+
 %%______________________________________________________________________________________%%
-%% (3) Overlay "nearby" and CPPT stations in same axis as MERMAID tracks.
+%% (3) Overlay "nearby" and CPPT stations in same axis as MERMAID tracks
 %%______________________________________________________________________________________%%
 [~, nb_sta, nb_lat, nb_lon] = parsenearbystationstbl(nearbytbl);
 
@@ -149,41 +145,35 @@ for i = 1:length(nb_sta)
 end
 
 %______________________________________________________________________________%
-%% Cosmetics
+%% (4) Final cosmetics
+%%______________________________________________________________________________________%%
 
-% Edges of "nearby" stations bouding box.
-% maxlat = 4;
-% maxlon = 251;
-% minlat = -33;
-% minlon = 176;
-% ax_mer.XLim = [minlon maxlon];
-% ax_mer.YLim = [minlat maxlat];
 ax_mer.XLim = lonlim;
 ax_mer.YLim = latlim;
 box on
 
-cb.Label.Interpreter = 'latex';
+cb_mer.Label.Interpreter = 'latex';
 
 % This will identify the indices of th colorbar tick labels which are
 % nearest the integer days 0 to 500.
 ticks2keep = nearestidx([cbticklabels{:}], [0:100:800]);
-cb.Ticks = cbticks(ticks2keep);
-cb.TickLabels = {'0'   ...
-                 '100' ...
-                 '200' ...
-                 '300' ...
-                 '400' ...
-                 '500' ...
-                 '600' ...
-                 '700' ...
-                 '800'};
-cb.Label.String = 'Days since deployment';
-cb.FontSize = fs;
-cb.Label.FontSize = fs;
+cb_mer.Ticks = cbticks(ticks2keep);
+cb_mer.TickLabels = {'0'   ...
+                    '100' ...
+                    '200' ...
+                    '300' ...
+                    '400' ...
+                    '500' ...
+                    '600' ...
+                    '700' ...
+                    '800'};
+cb_mer.Label.String = 'Days since deployment';
+cb_mer.FontSize = fs;
+cb_mer.Label.FontSize = fs;
 
 longticks(ax_mer, 3)
-cb.TickDirection = 'out';
-cb.TickLength = 0.015;
+cb_mer.TickDirection = 'out';
+cb_mer.TickLength = 0.015;
 
 
 %% MERMAID
@@ -198,6 +188,8 @@ mer_tx(13).Position(1) = 222;       % P022
 mer_tx(15).Position = [214  -23.5]; % P024
 mer_tx(16).Position = [211  -20.5]; % P025
 
+%% Nearby stations.
+nb_tx(1).Position = [183 -15.75];  % FUTU
 nb_tx(5).Position(1) = 249;        % VA02
 nb_tx(7).Position = [248.5 -27.5]; % RPN
 delete(nb_pl(7))
@@ -206,7 +198,8 @@ nb_tx(24).Position = [212 -12.7];  % VAH
 delete(nb_pl(24));
 nb_tx(25).Position = [208.5 -23.6]; % TBI
 
-% Collect the station names we will keep.
+
+% Delete station names around Fiji; put them in legend
 kpr = [2 15 16 17 18 20 21 22];
 for i = kpr
     if i == 2
@@ -219,29 +212,24 @@ for i = kpr
     end
 
 end
-
-% Delete those station names.
 delete(nb_tx(kpr))
 
-% Flip the symbol and make bigger to mark this cluster of
-% stations. Use the first as the marker and delete the rest.
+% Flip the triangle on Fiji and make bigger to mark this cluster of stations. Use the first as the
+% marker and delete the rest.
 nb_pl(kpr(1)).MarkerSize = 12;
 nb_pl(kpr(1)).Marker = '^';
 delete(nb_pl(kpr(2:end)))
 
+% Add a long list of names attached to the single triangle on Fiji.
 lg = legend(nb_pl(kpr((1))), patch_str, 'Interpreter', 'LaTeX');
 lg.Color = 'None';
-%lg.Position(4) = 0.2;
 
-%latimes
 set(ax_mer, 'Color', 'None', 'Position', ax_bathy.Position)
-%tx = text(ax_mer, 170, 5, '(a)', 'FontSize', 18, 'FontName', 'Helvetica', 'Interpreter', 'LaTex');
 
 ax_mer.XTick = [];
 ax_mer.YTick = [];
-movev(cb, -0.06)
+movev(cb_mer, -0.061)
 
 latimes(gaf)
 savepdf('merlocbathy')
 keyboard
-
