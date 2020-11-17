@@ -1,6 +1,8 @@
 function gps = readgps(processed)
 % gps = READGPS(processed)
 %
+% Read MERMAID GPS locations from text file output by automaid v3.2.0+.
+%
 % Input:
 % processed     Processed directory output by automaid
 %                   (def: $MERMAID/processed)
@@ -9,7 +11,7 @@ function gps = readgps(processed)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 17-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default path.
 merpath = getenv('MERMAID');
@@ -33,7 +35,7 @@ for i = 1:length(d)
 
         % Parse (skip "|" partition of C{7})
         gps.(mermaid).time = C{1};
-        gps.(mermaid).date = iso8601str2date(C{1});
+        gps.(mermaid).locdate = iso8601str2date(C{1});
         gps.(mermaid).lat = C{2};
         gps.(mermaid).lon = C{3};
         gps.(mermaid).hdop = C{4};
