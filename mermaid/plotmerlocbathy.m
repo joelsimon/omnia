@@ -8,21 +8,23 @@ function plotmerlocbathy
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 13-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
+clc
+close all
+
 % Paths.
 merpath = getenv('MERMAID');
-procdir = fullfile(merpath, 'processed')
-evtdir = fullfile(merpath, 'events')
+procdir = fullfile(merpath, 'processed');
+evtdir = fullfile(merpath, 'events');
 nearbytbl = fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystations.tbl');
 
-
+% Common parameters.
+fs = 13;
 latlim = [-33 4];
 lonlim = [176 251];
 deplim = [-7000 1500];
 
-clc
-close all
 %%______________________________________________________________________________________%%
-%% Plot bathymetric basemap
+%% (1) Plot bathymetric basemap
 %%______________________________________________________________________________________%%
 [ax_bathy, cb_bathy] = plotsouthpacificbathy(latlim, lonlim, deplim);
 fig2print(gcf, 'flandscape')
@@ -31,10 +33,7 @@ fig2print(gcf, 'flandscape')
 ax_mer.XLim = lonlim;
 ax_mer.YLim = latlim;
 
-ax = gca;
-hold(ax, 'on')
-
-fs = 13;
+hold(ax_bathy, 'on')
 
 cb_bathy.FontSize = fs;
 cb_bathy.Label.FontSize = fs;
@@ -44,8 +43,8 @@ movev(gca, 0.1)
 movev(cb_bathy, 0.1)
 cb_bathy.Ticks = [-7000:1000:0 1500];
 
-ax.XTick = [180:10:250];
-ax.XTickLabel = {'-180$^{\circ}$'  ...
+ax_bathy.XTick = [180:10:250];
+ax_bathy.XTickLabel = {'-180$^{\circ}$'  ...
                  '-170$^{\circ}$' ...
                  '-160$^{\circ}$' ...
                  '-150$^{\circ}$' ...
@@ -55,124 +54,68 @@ ax.XTickLabel = {'-180$^{\circ}$'  ...
                  '-110$^{\circ}$'};
 
 
-ax.YTick = [-30:10:0];
-ax.YTickLabel = flip({'0$^{\circ}$' ...
+ax_bathy.YTick = [-30:10:0];
+ax_bathy.YTickLabel = flip({'0$^{\circ}$' ...
                     '-10$^{\circ}$' ...
                     '-20$^{\circ}$' ...
                     '-30$^{\circ}$'});
 
-longticks(ax, 3)
+longticks(ax_bathy, 3)
 cb_bathy.TickLength = 0.015;
 cb_bathy.TickDirection = 'out';
 
 axesfs(gcf, fs, fs+3)
-%latimes
+
 cb_bathy.Location = 'EastOutside';
 
 %%______________________________________________________________________________________%%
-%% Overlay seconds (blank) axis to plot MERMAID tracks
+%% (2) Plot MERMAID tracks in secondary (transparent) axis
 %%______________________________________________________________________________________%%
 
+% Genereate secondary (transparent) axes in same location as base map.
 ax_mer = axes;
-set(ax_mer, 'Color', 'None', 'Position', ax_bathy.Position)
+set(ax_mer, 'Color', 'None', 'Position', ax_bathy.Position, ...
+            'DataAspectRatio', ax_bathy.DataAspectRatio)
 hold(ax_mer, 'on')
 fig2print(gcf, 'flandscape')
-
-% Equalize degrees in N/S and E/W directions.
-set(ax_mer, 'DataAspectRatio', [1 1 1])
-
-fs = 13;
 axesfs(gcf, fs, fs)
-
 scsize = 10;
 tsize = fs - 2;
-%______________________________________________________________________________%
 
 % Plot MERMAID tracks.
-
-% Read the lcoation data.
 mer = readgps(procdir);
 
-%% Do everything once for P008, the standard for logiest deployed.  The
-%% assumes P008 is the first in the structure
-name = fieldnames(mer);
-if ~isequaln(mer.(name{1}), mer.P008);
-    error('P008 is not the first float in the list')
+% Structure collecting the total length (in days) each MERMAID deployed.
+days_deployed = structfun(@(xx) days(xx.duration), mer, 'UniformOutput', false);
 
-end
+% The max number of days deployed by any MERMAID, as reference for colorbar saturation (only one
+% MERMAID will reach the maximum color saturation in terms of deployment length).
+longest_deployment = max(structfun(@(xx) xx(end), days_deployed));
 
-% We know mer.P008 is the first station in the list.
-sta  = mer.P008;
-locdate = sta.locdate;
-lon = sta.lon;
-lon(find(lon<0)) = lon(find(lon<0)) + 360; % convert longitudes from GPS coordinates to 0:360
-lat = sta.lat;
+cbdata = [0:ceil(longest_deployment)];
+cmap = jet(length(cbdata));
+colormap(ax_mer, cmap)
+[~, cbticks, cbticklabels] = x2color(cbdata, [], [], cmap, false);
 
-[~, nan_idx1] = unzipnan(locdate);
-[~, nan_idx2] = unzipnan(lon);
-[~, nan_idx3] = unzipnan(lat);
-
-nan_idx = unique([nan_idx1 ; nan_idx2 ; nan_idx3]);
-locdate(nan_idx) = [];
-lon(nan_idx) = [];
-lat(nan_idx) = [];
-
-% Remove locations taken within 1 hour of each other which signals it's
-% the same surfacing.
-rm_idx = find(diff(locdate) < hours(1));
-locdate(rm_idx) = [];
-lon(rm_idx) = [];
-lat(rm_idx) = [];
-
-% Find the last location reported by any MERMAID to generate the "days deployed" color axis
-last_day = max(structfun(@(xx) max(xx.locdate), mer, 'UniformOutput', true));
-
-days_deployed = days(locdate - locdate(1));
-max_days_deployed = days(last_day - locdate(1));
-
-cmap = jet(length(0:max_days_deployed));;
-colormap(ax_mer, cmap);
-[col, cbticks, cbticklabels] = x2color(days_deployed, [], ...
-                                       max_days_deployed, cmap, false);
-
-%plot(ax_mer, lon, lat, ':', 'Color', [0.6 0.6 0.6])
-sc(1) = scatter(ax_mer, lon, lat, scsize, col, 'filled');
-mer_tx(1) = text(ax_mer, lon(1), lat(1)+1, '08', 'FontSize', tsize);
-
-cb = colorbar('Location', 'SouthOutside');
+cb = colorbar(ax_mer, 'Location', 'SouthOutside');
 cb.Ticks = cbticks(1:20:end);
 cb.TickLabels = cbticklabels(1:20:end);
 
-%% Repeat for the other floats.
-for i = 2:length(name)
+name = fieldnames(mer);
+for i = 1:length(name)
     sta = mer.(name{i});
-    locdate = sta.locdate;
     lon = sta.lon;
     lon(find(lon<0)) = lon(find(lon<0)) + 360; % convert longitudes from GPS coordinates to 0:360
     lat = sta.lat;
-
-    [~, nan_idx1] = unzipnan(locdate);
-    [~, nan_idx2] = unzipnan(lon);
-    [~, nan_idx3] = unzipnan(lat);
-
-    nan_idx = unique([nan_idx1 ; nan_idx2 ; nan_idx3]);
-    locdate(nan_idx) = [];
-    lon(nan_idx) = [];
-    lat(nan_idx) = [];
-
-    rm_idx = find(diff(locdate) < hours(1));
-    locdate(rm_idx) = [];
-    lon(rm_idx) = [];
-    lat(rm_idx) = [];
-
+    drift_time = days_deployed.(name{i});
+    
     % Mark for removal the location taken while on the ship(?),
     % 17-Aug-2019 03:26:55 -- represents huge jump in location.
     if strcmp(name{i}, 'P023')
         rm_idx = find(lon == -149.641567 + 360);
-        locdate(rm_idx) = [];
         lon(rm_idx) = [];
         lat(rm_idx) = [];
-
+        drift_time(rm_idx) = [];
         % Plot a faint line connecting those points.
         plot(ax_mer, lon(rm_idx-1:rm_idx), lat(rm_idx-1:rm_idx), ':', ...
              'Color', [0 0 0], 'LineWidth', 1);
@@ -183,16 +126,18 @@ for i = 2:length(name)
 
     end
 
-    days_deployed = days(locdate - locdate(1));
-    col = x2color(days_deployed, [], max_days_deployed, cmap, false);
-
+    % Generate a colobar that saturates at the longest deployement date, so that the colors are in
+    % reference to each other (only a single GPS track will reach the saturation color).
+    col = x2color(drift_time, [], longest_deployment, cmap, false);
+    col(end,:)
     sc(i) = scatter(ax_mer, lon, lat, scsize, col, 'filled');
     mer_tx(i) = text(ax_mer, lon(1), lat(1)+1, name{i}(3:4), 'FontSize', tsize);
 
 end
-
-%______________________________________________________________________________%
-%% Plot "nearby" and CPPT stations.
+keyboard()
+%%______________________________________________________________________________________%%
+%% (3) Overlay "nearby" and CPPT stations in same axis as MERMAID tracks.
+%%______________________________________________________________________________________%%
 [~, nb_sta, nb_lat, nb_lon] = parsenearbystationstbl(nearbytbl);
 
 nb_lon(find(nb_lon<0)) = nb_lon(find(nb_lon<0)) + 360;
