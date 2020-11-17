@@ -7,7 +7,8 @@ function gps = readgps(processed)
 % processed     Processed directory output by automaid
 %                   (def: $MERMAID/processed)
 % Output:
-% gps           GPS structure that parses gps.txt, organized by float name
+% gps           GPS structure that parses gps.txt, organized by float name, along with some other
+%                   niceties (like their total float time since deployment)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
@@ -36,6 +37,7 @@ for i = 1:length(d)
         % Parse (skip "|" partition of C{7})
         gps.(mermaid).time = C{1};
         gps.(mermaid).locdate = iso8601str2date(C{1});
+        gps.(mermaid).duration =  [0 ; cumsum(diff(gps.(mermaid).locdate))];
         gps.(mermaid).lat = C{2};
         gps.(mermaid).lon = C{3};
         gps.(mermaid).hdop = C{4};
