@@ -1,54 +1,65 @@
- function plotmerlocbathy2
+function plotmerlocbathy2(name)
+% PLOTMERLOCBATHY2(name)
+
+% Defaults
+defval('name', 'P008')
+
 close all
 
 ax_fs = 13;
 cb_fs = 10;
 
-g = readgps;
-g = g.P008;
-lat = g.lat;
-lon = g.lon;
+% Read GPS points for requested MERMAID.
+G = readgps;
+G = G.(name);
+lat = G.lat;
+lon = G.lon;
 % Convert longitudes to 0:360 convention:
 lon(find(lon<0)) = lon(find(lon<0)) + 360;
+duration = G.duration;
+
 %%______________________________________________________________________________________%%
 %% (1) Plot bathymetric base map one separate axis
 %%______________________________________________________________________________________%%
 
-duration = g.duration;
-
+% Let MATLAB determine the x/ylims of the ultimate basemap: scatter the data then delete the plot.
 scatter(lon, lat, [], 'w');
 xl = xlim;
 yl = ylim;
 close
 
+% Plot the basemap on the newly-determined lon/latitude limits.
 ax_bathy = axes;
 [ax_bathy, cb_bathy] = plotsouthpacificbathy(yl, xl);
+
+% Base map cosmetics.
 cb_bathy.Location = 'EastOutside';
 cb_bathy.FontSize = ax_fs;
 cb_bathy.Label.FontSize = ax_fs;
 cb_bathy.Label.Interpreter = 'LaTeX';
+cb_bathy.TickDirection = 'Out'
 
-
+% Turn off base map axis labels.
 set(ax_bathy, 'Visible', 'off');
 
 fig2print(gcf, 'flandscape')
 
 %%______________________________________________________________________________________%%
 %% (2) Overlay MERMAID drift tracks in separate transparent axis
-%%
+%%______________________________________________________________________________________%%
 
 ax_mer = axes;
 
 % Figure out color map based on drift duration for scatter plot.
 days_deployed = days(duration);
 cmap = jet(length(days_deployed));
+colormap(ax_mer, cmap)
 [col, cbticks, cbticklabels] = x2color(days_deployed, [], [], cmap, false);
 
 % Scatter the data.
 sc = scatter(ax_mer, lon, lat, [], col, 'Filled');
 
-% Adjust the 
-colormap(ax_mer, cmap)
+% Adjust the colorbar ticklabels.
 cb_mer = colorbar(ax_mer, 'Location', 'SouthOutside');
 last_day_tick = floor(days_deployed(end) / 100) * 100;
 days2mark = [0:100:last_day_tick];
@@ -56,25 +67,28 @@ ticks2keep = nearestidx([cbticklabels{:}], days2mark);
 cb_mer.Ticks = cbticks(ticks2keep);
 % Really it's this -- cb_mer.TickLabels = cbticklabels(ticks2keep),
 % but we can get away with some rounding --
-cb_mer.TickLabels = num2cell(days2mark);
+cb_mer.TickLabels = days2mark;
+
+% Drift-track costmetics.
 cb_mer.Label.String = 'Days since deployment';
 cb_mer.FontSize = ax_fs;
 cb_mer.Label.FontSize = ax_fs;
 cb_mer.Label.Interpreter = 'LaTeX';
+cb_mer.TickDirection = 'Out'
 
 xlabel(ax_mer, 'Longitude');
 ylabel(ax_mer,'Latitude');
 
-set(ax_mer, 'Position', ax_bathy.Position, 'Color', 'None', 'DataAspectRatio', [1 1 1], 'Box', 'on');
+% Covert longitude back to GPS convention for XLabels.
+lonlabels = ax_mer.XTick;
+lonlabels(ax_mer.XTick>=180) = lonlabels(ax_mer.XTick>=180) - 360;
+ax_mer.XTickLabels = lonlabels;
 
 axesfs(gcf, ax_fs, ax_fs)
 latimes(gcf)
 
-
-keyboard
-%%______________________________________________________________________________________%%
-
-
-
-
-
+set(ax_mer, 'Position', ax_bathy.Position,  ...
+            'XLim', ax_bathy.XLim, ...
+            'YLim', ax_bathy.YLim, ...
+            'DataAspectRatio', ax_bathy.DataAspectRatio, ...
+            'TickDir', 'Out', 'Box', 'on', 'Color', 'None')
