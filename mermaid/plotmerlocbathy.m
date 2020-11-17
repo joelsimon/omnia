@@ -12,6 +12,7 @@ function plotmerlocbathy
 merpath = getenv('MERMAID');
 procdir = fullfile(merpath, 'processed')
 evtdir = fullfile(merpath, 'events')
+nearbytbl = fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystations.tbl');
 
 
 %%______________________________________________________________________________________%%
@@ -144,7 +145,7 @@ end
 
 %______________________________________________________________________________%
 %% Plot "nearby" and CPPT stations.
-[~, nb_sta, nb_lat, nb_lon] = readnearbytbl;
+[~, nb_sta, nb_lat, nb_lon] = parsenearbystationstbl(nearbytbl);
 
 nb_lon(find(nb_lon<0)) = nb_lon(find(nb_lon<0)) + 360;
 for i = 1:length(nb_sta)
@@ -247,28 +248,6 @@ movev(cb, -0.06)
 
 savepdf('merlocbathy')
 keyboard
-
-%______________________________________________________________________________%
-
-function [net, sta, lat, lon] = readnearbytbl
-filename = fullfile(getenv('SIMON2020_CODE'), 'data', 'nearbystations.tbl');
-
-% Read the file.
-s = readtext(filename);
-
-% Remove empty \newline.
-s(end) = [];
-
-% Parse the relevant info.
-for i = 1:length(s)
-    sp = strtrim(strsplit(strrep(s{i}, '\\', '') , '&'));
-
-    net{i} = sp{1};
-    sta{i} = sp{2};
-    lat(i) = str2double(sp{3});
-    lon(i) = str2double(sp{4});
-
-end
 
 %%______________________________________________________________________________________%%
 %%                                   simon2020_bathy.m                                  %%
