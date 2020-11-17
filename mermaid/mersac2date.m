@@ -21,33 +21,18 @@ function tdate = mersac2date(sac)
 % See also: seistime.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 22-Oct-2019, Version 2017b on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 17-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-%% Recursive.
-
+% Strip date from first 15 chars of filename.
 if iscell(sac)
-    tdate = NaT(size(sac), 'TimeZone', 'UTC');
-    for i = 1:length(sac)
+    tstr = cellfun(@(xx) xx(1:15), sac, 'UniformOutput', false);
 
-        %% Recursive.
-
-        tdate(i) = mersac2date(sac{i});
-
-    end
-    return
+else
+    tstr = sac(1:15);
 
 end
 
-% Ensure proper input.
-sac = strippath(sac);
-if ~issac(sac)
-    error('Input SAC filename only (must be char array ending in ''.SAC'' or ''.sac''')
-
-end
-
-% Convert filename string to datetime.
-tstr = sac(1:15);
-tstr(9) = []; % Remove 'T'
-fmt = 'uuuuMMddHHmmss';
+% Create datetime array.
+fmt = 'uuuuMMdd''T''HHmmss';
 tdate = datetime(tstr, 'InputFormat', fmt, 'TimeZone', 'UTC');

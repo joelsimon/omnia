@@ -30,27 +30,9 @@ function tdate = fdsnstr2date(tstr)
 % See also: fdsndate2str
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 08-Oct-2019, Version 2017b on GLNXA64
-
-%% Recursive.
-
-if iscell(tstr)
-    tdate = NaT(size(tstr), 'TimeZone', 'UTC');
-    for i = 1:length(tstr)
-
-        %% Recursive.
-
-        tdate(i) = fdsnstr2date(tstr{i});
-
-    end
-    return
-
-end
-
-% Remove the "T" at the 11th index.
-tstr(11) = [];
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 17-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % https://www.mathworks.com/help/matlab/ref/datetime.html?searchHighlight=datetime&s_tid=doc_srchtitle#buhzxmk-1-Format
-fmt = 'uuuu-MM-ddHH:mm:ss.SSS';
+fmt = 'uuuu-MM-dd''T''HH:mm:ss.SSS';
 tdate = datetime(tstr, 'InputFormat', fmt, 'TimeZone', 'UTC');

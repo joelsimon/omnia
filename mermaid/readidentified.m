@@ -39,8 +39,8 @@ function varargout = readidentified(filename, starttime, endtime, reftime, retur
 % See also: readevt2txt.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 04-Dec-2019, Version 2017b on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 17-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -82,11 +82,7 @@ eqdate = NaT(length(eqtime), 1, 'TimeZone', 'UTC');
 
 % Get SAC (time at first sample) and EQ (hypocenter time) datetimes.
 sacdate = mersac2date(sac);
-eqdate = NaT(size(eqtime), 'TimeZone', 'UTC');
-for i = 1:length(eqtime)
-        eqdate(i) = irisstr2date(eqtime{i}, 2);
-
-end
+eqdate = irisstr2date(eqtime, 2);
 
 % Switch which dates (SAC times or event times) to use to winnow the
 % return within a specific time interval.
