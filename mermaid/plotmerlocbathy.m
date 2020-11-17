@@ -8,6 +8,12 @@ function plotmerlocbathy
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 13-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
+% Paths.
+merpath = getenv('MERMAID');
+procdir = fullfile(merpath, 'processed')
+evtdir = fullfile(merpath, 'events')
+
+
 %%______________________________________________________________________________________%%
 %%                           simon2020_plotmerloc.m                                     %%
 %%______________________________________________________________________________________%%
@@ -36,13 +42,12 @@ tsize = fs - 2;
 % Plot MERMAID tracks.
 
 % Read the lcoation data.
-locdir =  fullfile(getenv('MERMAID'), 'locations');
-mer = readmerloc(locdir);
+mer = readgps(procdir);
 
-%% Do everthing once for P008, the starndard for logest deployed.  The
+%% Do everything once for P008, the standard for logiest deployed.  The
 %% assumes P008 is the first in the structure
 name = fieldnames(mer);
-if ~isequal(mer.(name{1}), mer.P008);
+if ~isequaln(mer.(name{1}), mer.P008);
     error('P008 is not the first float in the list')
 
 end
@@ -197,6 +202,7 @@ mer_tx(13).Position(1) = 222;       % P022
 mer_tx(15).Position = [214  -23.5]; % P024
 mer_tx(16).Position = [211  -20.5]; % P025
 
+nb_tx(5).Position(1) = 249;        % VA02
 nb_tx(7).Position = [248.5 -27.5]; % RPN
 delete(nb_pl(7))
 nb_tx(8).Position = [189 -15.25];  % AFI
