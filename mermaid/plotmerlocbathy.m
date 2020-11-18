@@ -82,12 +82,16 @@ tsize = fs - 2;
 % Plot MERMAID tracks.
 mer = readgps(procdir);
 
-% Structure collecting the total length (in days) each MERMAID deployed.
-days_deployed = structfun(@(xx) days(xx.duration), mer, 'UniformOutput', false);
+% Figure out the longest deployment time to generate the colorbar reference saturation
+name = fieldnames(mer);
+longest_deployment = 0;
+for i = 1:length(name)
+    days_deployed = days(mer.(name{i}).locdate(end) - mer.(name{i}).locdate(1));
+    if days_deployed > longest_deployment
+        longest_deployment = days_deployed;
 
-% The max number of days deployed by any MERMAID, as reference for colorbar saturation (only one
-% MERMAID will reach the maximum color saturation in terms of deployment length).
-longest_deployment = max(structfun(@(xx) xx(end), days_deployed));
+    end
+end
 
 % Define colormap and add colorbar.
 cbdata = [0:ceil(longest_deployment)];
@@ -97,13 +101,12 @@ colormap(ax_mer, cmap)
 cb_mer = colorbar(ax_mer, 'Location', 'SouthOutside');
 
 % Plot all drift tracks.
-name = fieldnames(mer);
 for i = 1:length(name)
     sta = mer.(name{i});
     lon = sta.lon;
     lon(find(lon<0)) = lon(find(lon<0)) + 360; % convert longitudes from GPS coordinates to 0:360
     lat = sta.lat;
-    drift_time = days_deployed.(name{i});
+    cum_days = [0 ; cumsum(days(diff(mer.(name{i}).locdate)))];
 
     % Mark for removal the location taken while on the ship(?),
     % 17-Aug-2019 03:26:55 -- represents huge jump in location.
@@ -111,7 +114,7 @@ for i = 1:length(name)
         rm_idx = find(lon == -149.641567 + 360);
         lon(rm_idx) = [];
         lat(rm_idx) = [];
-        drift_time(rm_idx) = [];
+        cum_days(rm_idx) = [];
         % Plot a faint line connecting those points.
         plot(ax_mer, lon(rm_idx-1:rm_idx), lat(rm_idx-1:rm_idx), ':', ...
              'Color', [0 0 0], 'LineWidth', 1);
@@ -124,7 +127,7 @@ for i = 1:length(name)
 
     % Generate a colorbar that saturates at the longest deployment date, so that the colors are in
     % reference to each other (only a single GPS track will reach the saturation color).
-    col = x2color(drift_time, [], longest_deployment, cmap, false);
+    col = x2color(cum_days, [], longest_deployment, cmap, false);
     col(end,:)
     sc(i) = scatter(ax_mer, lon, lat, scsize, col, 'filled');
     mer_tx(i) = text(ax_mer, lon(1), lat(1)+1, name{i}(3:4), 'FontSize', tsize);
