@@ -1,18 +1,23 @@
 function [ax, cb] = plotsouthpacificbathy(lon, lat, cax, filename)
 % [ax, cb] = PLOTSOUTHPACIFICBATHY(lon, lat, cax, filename)
 %
-% Plot the bathymetry of the South Pacific
+% Plot the bathymetry of the South Pacific.
 %
-% lat       Latitude boundaries, southing [90:-90] (def: [4 -33])
 % lon       Longitude boundaries, westing [0:360] (def: [176 251])
-% cax       Colorbar limits, postive is meters below surface (def: -7000 1500)]
+% lat       Latitude boundaries, southing [90:-90] (def: [4 -33])
+% cax       Colorbar limits, positive is meters below surface (def: -7000 1500)]
 % filename  Bathymetric .mat filename (from FJS)
+%
+% Ex:
+%    figure; PLOTSOUTHPACIFICBATHY
+%    figure; PLOTSOUTHPACIFICBATHY([180 190], [-10 -20], [-8000 -5000])
+%
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 18-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-% Defaults
+% Defaults.
 % http://ds.iris.edu/gmap/#network=*&starttime=2018-06-01&maxlat=4&maxlon=251&minlat=-33&minlon=176&drawingmode=box&planet=earth
 defval('lon', [176 251])
 defval('lat', [4 -33])
@@ -25,12 +30,13 @@ cax(find(cax==0)) = cax(find(cax==0)) + 1e-3;
 % Load data .mat file
 load(filename)
 
-lonvals = linspace(176, 251, size(z, 2));
-lonidx =  nearestidx(lonvals, lon);
+% Determine the indices of the data matrix ("z") that correspond to the requested lat/longitude
+% boundaries. The complete matrix spans lon = [176 251], lat = [4 -33].
+lonmap = linspace(176, 251, size(z, 2));
+lonidx = nearestidx(lonmap, lon);
 
-latvals = linspace(4, -33, size(z, 1));
-latidx =  nearestidx(latvals, lat);
-keyboard
+latmap = linspace(4, -33, size(z, 1));
+latidx =  nearestidx(latmap, lat);
 z = z(latidx(1):latidx(2), lonidx(1):lonidx(2));
 
 % Parse lat/lon boundaries into matrix elements.
@@ -47,7 +53,7 @@ ax = gca;
 % ...then colorbar again for adequate rendering.
 [cb, cm] = cax2dem(cax, 'hor');
 
-% Cosmetics
+% Cosmetics.
 xlabel('Longitude')
 ylabel('Latitude')
 cb.XLabel.String=sprintf('GEBCO %i elevation (m)', 2019);
