@@ -11,7 +11,7 @@ function [tot, surf, deep] = driftstats(gps, name, surftime, deeptime)
 % Input:
 % gps         GPS structure from readgps.m
 % name        Char name of MERMAID (e.g., 'P008'; fieldname in gps)
-% surftime     Maximum time difference between two GPS points to be considered surface drift [s]
+% surftime    Maximum time difference between two GPS points to be considered surface drift [s]
 %                 (def: 3600)
 % deeptime    Minimum time difference between two GPS points to be considered deep drift [s]
 %                 (def: 6.5*3600)
@@ -94,7 +94,7 @@ time = seconds(locdate(idx(:,2)) - locdate(idx(:,1)));
 
 % Issue: division by zero.
 % Solution: replace time = 0 with NaNs, divide, slot 0 back into same indices.
-zero_time = find(time==0)
+zero_time = find(time==0);
 time(zero_time) = NaN;
 vel = dist ./ time;
 time(zero_time) = 0;
@@ -109,4 +109,3 @@ tot_time = sum(time);
 ave_time = nanmean(time);
 
 ave_vel = nanmean(vel);
-keyboard
