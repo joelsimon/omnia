@@ -25,12 +25,12 @@ cax(find(cax==0)) = cax(find(cax==0)) + 1e-3;
 % Load data .mat file
 load(filename)
 
-lonvals = linspace(175, 251, size(z, 2));
+lonvals = linspace(176, 251, size(z, 2));
 lonidx =  nearestidx(lonvals, lon);
 
 latvals = linspace(4, -33, size(z, 1));
 latidx =  nearestidx(latvals, lat);
-
+keyboard
 z = z(latidx(1):latidx(2), lonidx(1):lonidx(2));
 
 % Parse lat/lon boundaries into matrix elements.
