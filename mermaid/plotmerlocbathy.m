@@ -23,7 +23,7 @@ deplim = [-7000 1500];
 %%______________________________________________________________________________________%%
 %% (1) Plot bathymetric base map
 %%______________________________________________________________________________________%%
-[ax_bathy, cb_bathy] = plotsouthpacificbathy(latlim, lonlim, deplim);
+[ax_bathy, cb_bathy] = plotsouthpacificbathy([176 251], [4 -33], deplim);
 fig2print(gcf, 'flandscape')
 
 %% Cosmetics to bathymetric base map.

@@ -31,7 +31,9 @@ close
 
 % Plot the basemap on the newly-determined lon/latitude limits.
 ax_bathy = axes;
-[ax_bathy, cb_bathy] = plotsouthpacificbathy(yl, xl);
+
+% Flip the YLimits because they must go from high to low numbers (southing).
+[ax_bathy, cb_bathy] = plotsouthpacificbathy(xl, flip(yl));
 
 % Base map cosmetics.
 cb_bathy.Location = 'EastOutside';
@@ -62,7 +64,7 @@ colormap(ax_mer, cmap)
 [col, cbticks, cbticklabels] = x2color(cum_days, [], [], cmap, false);
 
 % Scatter the data.
-sc = scatter(ax_mer, lon, lat, [], col, 'Filled');
+sc = scatter(ax_mer, lon, lat, [], col, 'Filled', 'MarkerEdgeColor', 'k');
 
 % Adjust the colorbar ticklabels.
 cb_mer = colorbar(ax_mer, 'Location', 'SouthOutside');
