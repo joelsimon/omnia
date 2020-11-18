@@ -66,7 +66,7 @@ sc = scatter(ax_mer, lon, lat, [], col, 'Filled');
 
 % Adjust the colorbar ticklabels.
 cb_mer = colorbar(ax_mer, 'Location', 'SouthOutside');
-last_day_tick = floor(cum_days(end) / 100) * 100;
+last_day_tick = floor(cum_days(end)/100) * 100;
 days2mark = [0:100:last_day_tick];
 ticks2keep = nearestidx([cbticklabels{:}], days2mark);
 cb_mer.Ticks = cbticks(ticks2keep);
@@ -84,10 +84,21 @@ cb_mer.TickDirection = 'Out';
 xlabel(ax_mer, 'Longitude');
 ylabel(ax_mer,'Latitude');
 
+% Keep only integer degrees (to not muck up next part)
+ax_mer.XTick = ax_mer.XTick(find(isint(ax_mer.XTick)));
+ax_mer.YTick = ax_mer.YTick(find(isint(ax_mer.YTick)));
+
 % Covert longitude back to GPS convention for XLabels.
 lonlabels = ax_mer.XTick;
 lonlabels(ax_mer.XTick>=180) = lonlabels(ax_mer.XTick>=180) - 360;
-ax_mer.XTickLabels = lonlabels;
+latlabels = ax_mer.YTick;
+
+ax_mer.XTickLabels = compose('%d', lonlabels);
+ax_mer.YTickLabels = compose('%d', latlabels);
+
+% Add LaTeX-ready degree symbols to lat/lon ticklabels.
+ax_mer.XTickLabels = cellfun(@(xx) [xx '$^{\circ}$'], ax_mer.XTickLabels, 'UniformOutput', false);
+ax_mer.YTickLabels = cellfun(@(xx) [xx '$^{\circ}$'], ax_mer.YTickLabels, 'UniformOutput', false);
 
 axesfs(gcf, ax_fs, ax_fs)
 latimes(gcf)
