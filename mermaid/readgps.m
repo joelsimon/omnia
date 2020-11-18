@@ -37,7 +37,6 @@ for i = 1:length(d)
         % Parse (skip "|" partition of C{7})
         gps.(mermaid).time = C{1};
         gps.(mermaid).locdate = iso8601str2date(C{1});
-        gps.(mermaid).duration =  [0 ; cumsum(diff(gps.(mermaid).locdate))];
         gps.(mermaid).lat = C{2};
         gps.(mermaid).lon = C{3};
         gps.(mermaid).hdop = C{4};
