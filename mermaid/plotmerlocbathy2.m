@@ -10,8 +10,8 @@ ax_fs = 13;
 cb_fs = 10;
 
 % Read GPS points for requested MERMAID.
-mer = readgps;
-mer = mer.(name);
+gps = readgps;
+mer = gps.(name);
 lat = mer.lat;
 lon = mer.lon;
 % Convert longitudes to 0:360 convention:
@@ -33,7 +33,9 @@ close
 ax_bathy = axes;
 
 % Flip the YLimits because they must go from high to low numbers (southing).
-[ax_bathy, cb_bathy] = plotsouthpacificbathy(xl, flip(yl));
+cax = [-7000 1500];
+[ax_bathy, cb_bathy] = plotsouthpacificbathy(xl, flip(yl), cax);
+cb_bathy.Ticks = [-7000:1000:0 1500];
 
 % Base map cosmetics.
 cb_bathy.Location = 'EastOutside';
@@ -102,7 +104,24 @@ ax_mer.YTickLabels = compose('%d', latlabels);
 ax_mer.XTickLabels = cellfun(@(xx) [xx '$^{\circ}$'], ax_mer.XTickLabels, 'UniformOutput', false);
 ax_mer.YTickLabels = cellfun(@(xx) [xx '$^{\circ}$'], ax_mer.YTickLabels, 'UniformOutput', false);
 
+%%______________________________________________________________________________________%%
+%% (3) Add drift statistics as title to plot
+%%______________________________________________________________________________________%%
+[drift_tot, drift_surf, drift_deep] = driftstats(gps, name, 3600, 6.5*3600);
+
+tl_str = sprintf('%s:', name);
+tl_str = sprintf('%s total drift=%i km,', tl_str, round(drift_tot.tot_dist/1000));
+tl_str = sprintf('%s surface vel.=%.1f km/hr,', tl_str, drift_surf.ave_vel*3.6);
+tl_str = sprintf('%s deep vel.=%.1f km/day', tl_str, drift_deep.ave_vel*3.6*24); 
+
+tl = title(ax_mer, tl_str);
+
+%%______________________________________________________________________________________%%
+%% (4) Final cosmetics and axes adjustment to ensure they lie on top of one another
+%%______________________________________________________________________________________%%
+
 axesfs(gcf, ax_fs, ax_fs)
+tl.FontSize = ax_fs + 2;
 latimes(gcf)
 
 set(ax_mer, 'Position', ax_bathy.Position,  ...
