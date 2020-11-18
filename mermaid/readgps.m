@@ -7,12 +7,11 @@ function gps = readgps(processed)
 % processed     Processed directory output by automaid
 %                   (def: $MERMAID/processed)
 % Output:
-% gps           GPS structure that parses gps.txt, organized by float name, along with some other
-%                   niceties (like their total float time since deployment)
+% gps           GPS structure that parses gps.txt, organized by float name
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 18-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default path.
 merpath = getenv('MERMAID');
