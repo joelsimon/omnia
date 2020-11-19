@@ -3,7 +3,7 @@ function plotmerlocbathyall
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 19-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -228,10 +228,13 @@ delete(nb_pl(kpr(2:end)))
 lg = legend(nb_pl(kpr((1))), patch_str, 'Interpreter', 'LaTeX');
 lg.Color = 'None';
 
-set(ax_mer, 'Color', 'None', 'Position', ax_bathy.Position)
+
 
 ax_mer.XTick = [];
 ax_mer.YTick = [];
-movev(cb_mer, -0.061)
 
 latimes(gaf)
+moveh([ax_bathy cb_mer], -0.05)
+movev(cb_mer, -0.1)
+
+set(ax_mer, 'Color', 'None', 'Position', ax_bathy.Position)
