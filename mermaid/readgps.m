@@ -3,11 +3,19 @@ function gps = readgps(processed)
 %
 % Read MERMAID GPS locations from text file output by automaid v3.2.0+.
 %
+% NB, P023 was out of the water on for GPS dates:
+% 2019-08-17T03:18:29Z
+% 2019-08-17T03:22:02Z
+% but those locations are NOT removed here. Be sure to remove them before processing, e.g., with
+% drifstats.m
+%
 % Input:
 % processed     Processed directory output by automaid
 %                   (def: $MERMAID/processed)
 % Output:
 % gps           GPS structure that parses gps.txt, organized by float name
+%
+% See also: driftstats.m, readloc.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
