@@ -20,9 +20,9 @@ function [tot, surf, deep] = driftstats(gps, name, surftime, deeptime)
 % surf        Drift statistics of surface drift
 % deep        Drift statistics of deep drift
 %
-% Each output structure returns the sums/means of these statistics, and breaks them by individual
-% leg (segments between GPS points).  The index matrix, '.idx,' attached to each are "leg-segment
-% GPS pairs," and they reference the complete list of locations and dates in gps.
+% Each output structure returns the sums/means of these statistics, and breaks them down by
+% individual leg (segments between GPS points).  The index matrix, '.idx,' attached to each are
+% "leg-segment GPS pairs," and they reference the complete list of locations and dates in gps.
 %
 % I.e., for P008
 %
@@ -30,7 +30,7 @@ function [tot, surf, deep] = driftstats(gps, name, surftime, deeptime)
 %
 % meaning that the first deep-drift leg occurred between the dates of
 %
-%     gps.P008.locdate(4:5) = [2018-08-05T13:32:46Z  2018-08-06T13:47:20Z]'
+%     gps.P008.locdate(4:5) = [2018-08-05T13:32:46Z  2018-08-06T13:47:20Z]
 %
 % See also: readgps.m
 %
@@ -49,20 +49,55 @@ lat = gps.lat;
 lon = gps.lon;
 locdate = gps.locdate;
 
+% Compute the time difference between each GPS fix.
 leg_time = seconds(diff(locdate));
 leg_time = [0 ; leg_time];
+
+%%______________________________________________________________________________________%%
+%% Considering ALL GPS fixes
+%%______________________________________________________________________________________%%
 
 % Compute leg-pair indices -- these reference the complete list in mer.(name).
 idx = 1:length(locdate);
 tot.idx = [idx'-1 idx'];
-tot.idx(1,1) = 1;    % otherwise tot.idx(1,1,) = 0; index out of bounds (makes a zero-time [1 1]  leg)
+tot.idx(1,1) = 1;    % otherwise tot.idx(1,1,) = 0; index out of bounds (makes a zero-time [1 1] leg)
 
+% Leg-pairs are defined by the SECOND COLUMN (which matches lat/lon/locdate indexing):
+%
+% 1st leg: indices [1   1] (null; no time difference)
+% 2nd leg: indices [1   2]
+% 3rd leg: indices [2   3]
+% ...
+% Nth leg: indices [N-1 N]
+% Nth + 1: indices [N N+1]  (Nth index of lat seen in Nth and Nth+1 index of tot.idx)
+
+% We need to be careful about P023 because it was out of the water on some dates.
+if strcmp(name, 'P023')
+    bad_dates = iso8601str2date({'2019-08-17T03:18:29Z' '2019-08-17T03:22:02Z'});
+    [~, bad_idx] = intersect(locdate, bad_dates);
+
+    % Insert NaNs as opposed to removing the values to maintain the same indexing.
+    lat(bad_idx) = NaN;
+    lon(bad_idx) = NaN;
+    locdate(bad_idx) = NaT;
+    leg_time(bad_idx) = NaN;
+    tot.idx(bad_idx,:) = NaN;
+
+end
+
+%%______________________________________________________________________________________%%
+%% Considering GPS fixes while drifting at the surface
+%%______________________________________________________________________________________%%
 short_time = find(leg_time < surftime);
 surf.idx = [short_time-1 short_time];
 if surf.idx(1,1) == 0
     surf.idx(1,1) = 1;
 
 end
+
+%%______________________________________________________________________________________%%
+%% Considering GPS fixes while drifting in the mixed layer
+%%______________________________________________________________________________________%%
 
 long_time = find(leg_time > deeptime);
 deep.idx = [long_time-1 long_time];
@@ -85,12 +120,26 @@ end
 %%______________________________________________________________________________________%%
 
 function [dist, time, vel, tot_dist, ave_dist, tot_time,  ave_time, ave_vel] ...
-    = dtv(idx, lat, lon, locdate)
-% Returns distances, times, and velocities meters, seconds, and meters per second.
+        = dtv(idx, lat, lon, locdate)
 
+% Find any non-finite indices (removed in P023)
+[~, nan_idx] = unzipnan(idx(:, 2));
+
+% Replace those indices with dummies so that they may be referenced as actual lat/lon and locdate
+% indices: just use 1 (this means that the 'deg' and 'time' computations will temporarily reference
+% the first lat/lon or locdate); we'll slot NaNs back into those indices below.
+idx(nan_idx,:) = 1;
+
+% Compute degrees traveled and time spend on each leg.
 deg = distance(lat(idx(:,2)), lon(idx(:,2)), lat(idx(:,1)), lon(idx(:,1)));
-dist = deg2km(deg) * 1000;
 time = seconds(locdate(idx(:,2)) - locdate(idx(:,1)));
+
+% Replace indices that were temporarily set to 1 back to NaN.
+deg(nan_idx) = NaN;
+time(nan_idx) = NaN;
+
+% Now this value is legit (DO NOT do this before NaN replacement, directly above).
+dist = deg2km(deg) * 1000;
 
 % Issue: division by zero.
 % Solution: replace time = 0 with NaNs, divide, slot 0 back into same indices.
@@ -99,13 +148,13 @@ time(zero_time) = NaN;
 vel = dist ./ time;
 time(zero_time) = 0;
 
-tot_deg = sum(deg);
+tot_deg = nansum(deg);
 ave_deg = nanmean(deg);
 
-tot_dist = sum(dist);
+tot_dist = nansum(dist);
 ave_dist = nanmean(dist);
 
-tot_time = sum(time);
+tot_time = nansum(time);
 ave_time = nanmean(time);
 
 ave_vel = nanmean(vel);
