@@ -108,13 +108,14 @@ for i = 1:length(name)
     lat = sta.lat;
     cum_days = [0 ; cumsum(days(diff(mer.(name{i}).locdate)))];
 
-    % Mark for removal the location taken while on the ship(?),
-    % 17-Aug-2019 03:26:55 -- represents huge jump in location.
+    % Remove indices when MERMAID P023 was out of the water (on the ship).
     if strcmp(name{i}, 'P023')
-        rm_idx = find(lon == -149.641567 + 360);
+        bad_dates = iso8601str2date({'2019-08-17T03:18:29Z' '2019-08-17T03:22:02Z'});
+        [~, rm_idx] = intersect(sta.locdate, bad_dates);
         lon(rm_idx) = [];
         lat(rm_idx) = [];
         cum_days(rm_idx) = [];
+
         % Plot a faint line connecting those points.
         plot(ax_mer, lon(rm_idx-1:rm_idx), lat(rm_idx-1:rm_idx), ':', ...
              'Color', [0 0 0], 'LineWidth', 1);

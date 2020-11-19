@@ -26,6 +26,17 @@ lon(find(lon<0)) = lon(find(lon<0)) + 360;
 locdate = mer.locdate;
 cum_days = [0 ; cumsum(days(diff(locdate)))];
 
+% Remove GPS fixes taken by P023 while out of water (on the ship).
+if strcmp(mername, 'P023')
+    bad_dates = iso8601str2date({'2019-08-17T03:18:29Z' '2019-08-17T03:22:02Z'});
+    [~, rm_idx] = intersect(locdate, bad_dates);
+    lat(rm_idx) = [];
+    lon(rm_idx) = [];
+    locdate(rm_idx) = [];
+    cum_days(rm_idx) = [];
+
+end
+
 %%______________________________________________________________________________________%%
 %% (1) Plot bathymetric base map one separate axis
 %%______________________________________________________________________________________%%
