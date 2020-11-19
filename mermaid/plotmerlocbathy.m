@@ -1,5 +1,5 @@
-function plotmerlocbathy2(mername, lgpos)
-% PLOTMERLOCBATHY2(mername, lgpos)
+function plotmerlocbathy(mername, legendloc)
+% PLOTMERLOCBATHY(mername, legendloc)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
@@ -8,7 +8,7 @@ function plotmerlocbathy2(mername, lgpos)
 % Defaults
 merpath = getenv('MERMAID');
 defval('mername', 'P008')
-defval('lgpos', 'SouthEast');
+defval('legendloc', 'SouthEast');
 defval('procdir', fullfile(merpath, 'processed'))
 defval('evtfile', fullfile(merpath, 'events', 'reviewed', 'all.txt'))
 
@@ -174,8 +174,8 @@ tl = title(ax_mer, tl_str);
 lg = legend(ax_mer, [sc sc_id], ...
             {'GPS location', sprintf('Earthquake detection\n(location interpolated)')}, ...
             'Interpreter', 'LaTeX', 'Color', 'None');
-lg.LineWidth = 1.5;
-lg.Position = lgpos;
+lg.LineWidth = 1;
+lg.Location = legendloc;
 
 axesfs(gcf, ax_fs, ax_fs)
 tl.FontSize = ax_fs + 2;
