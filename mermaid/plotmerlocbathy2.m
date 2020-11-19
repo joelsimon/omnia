@@ -1,17 +1,24 @@
-function plotmerlocbathy2(name)
-% PLOTMERLOCBATHY2(name)
+function plotmerlocbathy2(mername, lgpos)
+% PLOTMERLOCBATHY2(mername, lgpos)
+%
+% Author: Joel D. Simon
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 18-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults
-defval('name', 'P008')
+merpath = getenv('MERMAID');
+defval('mername', 'P008')
+defval('lgpos', 'SouthEast');
+defval('procdir', fullfile(merpath, 'processed'))
+defval('evtfile', fullfile(merpath, 'events', 'reviewed', 'all.txt'))
 
-close all
-
+% FontSizes.
 ax_fs = 13;
 cb_fs = 10;
 
 % Read GPS points for requested MERMAID.
-gps = readgps;
-mer = gps.(name);
+gps = readgps(procdir);
+mer = gps.(mername);
 lat = mer.lat;
 lon = mer.lon;
 % Convert longitudes to 0:360 convention:
@@ -23,13 +30,13 @@ cum_days = [0 ; cumsum(days(diff(locdate)))];
 %% (1) Plot bathymetric base map one separate axis
 %%______________________________________________________________________________________%%
 
-% Let MATLAB determine the x/ylims of the ultimate basemap: scatter the data then delete the plot.
+% Let MATLAB determine the x/ylims of the ultimate base map: scatter the data then delete the plot.
 scatter(lon, lat, [], 'w');
 xl = xlim;
 yl = ylim;
 close
 
-% Plot the basemap on the newly-determined lon/latitude limits.
+% Plot the base map on the newly-determined lon/latitude limits.
 ax_bathy = axes;
 
 % Flip the YLimits because they must go from high to low numbers (southing).
@@ -66,7 +73,7 @@ colormap(ax_mer, cmap)
 [col, cbticks, cbticklabels] = x2color(cum_days, [], [], cmap, false);
 
 % Scatter the data.
-sc = scatter(ax_mer, lon, lat, [], col, 'Filled', 'MarkerEdgeColor', 'k');
+sc = scatter(ax_mer, lon, lat, 75, col, 'Filled', 'MarkerEdgeColor', 'k');
 
 % Adjust the colorbar ticklabels.
 cb_mer = colorbar(ax_mer, 'Location', 'SouthOutside');
@@ -78,7 +85,7 @@ cb_mer.Ticks = cbticks(ticks2keep);
 % but we can get away with some rounding --
 cb_mer.TickLabels = days2mark;
 
-% Drift-track costmetics.
+% Drift-track cosmetics.
 cb_mer.Label.String = 'Days since deployment';
 cb_mer.FontSize = ax_fs;
 cb_mer.Label.FontSize = ax_fs;
@@ -104,21 +111,71 @@ ax_mer.YTickLabels = compose('%d', latlabels);
 ax_mer.XTickLabels = cellfun(@(xx) [xx '$^{\circ}$'], ax_mer.XTickLabels, 'UniformOutput', false);
 ax_mer.YTickLabels = cellfun(@(xx) [xx '$^{\circ}$'], ax_mer.YTickLabels, 'UniformOutput', false);
 
-%%______________________________________________________________________________________%%
-%% (3) Add drift statistics as title to plot
-%%______________________________________________________________________________________%%
-[drift_tot, drift_surf, drift_deep] = driftstats(gps, name, 3600, 6.5*3600);
 
-tl_str = sprintf('%s:', name);
+%%______________________________________________________________________________________%%
+%% (3) Overlay station locations at time of seismic recording
+%%______________________________________________________________________________________%%
+
+% Read text file of all hits/misses.
+[eq_sac, ~, eq_lat] = readevt2txt(evtfile, [], [], 'DET');
+
+% Read text file of interpolated station locations.
+loc = readloc(procdir);
+loc = loc.(mername);
+
+% Both lists need to trimmed: eqsac because it contains SAC files from other MERMAIDS, loc.sac
+% because it contains REQ sac files from this MERMAID
+[~, eq_idx, loc_idx] = intersect(eq_sac, loc.sac);
+
+eq_sac = eq_sac(eq_idx);
+eq_lat = eq_lat(eq_idx);
+
+loc_sac = loc.sac(loc_idx);
+loc_lon = loc.stlo(loc_idx);
+% Convert GPS longitudes to 0:360 convection.
+loc_lon(find(loc_lon<0)) = loc_lon(find(loc_lon<0)) + 360;
+loc_lat = loc.stla(loc_idx);
+
+% Split SAC file list into identified and unidentified sub_lists.
+id_idx = ~isnan(eq_lat);
+ud_idx = isnan(eq_lat);
+
+id_loc_sac = loc_sac(id_idx);
+id_loc_lon = loc_lon(id_idx);
+id_loc_lat = loc_lat(id_idx);
+
+ud_loc_sac = loc_sac(ud_idx);
+ud_loc_lon = loc_lon(ud_idx);
+ud_loc_lat = loc_lat(ud_idx);
+
+hold(ax_mer, 'on')
+sc_id = scatter(ax_mer, id_loc_lon, id_loc_lat, 25, 'xk');
+%sc_ud = scatter(ax_mer, ud_loc_lon, ud_loc_lat, 25, 'ok');
+hold(ax_mer, 'off')
+
+%%______________________________________________________________________________________%%
+%% (4) Add drift statistics as title to plot
+%%______________________________________________________________________________________%%
+
+% Compute drift statistics.
+[drift_tot, drift_surf, drift_deep] = driftstats(gps, mername, 3600, 6.5*3600);
+
+tl_str = sprintf('%s:', mername);
 tl_str = sprintf('%s total drift=%i km,', tl_str, round(drift_tot.tot_dist/1000));
 tl_str = sprintf('%s surface vel.=%.1f km/hr,', tl_str, drift_surf.ave_vel*3.6);
-tl_str = sprintf('%s deep vel.=%.1f km/day', tl_str, drift_deep.ave_vel*3.6*24); 
+tl_str = sprintf('%s deep vel.=%.1f km/day', tl_str, drift_deep.ave_vel*3.6*24);
 
 tl = title(ax_mer, tl_str);
 
 %%______________________________________________________________________________________%%
-%% (4) Final cosmetics and axes adjustment to ensure they lie on top of one another
+%% (5) Final cosmetics and axes adjustment to ensure they lie on top of one another
 %%______________________________________________________________________________________%%
+
+lg = legend(ax_mer, [sc sc_id], ...
+            {'GPS location', sprintf('Earthquake detection\n(location interpolated)')}, ...
+            'Interpreter', 'LaTeX', 'Color', 'None');
+lg.LineWidth = 1.5;
+lg.Position = lgpos;
 
 axesfs(gcf, ax_fs, ax_fs)
 tl.FontSize = ax_fs + 2;
