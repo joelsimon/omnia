@@ -1,5 +1,5 @@
-function plotmerlocbathy
-% PLOTMERLOCBATHY
+function plotmerlocbathyall
+% PLOTMERLOCBATHYALL
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
@@ -234,5 +234,3 @@ ax_mer.YTick = [];
 movev(cb_mer, -0.061)
 
 latimes(gaf)
-savepdf('merlocbathy')
-keyboard
