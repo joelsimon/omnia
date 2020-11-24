@@ -4,11 +4,15 @@ function loc = readloc(processed)
 % Read interpolated MERMAID locations at the time of recording SAC/miniSEED files from text file
 % output by automaid v3.2.0+.
 %
+% NB, this function reads all data in as double; see readlocraw.m to read as native strings.
+%
 % Input:
 % processed     Processed directory output by automaid
 %                   (def: $MERMAID/processed)
 % Output:
 % loc           Interpolated GPS structure that parses loc.txt, organized by float name
+%
+% See also: readlocraw.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
