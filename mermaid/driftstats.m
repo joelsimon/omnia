@@ -11,7 +11,7 @@ function [tot, surf, deep] = driftstats(gps, name, surftime, deeptime)
 % Input:
 % gps         GPS structure from readgps.m
 % name        Char name of MERMAID (e.g., 'P008'; fieldname in gps)
-% surftime    Maximum time difference between two GPS points to be considered surface drift [s]
+% surftime*   Maximum time difference between two GPS points to be considered surface drift [s]
 %                 (def: 3600)
 % deeptime    Minimum time difference between two GPS points to be considered deep drift [s]
 %                 (def: 6.5*3600)
@@ -19,6 +19,8 @@ function [tot, surf, deep] = driftstats(gps, name, surftime, deeptime)
 % tot         Drift statistics using every GPS point
 % surf        Drift statistics of surface drift
 % deep        Drift statistics of deep drift
+%
+% *NB, GPS fixes taken with 60 s of one another are not considered when estimating surface drift.
 %
 % Each output structure returns the sums/means of these statistics, and breaks them down by
 % individual leg (segments between GPS points).  The index matrix, '.idx,' attached to each are
@@ -36,7 +38,7 @@ function [tot, surf, deep] = driftstats(gps, name, surftime, deeptime)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 18-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 23-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default surface/deep drift time differences: it takes approximately 6.5 hrs to descend and ascend
 % back to surface at 500 m parking depth.
@@ -88,7 +90,7 @@ end
 %%______________________________________________________________________________________%%
 %% Considering GPS fixes while drifting at the surface
 %%______________________________________________________________________________________%%
-short_time = find(leg_time < surftime);
+short_time = find(leg_time<surftime & leg_time>60);
 surf.idx = [short_time-1 short_time];
 if surf.idx(1,1) == 0
     surf.idx(1,1) = 1;
@@ -99,7 +101,7 @@ end
 %% Considering GPS fixes while drifting in the mixed layer
 %%______________________________________________________________________________________%%
 
-long_time = find(leg_time > deeptime);
+long_time = find(leg_time>deeptime);
 deep.idx = [long_time-1 long_time];
 if deep.idx(1,1) == 0
     deep.idx(1,1) = 1;
