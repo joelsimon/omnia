@@ -160,7 +160,7 @@ ud_loc_lon = loc_lon(ud_idx);
 ud_loc_lat = loc_lat(ud_idx);
 
 hold(ax_mer, 'on')
-sc_id = scatter(ax_mer, id_loc_lon, id_loc_lat, 25, 'xk');
+sc_id = scatter(ax_mer, id_loc_lon, id_loc_lat, 100, 'xk');
 %sc_ud = scatter(ax_mer, ud_loc_lon, ud_loc_lat, 25, 'ok');
 hold(ax_mer, 'off')
 
@@ -173,8 +173,8 @@ hold(ax_mer, 'off')
 
 tl_str = sprintf('%s:', mername);
 tl_str = sprintf('%s total drift=%i km,', tl_str, round(drift_tot.tot_dist/1000));
-tl_str = sprintf('%s surface vel.=%.1f km/hr,', tl_str, drift_surf.ave_vel*3.6);
-tl_str = sprintf('%s deep vel.=%.1f km/day', tl_str, drift_deep.ave_vel*3.6*24);
+tl_str = sprintf('%s surface velocity=%.1f km/hr,', tl_str, drift_surf.ave_vel*3.6);
+tl_str = sprintf('%s deep velocity=%.1f km/day', tl_str, drift_deep.ave_vel*3.6*24);
 
 tl = title(ax_mer, tl_str);
 
@@ -184,13 +184,16 @@ tl = title(ax_mer, tl_str);
 
 lg = legend(ax_mer, [sc sc_id], ...
             {'GPS location', sprintf('Earthquake detection\n(location interpolated)')}, ...
-            'Interpreter', 'LaTeX', 'Color', 'None');
+            'Interpreter', 'LaTeX', 'Color', [0.8 0.8 0.8])
 lg.LineWidth = 1;
 lg.Location = legendloc;
+uistack(lg, 'top')
 
 axesfs(gcf, ax_fs, ax_fs)
-tl.FontSize = ax_fs + 2;
 latimes(gcf)
+movev(tl, 0.1);
+
+%set(lg.BoxFace, 'ColorType','truecoloralpha', 'ColorData', uint8(255*[0.9 ; 0.9 ; 0.9 ; 0.9]));
 
 set(ax_mer, 'Position', ax_bathy.Position,  ...
             'XLim', ax_bathy.XLim, ...
