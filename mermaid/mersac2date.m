@@ -24,7 +24,8 @@ function tdate = mersac2date(sac)
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 17-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-% Strip date from first 15 chars of filename.
+% Strip the path then date from first 15 chars of filename.
+sac = strippath(sac);
 if iscell(sac)
     tstr = cellfun(@(xx) xx(1:15), sac, 'UniformOutput', false);
 
