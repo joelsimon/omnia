@@ -8,7 +8,7 @@ function [max_lat_diff, max_lon_diff] = automaidversions(mustequate, old, new, f
 %               false: data/location values must be same within sensible range
 % old           Directory containing old SAC files (def: $MERMAID/processed)
 % new           Directory containing new SAC files (def: $MERMAID/test_processed)
-% fname         Output file name (def: '~/automaidversions_diff_[full/light].txt')
+% fname         Output file name (def: '~/automaidversions_diff[_full/_light].txt')
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
@@ -98,6 +98,8 @@ for i = 1:length(sac_old)
 
 end
 fprintf('Wrote %s\n\n', fname)
+
+fprintf('Comparing --\n(old): %s\n(new): %s\n', old, new)
 
 fprintf('Max lat: %+.8f deg or %+i m (%s)\n', max_lat_diff, round(deg2km(max_lat_diff)*1000), strippath(max_lat_sac))
 fprintf('Max lon: %+.8f deg or %+i m (%s)\n', max_lon_diff, round(deg2km(max_lon_diff)*1000), strippath(max_lon_sac))
