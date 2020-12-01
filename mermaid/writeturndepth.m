@@ -1,18 +1,20 @@
 function writeturndepth(sac, evtdir, savefile)
 % WRITETURNDEPTH(sac, evtdir, savefile)
 %
-% Writes a textfile of turning depths and locations for the first
-% phase of the first event associated with each SAC file in the
-% input list.
+% Writes a text file of turning depths and locations for the first phase of the
+% first event associated with each SAC file in the input list.
+%
+% NB, for upgoing phases (e.g., lowercase 'p'), prints EQ hypocenter as turning
+% location.
 %
 % Input:
 % sac       Cell array of fullpath SAC filenames
 % evtdir    Path to directory containing 'raw/' and 'reviewed'
 %               subdirectories (def: $MERMAID/events/)
-% savefile  Filename of textfile to create
+% savefile  Filename of textile to create
 %
 % Output:
-% Textfile with columns:
+% Textile with columns:
 % (1) SAC filename
 % (2) phase name
 % (3) turning depth (km)
@@ -20,13 +22,16 @@ function writeturndepth(sac, evtdir, savefile)
 % (5) longitude at turning depth (decimal degrees)
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 19-Dec-2019, Version 2017b on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 19-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default.
-defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
+merpath = getenv('MERMAID');
+defval('sac', revsac);
+defval('evtdir', fullfile(merpath, 'events'));
+defval('savefile', fullfile(merpath, 'events', 'reviewed', 'identified', 'txt', 'turndepth.txt'))
 
-% Textfile format.
+% Textile format.
 fmt = ['%44s    ', ...
        '%5s    ', ...
        '%7.2f    ', ...
@@ -60,45 +65,55 @@ for i = 1:length(sac)
     turnlat = NaN;
     turnlon = NaN;
 
-    % There is no turning depth for an upgoing phase (lowercase 'p').
-    if ~isempty(EQ) && ~isempty(EQ(1).TaupTimes) ...
-            && ~strcmp(EQ(1).TaupTimes(1).phaseName, 'p')
+    if ~isempty(EQ) && ~isempty(EQ(1).TaupTimes)
+        phasename = EQ(1).TaupTimes(1).phaseName;
 
-        % Fetch SAC metadata.
-        [~, h] = readsac(sac{i});
+        % For an upgoing phase (first letter lowercase), just print the EQ hypocenter as
+        % the turning point.
+        if strcmp(phasename(1), lower(phasename(1)))
+            turndepth = EQ(1).PreferredDepth;
+            turnlat = EQ(1).PreferredLatitude;
+            turnlon = EQ(1).PreferredLongitude;
 
-        % Compute turning depth for the first phase of the first event only.
-        tp = taupPierce(EQ(1).TaupTimes(1).model, ...
-                        EQ(1).TaupTimes(1).srcDepth, ...
-                        EQ(1).TaupTimes(1).phaseName, ...
-                        'sta', ....
-                        [h.STLA h.STLO], ...
-                        'evt', ...
-                        [EQ(1).PreferredLatitude EQ(1).PreferredLongitude], ...
-                        'turn');
+        else
+            % Fetch SAC metadata.
+            [~, h] = readsac(sac{i});
 
-        % Potentially multiple arrivals of same phase (e.g., triplication);
-        % the first-arriving phase only.
-        tp = tp(1);
+            % Compute turning depth for the first phase of the first event only.
+            tp = taupPierce(EQ(1).TaupTimes(1).model, ...
+                            EQ(1).TaupTimes(1).srcDepth, ...
+                            EQ(1).TaupTimes(1).phaseName, ...
+                            'sta', ....
+                            [h.STLA h.STLO], ...
+                            'evt', ...
+                            [EQ(1).PreferredLatitude EQ(1).PreferredLongitude], ...
+                            'turn');
 
-        % Find the index of the turning depth.
-        turn_idx = find(tp.pierce.depth);
+            % Potentially multiple arrivals of same phase (e.g., triplication);
+            % keep the first-arriving phase only.
+            tp = tp(1);
 
-        % Parse outputs.  Most usually there will be a single turning depth
-        % but on occasion there may be two depths of equal value at
-        % slightly different locations; take their average.
-        phasename = tp.phaseName;
-        turndepth = mean(tp.pierce.depth(turn_idx));
-        turnlat = mean(tp.pierce.latitude(turn_idx));
-        turnlon = mean(tp.pierce.longitude(turn_idx));
+            % Find the index of the turning depth.
+            turn_idx = find(tp.pierce.depth);
 
+            % Parse outputs.  Most usually there will be a single turning depth
+            % but on occasion there may be two depths of equal value at
+            % slightly different locations; take their average.
+            phasename = tp.phaseName;
+            turndepth = mean(tp.pierce.depth(turn_idx));
+            turnlat = mean(tp.pierce.latitude(turn_idx));
+            turnlon = mean(tp.pierce.longitude(turn_idx));
+
+        end
     end
+
     % Collect the data.
     data = {strippath(sac{i}), ...
             phasename, ...
             turndepth, ...
             turnlat, ...
             turnlon};
+
 
     % Write the relevant line.
     fprintf(fid, fmt, data{:});
