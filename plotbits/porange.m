@@ -1,10 +1,18 @@
 function col = porange
+% col = PORANGE
 %
-% PORANGE returns the RGB color space of "Princeton Orange,"
-% 100% red, 56.1% green and 0% blue.
+% Return the RGB color space of "Princeton Orange" (Pantone (PMS) 158).
+%
+% Ex: axes('Color', PORANGE)
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 21-Mar-2020, Version 2017b on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 22-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-col = [1 0.561 0];
+% From: https://communications.princeton.edu/guides-tools/logo-graphic-identity
+% “Princeton Orange” is defined as Pantone (PMS) 158"
+
+% From: https://www.pantone.com/color-finder/158-C
+rgb = [232 119 34];
+
+col = rgb / 255;
