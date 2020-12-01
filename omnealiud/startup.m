@@ -34,7 +34,7 @@
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 20-Jun-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 01-Dec-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % For my code, and code my code requires.
 addpath(genpath(getenv('OMNIA')))
@@ -52,3 +52,4 @@ javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
 
 % Any others paths, specific to JDS
 addpath('~/programs/offline/misc')
+addpath(fullfile(getenv('MERMAID'), 'iris', 'scripts'))
