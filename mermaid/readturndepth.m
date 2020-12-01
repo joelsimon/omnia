@@ -17,8 +17,11 @@ function [sac, phasename, turndepth, turnlat, turnlon] = readturndepth(savefile)
 % See also: writeturndepth.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 19-Dec-2019, Version 2017b on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 19-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+% Default.
+defval('savefile', fullfile(merpath, 'events', 'reviewed', 'identified', 'txt', 'turndepth.txt'))
 
 % Textfile format.
 fmt = ['%44s    ', ...
