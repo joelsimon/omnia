@@ -17,21 +17,28 @@ function failed = verifyloctxt(loc)
 % Default.
 defval('loc', readlocraw)
 
+% Load list of all SAC files so you don't have to search for each within loop.
+fs = fullsac;
+
 % For each SAC file: read the binary header and convert their fields to
 % 6-precision strings and compare that string with what is printed in loc.txt
 failed = {};
 name = fieldnames(loc);
-parfor i = 1:length(name)
+for i = 1:length(name)
     L = loc.(name{i});
 
     for j = 1:length(L.file_name)
-        sac = [L.file_name{j} '.sac'];
+        % Get fullpath filename.
+        [~, sac] = cellstrfind(fs, L.file_name{j});
+        sac = sac{:};
 
-        [~, h] = readsac(fullsac(sac));
+        % Read and format header.
+        [~, h] = readsac(sac);
         H_stla = sprintf('%.6f', h.STLA);
         H_stlo = sprintf('%.6f', h.STLO);
         H_stdp = sprintf('%.0f', h.STDP);
 
+        % Compare.
         if ~strcmp(H_stla, L.stla{j}) || ~strcmp(H_stlo, L.stlo{j}) || ~strcmp(H_stdp, L.stdp{j})
             fprintf('!!! Failed: %s\n', sac)
             failed = [failed ; sac]
