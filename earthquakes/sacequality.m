@@ -23,7 +23,7 @@ function [iseq, cf] = sacequality(sac1, sac2, names)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 01-Dec-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 02-Dec-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('names', {})
@@ -62,7 +62,7 @@ for i = 1:length(names)
     if ~isequal(h1.(name), h2.(name))
         if ~ischar(h1.(name))
             d = h1.(name) - h2.(name);
-            l = sprintf('%s: %i, ', name, get_exp(d));
+            l = sprintf('%s: %+i, ', name, get_exp(d));
 
         else
             l = sprintf('%s: %s|%s, ', name, h1.(name), h2.(name));
