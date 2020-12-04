@@ -26,7 +26,7 @@ function [iseq, cf] = sacequality(sac1, sac2, names)
 % Last modified: 02-Dec-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
-defval('names', {})
+defval('names', sacfieldnames)
 
 % Sanity.
 if ~iscell(names)
@@ -47,12 +47,6 @@ cf = [];
 if ~isequal(x1, x2)
     l = sprintf('data: not_equal, ');
     cf = [cf  l];
-
-end
-
-% Loop over the requested variables.
-if isempty(names)
-    names = fieldnames(h1);
 
 end
 
