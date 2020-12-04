@@ -1,7 +1,7 @@
-function names = sacnames
-% names = SACNAMES
+function names = sacfieldnames
+% SACFIELDNAMES
 %
-% Returns a 111x1 cell array of SAC header names.
+% Returns a 111x1 cell array of SAC header field names.
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
