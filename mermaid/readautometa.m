@@ -61,10 +61,6 @@ for i = 1:length(d)
             S.(mermaid).(field{j}) = C{j};
 
         end
-
-        % Append full path to filename.
-        S.(mermaid).filename = fullfile(d(i).folder, S.(mermaid).filename);
-
     end
 end
 
