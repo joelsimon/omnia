@@ -1,5 +1,5 @@
-function [iseq, cf] = sacequality(sac1, sac2, names)
-% [iseq, cf] = SACEQUALITY(sac1, sac2, names)
+function [iseq, cf, h1, h2] = sacequality(sac1, sac2, names)
+% [iseq, cf, h1, h2] = SACEQUALITY(sac1, sac2, names)
 %
 % Compare two SAC files.
 %
@@ -14,6 +14,7 @@ function [iseq, cf] = sacequality(sac1, sac2, names)
 %             data: empty, or "not_equal"
 %             alphanumeric header fields: empty, or "[char1]|[char2]"
 %             float32 header fields: empty, or order-of-magnitude difference
+% h1,2        SAC headers corresponding to sac1,2
 %
 % Ex1:
 %    sac1 = '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac';
@@ -23,7 +24,7 @@ function [iseq, cf] = sacequality(sac1, sac2, names)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 02-Dec-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 07-Dec-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('names', sacfieldnames)
