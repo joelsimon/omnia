@@ -64,8 +64,8 @@ function [seisdate, seiststr, seisertime, refdate, evtdate] = seistime(h)
 % See also: arrivaltime.m, readsac.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 04-Apr-2020, Version 2017b on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 07-Dec-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 % Documented 2017.2 pg. 45
 
 % NOTES ABOUT TIMING IN SAC
@@ -88,9 +88,9 @@ function [seisdate, seiststr, seisertime, refdate, evtdate] = seistime(h)
 
 % Generate date formats, pull times from SAC header, feed to datetime.m
 nullval = -12345;
-tims = [h.NZYEAR h.NZJDAY h.NZHOUR h.NZMIN h.NZSEC h.NZMSEC];
 
 % Check for missing data.
+tims = [h.NZYEAR h.NZJDAY h.NZHOUR h.NZMIN h.NZSEC h.NZMSEC];
 if any(tims == nullval)
     error('Null value (-12345): h.NZ*')
 
@@ -107,7 +107,22 @@ if h.DELTA == nullval
     error('Null value (-12345): h.DELTA')
 
 end
-headertimes = num2str(tims);
+
+% Format and zero pad times as necessary (NZMSEC=1 is 1 millisecond, or '001' in
+% SSS format).
+uuuu = sprintf('%04i ', tims(1));
+DDD = sprintf('%03i ', tims(2));
+HH = sprintf('%02i ', tims(3));
+mm = sprintf('%02i ', tims(4));
+ss = sprintf('%02i ', tims(5));
+SSS = sprintf('%03i', tims(6));
+
+% Use ISO year (u) not Gregorian year (y) per MATLAB 2017b warning.  The refdate
+% is the reference time in the SAC header -- it doesn't necessarily correspond
+% to anything (an event, the first sample, etc.).
+dateval = [uuuu DDD HH mm ss SSS];
+datefmt = ['uuuu DDD HH mm ss SSS'];
+refdate = datetime(dateval, 'InputFormat', datefmt, 'TimeZone', 'UTC');
 
 % I choose to NOT use h.E (even if it is included in the header, which it is not
 % always) because the data may have been decimated, and it is common to then
@@ -117,11 +132,6 @@ headertimes = num2str(tims);
 xax = xaxis(h.NPTS, h.DELTA, h.B);
 h.E = xax(end);
 
-% Use ISO year (u) not Gregorian year (y) per MATLAB 2017b warning.  The refdate
-% is the reference time in the SAC header -- it doesn't necessarily correspond to
-% anything (an event, the first sample, etc.).
-datefmt = ['uuuu DDD HH mm ss SSS'];
-refdate = datetime(headertimes, 'InputFormat', datefmt, 'TimeZone', 'UTC');
 
 % From SAC manual -- "All other times are offsets in seconds from this reference
 % time and are stored as floating point values in the header."
