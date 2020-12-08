@@ -1,30 +1,33 @@
 function [tot, surf, deep] = driftstats(gps, name, surftime, deeptime)
 % [tot, surf, deep] = DRIFTSTATS(gps, name, surftime, deeptime)
 %
-% Return drift statistics by leg, and in sum/average, broken down by surface and deep-drift
-% components (in SI units of meters and seconds).
+% Return drift statistics by leg, and in sum/average, broken down by surface and
+% deep-drift components (in SI units of meters and seconds).
 %
-% NB, surface- and deep-drift leg-segment GPS pairs (see note after I/O description) do not
-% necessarily span the complete set of all leg-segment pairs because they depend on the choice of
-% 'surftime' and 'deeptime' -- indeed they may even overlap if those parameters are chosen poorly.
+% NB, surface- and deep-drift leg-segment GPS pairs (see note after I/O
+% description) do not necessarily span the complete set of all leg-segment pairs
+% because they depend on the choice of 'surftime' and 'deeptime' -- indeed they
+% may even overlap if those parameters are chosen poorly.
 %
 % Input:
 % gps         GPS structure from readgps.m
 % name        Char name of MERMAID (e.g., 'P008'; fieldname in gps)
-% surftime*   Maximum time difference between two GPS points to be considered surface drift [s]
-%                 (def: 3600)
-% deeptime    Minimum time difference between two GPS points to be considered deep drift [s]
-%                 (def: 6.5*3600)
+% surftime*   Maximum time difference between two GPS points to be considered
+%                 surface drift [s] (def: 3600)
+% deeptime    Minimum time difference between two GPS points to be considered
+%                 deep drift [s] (def: 6.5*3600)
 % Output:
 % tot         Drift statistics using every GPS point
 % surf        Drift statistics of surface drift
 % deep        Drift statistics of deep drift
 %
-% *NB, GPS fixes taken with 60 s of one another are not considered when estimating surface drift.
+% *NB, GPS fixes taken with 60 s of one another are not considered when
+%  estimating surface drift.
 %
-% Each output structure returns the sums/means of these statistics, and breaks them down by
-% individual leg (segments between GPS points).  The index matrix, '.idx,' attached to each are
-% "leg-segment GPS pairs," and they reference the complete list of locations and dates in gps.
+% Each output structure returns the sums/means of these statistics, and breaks
+% them down by individual leg (segments between GPS points).  The index matrix,
+% '.idx,' attached to each are "leg-segment GPS pairs," and they reference the
+% complete list of locations and dates in gps.
 %
 % I.e., for P008
 %
