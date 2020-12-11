@@ -6,9 +6,12 @@
 # No I/O and therefore may require internal editing as it was built for JDS'
 # system defaults.
 #
-# Author: Dr. Joel D. Simon
+# Does NOT check git branches in $MERMAID: server, processed, or events -- make
+# sure those are set as needed before execution.
+#
+# Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 15-Sep-2020, Darwin Kernel Version 18.7.0
+# Last modified: 11-Dec-2020, Darwin Kernel Version 18.7.0
 
 # Print help with '-h' or '--help'.
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -42,21 +45,6 @@ fi
 start_dir=`pwd`
 cd $MERMAID
 
-# Ensure you are in master (and not some dev) branch in the three relevant directories.
-# printf '\n\n!!!!! Switching to master branch in dirs $MERMAID: server, locations, processed, and events !!!!!\n\n'
-# cd server
-# git checkout master  >& /dev/null
-# cd ..
-# cd locations
-# git checkout master  >& /dev/null
-# cd ..
-# cd processed
-# git checkout master  >& /dev/null
-# cd ..
-# cd events
-# git checkout master  >& /dev/null
-# cd ..
-
 # Pull most recent data.
 print 'Copying server...\n'
 $OMNIA/mermaid/servercopy >& server_out
@@ -89,7 +77,7 @@ print '\n...completed writing SAC files\n'
 # this code, however.
 print '\nGenerating preliminary match to global seismic catalogs...\n'
 /Applications/MATLAB_R2017b.app/bin/matlab -r \
-   "run matchall.m; run fetchmerloc.m; run lastdive.m; run exit" >& /dev/null
+   "run matchall.m; run lastdive.m; run exit" >& /dev/null
 print '\n..done with preliminary match to the seismic catalogs\n'
 
 # Print the last surfacing of each float.
