@@ -23,7 +23,7 @@ merpath = getenv('MERMAID');
 defval('processed', fullfile(merpath, 'processed'))
 
 % loc.txt format.
-fmt = '%40s    %10.6f    %11.6f    %4f\n';
+fmt = '%40s    %10.6f    %11.6f    %6f\n';
 
 % Loop over every subdir in processed/ and read individual MERMAID's gps files.
 d = skipdotdir(dir(processed));
