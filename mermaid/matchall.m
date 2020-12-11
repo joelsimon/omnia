@@ -1,9 +1,10 @@
-function matchall
+function matchall(writecp)
 % Matches all unmatched $MERMAID SAC files to the IRIS
 % database using cpsac2evt.m and its defaults, assuming same system
 % configuration as JDS.
 %
-% Also writes .cp files with M1 uncertainty estimates.
+% Input:
+% writecp        true to write changepoint (.cp) files (def: false)
 %
 % A list of any files which are unsuccessfully matched using
 % cpsac2evt.m are saved as 'matchall_fail.txt' $MERMAID/events (or
@@ -11,7 +12,10 @@ function matchall
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 30-Oct-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 11-Dec-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+% Default to not write cp files.
+defval('writecp', false)
 
 % Find only those SAC files which have not been preliminary matched.
 allsac = fullsac;
@@ -53,7 +57,7 @@ for i = 1:length(s)
 end
 
 % Write changepoint (.cp) files.
-if new > 0
+if writecp && new > 0
     fprintf('Writing changepoint files...\n')
     writechangepointall;
 
