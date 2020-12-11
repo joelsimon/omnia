@@ -1,5 +1,5 @@
-function  F = ploteqcp(EQ, CP, h)
-% F = PLOTEQCP(EQ, CP, h)
+function  F = ploteqcp(EQ, CP, sac)
+% F = PLOTEQCP(EQ, CP, sac)
 %
 % Plots time series in CP, and annotates with phase-arrival times in EQ.
 %
@@ -9,21 +9,20 @@ function  F = ploteqcp(EQ, CP, h)
 % Input:
 % EQ      EQ structure(s), e.g. from cpsac2evt.m
 % CP      CP structure, e.g. from cpsac2evt.m
-% h       SAC header associated with file used to generated EQ and CP
+% sac     SAC file used to generated EQ and CP
 %
 % Output:
 % F       Struct of figure bits
 %
 % Ex: (only plot phases kept after manual review in reviewevt.m)
-%    s = '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac';
-%    [~, h] = readsac(s);
-%    EQ = getevt(s); % first output is reviewed EQ structure
-%    CP = getcp(s);
-%    F = PLOTEQCP(EQ, CP, h)
+%    sac = '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac';
+%    EQ = getevt(sac); % first output is reviewed EQ structure
+%    CP = getcp(sac);
+%    F = PLOTEQCP(EQ, CP, sac)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 16-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 11-Dec-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Some plotting defaults.
 LineWidth = 1;
@@ -135,10 +134,11 @@ end
 % header).  The time would be relative to seisdate.B if I had
 % input pt0 = 0, because seisdate.B is EXACTLY the time at the
 % first sample, i.e., we start counting from 0 at that time.
+[~, h] = readsac(sac);
 [~, ~, ~, refdate] = seistime(h);
 F.f.ha(end).XLabel.String = sprintf('Time relative to %s UTC (s)\n[%s]', ...
                                        datestr(refdate), ...
-                                       strippath(strrep(EQ(1).Filename, '_', '\_')));
+                                       strrep(strippath(sac), '_', '\_'));
 longticks(F.f.ha, 3);
 latimes(F.fig);
 
