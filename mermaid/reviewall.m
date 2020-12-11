@@ -6,7 +6,7 @@ function reviewall(writecp, floatnum)
 %
 % Input:
 % writecp   true to run writechangepointall.m after review
-%           false to skip running writechangepointall.m (def)
+%           false to skip running writechangepointall.m (def: false)
 % floatnum  Character array of MERMAID float number, to only review
 %               those .evt files associated with it (e.g., '12')
 %
