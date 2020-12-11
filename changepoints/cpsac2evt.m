@@ -149,7 +149,7 @@ CP(2) = changepoint(domain, xw, n, h.DELTA, W.xlsecs, 1, inputs, conf, fml);
 corw = {'complete', 'windowed'};
 for i = 1:length(CP)
     % Plot annotated traces.
-    F(i) = ploteqcp(EQ, CP(i), h);
+    F(i) = ploteqcp(EQ, CP(i), sac);
 
     % Save em.
     pdfname = sprintf([strrep(strippath(sac), 'sac', '') '%s'], ...
