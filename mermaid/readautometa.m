@@ -7,23 +7,24 @@ function [D, S] = readautometa(processed)
 % processed     Processed directory output by automaid
 %                   (def: $MERMAID/processed)
 % Output:
-% D             Metadata structure, organized by float, cast to float
+% D             NaN (placeholder for future implementation)
 % S             Metadata structure, organized by float, in raw strings
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 04-Dec-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 14-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default path.
 defval('processed', fullfile(getenv('MERMAID'), 'processed'))
 
-% CSV format: 21 fields.
-fmt = [repmat('%s', [1 21]) '\n'];
+% CSV format: 23 fields.
+fmt = [repmat('%s', [1 23]) '\n'];
 
 % Field names (uppercase are actual SAC fields).
 field = {'filename',
          'KNETWK',
          'KSTNM',
+         'KHOLE',
          'KCMPNM',
          'STLA',
          'STLO',
@@ -39,6 +40,7 @@ field = {'filename',
          'USER3',
          'KUSER0',
          'KUSER1',
+         'KUSER2',
          'samplerate',
          'start',
          'end'};
