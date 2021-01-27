@@ -1,0 +1,68 @@
+#! /bin/zsh
+# usage: ./verify_geocsv_length [no inputs]
+#
+# Verifies that # mseed + # GPS points = # geo.csv lines in each of
+# $MERMAID/processed/452.020-P-*/
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 12-Jan-2021, Darwin Kernel Version 18.7.0
+
+function verify {
+    # Pass directory as first input
+    cd $1
+
+    # Number of GPS and GeoCSV header lines
+    gps_hdr_lines=4
+    geo_hdr_lines=6
+
+    # Count number of GPS lines
+    gps_lines=$( <gps.txt wc -l )
+
+    # Remove GPS header lines
+    gps_lines=$(( gps_lines - gps_hdr_lines))
+
+    geo_files=('geo.csv' 'geo_DET.csv' 'geo_REQ.csv')
+    for geo_file in $geo_files; do
+
+	# Count number of GeoCSV lines
+	geo_lines=$( <$geo_file wc -l )
+
+	# Remove header lines
+	geo_lines=$(( geo_lines - geo_hdr_lines ))
+
+	# Count number of events
+	if [[ $geo_file == *'DET'* ]]; then
+	    events_list=$( ls **/*DET*.mseed )
+	    type='det'
+
+	elif [[ $geo_file == *'REQ'* ]]; then
+	    events_list=$( ls **/*REQ*.mseed )
+	    type='req'
+
+	else
+	    events_list=$( ls **/*.mseed )
+	    type='all'
+
+	fi
+	num_events=$( echo $events_list | wc -l)
+
+	# Sum the GPS lines plus the number of relevant events
+	gps_plus_events=$(( gps_lines + num_events ))
+
+	# Verify that number matches the number of GeoCSV lines
+	if [[ gps_plus_events -eq geo_lines ]]; then
+	    printf "Pass: %s (%s)\n" $dir $type
+
+	else
+	    printf "!!! Fail: %s (%s)\n" $dir $type
+
+	fi
+    done
+}
+
+dirs=( $MERMAID/processed/452.020-P-*/ )
+for dir in $dirs; do
+    verify $dir
+
+done
