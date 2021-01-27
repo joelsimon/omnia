@@ -11,7 +11,7 @@ function reqdetdiff(s_req, s_det, diro)
 defval('diro', fullfile(getenv('MERMAID'), 'processed'))
 defval('test_diro', fullfile(getenv('MERMAID'), 'test_processed'))
 defval('s_req', fullsac('20200805T121328.22_5F62A85C.MER.REQ.WLT5.sac', diro))
-defval('s_det', fullsac('20200805T121329.22_5F2AF4E8.MER.DET.WLT5.sac', test_diro))
+defval('s_det', fullsac('20200805T121329.22_5F2AF4E8.MER.DET.WLT5.sac', diro))
 
 %%______________________________________________________________________________________%%
 % Detected: returned.
