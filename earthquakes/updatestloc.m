@@ -4,7 +4,7 @@ function updated = updatestloc(sac, evtdir)
 % Overwrite reviewed EQ.TaupTimes due to changes in SAC file.
 %
 % UPDATESTLOC updates the phase-arrival times due to a change in STATION
-% metadata, not event metadata.
+% metadata, not event metadata, such as station location or SAC-file timing.
 %
 % UPDATESTLOC DOES NOT update the phase-arrival times of the corresponding raw
 % events, nor does it update the corresponding raw or reviewed .CP files.
@@ -16,7 +16,7 @@ function updated = updatestloc(sac, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 16-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 27-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default path to raw and reviewed .evt files.
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
@@ -61,23 +61,9 @@ for i = 1:length(new_EQ)
     new_EQ(i).TaupTimes =  arrivaltime(h, evdate, [evla evlo], mod, evdp, ph, pt0);
     new_EQ(i) = reidpressure(new_EQ(i));
 
+    % Flag any updates.
     if ~isequaln(new_EQ(i), old_EQ(i))
         updated = true;
 
-        % Log automaid version that wrote this SAC file.
-        automaid_version = h.KUSER0;
-
-        % Generate note-to-self to be attached to EQ, if updated.
-        note = sprintf('%s: Overwrote .TaupTimes using SAC written with automaid %s', ...
-                       irisdate2str(datetime('now', 'TimeZone', 'UTC')), automaid_version);
-
-        % Append or add a new note-to-self field,
-        if isfield(new_EQ(i), 'Notes')
-            new_EQ(i).Notes = [new_EQ(i).Notes {note}];
-
-        else
-            new_EQ(i).Notes = {note};
-
-        end
     end
 end
