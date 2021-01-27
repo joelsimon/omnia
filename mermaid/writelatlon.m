@@ -1,7 +1,7 @@
 function writelatlon(sacdir, evtdir, returntype, filename)
 % WRITELATLON(sacdir, evtdir, returntype, filename)
 %
-% Writes textfile of MERMAID and event latitudes and longitudes to
+% Writes text file of MERMAID and event latitudes and longitudes to
 % $MERMAID/events/reviewed/identified/txt/mermaid_latlon.txt
 %
 % Input:
@@ -14,6 +14,8 @@ function writelatlon(sacdir, evtdir, returntype, filename)
 %              'DET': triggered SAC files as determined by onboard algorithm
 %              'REQ': user-requested SAC files
 % filename     Fullpath output filename (def: $MERMAID/events/.../mermaid_latlon.txt)
+% singl        true to write same file in single-precision (def: true)
+%
 %
 % Output:
 % *N/A*        Text file with columns:
@@ -27,7 +29,7 @@ function writelatlon(sacdir, evtdir, returntype, filename)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 12-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 27-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 merpath = getenv('MERMAID');
@@ -35,22 +37,31 @@ defval('sacdir', fullfile(merpath, 'processed'))
 defval('evtdir', fullfile(merpath, 'events'))
 defval('returntype', 'ALL')
 defval('filename',  fullfile(merpath, 'events', 'reviewed', 'identified', 'txt', 'mermaid_latlon.txt'))
+defval('singl', true)
 
 % Fetch all identified SAC files matching the requested return type.
 s = revsac(1, sacdir, evtdir, returntype);
 
 % Text file format.
 fmt = ['%44s    ', ...
-       '%8.4f    ' , ...
-       '%9.4f    ' , ...
+       '%10.6f    ' , ...
+       '%11.6f    ' , ...
        '%4i    ', ...
-       '%8.4f    ' , ...
-       '%9.4f    ' , ...
+       '%10.6f    ' , ...
+       '%11.6f    ' , ...
        '%6.2f\n'];
 
 % Open new, or unlock existing, text file.
-writeaccess('unlock', filename);
-fid = fopen(filename, 'w');
+filename =filename;
+writeaccess('unlock', filename, false);
+fid =fopen(filename, 'w');
+
+if singl
+    filename_single = [filename '_single'];
+    writeaccess('unlock', filename_single, false);
+    fid_single = fopen(filename_single, 'w');
+
+end
 
 % For every SAC file; parse relevant details and write to file.
 for i = 1:length(s)
@@ -72,18 +83,38 @@ for i = 1:length(s)
 
     end
 
-    data = {strippath(sac), ...
-            stla, ...
-            stlo, ...
-            stdp, ...
-            evla, ...
-            evlo, ...
-            evdp};
+    data ={strippath(sac), ...
+                  stla, ...
+                  stlo, ...
+                  stdp, ...
+                  evla, ...
+                  evlo, ...
+                  evdp};
 
     fprintf(fid, fmt, data{:});
 
+    if singl
+        data_single = {strippath(sac), ...
+                       single(stla), ...
+                       single(stlo), ...
+                       stdp, ...
+                       single(evla), ...
+                       single(evlo), ...
+                       evdp};
+
+        fprintf(fid_single, fmt, data_single{:});
+
+    end
 end
 
 % Restrict write access to filename, and print its name to screen.
-writeaccess('unlock', filename)
+writeaccess('lock', filename, false)
+fclose(fid);
 disp(filename)
+
+if singl
+    writeaccess('lock', filename_single, false)
+    fclose(fid_single);
+    disp(filename_single)
+
+end
