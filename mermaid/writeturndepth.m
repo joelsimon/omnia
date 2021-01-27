@@ -25,6 +25,8 @@ function writeturndepth(sac, evtdir, savefile)
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 19-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
+error('Needs to be updated to writemaxdepth')
+
 % Default.
 merpath = getenv('MERMAID');
 defval('sac', revsac);
