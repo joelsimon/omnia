@@ -1,10 +1,10 @@
 function txt = evt2txt(sacdir, revdir, geoazur)
 % txt = EVT2TXT(sacdir, revdir, geoazur)
 %
-% EVT2TXT converts reviewed .evt files (which are really .mat files)
-% to human readable textfiles.
+% EVT2TXT converts reviewed .evt files (which are really .mat files) to human
+% readable textfiles.  Completely overwrites the all files at every execution.
 %
-% EVT2TXT (over)writes:
+% EVT2TXT overwrites:
 %    [revdir]/reviewed/identified/txt/identified.txt
 %    [revdir]/reviewed/unidentified/txt/unidentified.txt
 %    [revdir]/reviewed/all.txt
@@ -12,6 +12,8 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 % These paths must exist before calling EVT2TXT.
 %
 % Inputs:
+% sacdir    Path to directory containing subdirectories with SAC files
+%               (def: $MERMAID/processed)
 % revdir    Path to directory containing 'reviewed' subdirectory
 %               (def: $MERMAID/events)
 % geoazur   logical true to assume GeoAzur's naming scheme
@@ -45,8 +47,8 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 % See also: cpsac2evt.m, reviewevt.m, revsac.m, getevt.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 09-Aug-2019, Version 2017b
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 27-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
