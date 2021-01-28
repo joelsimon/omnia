@@ -1,6 +1,5 @@
-function [CP, filename] = writechangepoint(fname, diro, domain, x, ...
-                                           n, delta, pt0, snrcut, ...
-                                           inputs, conf, fml);
+function [CP, filename] = writechangepoint(fname, diro, domain, x, n, delta, ...
+                                           pt0, snrcut, inputs, conf, fml);
 % [CP, filename] = WRITECHANGEPOINT(fname, diro, domain, x, n, ...
 %                                   delta, pt0, snrcut, inputs, conf, fml);
 %
@@ -8,8 +7,8 @@ function [CP, filename] = writechangepoint(fname, diro, domain, x, ...
 % named [diro]/[fname].cp.
 %
 % Input:
-% diro             Directory where .cp file is to be saved 
 % fname            Filename to append .cp extension
+% diro             Directory where .cp file is to be saved
 % domain,...,fml   Inputs changepoint.m, see there
 %
 % Output:
