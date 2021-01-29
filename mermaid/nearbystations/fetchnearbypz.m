@@ -3,8 +3,8 @@ function [nearbypz, pzfiles] = fetchnearbypz(txtfile, nearbydir)
 %
 % Writes SAC pole-zero response in units of meters (displacement).*
 %
-% !! Requires `wget` system command ; does not run on my Mac !!
-% 
+% !! Requires Linux-specific system command ; does not run on my Mac !!
+%
 % NB, SAC TRANSFER assumes units of nanometers.  Therefore, traces
 % TRANSFERred with SACPZ files fetched with FETCHNEARBYPZ must be
 % multiplied by 1e9 in SAC after the call to TRANSFER.
@@ -69,7 +69,7 @@ function [nearbypz, pzfiles] = fetchnearbypz(txtfile, nearbydir)
 % Last modified: 26-Nov-2019, Version 2017b & Python 2.7.15 (pymaid env.) on GLNXA64
 
 if contains(computer, 'MAC')
-    warning('Requires `wget` command; only tested on Linux)
+    warning('!!! Will probably break on Mac...only tested on Linux !!!')
 
 end
 
@@ -129,7 +129,7 @@ end
 % individualstations/.
 nearbypz = fullfile(pzdir, 'nearbystations.pz');
 system(sprintf('truncate -s 0 %s', nearbypz));  % Don't use touch -- does not empty existing file.
-[~, foo] = mkdir('individualstations')
+[~, foo] = mkdir('individualstations');
 for i = 1:length(pzfiles)
     system(sprintf('cat %s >> %s', pzfiles{i}, nearbypz));
     [~, foo] = movefile(pzfiles{i}, 'individualstations');
