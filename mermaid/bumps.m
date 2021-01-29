@@ -1,11 +1,18 @@
 function [s, dates] = bumps(plotit)
 % [s, dates] = BUMPS(plotit)
 %
-% Returns a list of MERMAID glitches(?).
+% Returns a list of MERMAID glitches(?), and optionally plots their dates.
+%
+% Input:
+% plotit   true to generate stem plot (def: false)
+%
+% Output:
+% s        List of SAC filenames logged her
+% dates    Datetime array corresponding to SAC file list
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 27-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 29-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('plotit', false)
 
@@ -432,7 +439,7 @@ s = {'20181231T114420.20_5C2A50AD.MER.DET.WLT5.sac', ...
      '20190716T095937.13_5DCED564.MER.DET.WLT5.sac', ...
      '20190715T045353.13_5DCED564.MER.DET.WLT5.sac', ...
      '20190712T170615.13_5DD9FB84.MER.DET.WLT5.sac', ... % First motion up?
-     '20190710T081746.13_5DCED564.MER.DET.WLT5.sac', ... % Frist motion up
+     '20190710T081746.13_5DCED564.MER.DET.WLT5.sac', ... % First motion up
      '20190709T184412.13_5DD9FB84.MER.DET.WLT5.sac', ...
      '20191122T151249.12_5DD84992.MER.DET.WLT5.sac', ...
      '20190805T082505.13_5DE51EEC.MER.DET.WLT5.sac', ...
@@ -475,14 +482,14 @@ s = {'20181231T114420.20_5C2A50AD.MER.DET.WLT5.sac', ...
      '20210105T200616.24_5FF6611E.MER.DET.WLT5.sac', ... % I'm unsure...
      '20210107T031228.21_60008B80.MER.DET.WLT5.sac', ... % *
      '20210121T183523.19_6009E7DE.MER.DET.WLT5.sac', ...
-    }
+    };
+
 s = unique(s);
 s = sort(s);
 s = s(:);
 
 % * I stopped writing "I'm unsure" because that is true for basically all
 % signals here
-
 
 dates = cellfun(@(xx) datetime(xx(1:8), 'InputFormat', 'uuuuMMdd', 'TimeZone', 'UTC'), s, 'UniformOutput', true);
 floats = cellfun(@(xx) str2num(xx(17:18)), s, 'UniformOutput', true);
@@ -491,31 +498,30 @@ floatnum = unique(floats);
 if plotit
     figure
     ha = krijetem(subnum(length(floatnum), 1));
-    shrink(ha, 1.1, 2.25)
+    shrink(ha, 1, 1.5)
     hold(gca, 'on')
     for i = 1:length(floatnum)
         idx = find(floats == floatnum(i));
         axes(ha(i))
-        % if i > 3
-        %     movev(ha(i), -i*0.02);
-
-        % end
         stem(dates(idx), ones(length(dates(idx))));
         box(ha(i), 'on')
-        ha(i).XLim = [min(dates) max(dates)]
-        ha(i).YLim = [0 2];
+        ha(i).XLim = [min(dates) max(dates)];
+        ha(i).YLim = [0 1.5];
         ha(i).Title.String = sprintf('MERMAID %i, n = %i', floatnum(i), length(idx));
         ha(i).YTick = [];
 
     end
-    longticks(ha, 2);
+    xticklabels(ha(1:end-1), [])
+    fig2print(gcf, 'flandscape')
+    longticks(ha, 4);
     latimes
     axesfs([], 10, 10)
     savepdf('bumps')
-    return
 
-    fid = fopen('bumps.txt', 'w');
+    filename = 'bumps.txt';
+    fid = fopen(filename, 'w');
     fprintf(fid, '%s\n', s{:});
+    fprintf('Wrote: %s\n', filename)
     fclose(fid);
 end
 
