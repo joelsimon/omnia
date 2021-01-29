@@ -40,8 +40,8 @@ function F = plotchangepoint(CP, scales, cpar, normaleyes, symmetric)
 % See also: changepoint.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 04-May-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 28-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('scales', 'all')
@@ -343,7 +343,7 @@ for i = scales
     numticks(ha2(ax_idx), 'y', 3);
 
     % Add SNR annotation in bottom left corner
-    [lgSNR(sc_idx), txSNR(sc_idx)] = textpatch(ax2, [], sprintf('$\\mathrm{SNR}~=~%.1f$', CP.SNRj(sc_idx)));
+    [lgSNR(sc_idx), txSNR(sc_idx)] = textpatch(ax2, [], sprintf('$\\mathrm{SNR}~=~%.1f$', CP.SNRj(i)));
     tack2corner(ha2(ax_idx), lgSNR(sc_idx), 'SouthWest');
 
     for j = 1:length(pl.vl{sc_idx})
