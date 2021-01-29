@@ -10,6 +10,8 @@ function [nearby_sac, nearby_sacu, new, newu] = rmnearbyresp(id, redo, otype, ne
 %
 % RMNEARBYRESP requires the SAC program.
 %
+% Use fetchnearbypz.m to fetch the most up-to-date SACPZ files from IRIS.
+%
 % Any existing SAC files removed, e.g., in the case of redo = true,
 % are printed to the screen.*
 %
@@ -35,7 +37,7 @@ function [nearby_sac, nearby_sacu, new, newu] = rmnearbyresp(id, redo, otype, ne
 %
 % *git history, if it exists, is respected with gitrmdir.m.
 %
-% See also: nearbytransfer (shell script), fetchnearbypz.m
+% See also: fetchnearbypz.m, nearbytransfer (shell scripts)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu

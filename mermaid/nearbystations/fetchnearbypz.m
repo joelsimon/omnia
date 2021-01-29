@@ -3,6 +3,8 @@ function [nearbypz, pzfiles] = fetchnearbypz(txtfile, nearbydir)
 %
 % Writes SAC pole-zero response in units of meters (displacement).*
 %
+% !! Requires `wget` system command ; does not run on my Mac !!
+% 
 % NB, SAC TRANSFER assumes units of nanometers.  Therefore, traces
 % TRANSFERred with SACPZ files fetched with FETCHNEARBYPZ must be
 % multiplied by 1e9 in SAC after the call to TRANSFER.
@@ -65,6 +67,11 @@ function [nearbypz, pzfiles] = fetchnearbypz(txtfile, nearbydir)
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 26-Nov-2019, Version 2017b & Python 2.7.15 (pymaid env.) on GLNXA64
+
+if contains(computer, 'MAC')
+    warning('Requires `wget` command; only tested on Linux)
+
+end
 
 % Defaults.
 defval('txtfile', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystations.txt'))

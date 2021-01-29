@@ -4,9 +4,11 @@ function [corrected, correctedu, failed] = rmnearbyrespall(redo)
 % Apply instrument-response correction ('none', 'vel', and 'acc') to
 % all 'nearby' stations SAC files assuming JDS system defaults.
 %
+% Downloads most up-to-date SACPZ files before deconvolving.
+%
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 12-Feb-2020, Version 2017b on GLNXA64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 30-May-2020, Version 9.3.0.713579 (R2017b) on GLNXA64
 
 defval('redo', false)
 
@@ -22,6 +24,9 @@ for i = 1:length(star_idx)
 
 end
 id = unique(id);
+
+% Ensure SAC pole-zero files are up to date by downloading the latest.
+fetchnearbypz
 
 otype = {'none', 'vel', 'acc'};
 ostr = {'displacement', 'velocity', 'acceleration'};
