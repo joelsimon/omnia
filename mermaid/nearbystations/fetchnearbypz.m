@@ -131,4 +131,4 @@ end
 
 % Wrap up: deactivate python environment and return to the original calling directory.
 system('source deactivate');
-cd(stardir
+cd(stardir)
