@@ -71,9 +71,9 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ph, conf, ..
 %
 % See also: sac2evt.m, reviewevt.m, getevt.m
 %
-% Author: Dr. Joel D. Simon
+% Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 25-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 28-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -149,7 +149,7 @@ CP(2) = changepoint(domain, xw, n, h.DELTA, W.xlsecs, 1, inputs, conf, fml);
 corw = {'complete', 'windowed'};
 for i = 1:length(CP)
     % Plot annotated traces.
-    F(i) = ploteqcp(EQ, CP(i), sac);
+    F(i) = ploteqcp(EQ, CP(i), sac, 'all');
 
     % Save em.
     pdfname = sprintf([strrep(strippath(sac), 'sac', '') '%s'], ...
