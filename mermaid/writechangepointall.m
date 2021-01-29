@@ -36,5 +36,4 @@ parfor i = 1:length(s)
 
     end
 end
-delete(pool)
 fprintf('Done writing changepoint files\n')
