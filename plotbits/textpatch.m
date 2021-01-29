@@ -7,12 +7,12 @@ function [lg, tx, ha2] = textpatch(ha, loc, str, fsize, fname, LaTeX, varargin)
 % Input:
 % ha                 Axes handle (def: gca)
 % loc                Legend location (def: 'NorthWest')
-% str                The string to be printed (def: 'Hello\nWorld!) 
+% str                The string to be printed (def: 'Hello\nWorld!)
 % fsize              FontSize (def: 12)
 % fname              FontName (def: 'Times')
 % LaTeX              logical true for LaTeX interpreter (def: true)
 % ['option', value]  Name, value pairs for legend.m
-%                        Warning: this may not work 
+%                        Warning: this may not work
 %                        and/or have unexpected results.
 % Output:
 % lg                 Legend handle
@@ -31,7 +31,7 @@ function [lg, tx, ha2] = textpatch(ha, loc, str, fsize, fname, LaTeX, varargin)
 % Ex: (Move textpatch location around figure window)
 %    x = linspace(0, 2*pi, 1e3);
 %    y = sin(x);
-%    figure; ha = gca; 
+%    figure; ha = gca;
 %    plot(x,y); axis tight
 %    lg = textpatch(ha, 'NorthWest', 'A Sin Wave'); pause(1);
 %    lg.Location = 'North'; pause(1);
@@ -46,7 +46,11 @@ function [lg, tx, ha2] = textpatch(ha, loc, str, fsize, fname, LaTeX, varargin)
 % Contact: jdsimon@princeton.edu
 % Last modified: 02-Jul-2018, Version 2017b
 
-%% N.B.: This is very finnicky. Do not adjust order of code below.
+% Suppress warnings.
+warn_state = warning;
+warning('off', 'all')
+
+%% N.B.: This is very finicky. Do not adjust order of code below.
 
 % Defaults.
 defval('ha', gca)
@@ -59,7 +63,7 @@ defval('fsize', 12)
 % Record current 'hold' state so that it's returned in same state
 % after function. Turn on if necessary.
 hstate = ishold(ha);
-if ~hstate 
+if ~hstate
     hold(ha, 'on')
 
 end
@@ -87,10 +91,7 @@ ha2.Visible = 'off';
 
 % Add legend for null value using requested string and options.  Note
 % that with two outputs legend acts oddly and varargin doesn't always
-% work as expected.  Hence I edit fontsize and interpreter later.
-%% N.B.: you are just going to have to deal with the warning about
-%% "valid interpreter syntax" and not attempt to add 'Interpreter'
-%% option here.
+% work as expected.  Hence I edit font size and interpreter later.
 [lg, lgobj] = legend(ha2, pl, str, 'Location', loc, varargin{:});
 
 % Delete the marker and (nonexistent) line in the legend box.
@@ -108,7 +109,7 @@ lg.FontSize = fsize;
 lg.FontName = fname;
 lg.Interpreter = interpreter;
 
-tx.FontSize = fsize;  
+tx.FontSize = fsize;
 tx.FontName = fname;
 tx.Interpreter = interpreter;
 
@@ -122,4 +123,5 @@ if ~hstate
 
 end
 
-
+% Restore entry warning state.
+warning(warn_state)
