@@ -1,5 +1,5 @@
-function  F = ploteqcp(EQ, CP, sac)
-% F = PLOTEQCP(EQ, CP, sac)
+function  F = ploteqcp(EQ, CP, sac, scales)
+% F = PLOTEQCP(EQ, CP, sac, scales)
 %
 % Plots time series in CP, and annotates with phase-arrival times in EQ.
 %
@@ -7,12 +7,14 @@ function  F = ploteqcp(EQ, CP, sac)
 % (e.q., the raw) EQ structure(s), as is latter case in cpsac2evt.m
 %
 % Input:
-% EQ      EQ structure(s), e.g. from cpsac2evt.m
-% CP      CP structure, e.g. from cpsac2evt.m
-% sac     SAC file used to generated EQ and CP
+% EQ          EQ structure(s), e.g. from cpsac2evt.m
+% CP          CP structure, e.g. from cpsac2evt.m
+% sac         SAC filename used to generated EQ and CP
+% scales      Array of scales to plot, or 'all' (def: 'all'),
+%                 where scale n+1 approximation at scale n
 %
 % Output:
-% F       Struct of figure bits
+% F           Struct of figure bits
 %
 % Ex: (only plot phases kept after manual review in reviewevt.m)
 %    sac = '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac';
@@ -22,7 +24,10 @@ function  F = ploteqcp(EQ, CP, sac)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 11-Dec-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 28-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+% Defaults:
+defval('scales', 'all')
 
 % Some plotting defaults.
 LineWidth = 1;
@@ -30,7 +35,7 @@ LineWidth = 1;
 % Plot arrival times for all scales -- in case of time-scale domain,
 % smooth by setting abe/dbe to central point of the time smear.
 F.fig = figure;
-F.f = plotchangepoint(CP, 'all', 'ar', false, true);
+F.f = plotchangepoint(CP, scales, 'ar', false, true);
 
 % Shrink the distance between each subplot -- 'multiplier' is adjusted
 % depending on the number of subplots (the number of wavelet scales
