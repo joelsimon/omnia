@@ -1,8 +1,8 @@
-function tt_path=taupPath(model,depth,phase,varargin)
+function [tt_path,fig]=taupPath(model,depth,phase,varargin)
 
 % TAUPPATH calculate ray path using TauP toolkit
 %
-% tt_path=taupPath(model,depth,phase,'option',value,...)
+% [tt_path,fig]=taupPath(model,depth,phase,'option',value,...)
 %
 % Input arguments:
 % The first three arguments are fixed:
@@ -28,8 +28,7 @@ function tt_path=taupPath(model,depth,phase,varargin)
 %            .path.depth
 %            .path.latitude
 %            .path.longitude
-%
-%   If no output argument specified, ray paths will be plotted.
+%  fig is the figure handle
 %
 % Example:
 %   taupPath([],550,'P,sS','deg',45.6)
@@ -45,13 +44,15 @@ function tt_path=taupPath(model,depth,phase,varargin)
 %
 % Written by:
 %   Qin Li
-%   Unverisity of Washington
+%   University of Washington
 %   qinli@u.washington.edu
 %   Nov, 2002
 %
-% Last modified by jdsimon@princeton.edu Ver. 2017b, 19-Dec-2019.
+% Last modified by jdsimon@princeton.edu Ver. 2017b, 01-Feb-2021
 
 % Joel D. Simon changelog -
+%
+% 01-Feb-2021: always generate plot and add 410 and 660; return `fig` handle.
 %
 % 19-Dec-2019: set default output to empty so this doesn't error if phases do not exist.
 %
@@ -70,6 +71,8 @@ end;
 if isempty(model)
     model='iasp91';
 end;
+
+fig = [];
 
 inArgs{1}='-mod';
 inArgs{2}=model;
@@ -158,7 +161,7 @@ c={'b','r','g','m','c','y', ...
    'b:','r:','g:','m:','c:','y:'};
 p={};
 h=[];
-if nargout==0 & matArrivals.length>0
+if matArrivals.length>0
     %clf; % jdsimon@princeton.edu edit so that I could subplot
     hold on
     [cx,cy]=circle(6371);
@@ -166,7 +169,15 @@ if nargout==0 & matArrivals.length>0
     [cx,cy]=circle(3480);
     plot(cx,cy,'color',[0.5 0.5 0.5],'linewidth',2);
     [cx,cy]=circle(1220);
-    plot(cx,cy,'color',[0.5 0.5 0.5],'linewidth',2);
+    plot(cx,cy,'color',[0.5 0.5 0.5],'linewidth',2)
+
+    % jdsimon@princeton.edu for 410 and 660
+    [cx,cy]=circle(6371-410);
+    plot(cx,cy,'--','color',[0.5 0.5 0.5],'linewidth',1);
+    [cx,cy]=circle(6371-660);
+    plot(cx,cy,'--','color',[0.5 0.5 0.5],'linewidth',1);
+    % jdsimon@princeton.edu for 410 and 660
+
     axis off;
     axis equal;
     for ii=1:matArrivals.length
@@ -180,9 +191,8 @@ if nargout==0 & matArrivals.length>0
         p{ii}=tt(ii).phaseName;
     end;
     legend(h,p);
-    return;
-
-end;
+    fig=gcf;
+end
 
 % jdsimon@princeton.edu edit -- sort the rows in ascending order
 % (first arriving phases first).
@@ -197,4 +207,4 @@ function [cx,cy]=circle(r)
     ang=0:0.002:pi*2;
     cx=sin(ang)*r;
     cy=cos(ang)*r;
-return;
+return
