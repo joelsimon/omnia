@@ -1,11 +1,14 @@
 function TF = need2updateid(EQ, id)
 % TF = NEED2UPDATEID(EQ, id)
 %
-% NEED2UPDATEID inspects every EQ structure associated with a given
-% event ID (both for MERMAID data, and nearby station data if it
-% exists) and compares the event metadata associated with that event
-% ID.  If metadata differs between EQ structures (e.g., an event
-% location was updated) NEED2UPDATEID returns true.
+% NEED2UPDATEID inspects every EQ structure associated with a given event ID
+% (both for MERMAID data, and nearby station data if it exists) and compares the
+% preferred and MbMl* event metadata associated with that event ID.  If metadata
+% differs between EQ structures (e.g., an event location was updated)
+% NEED2UPDATEID returns true.
+%
+% *Does not compared EQ.Magnitudes, EQ.Origins etc.; see full list in
+% subfunction.
 %
 % Input:
 % EQ         Cell of EQ structures, e.g. from getnearbysacevt.m
@@ -18,8 +21,8 @@ function TF = need2updateid(EQ, id)
 % See also: updateid.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 26-Nov-2019, Version 2017b on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 02-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default.
 TF = false;
@@ -43,21 +46,21 @@ if isempty(EQ) || length(EQ) == 1
 
 end
 
-% Initialize the a previous_EQ struct against which to check the
+% Initialize the a prev_EQ struct against which to check the
 % others.
 id = strtrim(num2str(id));
-previous_EQ = strip_EQ(EQ{1}, id);
+prev_EQ = strip_EQ(EQ{1}, id);
 
 % Check the current against the last former; exit if they differ.
 for i = 2:length(EQ)
     this_EQ = strip_EQ(EQ{i}, id);
 
-    if ~isequaln(previous_EQ, this_EQ)
+    if ~isequaln(prev_EQ, this_EQ)
         TF = true;
         return
 
     else
-        previous_EQ = this_EQ;
+        prev_EQ = this_EQ;
 
     end
 end
@@ -78,8 +81,10 @@ end
 
 base_EQ = EQ(ID_idx);
 base_EQ = rmfield(base_EQ, 'Filename');
-base_EQ = rmfield(base_EQ, 'Picks');
+base_EQ = rmfield(base_EQ, 'Magnitudes'); % Cut this struct; only compare PreferredMagnitude
+base_EQ = rmfield(base_EQ, 'Origins'); % Cut this struct; only compare PreferredOrigin
 base_EQ = rmfield(base_EQ, 'Params');
+base_EQ = rmfield(base_EQ, 'Picks');
 base_EQ = rmfield(base_EQ, 'PhasesConsidered');
 base_EQ = rmfield(base_EQ, 'QueryTime');
 base_EQ = rmfield(base_EQ, 'TaupTimes');
