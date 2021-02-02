@@ -1,8 +1,8 @@
-function [tt_path,fig]=taupPath(model,depth,phase,varargin)
+function [tt_path,fig,ax,pl,lg]=taupPath(model,depth,phase,varargin)
 
 % TAUPPATH calculate ray path using TauP toolkit
 %
-% [tt_path,fig]=taupPath(model,depth,phase,'option',value,...)
+% [tt_path,fig,ax,pl,lg]=taupPath(model,depth,phase,'option',value,...)
 %
 % Input arguments:
 % The first three arguments are fixed:
@@ -29,6 +29,9 @@ function [tt_path,fig]=taupPath(model,depth,phase,varargin)
 %            .path.latitude
 %            .path.longitude
 %  fig is the figure handle
+%  ax is the axis handle
+%  pl is a list of handles of the raypaths plotted
+%  lg is the legend handle
 %
 % Example:
 %   taupPath([],550,'P,sS','deg',45.6)
@@ -52,7 +55,8 @@ function [tt_path,fig]=taupPath(model,depth,phase,varargin)
 
 % Joel D. Simon changelog -
 %
-% 01-Feb-2021: always generate plot and add 410 and 660; return `fig` handle.
+% 01-Feb-2021: always generate plot and add 410 and 660.
+%              return `fig`, `ax`, `pl`, and `lg` handles.
 %
 % 19-Dec-2019: set default output to empty so this doesn't error if phases do not exist.
 %
@@ -71,8 +75,6 @@ end;
 if isempty(model)
     model='iasp91';
 end;
-
-fig = [];
 
 inArgs{1}='-mod';
 inArgs{2}=model;
@@ -185,13 +187,19 @@ if matArrivals.length>0
             char(matArrivals(ii).getName),matArrivals(ii).getTime);
         cx=(6371-tt(ii).path.depth).*sin(tt(ii).path.distance/180*pi);
         cy=(6371-tt(ii).path.depth).*cos(tt(ii).path.distance/180*pi);
-        h(ii)=plot(cx,cy,c{ii});
+        pl(ii)=plot(cx,cy,c{ii});
         plot(cx(1),cy(1),'k*');
         plot(cx(end),cy(end),'kv','MarkerFaceColor','k');
         p{ii}=tt(ii).phaseName;
     end;
-    legend(h,p);
+    lg=legend(pl,p);
     fig=gcf;
+    ax=gca;
+else
+    fig = [];
+    ax = [];
+    pl = [];
+    lg = [];
 end
 
 % jdsimon@princeton.edu edit -- sort the rows in ascending order
