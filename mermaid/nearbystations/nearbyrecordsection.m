@@ -33,6 +33,8 @@ defval('normlize', true)
 defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('returntype', 'DET')
 defval('ph', [])
+defval('popas', [4 1]);
+defval('taper', true)
 defval('otype', 'none')
 defval('includeCPPT', true)
 
