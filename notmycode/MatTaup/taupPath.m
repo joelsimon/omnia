@@ -1,8 +1,8 @@
-function [tt_path,fig,ax,pl,lg]=taupPath(model,depth,phase,varargin)
+function [tt_path,fig,ax,pl_path,pl_source,pl_receiver,lg]=taupPath(model,depth,phase,varargin)
 
 % TAUPPATH calculate ray path using TauP toolkit
 %
-% [tt_path,fig,ax,pl,lg]=taupPath(model,depth,phase,'option',value,...)
+% [tt_path,fig,ax,pl_path,pl_source,pl_receiver,lg]=taupPath(model,depth,phase,'option',value,...)
 %
 % Input arguments:
 % The first three arguments are fixed:
@@ -157,10 +157,6 @@ for ii=1:matArrivals.length
     tt(ii).path.longitude=matArrivals(ii).getMatPath.lon;
 end;
 
-c={'b','r','g','m','c','y', ...
-   'b--','r--','g--','m--','c--','y--', ...
-   'b-.','r-.','g-.','m-.','c-.','y-.', ...
-   'b:','r:','g:','m:','c:','y:'};
 p={};
 h=[];
 if matArrivals.length>0
@@ -183,22 +179,24 @@ if matArrivals.length>0
     axis off;
     axis equal;
     for ii=1:matArrivals.length
-        fprintf('  Phase: %-10s  Time: %.3f(s) \n', ...
-            char(matArrivals(ii).getName),matArrivals(ii).getTime);
+        % fprintf('  Phase: %-10s  Time: %.3f(s) \n', ...
+        %     char(matArrivals(ii).getName),matArrivals(ii).getTime);
         cx=(6371-tt(ii).path.depth).*sin(tt(ii).path.distance/180*pi);
         cy=(6371-tt(ii).path.depth).*cos(tt(ii).path.distance/180*pi);
-        pl(ii)=plot(cx,cy,c{ii});
-        plot(cx(1),cy(1),'k*');
-        plot(cx(end),cy(end),'kv','MarkerFaceColor','k');
+        pl_path(ii)=plot(cx,cy);
         p{ii}=tt(ii).phaseName;
     end;
-    lg=legend(pl,p);
+    pl_source=plot(cx(1),cy(1),'k*');
+    pl_receiver=plot(cx(end),cy(end),'kv','MarkerFaceColor','k');
+    lg=legend(pl_path,p);
     fig=gcf;
     ax=gca;
 else
     fig = [];
     ax = [];
-    pl = [];
+    pl_path = [];
+    pl_source = [];
+    pl_receiver = [];
     lg = [];
 end
 
@@ -207,6 +205,10 @@ end
 if ~isempty(tt)
     [~, idx] = sort([tt.time], 'ascend');
     tt = tt(idx);
+    pl_path = pl_path(idx);
+    for i=1:length(tt)
+        fprintf('  Phase: %-10s  Time: %.3f(s) \n', tt(i).phaseName, tt(i).time)
+    end
 end
 
 tt_path=tt;
