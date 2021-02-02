@@ -15,7 +15,7 @@ cppt_dir =  skipdotdir(dir(fullfile(mer_dir, 'cpptstations', 'evt')));
 nearby_id = {nearby_dir.name};
 cppt_id = {cppt_dir.name};
 
-for i = 1:2
+for i = 1:length(nearby_id)
     [sacfile, sacfile_u] = getnearbysac(nearby_id{i}, 'vel');
     sacfile = [sacfile ; sacfile_u];
 
@@ -43,7 +43,7 @@ for i = 1:2
     end
 end
 
-for i = 1:2
+for i = 1:length(cppt_id)
     sacfile = getcpptsac(cppt_id{i}, 'vel');
 
     [EQ, evtfile] = getcpptevt(cppt_id{i});
