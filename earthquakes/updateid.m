@@ -16,7 +16,7 @@ function [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu, cppt_
 % Input:
 % id            Event identification number in last
 %                   column of identified.txt(def: 10948555)
-% force         true to force update (refetch) even when not required
+% force         true to force update (refetch) even when need2updatedid.m is false
 %                   (def: false)
 % mer_evtdir    Path to directory containing MERMAID 'raw/' and 'reviewed'
 %                   subdirectories (def: $MERMAID/events/)
@@ -50,8 +50,8 @@ function [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu, cppt_
 % See also: need2updateid.m, updateeq.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 01-Feb-2020, Version 2017b on GLNXA64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 03-Feb-2021, Version 9.3.0.713579 (R2017b) on GLNXA64
 
 % Defaults.
 defval('id', '10937574')
@@ -117,10 +117,20 @@ if ~isempty(cppt_iddir)
 end
 
 % Determine if the EQ structures differ and exit if they do not.
-if ~force && ~need2updateid([mer_EQ; nearby_EQ; nearby_EQu; cppt_EQ], id)
-    fprintf('ID %s: update not required, all metadata match\n', id)
-    return
+if need2updateid([mer_EQ; nearby_EQ; nearby_EQu; cppt_EQ], id);
+    fprintf('\nID %s: update required, metadata do not match\n\n', id)
 
+else
+    fprintf('\nID %s: update not required, all metadata match\n', id)
+
+    if force
+        fprintf(' continuing...(forced refecth requested)\n\n')
+
+    else
+        fprintf(' exiting...(use `force=true` to force a refetch)\n\n')
+        return
+
+    end
 end
 
 % Fetch the most up-to-date information associated with this event.
