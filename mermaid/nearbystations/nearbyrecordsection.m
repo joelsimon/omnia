@@ -8,10 +8,10 @@ function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
 %
 % Input:
 % id, ..., taper   Input to recordsection.m, see there
-% otype            []: (empty) return raw time series
+% otype            []: return raw time series (def)
 %                  'none': return displacement time series (nm)
 %                  'vel': return velocity time series (nm/s)
-%                  'acc': return acceleration time series (nm/s/s) (def)
+%                  'acc': return acceleration time series (nm/s/s)
 % includeCPPT      true to include CPPT traces (NB, if true, the path to CPPT data
 %                      must mirror exactly 'nearbydir', except that "nearby" in the
 %                      former is replaced with "cppt" in the latter) (def: true)
@@ -20,8 +20,8 @@ function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
 %                      CPPT traces
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 04-May-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 03-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('id', '10948555')
 defval('lohi', [1 5]);
@@ -35,7 +35,7 @@ defval('returntype', 'DET')
 defval('ph', [])
 defval('popas', [4 1]);
 defval('taper', true)
-defval('otype', 'none')
+defval('otype', [])
 defval('includeCPPT', true)
 
 if strcmpi(alignon, 'atime')
