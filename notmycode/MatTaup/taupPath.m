@@ -171,9 +171,9 @@ if matArrivals.length>0
 
     % jdsimon@princeton.edu for 410 and 660
     [cx,cy]=circle(6371-410);
-    plot(cx,cy,'--','color',[0.5 0.5 0.5],'linewidth',1);
+    plot(cx,cy,'--','color',[0.5 0.5 0.5],'linewidth',0.25);
     [cx,cy]=circle(6371-660);
-    plot(cx,cy,'--','color',[0.5 0.5 0.5],'linewidth',1);
+    plot(cx,cy,'--','color',[0.5 0.5 0.5],'linewidth',0.25);
     % jdsimon@princeton.edu for 410 and 660
 
     axis off;
