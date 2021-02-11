@@ -5,7 +5,7 @@ function matchall(writecp)
 % cpsac2evt.m and its defaults, assuming same system configuration as JDS.
 %
 % Input:
-% writecp        true to write changepoint (.cp) files (def: true)
+% writecp        true to write changepoint (.cp) files (def: false)
 %
 % A list of any files which are unsuccessfully matched using
 % cpsac2evt.m are saved as 'matchall_fail.txt' $MERMAID/events (or
@@ -13,10 +13,10 @@ function matchall(writecp)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 28-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 11-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default.
-defval('writecp', true)
+defval('writecp', false)
 
 % Find only those SAC files which have not been preliminary matched.
 allsac = fullsac;
@@ -38,10 +38,19 @@ for i = 1:length(s)
 
     else
         % It's a raw signal, which is sampled at 6 scales
-        n = 6
+        n = 6;
 
     end
 
+    %% Temp patch to skip really long REQ files (need to update (i)wtspy.m
+    %% routines to handle longer time series / shortcut those functions?).
+    x = readsac(s{i});
+    if length(x) > 10000
+        fail = [fail i];
+        continue;
+
+    end
+    
     % Write raw event (.raw.evt) files.
     try
         cpsac2evt(s{i}, false, 'time', n);
