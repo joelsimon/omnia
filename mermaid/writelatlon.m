@@ -1,5 +1,5 @@
-function writelatlon(sacdir, evtdir, returntype, filename)
-% WRITELATLON(sacdir, evtdir, returntype, filename)
+function writelatlon(sacdir, evtdir, returntype, filename, precision)
+% WRITELATLON(sacdir, evtdir, returntype, filename, precision)
 %
 % Writes text file of MERMAID and event latitudes and longitudes to
 % $MERMAID/events/reviewed/identified/txt/mermaid_latlon.txt
@@ -15,7 +15,7 @@ function writelatlon(sacdir, evtdir, returntype, filename)
 %              'REQ': user-requested SAC files
 % filename     Fullpath output filename (def: $MERMAID/events/.../mermaid_latlon.txt)
 % singl        true to write same file in single-precision (def: true)
-%
+% precision    Number of decimal places in latitude, longitude (def: 4)
 %
 % Output:
 % *N/A*        Text file with columns:
@@ -29,7 +29,7 @@ function writelatlon(sacdir, evtdir, returntype, filename)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 27-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 11-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 merpath = getenv('MERMAID');
@@ -38,18 +38,22 @@ defval('evtdir', fullfile(merpath, 'events'))
 defval('returntype', 'ALL')
 defval('filename',  fullfile(merpath, 'events', 'reviewed', 'identified', 'txt', 'mermaid_latlon.txt'))
 defval('singl', true)
+defval('precision', 4)
 
 % Fetch all identified SAC files matching the requested return type.
 s = revsac(1, sacdir, evtdir, returntype);
 
+% lat:  -90.(precision) --> max. 4 leading chars incl. decimal
+% lon: -180.(precision) --> max. 5 leading chars incl. decimal
+
 % Text file format.
 fmt = ['%44s    ', ...
-       '%10.6f    ' , ...
-       '%11.6f    ' , ...
-       '%4i    ', ...
-       '%10.6f    ' , ...
-       '%11.6f    ' , ...
-       '%6.2f\n'];
+      ['%' sprintf('%i.%if    ', precision+4, precision)], ...  % lat
+      ['%' sprintf('%i.%if    ', precision+5, precision)], ...  % lon
+      '%4i    ', ...
+      ['%' sprintf('%i.%if    ', precision+4, precision)], ...  % lat
+      ['%' sprintf('%i.%if    ', precision+5, precision)], ...  % lon
+      '%6.2f\n'];
 
 % Open new, or unlock existing, text file.
 filename =filename;
