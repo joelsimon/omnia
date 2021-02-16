@@ -16,7 +16,7 @@ function reviewall(writecp, floatnum)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 16-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('writecp', false)
@@ -45,9 +45,16 @@ sac = fullsac([], fullfile(getenv('MERMAID'), 'processed'));
 sac = sac(idx);
 
 % Loop over in sequential (time) order.
+fail = [];
 sac = sort(strippath(sac));
 for i = 1:length(sac)
+    try
     reviewevt(sac{i}, [], [], viewr);
+
+    catch
+        fail = [fail; i];
+
+    end
     clc
 
 end
@@ -74,4 +81,19 @@ if writecp
 
     end
 end
-fprintf('All done.\n')
+
+if ~isempty(fail)
+    failsac = sac(fail);
+    failsac = cellfun(@(xx) strippath(xx), failsac, 'UniformOutput', ...
+                      false);
+    warning(['These SAC files were not reviewed:\n' ...
+             repmat('%s\n', 1, length(failsac))], failsac{:})
+
+else
+    failsac = {};
+
+end
+fid = fopen(fullfile(getenv('MERMAID'), 'events', 'reviewed', 'reviewall_fail.txt'), 'w');
+fprintf(fid, '%s\n', failsac{:});
+fclose(fid);
+fprintf('\nAll done.\n')
