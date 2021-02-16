@@ -29,7 +29,7 @@ function writelatlon(sacdir, evtdir, returntype, filename, precision)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 11-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 15-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 merpath = getenv('MERMAID');
@@ -48,11 +48,11 @@ s = revsac(1, sacdir, evtdir, returntype);
 
 % Text file format.
 fmt = ['%44s    ', ...
-      ['%' sprintf('%i.%if    ', precision+4, precision)], ...  % lat
-      ['%' sprintf('%i.%if    ', precision+5, precision)], ...  % lon
+      ['%' sprintf('%i.%if    ', precision+4, precision)], ...  % STLA
+      ['%' sprintf('%i.%if    ', precision+5, precision)], ...  % STLO
       '%4i    ', ...
-      ['%' sprintf('%i.%if    ', precision+4, precision)], ...  % lat
-      ['%' sprintf('%i.%if    ', precision+5, precision)], ...  % lon
+      ['%' sprintf('%i.%if    ', precision+4, precision)], ...  % EVLA
+      ['%' sprintf('%i.%if    ', precision+5, precision)], ...  % EVLO
       '%6.2f\n'];
 
 % Open new, or unlock existing, text file.
