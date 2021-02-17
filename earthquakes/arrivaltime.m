@@ -62,10 +62,10 @@ function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 %    ttB.arsamp == tt0.arsamp;
 %    subplot(2,1,1)
 %    plot(xax0, x);
-%    vertline(tt0.arsecs); title('pt0 = 0 s')
+%    vertline(tt0.arsecs); title('pt0 = 0 s (seconds since event)')
 %    subplot(2,1,2)
 %    plot(xaxB, x);
-%    vertline(ttB.arsecs); title('pt0 = -120.6810 s'); shg
+%    vertline(ttB.arsecs); title('pt0 = -120.6810 s (seconds since reference time)'); shg
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
@@ -135,8 +135,8 @@ for i = 1:len_tt
     % associated with that event arrive in the time window of the
     % seismogram.
     if  isbetween(tt(i).arrivaldatetime, seisdate.B, seisdate.E)
-        tt(i).truearsecs = seconds(tt(i).arrivaldatetime - ...
-                                       seisdate.B) + pt0;
+        tt(i).truearsecs = ...
+            seconds(tt(i).arrivaldatetime-seisdate.B) + pt0;
 
         %  There is unlikely to be a sample exactly on .truearsecs.  Find the
         %  sample nearest the true offset time.
