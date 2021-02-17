@@ -18,7 +18,11 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 %
 % Output:
 % EQ              Event structure that concatenates output structures
-%                     from irisFetch.Events and taupTime.m
+%                     from irisFetch.Events and arrivaltime.m  (see the
+%                     latter to understand how timing is handled, in
+%                     particular that relative times are w.r.t the SAC
+%                     reference time, that is to say the first sample is
+%                     assigned at h.B 0 s, not 0 s)
 %
 % By default SAC2EVT queries event information from the IRIS DMC for
 % the time duration beginning one hour before the start of the
@@ -56,11 +60,11 @@ function EQ = sac2evt(sac, model, ph, baseurl, varargin)
 %                 5, 'includeallmagnitudes', false)
 %    EQ.Params    % Note time and other parameters overwritten from defaults
 %
-% See also: cpsac2evt.m, http://service.iris.edu/fdsnws/event/docs/1/help/
+% See also: cpsac2evt.m, arrivaltime.m, http://service.iris.edu/fdsnws/event/docs/1/help/
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 01-Jul-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 17-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default I/O.
 defval('sac', 'centcal.1.BHZ.SAC')
@@ -161,7 +165,9 @@ for i = 1:length(ev)
                      'uuuu-MM-dd HH:mm:ss.SSS', 'TimeZone', 'UTC');
 
     % Compute travel times and arrival times on an x-axis where pt0, the
-    % time assigned to the first sample, is set at h.B seconds.
+    % time assigned to the first sample, is set at h.B seconds, i.e., times
+    % are w.r.t to the SAC reference time, not just always counting forward
+    % from 0 s. Note this initial offset is recorded in EQ.TaupTimes.pt0.
     tt = arrivaltime(h, evdate, [quake.PreferredLatitude ...
                         quake.PreferredLongitude], model, depth, ph, h.B);
     if isempty(tt)
