@@ -1,9 +1,9 @@
-function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
-          maxc_y, SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag] ...
-        = firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas)
+function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
+          SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag] = ...
+        firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas, pt0)
 % [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
 %  SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag] = ...
-%  FIRSTARRIVAL(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas)
+%  FIRSTARRIVAL(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas, pt0)
 %
 % Computes the travel-time residual between the AIC-based arrival-time estimate
 % of Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173, and the
@@ -47,6 +47,8 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %              to skip decimation (def: [])
 % popas    1 x 2 array of number of poles and number of passes for bandpass
 %              (def: [4 1])
+% pt0      Time in seconds assigned to first sample of X-xaxis (def: SAC header
+%             field "B" so that all times are relative to SAC reference time)
 %
 % Output:
 % tres     Travel time residual [s] w.r.t first phase arrival:
@@ -58,6 +60,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 % ph       Phase name associated with tres
 % delay    Time delay between true arrival time and time at largest
 %             amplitude (max_y) [s]
+% twosd    2-standard deviation error estimation per M1 method [s]** (def NaN)
 % xw1      Windowed segment of x (maybe filtered) contained in W1 --
 %              the entire segment of (maybe filtered) data considered
 %              for the AIC pick
@@ -66,7 +69,6 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %              multiple, only the first occurrence of this max. value is returned
 % maxc_y   Amplitude (e.g., counts, nm) of maximum (or minimum) amplitude of
 %              signal within W2 -- window beginning at dat and ending wlen2 later
-% twosd    2-standard deviation error estimation per M1 method [s]** (def NaN)
 % SNR      SNR, defined as ratio of biased variance of signal and
 %              noise segments (see wtsnr.m)
 % EQ       Input EQ structure or reviewed EQ struct associated with SAC file
@@ -97,17 +99,17 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, ...
 %             or taper (if the latter exists)
 %
 % *The x-axis here is w.r.t to original, NOT windowed, seismogram,
-% i.e. xaxis(h.NPTS, h.DELTA, h.B), where h is the SAC header structure
+% i.e. xaxis(h.NPTS, h.DELTA, pt0), where h is the SAC header structure
 % from readsac.m
 %
-% **See cpci.m Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
+% **See cpci.m: Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
 % ***If MERMAID depth is not contained in the header ('STDP' field),
 % then it is assumed to be 1500 m below the sea surface
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 16-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 22-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -121,6 +123,7 @@ defval('bathy', true)
 defval('wlen2', 1)
 defval('fs', [])
 defval('popas', [4 1])
+% `pt0` defaults to the SAC header field "B", see below
 
 % Start with baseline assumption both time windows will be complete.
 incomplete1 = false;
@@ -158,7 +161,7 @@ if ~isempty(fs)
 
     if R > 1
         decimated = true
-        fprintf('\nDecimated from %i Hz to %i Hz\n', old_fs, round(1 / (h.DELTA*R)));
+        fprintf('\decimated from %i Hz to %i Hz\n', old_fs, round(1 / (h.DELTA*R)));
 
         % Very important: adjust the appropriate SAMPLE header variables .NPTS and
         % .DELTA.  The absolute (SECONDS) timing variables (B, E) won't change
@@ -203,15 +206,30 @@ if ~isstruct(EQ)
     end
 end
 
-% Ensure time at first sample (pt0) is the same in both the EQ
-% structure and the SAC file header.
+% Ensure time at first sample (pt0) is the same in both the EQ structure and the
+% SAC file header (both are seconds offset from the SAC header's reference time).
 if ~isequal(EQ(1).TaupTimes(1).pt0, h.B)
     error('EQ(1).TaupTimes(1).pt0 ~= h.B')
 
 end
 
+% Default the output's zero-time (time at first sample) as seconds offset from
+% the SAC reference time, if no other time-offset is supplied.
+if ~exist('pt0', 'var')
+    pt0 = h.B;
+end
+
 % The synthetic (theoretical, 'syn') arrival time is stored in the EQ structure.
 syn = EQ(1).TaupTimes(1).truearsecs;
+
+% That arrival is set on a time axis relative to the SAC header's reference
+% time, i.e., the the first sample is assigned h.B seconds. Determine the
+% difference between the assigned first-sample time and the requested
+% first-sample time to correct the synthetic arrival time on on the same x-axis
+% as requested in the output.  If pt0 is left as the default (`pt0=h.B`) this
+% difference is 0 seconds.
+pt0_diff = EQ(1).TaupTimes(1).pt0 - pt0;
+syn = syn - pt0_diff;
 
 % Correct the travel time for bathymetry.
 ph = EQ(1).TaupTimes(1).phaseName;
@@ -235,14 +253,7 @@ else
 end
 
 % Window the time series.
-[xw1, W1, incomplete1] = timewindow(x, wlen, syn, 'middle', h.DELTA, h.B);
-
-% Print the parameters of the time window.
-time_middle_hB = mean([W1.xlsecs W1.xrsecs]); % xaxis with pt0 = h.B s
-time_middle_0 = time_middle_hB - h.B;         % xaxis with pt0 = 0 s
-fprintf('\n    Using %5.2f s time window centered at:\n', W1.wlensecs)
-fprintf('    %5.2f s with x-axis whose first sample is set at h.B (in this case, %5.2f s), or\n', time_middle_hB, h.B)
-fprintf('    %5.2f s with x-axis whose first sample is set at 0 s (seconds into seismogram)\n\n', time_middle_0)
+[xw1, W1, incomplete1] = timewindow(x, wlen, syn, 'middle', h.DELTA, pt0);
 
 % Check if any two contiguous datum within first time window == 0
 % (likely signals missing, filler values).
@@ -344,7 +355,7 @@ if ~isnan(lohi)
      x = bandpass(x, 1/h.DELTA, lohi(1), lohi(2), popas(1), popas(2), 'butter');
 
      % Remove the relevant window from the tapered and filtered time series.
-     [xw1, W1, incomplete1] = timewindow(x, wlen, syn, 'middle', h.DELTA, h.B);
+     [xw1, W1, incomplete1] = timewindow(x, wlen, syn, 'middle', h.DELTA, pt0);
 
 end
 
@@ -367,10 +378,8 @@ SNR = wtsnr({xw1}, cp, 1);
 if SNR > 1
     dat_samp = cp + 1;
 
-    % The data arrival time on an axis beginning at the time assigned to
-    % the first sample of the seismogram (h.B in the SAC header and
-    % EQ(1).TaupTimes(1).pt0 in the EQ structure, which are the same) is
-    % simply the arrival sample index of the windowed x-axis.
+    % The data arrival time on an axis beginning at the time assigned to the first
+    % sample of the seismogram ('pt0' input).
     dat = W1.xax(dat_samp);
 
     % The travel time residual is defined as the arrival-time estimate (cp
@@ -381,7 +390,7 @@ if SNR > 1
 
     % Maximum absolute amplitude (e.g., counts or nm) considering a window
     % of length wlen2 starting at the actual phase arrival.
-    [xw2, W2, incomplete2] = timewindow(x, wlen2, dat, 'first', h.DELTA, h.B);
+    [xw2, W2, incomplete2] = timewindow(x, wlen2, dat, 'first', h.DELTA, pt0);
 
     % Check if any two contiguous datum within the second time window == 0
     % (likely signals missing, filler values).
