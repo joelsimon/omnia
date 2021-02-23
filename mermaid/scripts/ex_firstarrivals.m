@@ -23,14 +23,14 @@ EQ = EQ.EQ;
 % This is the same pt0 reference as the times in the associated EQ structure.
 pt01 = h.B;
 
-[tres1, dat1, syn1, tadj1, ~, ~, ~, xw1, ~, ~, ~, ~, ~, W1] = ...
+[tres1, dat1, syn1, tadj1, ~, delay1, ~, xw1, ~, ~, ~, ~, ~, W1] = ...
     firstarrival(s, false, [], [], [], [], EQ, [], [], [], [], pt01);
 
 % (2) Time is seconds after 0 s.
 % In this case, h.B nearly equals 0, so (1) and (2) are indistinguishable.
 pt02 = 0;
 
-[tres2, dat2, syn2, tadj2, ~, ~, ~, xw2, ~, ~, ~, ~, ~, W2] = ...
+[tres2, dat2, syn2, tadj2, ~, delay2, ~, xw2, ~, ~, ~, ~, ~, W2] = ...
     firstarrival(s, false, [], [], [], [], EQ, [], [], [], [], pt02);
 
 % (3) Time is seconds after theoretical arrival time (syn = 0). Requires you set
@@ -39,13 +39,14 @@ pt02 = 0;
 % ALREADY offset by h.B (alternatively, use syn2; see ex_firstarrivals.pdf).
 pt03 = -(syn1 - h.B); % == -syn2
 
-[tres3, dat3, syn3, tadj3, ~, ~, ~, xw3, ~, ~, ~, ~, ~, W3] = ...
+[tres3, dat3, syn3, tadj3, ~, delay3, ~, xw3, ~, ~, ~, ~, ~, W3] = ...
     firstarrival(s, false, [], [], [], [], EQ, [], [], [], [], pt03);
 
 % Should be zero.
 syn3
 diff([tres1 tres2 tres3])
 diff([tadj1 tadj2 tadj3])
+diff([delay1 delay2 delay3])
 
 %% Plot all.
 
@@ -87,5 +88,4 @@ xlabel(sprintf('Seconds after theoretical arrival time; tres=%.4f (tadj=%.4f)', 
 % Should be zero: if you add the arrival time as offset from the SAC reference
 % time (and subtracting the tadj; recall, syn1 is tadj with bathtime.m) it
 % should be equal to the absolute UTC arrival time in the EQ structure.
-time_diff = ...
-    seconds((refdate + seconds(syn1) - seconds(tadj1)) - EQ(1).TaupTimes(1).arrivaldatetime)
+seconds((refdate + seconds(syn1) - seconds(tadj1)) - EQ(1).TaupTimes(1).arrivaldatetime)
