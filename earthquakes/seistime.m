@@ -132,7 +132,6 @@ refdate = datetime(dateval, 'InputFormat', datefmt, 'TimeZone', 'UTC');
 xax = xaxis(h.NPTS, h.DELTA, h.B);
 h.E = xax(end);
 
-
 % From SAC manual -- "All other times are offsets in seconds from this reference
 % time and are stored as floating point values in the header."
 seisdate.B = refdate + seconds(h.B);
