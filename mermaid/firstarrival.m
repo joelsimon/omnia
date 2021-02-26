@@ -1,8 +1,8 @@
 function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
-          SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag] = ...
+          SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag, xax0] = ...
         firstarrival(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas, pt0)
 % [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ...
-%  SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag] = ...
+%  SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag, xax0] = ...
 %  FIRSTARRIVAL(s, ci, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas, pt0)
 %
 % Computes the travel-time residual between the AIC-based arrival-time estimate
@@ -97,6 +97,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ..
 %             or taper (if the latter exists)
 %          1: At least two contiguous datum == 0 in W1, W2,
 %             or taper (if the latter exists)
+% xax0     Time axis for complete signal, `xaxis(h.NPTS, h.DELTA, pt0)`
 %
 % *The x-axis here is w.r.t to original, NOT windowed, seismogram,
 % i.e. xaxis(h.NPTS, h.DELTA, pt0), where h is the SAC header structure
@@ -161,7 +162,7 @@ if ~isempty(fs)
 
     if R > 1
         decimated = true
-        fprintf('\decimated from %i Hz to %i Hz\n', old_fs, round(1 / (h.DELTA*R)));
+        fprintf('\nDecimated from %i Hz to %i Hz\n', old_fs, round(1 / (h.DELTA*R)));
 
         % Very important: adjust the appropriate SAMPLE header variables .NPTS and
         % .DELTA.  The absolute (SECONDS) timing variables (B, E) won't change
@@ -457,6 +458,14 @@ end
 % decimated the zerflag is meaningless.
 if decimated
     zerflag = NaN;
+
+end
+
+% Finally, compute the full time axis of the possibly decimated data, for reference.
+xax0 = xaxis(h.NPTS, h.DELTA, pt0);
+if ~all(intersect(W1.xax, xax0) == W1.xax) || ...
+        ~all(intersect(W2.xax, xax0) == W2.xax)
+    error('Windowed segments do not align with full time axis')
 
 end
 
