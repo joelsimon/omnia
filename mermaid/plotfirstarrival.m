@@ -1,8 +1,9 @@
-function [f, ax, tx, pl, FA] = plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, ...
-                                            lohi, sacdir, evtdir, bathy, wlen2, ...
-                                            fs, popas, hardcode_twosd) % last input hidden
-% [f, ax, tx, pl, FA] = PLOTFIRSTARRIVAL(s, ax, FontSize, EQ, ci, wlen, lohi, ...
-%                                        sacdir, evtdir, bathy, wlen2, fs, popas)
+function [f, ax, tx, pl, FA] = ...
+        plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, lohi, sacdir, evtdir, ...
+                         bathy, wlen2, fs, popas, pt0, hardcode_twosd) % last input hidden
+% [f, ax, tx, pl, FA] = ...
+%     plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, lohi, sacdir, evtdir, ...
+%                      bathy, wlen2, fs, popas, pt0)
 %
 % Plots the output of firstarrival.m, with a time-axis centered on
 % theoretical first-phase-arrival time.
@@ -32,6 +33,8 @@ function [f, ax, tx, pl, FA] = plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, .
 %              to skip decimation (def: [])
 % popas    1 x 2 array of number of poles and number of passes for bandpass
 %              (def: [4 1])
+% pt0      Time in seconds assigned to first sample of X-xaxis (def: SAC header
+%             field "B" so that all times are relative to SAC reference time)
 %
 % Output: (all empty if no arrival identified)
 % f        Figure handle
@@ -49,7 +52,7 @@ function [f, ax, tx, pl, FA] = plotfirstarrival(s, ax, FontSize, EQ, ci, wlen, .
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 09-Aug-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-% Defaults.
+% Defaults -- those left empty are defaulted in firstarrival.m
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 defval('ax', [])
 defval('FontSize', [14 12])
@@ -63,6 +66,7 @@ defval('bathy', true)
 defval('wlen2', 1)
 defval('fs', [])
 defval('popas', [4 1])
+defval('pt0', [])
 defval('hardcode_twosd', []) % hidden input -- see note at bottom
 
 % Generate new axis if one not supplied.
@@ -80,7 +84,7 @@ hold(ax, 'on')
 [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ, ...
  W1, xw2, W2, winflag, tapflag, zerflag] = firstarrival(s, ci, wlen, lohi, ...
                                                   sacdir, evtdir, EQ, bathy, ...
-                                                  wlen2, fs, popas);
+                                                  wlen2, fs, popas, pt0);
 if isnan(tres)
     warning('No arrival identified')
     f = [];
@@ -219,7 +223,7 @@ end
 max_ylim = max(abs(ax.YLim));
 ax.YAxis.Exponent = log10(max_ylim) - 1;
 
-% Tack textboxes to corners.
+% Tack text boxes to corners.
 pause(0.01)
 tack2corner(ax, tx.ul, 'NorthWest')
 tack2corner(ax, tx.ur, 'NorthEast')
@@ -256,7 +260,7 @@ FA.zerflag = zerflag;
 % hardcode_twosd
 %
 % Hidden input to supply a HARDCODED 2*std. dev. value, e.g., to ensure it is
-% identical to a textfile matched to these seismograms.  This is necessary
+% identical to a text file matched to these seismograms.  This is necessary
 % because the random nature of the M1 method can result in minor differences in
 % uncertainties, and the hackish nature of textpatch.m does not always allow
-% string editing with the LaTeX interpreter.
+% easy string editing with the LaTeX interpreter.
