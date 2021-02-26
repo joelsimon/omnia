@@ -1,7 +1,7 @@
 function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zerflag] = ...
-        firstarrivalpressure(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas)
+        firstarrivalpressure(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas, pt0)
 % [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zerflag] = ...
-%       FIRSTARRIVALPRESSURE(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas)
+%       FIRSTARRIVALPRESSURE(s, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas, pt0)
 %
 % Extension of firstarrival.m (which deals with travel time residuals)
 % that computes the RMS value of the first arrival considering the
@@ -29,6 +29,8 @@ function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zer
 %              to skip decimation (def: [])
 % popas    1 x 2 array of number of poles and number of passes for bandpass
 %              (def: [4 1])
+% pt0      Time in seconds assigned to first sample of X-xaxis (def: SAC header
+%             field "B" so that all times are relative to SAC reference time)
 %
 % Output:
 % RMS      Root mean squared value of xw3: arrival to max. amplitude of wavetrain
@@ -37,21 +39,19 @@ function [RMS, ph, P, maxc_y, delay, xw3, W3, xw2, W2, EQ, winflag, tapflag, zer
 % maxc_y   Amplitude (counts) of maximum (or minimum) amplitude of bandpassed
 % delay    Time delay between true arrival time and time at largest
 %             amplitude (max_y) [s]
-% xw3      Windowed segment of x (maybe filtered) contained in W3 and used for
-%              RMS calculation
-% W3       timewindow.m struct of length delay [s]
-%              beginning at dat
-% xw2      Windowed segment of x (maybe filtered) contained in W2
-% W2       timewindow.m struct of length wlen/2 [s]
-%              beginning at dat
+% xw3      Windowed segment of of signal (maybe filtered) contained in W3
+%              and used for RMS calculation
+% W3       timewindow.m struct of length delay [s] beginning at dat
+% xw2      Windowed segment of the signal (maybe filtered) contained in W2
+% W2       timewindow.m struct of length wlen/2 [s] beginning at dat
 % EQ       EQ structure, either input or retrieved with getevt.m
 % win/tap/zerflag  Flag (sentinel) values from firstarrival.m, see there
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 23-Apr-2020, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 26-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-% Defaults.
+% Defaults -- those left empty are defaulted in firstarrival.m
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 defval('wlen', 30)
 defval('lohi', [1 5])
@@ -62,10 +62,11 @@ defval('bathy', true)
 defval('wlen2', 1)
 defval('fs', [])
 defval('popas', [4 1])
+defval('pt0', [])
 
 % Run firstarrival to retrieve relevant statistics about the first-arriving phase.
 [~, ~, ~, ~, ph, delay, ~, ~, ~, ~, maxc_y, ~, EQ, ~, xw2, W2, winflag, tapflag, zerflag] = ...
-    firstarrival(s, false, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas);
+    firstarrival(s, false, wlen, lohi, sacdir, evtdir, EQ, bathy, wlen2, fs, popas, pt0);
 
 % Find the new RMS time window which brackets just the time starting
 % at the AIC pick of the first arrival and extending 'delay' seconds,
