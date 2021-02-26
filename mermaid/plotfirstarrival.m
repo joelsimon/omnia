@@ -48,9 +48,9 @@ function [f, ax, tx, pl, FA] = ...
 % *AIC picker and uncertainty estimator from
 % Simon, J. D. et al., (2020), BSSA, doi: 10.1785/0120190173
 %
-% Author: Dr. Joel D. Simon
+% Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 09-Aug-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 26-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults -- those left empty are defaulted in firstarrival.m
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -82,9 +82,10 @@ hold(ax, 'on')
 
 % Compute first-arrival statistics.
 [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ, ...
- W1, xw2, W2, winflag, tapflag, zerflag] = firstarrival(s, ci, wlen, lohi, ...
-                                                  sacdir, evtdir, EQ, bathy, ...
-                                                  wlen2, fs, popas, pt0);
+ W1, xw2, W2, winflag, tapflag, zerflag, xax0] = firstarrival(s, ci, wlen, ...
+                                                  lohi, sacdir, evtdir, EQ, ...
+                                                  bathy, wlen2, fs, popas, ...
+                                                  pt0);
 if isnan(tres)
     warning('No arrival identified')
     f = [];
@@ -255,6 +256,7 @@ FA.W2 = W2;
 FA.winflag = winflag;
 FA.tapflag = tapflag;
 FA.zerflag = zerflag;
+FA.xax0 = xax0;
 
 %_________________________________________________________________________________%
 % hardcode_twosd
