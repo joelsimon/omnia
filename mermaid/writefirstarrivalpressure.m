@@ -1,7 +1,7 @@
 function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
-                                   evtdir, EQ, bathy, wlen2, fs, popas)
+                                   evtdir, EQ, bathy, wlen2, fs, popas, pt0)
 % WRITEFIRSTARRIVALPRESSURE(s, redo, filename, wlen, lohi, sacdir, evtdir, ...
-%                           EQ, bathy, wlen2, fs, popas)
+%                           EQ, bathy, wlen2, fs, popas, pt0)
 %
 % WRITEFIRSTARRIVALPRESSURE writes the output of
 % firstarrivalpressure.m to a text file.  This function differs from
@@ -35,6 +35,8 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 %              to skip decimation (def: [])
 % popas    1 x 2 array of number of poles and number of passes for bandpass
 %              (def: [4 1])
+% pt0      Time in seconds assigned to first sample of X-xaxis (def: SAC header
+%             field "B" so that all times are relative to SAC reference time)
 %
 % Output:
 % Text file with the following columns (firstarrivalpressure.m outputs in parentheses):
@@ -58,8 +60,8 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 % See also: firstarrivalpressure.m, readfirstarrivalpressure.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 24-Apr-2020, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 26-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', revsac(1))
@@ -75,6 +77,7 @@ defval('bathy', true)
 defval('wlen2', 1)
 defval('fs', [])
 defval('popas', [4 1])
+defval('pt0', 0)
 
 % Textfile format.
 fmt = ['%44s    ' , ...
@@ -95,10 +98,9 @@ fmt = ['%44s    ' , ...
        '%i\n'];
 
 % Sort out if deleting, appending to, or creating output file.
-file_exists = (exist(filename,'file') == 2);
-if file_exists
+if exist(filename,'file') == 2
     % Grant write access to file.
-    fileattrib(filename, '+w')
+    writeaccess('unlock', filename, false)
 
     if redo
         % Clear existing contents.
@@ -142,7 +144,7 @@ parfor i = 1:length(s)
     end
 
     % Concatenate the write lines.
-    wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2, fs, popas);
+    wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2, fs, popas, pt0);
     wlines = [wlines wline];
 
 end
@@ -170,15 +172,15 @@ if status ~= 0
 end
 
 % Write protect the file.
-fileattrib(filename, '-w')
+writeaccess('lock', filename, false)
 
 %_______________________________________________________________________________%
-function wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2, fs, popas)
+function wline = single_wline(sac, wlen, lohi, sacdir, evtdir, fmt, single_EQ, bathy, wlen2, fs, popas, pt0)
 % Local call to, and formatting of, firstarrivalpressure.m
 
 % Collect.
 [RMS, ph, P, ~, ~, ~, ~, ~, ~, EQ, winflag, tapflag, zerflag] = ...
-    firstarrivalpressure(sac, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs, popas);
+    firstarrivalpressure(sac, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs, popas, pt0);
 
 % Nab fullpath SAC file name, if not supplied.
 if isempty(fileparts(sac))

@@ -1,7 +1,7 @@
 function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
-                           evtdir, EQ, bathy, wlen2, fs, popas)
+                           evtdir, EQ, bathy, wlen2, fs, popas, pt0)
 % WRITEFIRSTARRIVAL(s, redo, filename, wlen, lohi, sacdir, evtdir, EQ, ...
-%                   bathy,  wlen2, fs, popas)
+%                   bathy, wlen2, fs, popas, pt0)
 %
 % WRITEFIRSTARRIVAL writes the output of firstarrival.m a text file.
 %
@@ -33,6 +33,8 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 %              to skip decimation (def: [])
 % popas    1 x 2 array of number of poles and number of passes for bandpass
 %              (def: [4 1])
+% pt0      Time in seconds assigned to first sample of X-xaxis (def: SAC header
+%             field "B" so that all times are relative to SAC reference time)
 %
 % Output:
 % Text file with the following columns (firstarrivals.m outputs in parentheses):
@@ -60,23 +62,26 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 % See also: firstarrival.m, readfirstarrival.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 23-Apr-2020, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 26-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', revsac(1))
 defval('redo', false)
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'firstarrival.txt'))
-defval('wlen', 30)
-defval('lohi', [1 5])
-defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
-defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
+
+% Default the rest as empties to be filled in firstarrival.m
+defval('wlen', [])
+defval('lohi', [])
+defval('sacdir', [])
+defval('evtdir', [])
 defval('EQ', [])
-defval('bathy', true)
-defval('wlen2', 1)
+defval('bathy', [])
+defval('wlen2', [])
 defval('fs', [])
-defval('popas', [4 1])
+defval('popas', [])
+defval('pt0', [])
 
 % Textfile format.
 fmt = ['%44s    ' , ...
@@ -95,10 +100,9 @@ fmt = ['%44s    ' , ...
        '%3i\n'];
 
 % Sort out if deleting, appending to, or creating output file.
-file_exists = (exist(filename,'file') == 2);
-if file_exists
+if exist(filename, 'file') == 2
     % Grant write access to file.
-    fileattrib(filename, '+w')
+    writeaccess('unlock', filename, false)
 
     if redo
         % Clear existing contents.
@@ -142,7 +146,7 @@ parfor i = 1:length(s)
     end
 
     % Concatenate the write lines.
-    wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs, popas, fmt);
+    wline = single_wline(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs, popas, pt0, fmt);
     wlines = [wlines wline];
 
 end
@@ -170,15 +174,15 @@ if status ~= 0
 end
 
 % Write protect the file.
-fileattrib(filename, '-w')
+writeaccess('lock', filename, false)
 
 %_______________________________________________________________________________%
-function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs, popas, fmt)
+function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs, popas, pt0, fmt)
 % Local call to, and formatting of, firstarrival.m
 
 % Collect.
 [tres, dat, ~, tadj, ph, delay, twosd, ~, ~, ~, maxc_y, SNR, EQ, ~, ~, ~, winflag, tapflag, zerflag] = ...
-    firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs, popas);
+    firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs, popas, pt0);
 publicid = fx(strsplit(EQ(1).PublicId, '='),  2);
 tptime = EQ(1).TaupTimes(1).time;
 
