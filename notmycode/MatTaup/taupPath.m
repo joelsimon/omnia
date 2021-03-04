@@ -14,6 +14,7 @@ function [tt_path,fig,ax,pl_path,pl_source,pl_receiver,lg]=taupPath(model,depth,
 %   'km'  value:   Epicentral distance in kilometer
 %   'sta'/'station' value:  Station location [Lat Lon]
 %   'evt'/'event' value:    Event location [Lat Lon]
+%   'plot': Logical true to plot (default: true)
 %
 % Output argument:
 %   tt_path is a structure array with fields:
@@ -51,9 +52,11 @@ function [tt_path,fig,ax,pl_path,pl_source,pl_receiver,lg]=taupPath(model,depth,
 %   qinli@u.washington.edu
 %   Nov, 2002
 %
-% Last modified by jdsimon@princeton.edu Ver. 2017b, 01-Feb-2021
+% Last modified by jdsimon@princeton.edu Ver. 2017b, 03-Mar-2021
 
 % Joel D. Simon changelog -
+%
+% 03-Mar-2021: add 'plot' varargin option
 %
 % 01-Feb-2021: always generate plot and add 410 and 660.
 %              return `fig`, `ax`, `pl`, and `lg` handles.
@@ -83,6 +86,7 @@ inArgs{4}=num2str(depth);
 inArgs{5}='-ph';
 inArgs{6}=phase;
 n_inArgs=6;
+plotit = true; % default
 
 dist=0;
 sta=0;
@@ -121,6 +125,12 @@ while (ii<=length(varargin))
         n_inArgs=n_inArgs+3;
         ii=ii+2;
         evt=1;
+   case {'plot'}
+        plotit=varargin{ii+1};
+        if ~isa(plotit,'logical')
+            error('  Incompatible value for option %s !',varargin{ii});
+        end;
+        ii=ii+2;
     otherwise
         error('  Unknown option %s \n',varargin{ii});
     end; %switch
@@ -159,7 +169,7 @@ end;
 
 p={};
 h=[];
-if matArrivals.length>0
+if matArrivals.length>0 && plotit
     %clf; % jdsimon@princeton.edu edit so that I could subplot
     hold on
     [cx,cy]=circle(6371);
@@ -205,9 +215,13 @@ end
 if ~isempty(tt)
     [~, idx] = sort([tt.time], 'ascend');
     tt = tt(idx);
-    pl_path = pl_path(idx);
     for i=1:length(tt)
         fprintf('  Phase: %-10s  Time: %.3f(s) \n', tt(i).phaseName, tt(i).time)
+    end
+
+    if ~isempty(pl_path)
+        pl_path = pl_path(idx);
+
     end
 end
 
