@@ -3,15 +3,22 @@ function [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu, cppt_
 % [mer_evt, mer_EQ, nearby_evt, nearby_EQ, nearby_evtu, nearby_EQu, cppt_evt, cppt_EQ] = ...
 %     UPDATEID(id, force, mer_evtdir, mer_sacdir, nearbydir, cpptdir, model, ph, baseurl)
 %
-% UPDATEID refetches event metadata from IRIS and updates (overwrites)
-% the associated .evt files for a given event ID.
+% UPDATEID checks if the event metadata for MERMAID .evt (and maybe "nearby" and
+% "CPPT" stations) files corresponding to the same event differs, and if it does
+% not and `force` is not true determines that an update is not required and
+% exits.
+%
+% If event metadata contained in the EQ structures for the same event does
+% differ between .evt files, for if `force` is true, UPDATEID refetches event
+% metadata from IRIS and updates (overwrites) all associated MERMAID (and maybe
+% "nearby" and "CPPT") .evt files for that event ID.
 %
 % This function requires irisFetch.Events and an internet connection.
 %
-% N.B.: ONLY THE EVENT DETAILS ARE CONSIDERED in determining if an
-% update is required, e.g., if the .PhasesConsidered differ between EQ
-% structures, but the underlying event metadata to which they apply
-% are equal, this function will not continue unless force is true.
+% N.B.: ONLY THE EVENT DETAILS ARE CONSIDERED in determining if an update is
+% required, e.g., if the .PhasesConsidered differ between EQ structures, but the
+% underlying event metadata to which they apply are equal, this function will
+% not continue unless force is true.  See need2updateid.m for the exact details.
 %
 % Input:
 % id            Event identification number in last
@@ -117,7 +124,7 @@ if ~isempty(cppt_iddir)
 end
 
 % Determine if the EQ structures differ and exit if they do not.
-if need2updateid([mer_EQ; nearby_EQ; nearby_EQu; cppt_EQ], id);
+if need2updateid ([mer_EQ; nearby_EQ; nearby_EQu; cppt_EQ], id);
     fprintf('\nID %s: update required, metadata do not match\n\n', id)
 
 else
