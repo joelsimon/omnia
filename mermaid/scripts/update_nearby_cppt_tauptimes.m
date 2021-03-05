@@ -1,5 +1,5 @@
-function update_nearby_cppt_tauptimes
-% UPDATE_NEARBY_CPPT_TAUPTIMES
+function isupdated = update_nearby_cppt_tauptimes
+% isupdated = UPDATE_NEARBY_CPPT_TAUPTIMES
 %
 % Runs updatetauptimes.m on all nearby and CPPT .evt files assuming JDS'
 % system defaults.
@@ -15,6 +15,7 @@ cppt_dir =  skipdotdir(dir(fullfile(mer_dir, 'cpptstations', 'evt')));
 nearby_id = {nearby_dir.name};
 cppt_id = {cppt_dir.name};
 
+ct = 0
 for i = 1:length(nearby_id)
     [sacfile, sacfile_u] = getnearbysac(nearby_id{i}, 'vel');
     sacfile = [sacfile ; sacfile_u];
@@ -27,18 +28,19 @@ for i = 1:length(nearby_id)
         [~,h] = readsac(sacfile{j});
 
         if ~isempty(EQ{j})
-            isupdated = updatetauptimes(sacfile{j}, evtfile{j});
+            ct = ct + 1;
+            isupdated(ct) = updatetauptimes(sacfile{j}, evtfile{j});
 
-            if isupdated
-                fprintf('Yes: %i\n', h.NZMSEC)
+            % if isupdated
+            %     fprintf('Yes: %i\n', h.NZMSEC)
 
-            else
-                fprintf('No: %i\n', h.NZMSEC)
-                if h.NZMSEC < 100 & h.NZMSEC ~= 0
-                    error(sprintf('%s', sacfile{j}))
+            % else
+            %     fprintf('No: i\n', h.NZMSEC)
+            %     if h.NZMSEC < 100 & h.NZMSEC ~= 0
+            %         error(sprintf('%s', sacfile{j}))
 
-                end
-            end
+            %     end
+            % end
         end
     end
 end
@@ -52,18 +54,19 @@ for i = 1:length(cppt_id)
         [~,h] = readsac(sacfile{j});
 
         if ~isempty(EQ{j})
-            isupdated = updatetauptimes(sacfile{j}, evtfile{j});
+            ct = ct + 1;
+            isupdated(ct) = updatetauptimes(sacfile{j}, evtfile{j});
 
-            if isupdated
-                fprintf('Yes: %i\n', h.NZMSEC)
+            % if isupdated
+            %     fprintf('Yes: %i\n', h.NZMSEC)
 
-            else
-                fprintf('No: %i\n', h.NZMSEC)
-                if h.NZMSEC < 100 & h.NZMSEC ~= 0
-                    error(sprintf('%s', sacfile{j}))
+            % else
+            %     fprintf('No: %i\n', h.NZMSEC)
+            %     if h.NZMSEC < 100 & h.NZMSEC ~= 0
+            %         error(sprintf('%s', sacfile{j}))
 
-                end
-            end
+            %     end
+            % end
         end
     end
 end
