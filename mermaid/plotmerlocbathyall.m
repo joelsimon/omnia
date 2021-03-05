@@ -3,7 +3,7 @@ function plotmerlocbathyall
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 19-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -158,19 +158,11 @@ box on
 
 cb_mer.Label.Interpreter = 'latex';
 
-% This will identify the indices of th colorbar tick labels which are
-% nearest the integer days 0 to 500.
-ticks2keep = nearestidx([cbticklabels{:}], [0:100:800]);
+% This will identify the indices of th colorbar tick labels.
+max_tick2keep = round2fac(cbticklabels{end}, 100, 'down');
+ticks2keep = nearestidx([cbticklabels{:}], [0:100:max_tick2keep]);
 cb_mer.Ticks = cbticks(ticks2keep);
-cb_mer.TickLabels = {'0'   ...
-                    '100' ...
-                    '200' ...
-                    '300' ...
-                    '400' ...
-                    '500' ...
-                    '600' ...
-                    '700' ...
-                    '800'};
+cb_mer.TickLabels = round2fac(ticks2keep, 100, 'down');
 cb_mer.Label.String = 'Days since deployment';
 cb_mer.FontSize = fs;
 cb_mer.Label.FontSize = fs;
