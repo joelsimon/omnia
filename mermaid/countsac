@@ -3,8 +3,10 @@
 # Counts SAC files for MERMAID data, as well as raw and reviewed .evt
 # and .pdf files, and changepoint (.cp) files.
 #
-# Last modified by fjsimons-at-alum.mit.edu, 02/12/2019
-# Last modified by jdsimon@princeton.edu, 02-Sep-2020
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified by JDS: 05-Mar-2021, Darwin Kernel Version 18.7.0
+# (previously modified by fjsimons-at-alum.mit.edu, 02/12/2019)
 
 set MERMAID = $MERMAID
 find $MERMAID/processed/ -maxdepth 3 -type f -name '*sac' > $MERMAID/all_sac
@@ -28,7 +30,7 @@ endif
 
 foreach float ($floatnum[*])
     # This tallies the SAC files.
-    grep "P-$float" $MERMAID/all_sac > $MERMAID/temp
+    grep -v "prelim" $MERMAID/all_sac | grep "P-$float" > $MERMAID/temp
     set total = `cat $MERMAID/temp | wc -l`
     set det =  `grep .DET. $MERMAID/temp  | wc -l`
     set req =  `grep .REQ. $MERMAID/temp  | wc -l`
