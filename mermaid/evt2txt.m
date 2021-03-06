@@ -48,8 +48,8 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 27-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
-
+% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+ 
 % Defaults.
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('revdir', fullfile(getenv('MERMAID'), 'events'))
@@ -111,6 +111,11 @@ for i = 1:2
     % Below rely on the filename to get the time, ergo we must strip the path.
     sac = cellfun(@(xx) strippath(xx), sac, 'UniformOutput', false);
 
+    % Remove preliminary (rapid location estimates) SAC files.
+    prelim_idx = find(contains(sac, 'prelim'));
+    sac(prelim_idx) = [];
+    evt(prelim_idx) = [];
+    
     % Sort the events based on the time assigned the first sample in the seismogram.
 
     % !! Edit this line to accommodate different SAC naming schemes.  In

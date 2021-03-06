@@ -29,7 +29,7 @@ function writelatlon(sacdir, evtdir, returntype, filename, precision)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 15-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 merpath = getenv('MERMAID');
@@ -70,6 +70,11 @@ end
 % For every SAC file; parse relevant details and write to file.
 for i = 1:length(s)
     sac = s{i};
+    if contains(sac, 'prelim')
+        continue
+
+    end
+
     EQ = getevt(sac);
     EQ(1).TaupTimes(1).phaseName;
 
