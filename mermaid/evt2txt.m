@@ -61,7 +61,7 @@ txt.identified = [];
 txt.unidentified = [];
 
 if ~geoazur
-    fmt = ['%44s    '  , ...
+    fmt = ['%51s    '  , ...
            '%19s    '  , ...
            '%7.3f    ' , ...
            '%8.3f    ' , ...
@@ -111,10 +111,10 @@ for i = 1:2
     % Below rely on the filename to get the time, ergo we must strip the path.
     sac = cellfun(@(xx) strippath(xx), sac, 'UniformOutput', false);
 
-    % Remove preliminary (rapid location estimates) SAC files.
-    prelim_idx = find(contains(sac, 'prelim'));
-    sac(prelim_idx) = [];
-    evt(prelim_idx) = [];
+    % % Remove preliminary (rapid location estimates) SAC files.
+    % prelim_idx = find(contains(sac, 'prelim'));
+    % sac(prelim_idx) = [];
+    % evt(prelim_idx) = [];
     
     % Sort the events based on the time assigned the first sample in the seismogram.
 

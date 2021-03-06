@@ -40,7 +40,7 @@ function varargout = readidentified(filename, starttime, endtime, reftime, retur
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -68,16 +68,16 @@ end
 lynes = readtext(filename);
 
 % Parse.
-sac = cellfun(@(xx) xx(1:44), lynes, 'UniformOutput', false);
-eqtime = cellfun(@(xx) xx(49:67), lynes, 'UniformOutput', false);
-eqlat = cellfun(@(xx) str2double(xx(72:78)), lynes, 'UniformOutput', true);
-eqlon = cellfun(@(xx) str2double(xx(83:90)), lynes, 'UniformOutput', true);
-eqregion = strtrim(cellfun(@(xx) xx(95:128), lynes, 'UniformOutput', false));
-eqdepth  = cellfun(@(xx) str2double(xx(133:138)), lynes, 'UniformOutput', true);
-eqdist = cellfun(@(xx) str2double(xx(143:149)), lynes, 'UniformOutput', true);
-eqmag = cellfun(@(xx) str2double(xx(154:157)), lynes, 'UniformOutput', true);
-eqphase1 = strtrim(cellfun(@(xx) xx(162:167), lynes, 'UniformOutput', false));
-eqid = strtrim(cellfun(@(xx) xx(172:184), lynes, 'UniformOutput', false));
+sac = cellfun(@(xx) strtrim(xx(1:44+7)), lynes, 'UniformOutput', false);
+eqtime = cellfun(@(xx) xx(49+7:67+7), lynes, 'UniformOutput', false);
+eqlat = cellfun(@(xx) str2double(xx(72+7:78+7)), lynes, 'UniformOutput', true);
+eqlon = cellfun(@(xx) str2double(xx(83+7:90+7)), lynes, 'UniformOutput', true);
+eqregion = strtrim(cellfun(@(xx) xx(95+7:128+7), lynes, 'UniformOutput', false));
+eqdepth  = cellfun(@(xx) str2double(xx(133+7:138+7)), lynes, 'UniformOutput', true);
+eqdist = cellfun(@(xx) str2double(xx(143+7:149+7)), lynes, 'UniformOutput', true);
+eqmag = cellfun(@(xx) str2double(xx(154+7:157+7)), lynes, 'UniformOutput', true);
+eqphase1 = strtrim(cellfun(@(xx) xx(162+7:167+7), lynes, 'UniformOutput', false));
+eqid = strtrim(cellfun(@(xx) xx(172+7:184+7), lynes, 'UniformOutput', false));
 eqdate = NaT(length(eqtime), 1, 'TimeZone', 'UTC');
 
 % Get SAC (time at first sample) and EQ (hypocenter time) datetimes.

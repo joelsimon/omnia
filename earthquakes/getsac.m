@@ -26,8 +26,8 @@ function sac = getsac(id, evtdir, sacdir, returntype)
 % See also: evt2txt.m, getsacevt.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 31-Jan-2020, Version 2017b on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('id', '10948555')
@@ -77,8 +77,10 @@ if isempty(this_event_idx)
 end
 
 % Pull the SAC files (first column) using the index of matched lines in the large text file.
-sac = cellfun(@(xx) strtrim(xx(1:columnsep(1))), textlines(this_event_idx), ...
-              'UniformOutput', false);
+for i = 1:length(this_event_idx)
+    sac{i} = fx(strsplit(strtrim(textlines{this_event_idx(i)})), 1);
+
+end
 
 % Separate 'DET' (triggered) and 'REQ' (requested) data for MERMAID.
 switch upper(returntype)
