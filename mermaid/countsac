@@ -73,22 +73,22 @@ printf "   Total : %5i    %5i                   %5i\n\n" $total_count $det_count
 
 # Count .evt files.
 set rawevt_count = 0
-set rawevt_count = `find $MERMAID/events/raw -iname '*.evt' | wc -l`
+set rawevt_count = `find $MERMAID/events/raw -not -iname '*prelim*' -iname '*.evt' | wc -l`
 set double_rawevt_count = `echo "2*$rawevt_count" | bc`  # Should equal number of pdfs
 
 set revevt_count = 0
-set revevt_count = `find $MERMAID/events/reviewed -iname '*.evt' | wc -l`
+set revevt_count = `find $MERMAID/events/reviewed -not -iname '*prelim*' -iname '*.evt' | wc -l`
 
 set need_review = 0
 set need_review = `echo "$rawevt_count - $revevt_count" | bc`
 
 # Count raw .pdf files (should be twice the raw .evt count)
 set rawpdf_count = 0
-set rawpdf_count = `find $MERMAID/events/raw -iname '*.pdf' | wc -l`
+set rawpdf_count = `find $MERMAID/events/raw -not -iname '*prelim*' -iname '*.pdf' | wc -l`
 
 # Count .cp files.
 set cp_count = 0
-set cp_count = `find $MERMAID/events/changepoints/ -iname '*.cp' | wc -l`
+set cp_count = `find $MERMAID/events/changepoints/ -not -iname '*prelim*' -iname '*.cp' | wc -l`
 
 # Count number of SAC files that failed to be properly processed by cpsac2evt.m
 set failed_count = 0

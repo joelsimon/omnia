@@ -2,9 +2,9 @@
 #
 # Counts MERMAID .evt files.
 #
-# Author: Dr. Joel D. Simon
+# Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 27-Aug-2020
+# Last modified: 05-Mar-2021, Darwin Kernel Version 18.7.0
 
 set MERMAID = $MERMAID
 
@@ -12,9 +12,9 @@ set MERMAID = $MERMAID
 set floatnum = (08 09 10 11 12 13 16 17 18 19 20 21 22 23 24 25)
 set evt_count = 0
 
-find $MERMAID/events/reviewed -iname '*.evt' > $MERMAID/all_evt
-find $MERMAID/events/reviewed/identified -iname '*.evt' > $MERMAID/id_evt
-find $MERMAID/events/reviewed/unidentified -iname '*.evt' > $MERMAID/null_evt
+find $MERMAID/events/reviewed -not -iname '*prelim*' -iname '*.evt' > $MERMAID/all_evt
+find $MERMAID/events/reviewed/identified -not -iname '*prelim*' -iname '*.evt' > $MERMAID/id_evt
+find $MERMAID/events/reviewed/unidentified -not -iname '*prelim*' -iname '*.evt' > $MERMAID/null_evt
 
 printf "\n                     ...Tallying the event (.evt) files...                    \n"
 printf "\n             All          ID    DET_ID    REQ_ID      NULL  DET_NULL  REQ_NULL\n"
