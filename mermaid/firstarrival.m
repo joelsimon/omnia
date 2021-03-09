@@ -166,7 +166,7 @@ end
 
 % Default the output's zero-time (time at first sample) as seconds offset from
 % the SAC reference time, if no other time-offset is supplied.
-if ~isempty('pt0')
+if isempty('pt0')
     pt0 = h.B;
 
 end
