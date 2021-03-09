@@ -487,9 +487,14 @@ end
 
 % Finally, compute the full time axis of the possibly decimated data, for reference.
 xax0 = xaxis(h.NPTS, h.DELTA, pt0);
-if ~all(intersect(W1.xax, xax0) == W1.xax) || ...
-        ~all(intersect(W2.xax, xax0) == W2.xax)
-    error('Windowed segments do not align with full time axis')
+
+% Verify timing-axes.
+if ~all(intersect(W1.xax, xax0) == W1.xax)
+    error('First window does not align with full time axis')
+
+end
+if isstruct(W2) && ~all(intersect(W2.xax, xax0) == W2.xax)
+    error('Second window does not align with full time axis')
 
 end
 
