@@ -63,7 +63,7 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 08-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', revsac(1))
@@ -187,7 +187,7 @@ function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, single_EQ, ba
 
 % Collect.
 [tres, dat, ~, tadj, ph, delay, twosd, ~, ~, ~, maxc_y, SNR, EQ, ~, ~, ~, winflag, tapflag, zerflag] = ...
-    firstarrival(sac, true, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs, popas, pt0);
+    firstarrival(sac, ci, wlen, lohi, sacdir, evtdir, single_EQ, bathy, wlen2, fs, popas, pt0);
 publicid = fx(strsplit(EQ(1).PublicId, '='),  2);
 tptime = EQ(1).TaupTimes(1).time;
 
