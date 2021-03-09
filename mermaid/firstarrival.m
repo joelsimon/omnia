@@ -110,7 +110,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ..
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 08-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -215,6 +215,7 @@ syn = EQ(1).TaupTimes(1).truearsecs;
 % difference is 0 seconds.
 pt0_diff = EQ(1).TaupTimes(1).pt0 - pt0;
 syn = syn - pt0_diff;
+fprintf('Reporting arrivals on an X-xaxis whose first sample is set to time: %.6f s\n', pt0)
 
 % Correct the travel time for bathymetry.
 ph = EQ(1).TaupTimes(1).phaseName;
