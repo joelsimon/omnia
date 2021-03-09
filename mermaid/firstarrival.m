@@ -119,12 +119,12 @@ defval('wlen', 30)
 defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
-defval('EQ', getevt(s, evtdir))
+defval('EQ', []) % defaults to `getevt(s, evtdir)`, later
 defval('bathy', true)
 defval('wlen2', 1)
 defval('fs', []) % defaults to not bandpass filter
 defval('popas', [4 1])
-defval('pt0', EQ(1).TaupTimes(1).pt0) % == h.B in SAC header (verified below)
+defval('pt0', []) % defaults to `EQ(1).TaupTimes(1).pt0` (== h.B in SAC header), later
 
 % Start with baseline assumption both time windows will be complete.
 incomplete1 = false;
@@ -147,6 +147,29 @@ if isempty(fileparts(s))
 
 end
 [x, h] = readsac(s);
+
+% Nab EQ structure, if not supplied (assuming MERMAID data here; getevt.m at
+% this time assumes MERMAID event directory structure.  If, for example, you
+% want to use this function for a 'nearby' EQ you must supply it directly).
+if isempty(EQ)
+    EQ = getevt(s, evtdir);
+
+else
+    % Verify the filename in the supplied EQ structure matches the SAC file.
+    nopath_sac = strippath(s);
+    sac_idx = strfind(upper(nopath_sac), 'SAC');
+    if ~strcmp(nopath_sac(1:sac_idx), EQ(1).Filename(1:sac_idx))
+        error('Supplied EQ structure does not match SAC file')
+
+    end
+end
+
+% Default the output's zero-time (time at first sample) as seconds offset from
+% the SAC reference time, if no other time-offset is supplied.
+if ~isempty('pt0')
+    pt0 = h.B;
+
+end
 
 % Decimate, if requested.
 decimated = false;
