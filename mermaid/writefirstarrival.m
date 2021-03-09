@@ -40,8 +40,8 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 % Text file with the following columns (firstarrivals.m outputs in parentheses):
 %    (1) SAC filename
 %    (2) Theoretical 1st-arriving phase name (ph)
-%    (3) AIC arrival-time pick, in seconds into seismogram with
-%        xaxis = xax(h.NPTS, h.DELTA, h.B)
+%    (3) AIC arrival-time pick, in seconds on a time axis defined by
+%        xaxis = xax(h.NPTS, h.DELTA, pt0)
 %    (4) Travel time residual: dat - syn (tres)
 %    (5) Theoretical travel time in seconds of (2), according to taupTime.m
 %    (6) Time difference between reference model with bathymetry and
