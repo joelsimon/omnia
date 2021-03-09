@@ -18,7 +18,7 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 %              that SAC file name already exists in the text file (def)
 % filename Output text file name (def: $MERMAID/.../firstarrivalpressure.txt)
 % wlen     Window length [s] (def: 30)
-% lohi     1x2 array of corner frequencies (def: [1 5]])
+% lohi     1x2 array of corner frequencies, or NaN to skip bandpass (def: [1 5]])
 % sacdir   Directory containing (possibly subdirectories)
 %              of .sac files (def: $MERMAID/processed)
 % evtdir   Directory containing (possibly subdirectories)
@@ -33,8 +33,8 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 %              (def: 1)
 % fs       Re-sampled frequency (Hz) after decimation, or []
 %              to skip decimation (def: [])
-% popas    1 x 2 array of number of poles and number of passes for bandpass
-%              (def: [4 1])
+% popas    1 x 2 array of number of poles and number of passes for bandpass,
+%              or NaN if no bandpass (def: [4 1])
 % pt0      Time in seconds assigned to first sample of X-xaxis (def: SAC header
 %             field "B" so that all times are relative to SAC reference time)
 %

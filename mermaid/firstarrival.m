@@ -45,8 +45,8 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ..
 %              (def: 1)
 % fs       Re-sampled frequency (Hz) after decimation, or []
 %              to skip decimation (def: [])
-% popas    1 x 2 array of number of poles and number of passes for bandpass
-%              (def: [4 1])
+% popas    1 x 2 array of number of poles and number of passes for bandpass,
+%              or NaN if no bandpass (def: [4 1])
 % pt0      Time in seconds assigned to first sample of X-xaxis (def: SAC header
 %             field "B" so that all times are relative to SAC reference time)
 %
@@ -161,7 +161,7 @@ if ~isempty(fs)
     x = decimate(x, R);
 
     if R > 1
-        decimated = true
+        decimated = true;
         fprintf('\nDecimated from %i Hz to %i Hz\n', old_fs, round(1 / (h.DELTA*R)));
 
         % Very important: adjust the appropriate SAMPLE header variables .NPTS and
