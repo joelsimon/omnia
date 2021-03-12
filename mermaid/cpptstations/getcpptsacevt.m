@@ -1,7 +1,7 @@
 function [mer_sac, mer_EQ, cppt_sac, cppt_EQ] = ...
-    getcpptsacevt(id, mer_evtdir, mer_sacdir, cpptdir, check4update, returntype, otype)
+    getcpptsacevt(id, mer_evtdir, mer_sacdir, cpptdir, check4update, returntype, otype, incl_prelim)
 % [mer_sac, mer_EQ, cppt_sac, cppt_EQ] = ...
-%      GETCPPTSACEVT(id, mer_evtdir, mer_sacdir, cpptdir, check4update, returntype, otype)
+%      GETCPPTSACEVT(id, mer_evtdir, mer_sacdir, cpptdir, check4update, returntype, otype, incl_prelim)
 %
 % GETCPPTSACEVT returns SAC filenames and EQ structures corresponding
 % to an input event ID for MERMAID and CPPT seismic stations.
@@ -33,6 +33,7 @@ function [mer_sac, mer_EQ, cppt_sac, cppt_EQ] = ...
 %               'none': return displacement time series (nm)
 %               'vel': return velocity time series (nm/s)
 %               'acc': return acceleration time series (nm/s/s)
+% incl_prelim    true to include 'prelim.sac' (def: true)
 %
 % Output:
 % mer_sac       Cell array of MERMAID SAC files
@@ -63,9 +64,10 @@ defval('cpptdir', fullfile(getenv('MERMAID'), 'events', 'cpptstations'))
 defval('check4update', true)
 defval('returntype', 'ALL')
 defval('otype', [])
+defval('incl_prelim', true)
 
 % This function is simply a script for getnearbysacevt.m; supply
 % 'cpptsac2evt.m' as undocumented input there for proper warnings
 % (see postscript note there).
 [mer_sac, mer_EQ, cppt_sac, cppt_EQ] = ...
-    getnearbysacevt(id, mer_evtdir, mer_sacdir, cpptdir, check4update, returntype, otype, 'cpptsac2evt');
+    getnearbysacevt(id, mer_evtdir, mer_sacdir, cpptdir, check4update, returntype, otype, incl_prelim, 'cpptsac2evt');

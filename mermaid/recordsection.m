@@ -1,8 +1,8 @@
 function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, evtdir, ...
                                       procdir, normlize, returntype, ph, popas, ...
-                                      taper)
+                                      taper, incl_prelim)
 % [F, EQ, sac] = RECORDSECTION(id, lohi, alignon, ampfac, evtdir, procdir, ...
-%                              normlize, returntype, ph, popas, taper)
+%                              normlize, returntype, ph, popas, taper, incl_prelim)
 %
 % Plots a record section of all MERMAID seismograms that recorded the
 % same event, according to 'identified.txt' (output of evt2txt.m)
@@ -33,6 +33,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, evtdir, ...
 %               (def: [4 1])
 % taper     logical true to apply Hanning window (before filtering, if any)
 %               (def: true)
+% incl_prelim true to include 'prelim.sac'
 %
 % Output:
 % F        Structure with figure handles and bits
@@ -84,17 +85,18 @@ defval('returntype', 'DET')
 defval('ph', []);
 defval('popas', [4 1]);
 defval('taper', true)
+defval('incl_prelim', true)
 
 % Find all the SAC files that match this event ID.
 id = num2str(id);
-sac = getsac(id, evtdir, procdir, returntype);
+sac = getsac(id, evtdir, procdir, returntype, incl_prelim);
 if isempty(sac)
     F = [];
     EQ = [];
     return
 
 end
-
+strippath(sac')
 % Generate figure window.
 F.f = figure;
 fig2print(F.f, 'flandscape')

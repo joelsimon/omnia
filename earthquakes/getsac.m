@@ -1,5 +1,5 @@
-function sac = getsac(id, evtdir, sacdir, returntype)
-% sac = GETSAC(id, evtdir, sacdir, returntype)
+function sac = getsac(id, evtdir, sacdir, returntype, incl_prelim)
+% sac = GETSAC(id, evtdir, sacdir, returntype, incl_prelim)
 %
 % GETSAC returns the SAC file(s) that match the input event ID in
 % [evtdir]/reviewed/identified/txt/identified.txt, written with
@@ -18,6 +18,7 @@ function sac = getsac(id, evtdir, sacdir, returntype)
 %              'ALL': both triggered and user-requested SAC files (def)
 %              'DET': triggered SAC files as determined by onboard algorithm
 %              'REQ': user-requested SAC files
+% incl_prelim  true to include 'prelim.sac' (def: true)
 %
 % Output:
 % sac          Cell array of SAC files
@@ -34,6 +35,7 @@ defval('id', '10948555')
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('returntype', 'ALL')
+defval('incl_prelim', true)
 
 % Assumes Princeton-owned, third-generation MERMAID float SAC file
 % naming convention (NOT older, GeoAzur SAC files).  Assuming
@@ -125,4 +127,10 @@ if ~isempty(multi_idx)
         warning('\n%s may contain signals from multiple earthquakes\n', sac{multi_idx(i)})
 
     end
+end
+
+% Remove any 'prelim.sac' files, maybe.
+if ~incl_prelim
+    sac(cellstrfind(sac, 'prelim')) = [];
+
 end

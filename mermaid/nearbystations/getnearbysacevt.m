@@ -1,7 +1,7 @@
 function [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
-    getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir, check4update, returntype, otype, sac2evtfunc) %**
+    getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir, check4update, returntype, otype, incl_prelim, sac2evtfunc) %**
 % [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
-%      GETNEARBYSACEVT(id, mer_evtdir, mer_sacdir, nearbydir, check4update, returntype, otype)
+%      GETNEARBYSACEVT(id, mer_evtdir, mer_sacdir, nearbydir, check4update, returntype, otype, incl_prelim)
 %
 % GETNEARBYSACEVT returns SAC filenames and EQ structures corresponding
 % to an input event ID for MERMAID and 'nearby' seismic stations.
@@ -33,6 +33,7 @@ function [mer_sac, mer_EQ, nearby_sac, nearby_EQ, nearby_sacu, nearby_EQu] = ...
 %               'none': return displacement time series (nm)
 %               'vel': return velocity time series (nm/s)
 %               'acc': return acceleration time series (nm/s/s)
+% incl_prelim    true to include 'prelim.sac' (def: true)
 %
 % Output:
 % mer_sac       Cell array of MERMAID SAC files
@@ -68,13 +69,14 @@ defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('check4update', true)
 defval('returntype', 'ALL')
 defval('otype', [])
+defval('incl_prelim', true)
 defval('sac2evtfunc', 'nearbysac2evt') %**
 
 %% MERMAID data --
 
 % Fetch MERMAID SAC files and EQ structures.
 id = strtrim(num2str(id));
-[mer_sac, mer_EQ] = getsacevt(id, mer_evtdir, mer_sacdir, false, returntype);
+[mer_sac, mer_EQ] = getsacevt(id, mer_evtdir, mer_sacdir, false, returntype, incl_prelim);
 
 % If MERMAID did not see this event, then do not return any
 % corresponding nearby SAC or event files.

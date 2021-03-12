@@ -1,5 +1,5 @@
-function [sac, EQ] = getsacevt(id, evtdir, sacdir, check4update, returntype)
-% [sac, EQ] = GETSACEVT(id, evtdir, sacdir, check4update, returntype)
+function [sac, EQ] = getsacevt(id, evtdir, sacdir, check4update, returntype, incl_prelim)
+% [sac, EQ] = GETSACEVT(id, evtdir, sacdir, check4update, returntype, incl_prelim)
 %
 % GETSACEVT combines getsac.m and getevet.m to return the list of SAC
 % files and reviewed EQ structures corresponding to an event ID.
@@ -17,6 +17,7 @@ function [sac, EQ] = getsacevt(id, evtdir, sacdir, check4update, returntype)
 %               'ALL': both triggered and user-requested SAC & .evt files (def)
 %               'DET': triggered SAC & .evt files as determined by onboard algorithm
 %               'REQ': user-requested SAC & .evt files
+% incl_prelim    true to include 'prelim.sac' (def: true)
 %
 % Output:
 % sac           Cell array of SAC files
@@ -36,10 +37,11 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('check4update', true)
 defval('returntype', 'ALL')
+defval('incl_prelim', true)
 
 % This function is just simple wrapper.
 id = num2str(id);
-sac = getsac(id, evtdir, sacdir, returntype);
+sac = getsac(id, evtdir, sacdir, returntype, incl_prelim);
 if isempty(sac)
     EQ = {};
     return

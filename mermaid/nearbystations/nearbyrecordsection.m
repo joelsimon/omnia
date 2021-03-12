@@ -1,8 +1,8 @@
 function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
                                  mer_sacdir, normlize, nearbydir, returntype, ...
-                                 ph, popas, taper, otype, includeCPPT)
+                                 ph, popas, taper, otype, includeCPPT, incl_prelim)
 % F = NEARBYRECORDSECTION(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, ...
-%         normlize, nearbydir, returntype, ph, popas, taper, otype, includeCPPT)
+%         normlize, nearbydir, returntype, ph, popas, taper, otype, includeCPPT, incl_prelim)
 %
 % Plots a record section with MERMAID and "nearby" stations' data.
 %
@@ -15,6 +15,8 @@ function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
 % includeCPPT      true to include CPPT traces (NB, if true, the path to CPPT data
 %                      must mirror exactly 'nearbydir', except that "nearby" in the
 %                      former is replaced with "cppt" in the latter) (def: true)
+% incl_prelim      true to include 'prelim.sac' (def: true)
+%
 % Output:
 % F                Output of recordsection.m, with added "nearby" and possibly
 %                      CPPT traces
@@ -37,6 +39,7 @@ defval('popas', [4 1]);
 defval('taper', true)
 defval('otype', [])
 defval('includeCPPT', true)
+defval('include_prelim', true)
 
 if strcmpi(alignon, 'atime')
     error('alignon = ''atime'' not yet coded')
@@ -45,7 +48,7 @@ end
 
 % Plot the baseline MERMAID record section.
 [F, mer_EQ] = recordsection(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, ...
-                            normlize, returntype, ph, popas, taper);
+                            normlize, returntype, ph, popas, taper, incl_prelim);
 if isempty(mer_EQ)
     return
 
@@ -57,13 +60,13 @@ evtdate = datetime(irisstr2date(mer_EQ{1}(1).PreferredTime));
 
 % Get the nearby SAC files and EQ structures.
 [~, ~, nearby_sac, nearby_EQ] = ...
-    getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir, true, returntype, otype);
+    getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir, true, returntype, otype, incl_prelim);
 
 % Fetch the similar CPPT data, if requested.
 if includeCPPT
     cpptdir = strrep(nearbydir, 'nearby', 'cppt');
     [~, ~, cppt_sac, cppt_EQ] = ...
-        getcpptsacevt(id, mer_evtdir, mer_sacdir, cpptdir, true, returntype, otype);
+        getcpptsacevt(id, mer_evtdir, mer_sacdir, cpptdir, true, returntype, otype, incl_prelim);
 
     % Concatenate with the "nearby" stations' data.
     nearby_sac = [nearby_sac ; cppt_sac];
