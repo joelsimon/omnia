@@ -1,6 +1,6 @@
-function varargout = readevt2txt(filename, starttime, endtime, returntype)
+function varargout = readevt2txt(filename, starttime, endtime, returntype, incl_prelim)
 % [sac, eqtime, eqlat, eqlon, eqregion, eqdepth, eqdist, eqmag, ...
-%      eqphase1, eqid, sacdate, eqdate] = READEVT2TXT(filename, starttime, endtime, returntype)
+%      eqphase1, eqid, sacdate, eqdate] = READEVT2TXT(filename, starttime, endtime, returntype, incl_prelim)
 %
 % Reads and parses event information from 'all.txt', written with
 % evt2txt.m, assuming Princeton MERMAID naming scheme (SAC filenames
@@ -12,15 +12,17 @@ function varargout = readevt2txt(filename, starttime, endtime, returntype)
 % 'SAC' option, not the 'EVT', option in readidentified.
 %
 % Input:
-% filename   Textfile name: 'all.txt', output by evt2txt.m
-%            (def: $MERMAID/events/reviewed/all.txt)
-% starttime  Inclusive start time (earliest SAC time to consider),
-%                as datetime (def: start at first SAC file in catalog)
-% endtime    Inclusive end time (latest SAC time to consider),
-%                as datetime (def: end at SAC file in catalog)
+% filename     Textfile name: 'all.txt', output by evt2txt.m
+%                  (def: $MERMAID/events/reviewed/all.txt)
+% starttime    Inclusive start time (earliest SAC time to consider),
+%                  as datetime (def: start at first SAC file in catalog)
+% endtime      Inclusive end time (latest SAC time to consider),
+%                  as datetime (def: end at SAC file in catalog)
 % returntype   'ALL': both triggered and user-requested SAC files (def)
 %              'DET': triggered SAC files as determined by onboard algorithm
 %              'REQ': user-requested SAC file
+% incl_prelim  true to include 'prelim.sac' (def: true)
+%
 % Output:
 % sac        SAC filename
 % eqtime     Event rupture time ['yyyy-mm-dd HH:MM:SS']
@@ -40,13 +42,14 @@ function varargout = readevt2txt(filename, starttime, endtime, returntype)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 16-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', 'all.txt'))
 defval('starttime', NaT('TimeZone', 'UTC'))
 defval('endtime', NaT('TimeZone', 'UTC'))
 defval('returntype', 'ALL')
+defval('incl_prelim', true)
 
 % Sanity.
 if ~isdatetime(starttime) || ~isdatetime(endtime)
@@ -104,6 +107,13 @@ idx = find(isbetween(sacdate, starttime, endtime));
 if ~strcmpi(returntype, 'ALL')
     ridx = cellstrfind(sac, sprintf('MER.%s.*sac', upper(returntype)));
     idx = intersect(idx, ridx);
+
+end
+
+% Remove 'prelim.sac' files, if they are unwanted.
+if ~incl_prelim
+    pidx = cellstrfind(sac, 'prelim.sac');
+    idx = setdiff(idx, pidx);
 
 end
 

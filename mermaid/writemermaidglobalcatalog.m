@@ -1,5 +1,5 @@
-function mercatfile = writemermaidglobalcatalog(globalfile, idfile, nfloats)
-% mercatfile = WRITEMERMAIDGLOBALCATALOG(globalfile, idfile, nfloats)
+function mercatfile = writemermaidglobalcatalog(globalfile, idfile, nfloats, incl_prelim)
+% mercatfile = WRITEMERMAIDGLOBALCATALOG(globalfile, idfile, nfloats, incl_prelim)
 %
 % WRITEMERMAIDGLOBALCATALOG reads the text file output by
 % writeglobalcatalog.m and appends to each line (corresponding to a
@@ -12,12 +12,13 @@ function mercatfile = writemermaidglobalcatalog(globalfile, idfile, nfloats)
 % latter two parse individually by return type.
 %
 % Input:
-% globalfile  Name of text file output writeglobalcatalog.m
-%                 (def: $MERMAID/events/globalcatalog/M6.txt)
-% idfile      Name of 'identified.txt' file output by evt2txt.m,
-%                 (def: $MERMAID/events/reviewed/identified/txt/identified.txt)
-% nfloats     Number of floats to consider (def: 16), which
-%                 controls the field width of the last column
+% globalfile   Name of text file output writeglobalcatalog.m
+%                  (def: $MERMAID/events/globalcatalog/M6.txt)
+% idfile       Name of 'identified.txt' file output by evt2txt.m,
+%                  (def: $MERMAID/events/reviewed/identified/txt/identified.txt)
+% nfloats      Number of floats to consider (def: 16), which
+%                  controls the field width of the last column
+% incl_prelim  true to include 'prelim.sac' (def: true)
 %
 % Output:
 % *N/A*       Writes M?_all.txt, M?_DET.txt, M?_REQ.txt,
@@ -28,18 +29,19 @@ function mercatfile = writemermaidglobalcatalog(globalfile, idfile, nfloats)
 % See also: readmermaidglobalcatalog.m, plotmermaidglobalcatalog.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 07-Oct-2019, Version 2017b on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 16-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('globalfile', fullfile(getenv('MERMAID'), 'events', 'globalcatalog', 'M6.txt'));
 defval('idfile', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'identified.txt'))
 defval('nfloats', 16)
+defval('incl_prelim', true)
 
 % Read the global events file and the MERMAID-identified events file.
 [eqtime, eqlat, eqlon, eqdepth, eqmag, globe_id] = readglobalcatalog(globalfile);
-[sac, ~, ~, ~, ~, ~, ~, ~, ~, mer_id] =  readidentified(idfile);
+[sac, ~, ~, ~, ~, ~, ~, ~, ~, mer_id] =  readidentified(idfile, [], [], [], [], incl_prelim);
 
 % Find the float numbers.
 floatnum = cellfun(@(xx) xx(17:18), sac,'UniformOutput', false);

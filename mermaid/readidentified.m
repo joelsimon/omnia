@@ -1,6 +1,6 @@
-function varargout = readidentified(filename, starttime, endtime, reftime, returntype)
+ function varargout = readidentified(filename, starttime, endtime, reftime, returntype, incl_prelim)
 % [sac, eqtime, eqlat, eqlon, eqregion, eqdepth, eqdist, eqmag, eqphase1, ...
-%  eqid, sacdate, eqdate] = READIDENTIFIED(filename, starttime, endtime, reftime, returntype)
+%  eqid, sacdate, eqdate] = READIDENTIFIED(filename, starttime, endtime, reftime, returntype, incl_prelim)
 %
 % Reads and parses event information from identified.txt, written with
 % evt2txt.m, assuming Princeton MERMAID naming scheme (SAC filenames
@@ -20,6 +20,7 @@ function varargout = readidentified(filename, starttime, endtime, reftime, retur
 % returntype   'ALL': both triggered and user-requested SAC files (def)
 %              'DET': triggered SAC files as determined by onboard algorithm
 %              'REQ': user-requested SAC file
+% incl_prelim  true to include 'prelim.sac' (def: true)
 %
 % Output:
 % sac        SAC filename
@@ -40,7 +41,7 @@ function varargout = readidentified(filename, starttime, endtime, reftime, retur
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 16-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -49,6 +50,7 @@ defval('starttime', NaT('TimeZone', 'UTC')) % Dummy variable; changed below
 defval('endtime', NaT('TimeZone', 'UTC')) % Dummy variable; changed below
 defval('reftime', 'SAC')
 defval('returntype', 'ALL')
+defval('incl_prelim', true)
 
 % Sanity.
 if ~isdatetime(starttime) || ~isdatetime(endtime)
@@ -115,6 +117,13 @@ idx = find(isbetween(refdate, starttime, endtime));
 if ~strcmpi(returntype, 'ALL')
     ridx = cellstrfind(sac, sprintf('MER.%s.*sac', upper(returntype)));
     idx = intersect(idx, ridx);
+
+end
+
+% Remove 'prelim.sac' files, if they are unwanted.
+if ~incl_prelim
+    pidx = cellstrfind(sac, 'prelim.sac');
+    idx = setdiff(idx, pidx);
 
 end
 
