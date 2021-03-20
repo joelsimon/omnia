@@ -3,7 +3,7 @@ function gps = readgps(processed)
 %
 % Read MERMAID GPS locations from csv file output by automaid v3.3.0+.
 %
-% NB, P023 was out of the water on for GPS dates:
+% NB, P023 was out of the water during GPS dates:
 % 2019-08-17T03:18:29Z
 % 2019-08-17T03:22:02Z
 % but those locations are NOT removed here. Be sure to remove them before
