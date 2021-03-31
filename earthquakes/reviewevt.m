@@ -93,9 +93,9 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 %
 % See also: cpsac2evt.m
 %
-% Author: Dr. Joel D. Simon
+% Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Aug-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 31-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% Recursive.
 
@@ -138,9 +138,10 @@ EQ = temp.EQ;
 CP = temp.CP;
 clear('temp')
 
-raw_pdf = fullfile(raw_diro, 'pdf', [sans_sac '*.raw.pdf']);
-pdfdir = dir(raw_pdf);
-if isempty(pdfdir)
+co_pdf = fullfile(raw_diro, 'pdf', [sans_sac '.complete.raw.pdf']);
+wi_pdf = fullfile(raw_diro, 'pdf', [sans_sac '.windowed.raw.pdf']);
+pdf_file = {co_pdf wi_pdf};
+if exist(co_pdf, 'file') ~= 2 && exist(co_pdf, 'file') ~= 2
     error('No .pdfs matching %s found.', raw_pdf)
 
 end
@@ -181,8 +182,8 @@ switch viewr
 
 end
 
-for i = 1:length(pdfdir)
-    system(sprintf(open_pdf, fullfile(pdfdir(i).folder, pdfdir(i).name)));
+for i = 1:length(pdf_file)
+    system(sprintf(open_pdf, pdf_file{i}));
 
 end
 
