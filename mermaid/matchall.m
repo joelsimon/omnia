@@ -24,7 +24,7 @@ rawevt = skipdotdir(dir(fullfile(getenv('MERMAID'), 'events', 'raw', 'evt')));
 already_matched = strrep({rawevt.name}, '.raw.evt', '.sac'); % Not necessarily reviewed!
 allsac_nopath = cellfun(@(xx) strippath(xx), allsac, 'UniformOutput', false);
 [~, idx] = setdiff(allsac_nopath, already_matched);
-pool = gcp;
+%pool = gcp;
 
 % Loop over the unmatched SAC files.
 fail = [];
