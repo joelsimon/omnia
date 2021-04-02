@@ -211,16 +211,21 @@ if ~isempty(EQ)
     end
 
     % These list the first phase of the largest earthquake.
-    fprintf( '\n     Filename: %s\n', sacname)
+    fprintf( '\n     Filename: %s', sacname)
+    fprintf(newline)
+    fprintf( '\n     Start time: %s', datestr(mersac2date(sac)))
+    fprintf(newline)
     fprintf( '\n     *First arrival associated with largest magnitude earthquake [EQ(1)]*')
     fprintf( '\n     *Phase:             %7s',       EQ(1).TaupTimes(1).phaseName)
     fprintf( '\n     *Magnitude:         %7.1f %s',  EQ(1).PreferredMagnitudeValue, EQ(1).PreferredMagnitudeType)
     fprintf( '\n     *Distance [deg]:    %7.1f',     EQ(1).TaupTimes(1).distance)
     fprintf( '\n     *Depth [km]:        %7.1f',     EQ(1).PreferredDepth)
-    fprintf( '\n     *Arrival time [s]:  %7.1f',     EQ(1).TaupTimes(1).truearsecs)
-    fprintf(['\n     *JDS residual [s]:  ' sprintf(repmat('%7.1f', ...
+    fprintf(newline)
+    fprintf( '\n     *Model arrival time  (red) [s]:%7.1f',     EQ(1).TaupTimes(1).truearsecs)
+    fprintf(['\n     *JDS arrival time (purple) [s]:' sprintf(repmat('%7.1f', ...
+            [1 length(JDSarsecs)]), JDSarsecs)])
+    fprintf(['\n     *JDS residual (purple-red) [s]:' sprintf(repmat('%7.1f', ...
             [1 length(JDSarsecs)]), JDSarsecs - EQ(1).TaupTimes(1).truearsecs)])
-
 
     % These list all phases of largest earthquake.
     fprintf(['\n\n\n     EQ(1).TaupTimes(#):' sprintf(repmat('  %5i', [1 ...
