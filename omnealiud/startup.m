@@ -39,8 +39,9 @@
 % For my code, and code my code requires.
 addpath(genpath(getenv('OMNIA')))
 
-% Remove the paper-specific path, with generic "fig*.m" names.
+% Remove the paper-specific paths, with generic "fig*.m" names.
 rmpath(genpath(fullfile(getenv('OMNIA'), 'BSSA2020')))
+rmpath(genpath(fullfile(getenv('OMNIA'), 'GJI2021')))
 
 % For MatTaup.
 javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', ...
