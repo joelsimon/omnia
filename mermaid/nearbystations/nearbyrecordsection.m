@@ -1,8 +1,8 @@
 function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
                                  mer_sacdir, normlize, nearbydir, returntype, ...
-                                 ph, popas, taper, otype, includeCPPT, incl_prelim)
+                                 ph, popas, taper, otype, incl_CPPT, incl_prelim)
 % F = NEARBYRECORDSECTION(id, lohi, alignon, ampfac, mer_evtdir, mer_sacdir, ...
-%         normlize, nearbydir, returntype, ph, popas, taper, otype, includeCPPT, incl_prelim)
+%         normlize, nearbydir, returntype, ph, popas, taper, otype, incl_CPPT, incl_prelim)
 %
 % Plots a record section with MERMAID and "nearby" stations' data.
 %
@@ -12,10 +12,10 @@ function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
 %                  'none': return displacement time series (nm)
 %                  'vel': return velocity time series (nm/s)
 %                  'acc': return acceleration time series (nm/s/s)
-% includeCPPT      true to include CPPT traces (NB, if true, the path to CPPT data
+% incl_CPPT        true to include CPPT traces (NB, if true, the path to CPPT data
 %                      must mirror exactly 'nearbydir', except that "nearby" in the
 %                      former is replaced with "cppt" in the latter) (def: true)
-% incl_prelim      true to include 'prelim.sac' (def: true)
+% incl_prelim      true to include 'prelim.sac' (def: false)
 %
 % Output:
 % F                Output of recordsection.m, with added "nearby" and possibly
@@ -23,7 +23,7 @@ function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 03-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 17-Apr-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('id', '10948555')
 defval('lohi', [1 5]);
@@ -38,8 +38,8 @@ defval('ph', [])
 defval('popas', [4 1]);
 defval('taper', true)
 defval('otype', [])
-defval('includeCPPT', true)
-defval('include_prelim', true)
+defval('incl_CPPT', true)
+defval('incl_prelim', false)
 
 if strcmpi(alignon, 'atime')
     error('alignon = ''atime'' not yet coded')
@@ -63,7 +63,7 @@ evtdate = datetime(irisstr2date(mer_EQ{1}(1).PreferredTime));
     getnearbysacevt(id, mer_evtdir, mer_sacdir, nearbydir, true, returntype, otype, incl_prelim);
 
 % Fetch the similar CPPT data, if requested.
-if includeCPPT
+if incl_CPPT
     cpptdir = strrep(nearbydir, 'nearby', 'cppt');
     [~, ~, cppt_sac, cppt_EQ] = ...
         getcpptsacevt(id, mer_evtdir, mer_sacdir, cpptdir, true, returntype, otype, incl_prelim);
