@@ -31,17 +31,21 @@ function [tot, surf, deep] = driftstats(gps, name, surftime, deeptime)
 %
 % I.e., for P008
 %
-%     deep.idx(1,:) = [4 5]
+%    deep.idx(1,:) = [4 5]
 %
 % meaning that the first deep-drift leg occurred between the dates of
 %
-%     gps.P008.locdate(4:5) = [2018-08-05T13:32:46Z  2018-08-06T13:47:20Z]
+%    gps.P008.locdate(4:5) = [2018-08-05T13:32:46Z  2018-08-06T13:47:20Z]
+%
+% The index-vectors `.idx`, `.dist`, `.time`, `.vel` go as, e.g.:
+%
+%    tot.time(N) == seconds(gps.(name).locdate(N) - gps.(name).locdate(N-1))
 %
 % See also: readgps.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 23-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 17-Apr-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default surface/deep drift time differences: it takes approximately 6.5 hrs to descend and ascend
 % back to surface at 500 m parking depth.
@@ -55,6 +59,7 @@ lon = gps.lon;
 locdate = gps.locdate;
 
 % Compute the time difference between each GPS fix.
+% leg_time(N) == seconds(locdate(N) - locdate(N-1))
 leg_time = seconds(diff(locdate));
 leg_time = [0 ; leg_time];
 
@@ -63,10 +68,6 @@ leg_time = [0 ; leg_time];
 %%______________________________________________________________________________________%%
 
 % Compute leg-pair indices -- these reference the complete list in mer.(name).
-idx = 1:length(locdate);
-tot.idx = [idx'-1 idx'];
-tot.idx(1,1) = 1;    % otherwise tot.idx(1,1,) = 0; index out of bounds (makes a zero-time [1 1] leg)
-
 % Leg-pairs are defined by the SECOND COLUMN (which matches lat/lon/locdate indexing):
 %
 % 1st leg: indices [1   1] (null; no time difference)
@@ -74,19 +75,17 @@ tot.idx(1,1) = 1;    % otherwise tot.idx(1,1,) = 0; index out of bounds (makes a
 % 3rd leg: indices [2   3]
 % ...
 % Nth leg: indices [N-1 N]
-% Nth + 1: indices [N N+1]  (Nth index of lat seen in Nth and Nth+1 index of tot.idx)
+% Nth + 1: indices [N N+1]
+idx = 1:length(locdate);
+tot.idx = [idx'-1 idx'];
+tot.idx(1,1) = 1;    % otherwise tot.idx(1,1,) = 0; index out of bounds (makes a zero-time [1 1] leg)
 
-% We need to be careful about P023 because it was out of the water on some dates.
-if strcmp(name, 'P023')
-    bad_dates = iso8601str2date({'2019-08-17T03:18:29Z' '2019-08-17T03:22:02Z'});
-    [~, bad_idx] = intersect(locdate, bad_dates);
-
-    % Insert NaNs as opposed to removing the values to maintain the same indexing.
-    lat(bad_idx) = NaN;
-    lon(bad_idx) = NaN;
-    locdate(bad_idx) = NaT;
-    leg_time(bad_idx) = NaN;
-    tot.idx(bad_idx,:) = NaN;
+% Replace leg-pair indices corresponding to `NaT` placeholders with [NaN NaN].
+% See 'readgps.m' for explanation for P023, why we must REPLACE NOT REMOVE
+% datetimes\locations when MERMAID was recovered so that `diff`s are legit.
+placeholder = find(isnan(leg_time));
+for i = 1:length(placeholder)
+    tot.idx(placeholder(i), :) = [NaN NaN];
 
 end
 
@@ -130,9 +129,10 @@ function [dist, time, vel, tot_dist, ave_dist, tot_time,  ave_time, ave_vel] ...
 % Find any non-finite indices (removed in P023)
 [~, nan_idx] = unzipnan(idx(:, 2));
 
-% Replace those indices with dummies so that they may be referenced as actual lat/lon and locdate
-% indices: just use 1 (this means that the 'deg' and 'time' computations will temporarily reference
-% the first lat/lon or locdate); we'll slot NaNs back into those indices below.
+% Replace those indices with dummies so that they may be referenced as actual
+% lat/lon and locdate indices: just use 1 (this means that the 'deg' and 'time'
+% computations will temporarily reference the first lat/lon or locdate); we'll
+% slot NaNs back into those indices below.
 idx(nan_idx,:) = 1;
 
 % Compute degrees traveled and time spend on each leg.
