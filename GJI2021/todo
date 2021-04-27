@@ -1,5 +1,7 @@
 * Set all $SIMON2020_CODE --> $GJI21_CODE
 
+* Really, comb all code for occurences of 'SIMON2020'
+
 *   % Define paths.
     merdir = getenv('MERMAID');
     evtdir = fullfile(merdir, 'events');
