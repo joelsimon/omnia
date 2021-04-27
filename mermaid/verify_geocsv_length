@@ -6,14 +6,14 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 12-Jan-2021, Darwin Kernel Version 18.7.0
+# Last modified: 27-Apr-2021, Darwin Kernel Version 18.7.0
 
 function verify {
     # Pass directory as first input
     cd $1
 
     # Number of GPS and GeoCSV header lines
-    gps_hdr_lines=4
+    gps_hdr_lines=3
     geo_hdr_lines=6
 
     # Count number of GPS lines
@@ -33,15 +33,15 @@ function verify {
 
 	# Count number of events
 	if [[ $geo_file == *'DET'* ]]; then
-	    events_list=$( ls **/*DET*.mseed )
+	    events_list=$( find . -not -name '*prelim*' -name '*DET*mseed' )
 	    type='det'
 
 	elif [[ $geo_file == *'REQ'* ]]; then
-	    events_list=$( ls **/*REQ*.mseed )
+	    events_list=$( find . -not -name '*prelim*' -name '*REQ*mseed' )
 	    type='req'
 
 	else
-	    events_list=$( ls **/*.mseed )
+	    events_list=$( find . -not -name '*prelim*' -name '*mseed' )
 	    type='all'
 
 	fi
@@ -55,7 +55,9 @@ function verify {
 	    printf "Pass: %s (%s)\n" $dir $type
 
 	else
-	    printf "!!! Fail: %s (%s)\n" $dir $type
+	    printf "!!!! Fail: %s (%s)\n" $dir $type
+	    printf 'GPS+mSEED: %i\n' gps_plus_events
+	    printf '   GeoCSV: %i\n' geo_lines
 
 	fi
     done
