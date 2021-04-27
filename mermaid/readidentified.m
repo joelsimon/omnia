@@ -1,11 +1,11 @@
- function varargout = readidentified(filename, starttime, endtime, reftime, returntype, incl_prelim)
-% [sac, eqtime, eqlat, eqlon, eqregion, eqdepth, eqdist, eqmag, eqphase1, ...
-%  eqid, sacdate, eqdate] = READIDENTIFIED(filename, starttime, endtime, reftime, returntype, incl_prelim)
+function varargout = readidentified(filename, starttime, endtime, reftime, returntype, incl_prelim)
+% [sac, eqtime, eqlat, eqlon, eqregion, eqdepth, eqdist, eqmag, eqphase1, eqid, sacdate, eqdate] ...
+%     = READIDENTIFIED(filename, starttime, endtime, reftime, returntype, incl_prelim)
 %
 % Reads and parses event information from identified.txt, written with
-% evt2txt.m, assuming Princeton MERMAID naming scheme (SAC filenames
-% of length 44). For all events, including those unidentified, see
-% readevt2txt.m.
+% evt2txt.m, assuming Princeton MERMAID naming scheme (SAC filenames of length
+% 44 (+7 for the occasional preliminary-location SAC file). For all events,
+% including those unidentified, see readevt2txt.m.
 %
 % Input:
 % filename     Textfile name: 'identified.txt', output by evt2txt.m
