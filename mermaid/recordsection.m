@@ -31,8 +31,9 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, evtdir, ...
 %               (def: the phases present in the corresponding .evt files)
 % popas     1 x 2 array of number of poles and number of passes for bandpass
 %               (def: [4 1])
-% taper     logical true to apply Hanning window (before filtering, if any)
-%               (def: true)
+% taper     0: do not taper before bandpass filtering (if any)
+%           1: (def) taper with Hann (`hanning`) before filtering
+%           2: taper with Tukey (`tukeywin`) before filtering
 % incl_prelim true to include 'prelim.sac'
 %
 % Output:
@@ -84,7 +85,7 @@ defval('normlize', true)
 defval('returntype', 'DET')
 defval('ph', []);
 defval('popas', [4 1]);
-defval('taper', true)
+defval('taper', 1)
 defval('incl_prelim', true)
 
 % Find all the SAC files that match this event ID.
@@ -144,9 +145,17 @@ for i = 1:length(sac)
     x{i} = detrend(x{i}, 'linear');
 
     % Taper, maybe.
-    if taper
-        windowfunc = hanning(length(x{i}));
-        x{i} = windowfunc.*x{i};
+    switch taper
+      case 1
+        fprintf('Data tapered using `hanning`\n')
+        x{i} = hanning(length(x{i})) .* x{i};
+
+      case 2
+        fprintf('Data tapered using `tukeywin`\n')
+        x{i} = tukeywin(length(x{i})) .* x{i};
+
+      otherwise
+        fprintf('Data not tapered\n')
 
     end
 

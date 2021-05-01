@@ -36,7 +36,7 @@ defval('nearbydir', fullfile(getenv('MERMAID'), 'events', 'nearbystations'))
 defval('returntype', 'DET')
 defval('ph', [])
 defval('popas', [4 1]);
-defval('taper', true)
+defval('taper', 1)
 defval('otype', [])
 defval('incl_CPPT', true)
 defval('incl_prelim', false)
@@ -206,9 +206,17 @@ for i = 1:length(nearby_EQ)
     abbrev_x{i} = detrend(abbrev_x{i}, 'linear');
 
     % Taper, maybe.
-    if taper
-        windowfunc = hanning(length(abbrev_x{i}));;
-        abbrev_x{i} = windowfunc.*abbrev_x{i};
+    switch taper
+      case 1
+        fprintf('Data tapered using `hanning`\n')
+        abbrev_x{i} = hanning(length(abbrev_x{i})) .* abbrev_x{i};
+
+      case 2
+        fprintf('Data tapered using `tukeywin`\n')
+        abbrev_x{i} = tukeywin(length(abbrev_x{i})) .* abbrev_x{i};
+
+      otherwise
+        fprintf('Data not tapered\n')
 
     end
 
