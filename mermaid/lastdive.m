@@ -7,10 +7,6 @@ function [errors, outfile] = lastdive(servdir, procdir)
 % $MERMAID/processed/lastdive.txt, and
 % $MERMAID/processed/lastdive_error.txt
 %
-% The "last dive" is considered the contents in the .out file after the latest
-% transmission that is at least 24 hrs earlier than the final transmission in
-% the *.out file.
-%
 % Input:
 % servdir      MERMAID server directory (def: $MERMAID/server)
 % procdir      MERMAID processed directory (def: $MERMAID/processed)
@@ -21,9 +17,63 @@ function [errors, outfile] = lastdive(servdir, procdir)
 % outfile      The contents of each *.out file corresponding to the last dive
 % *N/A*        Writes lastdive.txt and lastdive_error.txt to 'procdir'
 %
-% Author: Dr. Joel D. Simon
+% Note that the same command file is sent multiple times while at the surface,
+% meaning that there may be an error in the outfile associated with the last
+% surfacing despite the command file being successfully transmitted at another
+% attempt (e.g., 15 minutes later). For example, during this surfacing the
+% command file was successfully transferred at the first attempt.
+%
+%     {'***20210428-06h34mn58: sending cmd from 452.020-P-21.cmd'    }
+%     {'Tx: "$log 0*74"'                                             }
+%     {'Rx: "log 0"'                                                 }
+%     {'Tx: "$buoy default*4A"'                                      }
+%     {'Rx: "buoy default 0"'                                        }
+%     {'Tx: "$buoy bypass 20000 120000*1A"'                          }
+%     {'Rx: "buoy bypass 20000ms 120000ms (10000ms 120000ms stored)"'}
+%     {'Tx: "$stage del*29"'                                         }
+%     {'Rx: "stage del 2"'                                           }
+%     {'Tx: "$stage 1000dbar (50dbar) 670mn (670mn)*60"'             }
+%     {'Rx: "stage 1"'                                               }
+%     {'Tx: "$stage 1000dbar (50dbar) 11630mn (12300mn)*65"'         }
+%     {'Rx: "stage 2"'                                               }
+%     {'Tx: "$stage store*3B"'                                       }
+%     {'Rx: "stage store 48"'                                        }
+%     {'Tx: "$mermaid UPLOAD_MAX:150*5D"'                            }
+%     {'*** file 452.020-P-21.cmd content sent'                      }
+%     {'*** Clear request commands ***'                              }
+%     {0×0 char                                                      }
+%     {'***20210428-06h45mn12: sending cmd from 452.020-P-21.cmd'    }
+%     {'Tx: "$log 0*74"'                                             }
+%     {'Rx: "log 0"'                                                 }
+%     {'Tx: "$buoy default*4A"'                                      }
+%     {'Rx: "buoy default 0"'                                        }
+%     {'Tx: "$buoy bypass 20000 120000*1A"'                          }
+%     {'Rx: "buoy bypass 20000ms 120000ms (10000ms 120000ms stored)"'}
+%     {'Tx: "$stage del*29"'                                         }
+%     {'Rx: "stage del 2"'                                           }
+%     {'Tx: "$stage 1000dbar (50dbar) 670mn (670mn)*60"'             }
+%     {'Rx: "stage 1"'                                               }
+%     {'Tx: "$stage 1000dbar (50dbar) 11630mn (12300mn)*65"'         }
+%     {'Rx: error code X1'                                           }
+%     {'### cmd error 1'                                             }
+%     {'*** try 1/3 failed for file 452.020-P-21.cmd'                }
+%     {'Tx: "$log 0*74"'                                             }
+%     {'Rx: error code X3'                                           }
+%     {'### cmd error 3'                                             }
+%     {'*** try 2/3 failed for file 452.020-P-21.cmd'                }
+%     {'Tx: "$log 0*74"'                                             }
+%     {'Rx: "log 0"'                                                 }
+%     {'Tx: "$buoy default*4A"'                                      }
+%     {'Rx: "log 0"'                                                 }
+%     {'Rx: csum mismatch 74 instead of 4A'                          }
+%     {'### cmd error 2'                                             }
+%     {'*** try 3/3 failed for file 452.020-P-21.cmd'                }
+%     {'*** too many errors, skipping file 452.020-P-21.cmd'         }
+%     {0×0 char                                                      }
+%
+% Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 03-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 30-Apr-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('servdir', fullfile(getenv('MERMAID'), 'server'))
@@ -54,26 +104,15 @@ for i = 1:length(d)
     % Find all occurrences of "sending cmd...", which specifies new transmission.
     [cmd_index, cmd_datestr] = cellstrfind(tx, sprintf('sending cmd from %s.cmd', serial_number));
 
-    % Convert cmd date strings into datetime objects. Start at last
-    % transmission and work backwards to find first gap in transmission
-    % greater than 24 hrs, implying a dive has occurred.
-    N = length(cmd_datestr);
-    Format = 'uuuuMMdd';
-    TimeZone = 'UTC';
-    cmd_datetime(1) = datetime(cmd_datestr{end}(4:11), 'Format', Format, ...
-                               'TimeZone', TimeZone);
-    for j = 1:N-1
-        dive_index = N-j;
-        cmd_datetime(j+1) = datetime(cmd_datestr{dive_index}(4:11), 'Format', Format, ...
-                                     'TimeZone', TimeZone);
-        if cmd_datetime(j) - cmd_datetime(j+1)  > days(1)
-            break
-
-        end
-    end
+    % Find index corresponding to first command of last (most recent) dive.
+    % Dives are defined by gaps greater than 24 hours between commands.
+    date_strs = cellfun(@(xx) xx(4:11), cmd_datestr, 'UniformOutput', false);
+    date_times = datetime(date_strs, 'Format', 'uuuuMMdd', 'TimeZone', 'UTC');
+    dive_idx = days(diff(date_times)) > 1;
+    last_dive = max(find(dive_idx)) + 1;  % it's a `diff` index, so add 1
 
     % Inspect text in *.out file corresponding to data since the last dive.
-    dive_block = tx(cmd_index(dive_index):length(tx));
+    dive_block = tx(cmd_index(last_dive):length(tx));
     contains_error = ~isempty(cellstrfind(dive_block, 'error'));
     if contains_error
         fprintf('WARNING: %s last dive contains error\n', serial_number)
