@@ -64,15 +64,18 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, evtdir, ...
 
 % Wish list:
 %
-% Overlaid travel time curves for 'atime' option.  Compute differences between
-% all phases and first-arriving phase at every distance.  Then set
-% first-arriving phase at every distance to 0 seconds and all subsequent phase
-% arrival times as those differences just computed.  Will not be trivial because
-% tt(?).distances may not intersect and thus would require interpolation between
-% distances and times for different phases.  Alternatively, could compute travel
-% times discretely for one phase given the tt(?).distance vector of another
-% phase of interest, such that you are directly computing phase travel times at
-% the same distances. This would be inefficient.
+% *Specify decimation frequency, as in `firstarrival`
+%
+% *Overlaid travel time curves for 'atime' option.  Compute differences between
+%  all phases and first-arriving phase at every distance.  Then set
+%  first-arriving phase at every distance to 0 seconds and all subsequent phase
+%  arrival times as those differences just computed.  Will not be trivial
+%  because tt(?).distances may not intersect and thus would require
+%  interpolation between distances and times for different phases.
+%  Alternatively, could compute travel times discretely for one phase given the
+%  tt(?).distance vector of another phase of interest, such that you are
+%  directly computing phase travel times at the same distances. This would be
+%  inefficient.
 
 % Defaults.
 defval('id', '10948555')

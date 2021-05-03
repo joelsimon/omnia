@@ -25,6 +25,9 @@ function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 17-Apr-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
+% Wish list:
+% *Specify decimation frequency, as in `firstarrival`
+
 defval('id', '10948555')
 defval('lohi', [1 5]);
 defval('alignon', 'etime')
