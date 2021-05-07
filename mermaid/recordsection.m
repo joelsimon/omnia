@@ -33,7 +33,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, evtdir, ...
 %               (def: [4 1])
 % taper     0: do not taper before bandpass filtering (if any)
 %           1: (def) taper with Hann (`hanning`) before filtering
-%           2: taper with Tukey (`tukeywin`) before filtering
+%           2: taper with 0.1-ratio Tukey (`tukeywin`) before filtering
 % incl_prelim true to include 'prelim.sac'
 %
 % Output:
@@ -60,7 +60,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, evtdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 19-Jun-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 07-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Wish list:
 %
@@ -155,7 +155,7 @@ for i = 1:length(sac)
 
       case 2
         fprintf('Data tapered using `tukeywin`\n')
-        x{i} = tukeywin(length(x{i})) .* x{i};
+        x{i} = tukeywin(length(x{i}), 0.1) .* x{i};
 
       otherwise
         fprintf('Data not tapered\n')

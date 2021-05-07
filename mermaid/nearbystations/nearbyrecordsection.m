@@ -23,7 +23,7 @@ function F = nearbyrecordsection(id, lohi, alignon, ampfac, mer_evtdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Apr-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 07-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Wish list:
 % *Specify decimation frequency, as in `firstarrival`
@@ -216,7 +216,7 @@ for i = 1:length(nearby_EQ)
 
       case 2
         fprintf('Data tapered using `tukeywin`\n')
-        abbrev_x{i} = tukeywin(length(abbrev_x{i})) .* abbrev_x{i};
+        abbrev_x{i} = tukeywin(length(abbrev_x{i}), 0.1) .* abbrev_x{i};
 
       otherwise
         fprintf('Data not tapered\n')
