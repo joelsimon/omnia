@@ -17,11 +17,11 @@ function tres = fig9(ref_time, plt)
 %                                  model (theoretical PKPbc arrival time at 0 s)
 % plt         Generate firstarrival.m plots for each PKPbc seismogram (def: false)
 %
-% Developed as: simon2021_PKPres
+% Developed as: simon2021_PKPres.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -125,7 +125,7 @@ for i = 1:length(EQ)
     dist(i) = EQ(i).TaupTimes(1).distance;
 
     % Get the header info for this SAC file.
-    [~, h] = readsac(fullsac(EQ(i).Filename));
+   [~, h] = readsac(fullsac(EQ(i).Filename, procdir));
 
     % I know these all include PKPab and PKPbc arrivals because I've looked. PKPbc
     % dies off around ~155 degrees; these are all below that. PKPbc always
