@@ -13,11 +13,11 @@ function fig7
 % A TauP travel-time curve (*taupCurve*.pdf) is plotted for both to see this
 % fact.
 %
-% Developed as: simon2021_PKIKP
+% Developed as: simon2021_PKIKP.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 29-Apr-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all

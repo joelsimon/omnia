@@ -3,11 +3,11 @@ function fig1b
 %
 % Plots ray paths on regional (South Pacific) map.
 %
-% Developed as: simon2021_map2
+% Developed as: simon2021_map2.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 11-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -94,7 +94,7 @@ for i = 1:length(id)
     for j = 1:length(id{i})
         evt_ct = evt_ct + 1;
         idsac = getsac(id{i}{j}, evtdir, procdir, returntype, incl_prelim);
-        EQ = getevt(idsac{1});
+        EQ = getevt(idsac{1}, evtdir);
 
         evla = EQ.PreferredLatitude;
         evlo = EQ.PreferredLongitude;;

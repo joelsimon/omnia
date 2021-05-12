@@ -3,11 +3,11 @@ function fig4
 %
 % Plots a T wave.
 %
-% Developed as: simon2021_twave
+% Developed as: simon2021_twave.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 06-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -37,7 +37,7 @@ shrink(ha, 1, 2.5);
 
 % Compute theoretical arrival time of surface waves.
 EQ = getevt(s, evtdir);
-[x, h] = readsac(s);
+[x, h] = readsac(fullsac(s, procdir));
 
 evtdate = irisstr2date(EQ.PreferredTime);
 evla = EQ.PreferredLatitude;

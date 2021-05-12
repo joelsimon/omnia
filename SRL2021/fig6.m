@@ -7,7 +7,7 @@ function fig6
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -30,8 +30,8 @@ figure
 %%______________________________________________________________________________________%%
 
 % Figure 7: PKIKP wave
-s = '20191220T115726.16_5E0574F1.MER.DET.WLT5.sac';
-EQ = getevt(fullsac(s, procdir), evtdir);
+s = fullsac('20191220T115726.16_5E0574F1.MER.DET.WLT5.sac', procdir);
+EQ = getevt(s, evtdir);
 
 
 [tt_pkikp, ~, ax, path_pkikp, source_pkikp, receiver_pkikp, lg] = ...

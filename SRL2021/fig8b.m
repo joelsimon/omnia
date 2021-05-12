@@ -7,11 +7,11 @@ function fig8b
 % firstarrival.m centered on the theoretical arrival time of PKPbc (as is done
 % in fig9.m; see comments here and there for further explanation).
 %
-% Developed as: simon2021_PKPRS
+% Developed as: simon2021_PKPrs.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 24-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -38,6 +38,7 @@ bathy = true;
 wlen2 = 1.75;
 fs = [];
 popas = [4 1];
+incl_prelim = false;
 
 alignon = 'etime';
 ampfac = 2;
@@ -49,7 +50,7 @@ taper = 2;
 % Plot the baseline record section, to be edited and annotated.
 id = 10964158;
 [F, EQ, sac] = recordsection(id,  lohi, alignon, ampfac, evtdir, procdir, ...
-                             normlize, returntype, [], popas, taper);
+                             normlize, returntype, [], popas, taper, incl_prelim);
 
 axesfs(F.f, 15, 15);
 F.txhz.String = sprintf('%.0f--%.0f Hz', lohi);
@@ -132,7 +133,7 @@ for i = 1:length(sac)
 
     % Shift the reference of that arrival time from the seismogram time
     % (xaxis(h.NPTS, h.DELTA, h.B)) so that 0 s occurs at the time of the event.
-    [~, h] = readsac(sac{i});
+    [~, h] = readsac(sac{i}, procdir);
     seisdate = seistime(h);
 
     % In absolute (datetime) terms.

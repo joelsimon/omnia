@@ -1,13 +1,13 @@
 function fig2
 % FIG2
 %
-% Plots S-wave record section.
+% Plots an S wave record section.
 %
 % Developed as: simon2021_swave
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 29-Apr-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -35,6 +35,7 @@ returntype = 'DET';
 otype = 'vel';
 popas = [4 1];
 taper = false;
+incl_prelim = false;
 
 axfs = 20;
 txfs = 18;
@@ -47,7 +48,7 @@ filename = 'simon2021_swave';
 id = '10953779'
 ph = 'p, P, s, S';
 F = recordsection(id, lohi, alignon, 2, evtdir, procdir, normlize, returntype, ...
-                  ph, popas, taper);
+                  ph, popas, taper, incl_prelim);
 
 F.txhz.String = sprintf('%.1f--%.1f Hz', lohi);
 axesfs(F.f, axfs, axfs)
@@ -70,12 +71,11 @@ set(F.lghz, 'Interpreter', 'LaTeX', 'FontSize', 0.9*txfs)
 
 botz(F.ph);
 
-
 savepdf(mfilename)
 close
 
 % Print the catalog this event metadata was culled from.
-[s, EQ] = getsacevt(id, [], [], [], 'DET');
+[s, EQ] = getsacevt(id, evtdir, procdir, true, 'DET');
 for i = 1:length(s)
     fprintf('\n')
     s{i}

@@ -3,7 +3,7 @@ function fig8a
 %
 % Plots core-phase record section including nearby island-station data.
 %
-% Developed as: simon2021_nearbyPKPrs (and simon2021_PKPrs before that...)
+% Developed as: simon2021_nearbyPKPrs.m (and simon2021_PKPrs.m before that...)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com

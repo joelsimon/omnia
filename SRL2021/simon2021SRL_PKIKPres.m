@@ -62,7 +62,7 @@ s = s(idx);
 idx = 0;
 count = 0;
 for i = 1:length(s)
-    EQ(i) = getevt(s{i});
+    EQ(i) = getevt(fullsac(s{i}, procdir), evtdir);
 
 end
 clear('s')

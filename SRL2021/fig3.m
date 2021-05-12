@@ -3,11 +3,11 @@ function fig3
 %
 % Plots a Rayleigh wave.
 %
-% Developed as: simon2021_surfacewave
+% Developed as: simon2021_surfacewave.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 07-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -34,7 +34,7 @@ s = fullsac('20191206T130408.08_5DF32AF0.MER.DET.WLT5.sac', procdir);
 
 % Compute theoretical arrival time of surface waves.
 EQ = getevt(s, evtdir);
-[x, h] = readsac(s);
+[x, h] = readsac(fullsac(s, procdir));
 
 % Compute the arrival time of the surface wave (note that, even though I include
 % it, the event depth is not considered for a horizontal phase).
