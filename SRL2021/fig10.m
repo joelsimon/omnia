@@ -3,7 +3,7 @@ function fig10
 %
 % Plots a single MERMAID seismogram showing two unidentified local events.
 %
-% Developed as: simon2021_local
+% Developed as: simon2021_local.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com

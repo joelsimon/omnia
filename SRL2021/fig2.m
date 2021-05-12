@@ -3,7 +3,7 @@ function fig2
 %
 % Plots an S wave record section.
 %
-% Developed as: simon2021_swave
+% Developed as: simon2021_swave.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
