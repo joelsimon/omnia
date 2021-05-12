@@ -28,8 +28,8 @@ function [sac, EQ] = getsacevt(id, evtdir, sacdir, check4update, returntype, inc
 % See also: getnearbysacevt.m, getsac.m, getevt.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 31-Jan-2020, Version 2017b on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 12-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('id', '10948555')
@@ -38,6 +38,16 @@ defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('check4update', true)
 defval('returntype', 'ALL')
 defval('incl_prelim', true)
+
+% Tired fingers make mistakes.
+if ~islogical(check4update)
+    error('Input `check4update` must be logical')
+
+end
+if ~islogical(incl_prelim)
+    error('Input `incl_prelim` must be logical')
+
+end
 
 % This function is just simple wrapper.
 id = num2str(id);
@@ -49,7 +59,7 @@ if isempty(sac)
 end
 
 for i = 1:length(sac)
-    % Must be cell in case multiple EQ's corresponding to one SAC file.
+    % Must be cell in case multiple EQs corresponding to one SAC file.
     EQ{i}  = getevt(sac{i}, evtdir);
 
 end

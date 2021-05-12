@@ -28,7 +28,7 @@ function sac = getsac(id, evtdir, sacdir, returntype, incl_prelim)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('id', '10948555')
@@ -36,6 +36,12 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('returntype', 'ALL')
 defval('incl_prelim', true)
+
+% Tired fingers make mistakes.
+if ~islogical(incl_prelim)
+    error('Input `incl_prelim` must be logical')
+
+end
 
 % Assumes Princeton-owned, third-generation MERMAID float SAC file
 % naming convention (NOT older, GeoAzur SAC files).  Assuming

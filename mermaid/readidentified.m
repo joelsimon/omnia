@@ -41,7 +41,7 @@ function varargout = readidentified(filename, starttime, endtime, reftime, retur
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 16-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -63,6 +63,10 @@ if isempty(starttime.TimeZone) || isempty(endtime.TimeZone)
 end
 if all(~strcmpi(returntype, {'ALL', 'DET', 'REQ'}))
     error('Specify one of ''ALL'', ''DET'', or ''REQ'' for input: returntype')
+
+end
+if ~islogical(incl_prelim)
+    error('Input `incl_prelim` must be logical')
 
 end
 
