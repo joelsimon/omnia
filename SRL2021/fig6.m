@@ -3,7 +3,7 @@ function fig6
 %
 % Plots cross-sectional ray paths of inner- and outer-core phases through the Earth.
 %
-% Developed as: simon2020_tauppath
+% Developed as: simon2021_tauppath.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
