@@ -5,7 +5,7 @@ function simon2021SRL_iridiumcosts
 %
 % See $SRL21_CODE/data/iridium_bill.pdf for numbers this uses.
 %
-% Developed as: simon2021_iridiumcosts
+% Developed as: simon2021_iridiumcosts.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
@@ -21,7 +21,7 @@ procdir = fullfile(merdir, 'processed');
 % Use 'master' branch  because 'GJI21' did not include all Mar 2021 data.
 startdir = pwd;
 cd(procdir)
-system('git checkout GJI21');
+system('git checkout master');
 cd(startdir)
 
 % From 'iridium_bill.pdf'
