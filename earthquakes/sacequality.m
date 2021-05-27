@@ -1,4 +1,4 @@
-function [iseq, cf, h1, h2] = sacequality(sac1, sac2, names)
+function [iseq, cf, h1, h2] = sacequality(sac1, sac2, names, mess)
 % [iseq, cf, h1, h2] = SACEQUALITY(sac1, sac2, names)
 %
 % Compare two SAC files.
@@ -6,6 +6,7 @@ function [iseq, cf, h1, h2] = sacequality(sac1, sac2, names)
 % Input:
 % sac1,2      Full path SAC files to compare
 % names       Cell array of field names to compare (def: all)
+% mess        true for "Comparing..." message printout (def: true)
 %
 % Output:
 % iseq        true: SAC files are equal
@@ -24,10 +25,11 @@ function [iseq, cf, h1, h2] = sacequality(sac1, sac2, names)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 07-Dec-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 26-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('names', sacfieldnames)
+defval('mess', true)
 
 % Sanity.
 if ~iscell(names)
@@ -36,7 +38,10 @@ if ~iscell(names)
 end
 
 % Read data and header.
-fprintf('Comparing:\n%s\n%s\n\n', sac1, sac2)
+if mess
+    fprintf('Comparing:\n%s\n%s\n\n', sac1, sac2)
+
+end
 [x1, h1] = readsac(sac1);
 [x2, h2] = readsac(sac2);
 
