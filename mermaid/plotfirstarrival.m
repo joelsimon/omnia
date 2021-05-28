@@ -50,7 +50,7 @@ function [f, ax, tx, pl, FA] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 27-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults -- those left empty are defaulted in firstarrival.m
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -127,7 +127,7 @@ end
 pl.tl = title(sprintf('%s = %.2f s [max. %.2f s later]', tstr, tres, delay), ...
               'FontWeight', 'Normal', 'FontSize', FontSize(1));
 sacname = strippath(strrep(EQ(1).Filename, '_', '\_'));
-pl.xl = xlabel(sprintf('Time relative to \\textit{%s} phase (s)\n[%s]', ph, ...
+pl.xl = xlabel(sprintf('Time relative to theoretical arrival of \\textit{%s} phase (s)\n[%s]', ph, ...
                        sacname), 'FontSize', FontSize(1));
 pl.yl = ylabel(sprintf('Amplitude\n[max. %.1e]', maxc_y), 'FontSize', FontSize(1));
 
