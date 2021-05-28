@@ -17,7 +17,7 @@ function fig7
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 12-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 27-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -64,6 +64,7 @@ for i = 1:length(s)
     %% slightly each time
     [f, ax, tx, pl, FA] = plotfirstarrival(sac, ha, [], [], ci, wlen, lohi, ...
                                            [], [], true, wlen2, fs, popas);
+
     pl.signal.Color = 'k';
     ax.YLabel.String = 'Counts';
     set(pl.syn, 'Color', 'blue', 'LineWidth', 1, 'LineStyle', '-')
@@ -155,6 +156,15 @@ for i = 1:length(s)
 
     end
 
+    % Replace "2SD" with "2Std.Dev."
+    old = '2${\mathrm{SD}}_\mathrm{err}$';
+    new = '2${\mathrm{St.Dev\hspace{-.1em}.}}_\mathrm{err}$';
+    tx.lrth.String = strrep(tx.lrth.String, old, new);
+
+    % Replace "SNR=9.9e+00" with "SNR=9.9"
+    old = 'e+00';
+    new = '';
+    tx.llth.String = strrep(tx.llth.String, old, new);
 
     tx.ulth.FontSize = 14;
     tx.urth.FontSize = 14;
