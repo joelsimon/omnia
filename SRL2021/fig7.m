@@ -156,9 +156,9 @@ for i = 1:length(s)
 
     end
 
-    % Replace "2SD" with "2Std.Dev."
+    % Replace "2SD" with "2Std.dev."
     old = '2${\mathrm{SD}}_\mathrm{err}$';
-    new = '2${\mathrm{St.Dev\hspace{-.1em}.}}_\mathrm{err}$';
+    new = '2${\mathrm{St.dev\hspace{-.1em}.}}_\mathrm{err}$';
     tx.lrth.String = strrep(tx.lrth.String, old, new);
 
     % Replace "SNR=9.9e+00" with "SNR=9.9"
