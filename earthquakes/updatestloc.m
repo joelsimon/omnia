@@ -1,38 +1,32 @@
-function isupdated = updatestloc(sac, evtdir)
-% isupdated = UPDATESTLOC(sac, evtdir)
+function [isupdated, new_EQ, old_EQ] = updatestloc(sacfile, evtdir)
+% [isupdated, new_EQ, old_EQ] = UPDATESTLOC(sacfile, evtdir)
 %
 % Overwrite reviewed EQ.TaupTimes.
 %
-% UPDATETAUPTIMES updates the phase-arrival times due to a change in station
-% or event metadata. 
-%
-% UPDATETAUPTIMES does not update the station or event metadata themselves
-% (see updateid.m to accomplish the latter).
-%
-% UPDATETAUPTIMES does not update the phase-arrival times of the corresponding
-% raw events, nor does it update the corresponding raw or reviewed .CP files.
-%
-% UPDATESTLOC is a wrapper for updatetauptimes.m
+% Wrapper for `updatetauptimes.m` that takes evt/ directory rather than the
+% assocaited .evt file as second input.
 %
 % Input:
-% sac         Fullpath SAC filename
+% sacfile     Fullpath SAC filename
 % evtdir      Path to events/ raw and reviewed sub-directories
 %                 (def: $MERMAID/events)
 %
 % Output:
 % isupdated   Logical true/false alerting if EQ.TaupTimes updated
+% new_EQ      Current EQ structure, potentially updated
+% old_EQ      Previous EQ structure, potentially equal to `new_EQ`
 %
 % See also: updatetauptimes.m, updateid.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 04-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default path to raw and reviewed .evt files.
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 
 % Collect ONLY the reviewed EQ structure(s) path.
-[~, ~, ~, ~, evt] = getevt(sac, evtdir);
+[~, ~, ~, ~, evtfile] = getevt(sacfile, evtdir);
 
 % Update EQ.TaupTimes.
-isupdated = updatetauptimes(sac, evt);
+[isupdated, new_EQ, old_EQ] = updatetauptimes(sacfile, evtfile);

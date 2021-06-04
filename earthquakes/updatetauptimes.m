@@ -1,5 +1,5 @@
-function isupdated = updatetauptimes(sacfile, evtfile)
-% isupdated = UPDATETAUPTIMES(sacfile, evtfile)
+function [isupdated, new_EQ, old_EQ] = updatetauptimes(sacfile, evtfile)
+% [isupdated, new_EQ, old_EQ] = UPDATETAUPTIMES(sacfile, evtfile)
 %
 % Overwrite reviewed EQ.TaupTimes.
 %
@@ -17,33 +17,32 @@ function isupdated = updatetauptimes(sacfile, evtfile)
 % evtfile     Fullpath .evt (EQ structure) filename
 %
 % Output:
-% isupdated   true if evtfile updated with new EQ struct (def: false)
-%
-% Output:
 % isupdated   Logical true/false alerting if EQ.TaupTimes updated
+% new_EQ      Current EQ structure, potentially updated
+% old_EQ      Previous EQ structure, potentially equal to `new_EQ`
 %
 % See also: updateid.m, updatestloc.m (a wrapper; uses SAC filename)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 04-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Read the EQ structure.
 tmp = load(evtfile, 'EQ', '-mat');
-EQ = tmp.EQ;
+old_EQ = tmp.EQ;
 
 % Read the (possibly updated) SAC-file header.
 [~, h] = readsac(sacfile);
 
 % Overwrite .TaupTimes if that sub-structure requires an update.
-[new_EQ, isupdated] = main(EQ, h);
+[new_EQ, isupdated] = main(old_EQ, h);
 
 % Verify this EQ structure corresponds to this SAC file -- may have to chop
 % off, e.g., 'vel', from the end of this sac file.
 sac_nopath = strippath(sacfile);
 sac_idx = strfind(lower(sac_nopath), 'sac');
 sac_nopath = sac_nopath(1:sac_idx+2);
-if ~strcmpi(sac_nopath, EQ.Filename)
+if ~strcmpi(sac_nopath, old_EQ.Filename)
     error('sacfile and evtfile do not correspond to one another')
 
 end
