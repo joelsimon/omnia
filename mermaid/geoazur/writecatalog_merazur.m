@@ -5,7 +5,7 @@
 %
 % 1) Rematch earthquakes: rematch_merazur.m
 %
-% 2) Review those rematchs: reviewrematch_merazur.m
+% 2) Review those rematches: reviewrematch_merazur.m
 %
 % 3) Compute and save changepoints and their confidence intervals
 % writechangepoint_merazur.m
