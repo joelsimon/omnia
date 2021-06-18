@@ -34,13 +34,14 @@
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 01-Dec-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 18-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % For my code, and code my code requires.
 addpath(genpath(getenv('OMNIA')))
 
 % Remove the paper-specific paths, with generic "fig*.m" names.
 rmpath(genpath(fullfile(getenv('OMNIA'), 'BSSA2020')))
+rmpath(genpath(fullfile(getenv('OMNIA'), 'SRL2021')))
 rmpath(genpath(fullfile(getenv('OMNIA'), 'GJI2021')))
 
 % For MatTaup.
