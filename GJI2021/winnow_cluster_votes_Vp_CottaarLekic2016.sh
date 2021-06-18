@@ -4,6 +4,9 @@
 # 10.1093/gji/ggw324 to text files of longitude, latitude, and the number of
 # slow Vp votes at 2700 km depth in box defined between:
 #
+# This script requires 'cluster_votes_Vp_CottaarLekic2016.txt' which may be
+# retrieved from the Supplementary Data of https://doi.org/10.1093/gji/ggw324
+#
 # Longitude: 176, 251
 # Latitude:  -33,   4
 #
