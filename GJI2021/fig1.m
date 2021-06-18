@@ -47,7 +47,7 @@ right = [61 101 267 391];
 % Compute the slope between each pair, useful to compute an average at the edge.
 rise = plat(right) - plat(left);    % latitude diff
 run = plon(left)+360 - plon(right); % longitude diff
-slope = rise./run;                  % latitude / longitudge
+slope = rise./run;                  % latitude / longitude
 
 % Compute the distance from the last legit point the edge.
 run_left = -20 - plon(left);
@@ -133,7 +133,7 @@ f.ha.LineWidth = 0.5;
 f.ha.GridAlpha = .075;
 
 % Get the locations of all floats at the time of their deployment.
-datadir = fullfile(getenv('SIMON2020_CODE'), 'data');
+datadir = fullfile(getenv('GJI21_CODE'), 'data');
 str = readtext(fullfile(datadir, 'misalo.txt'));
 
 % Assuming this file is sorted...

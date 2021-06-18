@@ -15,7 +15,7 @@ function fig3
 clc
 close all
 
-datadir = fullfile(getenv('$GJI21_CODE'), 'data');
+datadir = fullfile(getenv('GJI21_CODE'), 'data');
 
 % NB, I believe Frederik scp'd the following 'html2dive.mat' to me; it is not in
 % any emails.  I sent him back html2dive2.mat, which is a different experiment
