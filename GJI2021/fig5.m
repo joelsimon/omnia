@@ -34,7 +34,7 @@ normlize = true;
 returntype = 'DET';
 otype = 'vel';
 popas = [4 1];
-taper = true;
+taper = 2;
 incl_prelim = false;
 
 axfs = 20;
