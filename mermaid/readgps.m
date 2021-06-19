@@ -26,6 +26,9 @@ function gps = readgps(processed, rm23)
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 17-Apr-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
+% "clockfreq" column added v3.4.0-K
+error('Must adjust based on automaid version')
+
 % Default path.
 merpath = getenv('MERMAID');
 defval('processed', fullfile(merpath, 'processed'))
