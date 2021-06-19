@@ -3,6 +3,10 @@ function gps = read_simon2021gji_supplement_gps(supplement_directory)
 %
 % Read MERMAID GPS locations from Joel D. Simon's 2021 GJI paper???
 %
+% Those GPS files were output by automaid v3.4.0-7. They are not trimmed
+% "http://geoweb.princeton.edu/people/simons/SOM/P0??_all.txt" files (written by
+% FJS' vit2tbl.m), as was done with first original submission to GJI.
+%
 % NB, P023 was out of the water during GPS dates:
 % 2019-08-17T03:18:29Z
 % 2019-08-17T03:22:02Z
@@ -15,9 +19,9 @@ function gps = read_simon2021gji_supplement_gps(supplement_directory)
 % supplement_directory  Directory where simon2021gji_supplement_????_gps.txt reside
 %
 % Output:
-% gps                   GPS structure that parses gps.csv, organized by float name
+% gps                   GPS structure that parses *gps*.txt, organized by float name
 %
-% See also: driftstats.m
+% See also: driftstats.m, readgps.m (on which this specific case is based)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
