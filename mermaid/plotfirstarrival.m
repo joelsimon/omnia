@@ -50,7 +50,7 @@ function [f, ax, tx, pl, FA] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 27-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 21-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults -- those left empty are defaulted in firstarrival.m
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -131,9 +131,10 @@ pl.xl = xlabel(sprintf('Time relative to theoretical arrival of \\textit{%s} pha
                        sacname), 'FontSize', FontSize(1));
 pl.yl = ylabel(sprintf('Amplitude\n[max. %.1e]', maxc_y), 'FontSize', FontSize(1));
 
-% Adjust the axis.
+% Adjust the axis.  Open up the Y-Axis by some multiple of the max. (+/-) value
+% in within the windowed segment (don't use range because that's not symmetric).
 xlim([-wlen/2 wlen/2])
-rangey = range(xw1) * 1.1;  % Expand by some multiple of the range of the windowed segment.
+rangey = (2 * max(abs(xw1))) * 1.1;
 ylim([-rangey rangey])
 
 % Force 5 ticks on x-axis.
@@ -220,7 +221,7 @@ else
     end
 end
 
-% Adjust YAxis TickLabels so that they have a field length at most of 2.
+% Adjust Y-Axis TickLabels so that they have a field length at most of 2.
 max_ylim = max(abs(ax.YLim));
 ax.YAxis.Exponent = log10(max_ylim) - 1;
 
