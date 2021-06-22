@@ -1,5 +1,5 @@
-function simon2021gji_inspectzerflag
-% SIMON2021GJI_INSPECTZERFLAG
+function simon2021gji_inspect_zerflag
+% SIMON2021GJI_INSPECT_ZERFLAG
 %
 % Unaffected by otype because only the RAW SAC files see the contiguous zeros
 % (once you deconvolve you add non-zero noise).  So .none and .vel have the same
@@ -21,7 +21,7 @@ function simon2021gji_inspectzerflag
 %      '2019.267.0718.00.PAE.CPZ1.SHZ.SAC' ... % !! Fail !!
 %      '2019.348.0500.00.TBI.CPZ1.SHZ.SAC'}    % Pass
 %
-% Developed as: simon2020_inspectzerflag.m
+% Developed as: simon2020_inspect_zerflag.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com

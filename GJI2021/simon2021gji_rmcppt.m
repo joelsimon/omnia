@@ -8,7 +8,7 @@ function s = simon2021gji_rmcppt
 % must therefore be removed from consideration.
 %
 % For their identification,
-% see also: simon2021gji_inspectzerflag.m
+% see also: simon2021gji_inspect_zerflag.m
 %
 % s =
 %    {'2018.269.0037.00.TVO.CPZ1.SHZ.SAC'}
