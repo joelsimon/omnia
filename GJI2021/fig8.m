@@ -46,7 +46,7 @@ mercatfile = {'M4_DET.txt', 'M5_DET.txt', 'M6_DET.txt', 'M7_DET.txt', 'M8_DET.tx
 
 % The first MERMAID deployed was P008 -- get that deployment date and
 % use that as the start date.
-supplement_directory = fullfile(getenv('GJI21_CODE'), 'data');
+supplement_directory = fullfile(getenv('GJI21_CODE'), 'data', 'supplement');
 mer = read_simon2021gji_supplement_gps(supplement_directory);
 mer = readmerloc;
 startdate = mer.P008.locdate(1);

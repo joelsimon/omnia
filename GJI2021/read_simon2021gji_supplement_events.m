@@ -2,18 +2,18 @@ function MERMAID = read_simon2021gji_supplement_events(filename)
 % MERMAID = READ_SIMON2021GJI_SUPPLEMENT_EVENTS(filename)
 %
 % Reads the supplementary data text file of MERMAID events,
-% simon2021gji_supplement_events.txt, written by
-% ???
+% simon2021_supplement_events.txt, written by
+% write_simon2021_supplement_events.txt
 %
 % Input:
 % filename       Filename
-% (def: $GJI/supplement/data/textfiles/simon2021gji_supplement_events.txt)
+%                (def: $GJI_CODE/data/supplement/simon2021gji_supplement_events.txt)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 19-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-defval('filename', fullfile(getenv('GJI21'), 'supplement', 'data', 'textfiles', ...
+defval('filename', fullfile(getenv('GJI21_CODE'), 'data', 'supplement', ...
                             'simon2021gji_supplement_events.txt'))
 
 sac_fmt = '%44s        ';

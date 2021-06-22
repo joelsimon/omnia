@@ -31,7 +31,7 @@ tsize = fs - 2;
 % Plot MERMAID tracks.
 
 % Read the location data.
-supplement_directory = fullfile(getenv('GJI21_CODE'), 'data');
+supplement_directory = fullfile(getenv('GJI21_CODE'), 'data', 'supplement');
 mer = read_simon2021gji_supplement_gps(supplement_directory);
 
 %% Do everthing once for P008, the starndard for logest deployed.
