@@ -3,7 +3,7 @@ function fig8
 %
 % plotmermaidglobalcatalog.m from start of the SPPIM array (05-Aug-2018) through 2019.
 %
-% Developed as: $SIMON2020_CODE/simon2020_plotmermaidglobalcatalog.
+% Developed as: simon2020_plotmermaidglobalcatalog.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com

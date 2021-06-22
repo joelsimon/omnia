@@ -3,7 +3,7 @@ function fig5
 %
 % Plots MERMAID record section, w/ and w/o other island stations' data.
 %
-% Developed as: $SIMON2020_CODE/simon2020_recordsections.m
+% Developed as: simon2020_recordsections.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com

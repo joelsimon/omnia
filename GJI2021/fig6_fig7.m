@@ -5,7 +5,7 @@ function fig6_fig7
 % and distance scatter plot; AND raypaths for ALL identified events; no
 % winnowing.
 %
-% Developed as: $SIMON2020_CODE/simon2020_distmagsnr_rays
+% Developed as: simon2020_distmagsnr_rays.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com

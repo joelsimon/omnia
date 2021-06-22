@@ -6,7 +6,7 @@ function fig3
 % and/or my version of MATLAB); this just adds some formatting using data he
 % sent.
 %
-% Developed as: $SIMON2020_CODE/simon2020_dive.m
+% Developed as: simon2020_dive.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com

@@ -3,7 +3,7 @@ function fig4a
 %
 % Plots MERMAID drift trajectories and island station locations.
 %
-% Developed as: $SIMON2020_CODE/simon2020_plotmerloc.m
+% Developed as: simon2020_plotmerloc.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com

@@ -16,7 +16,7 @@ function fig4c(plot_mermaids)
 % corner of the axis, thus only 1/4 of the box area is inside the axis, while
 % 3/4 of the box are is outside).
 %
-% Developed as: $SIMON2020_CODE/simon2020_vp_vote_map.m
+% Developed as: simon2020_vp_vote_map.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com

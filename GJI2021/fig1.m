@@ -3,7 +3,7 @@ function fig1
 %
 % Plots global and regional station maps with MERMAID locations.
 %
-% Developed as: $SIMON2020_CODE/simon2020_globalstations.m
+% Developed as: simon2020_globalstations.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
