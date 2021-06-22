@@ -120,7 +120,7 @@ for i = 1:12
 
     % Edit top left textpatch to be two lines with date on top
     % Edit top right textpatch to include MERMAID number
-    tx.ulth.String = sprintf('%s\n%s', FA.EQ.PreferredTime(1:19), tx.ul.String{:});
+    tx.ulth.String = sprintf('%s\n%s', irisstr2date(FA.EQ.PreferredTime), tx.ul.String{:});
     tx.urth.String = sprintf('%s\nP0%s', tx.urth.String, getmerser(s12{i}));
 
     % Equalize upper-box heights.

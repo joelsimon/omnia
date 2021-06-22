@@ -174,7 +174,7 @@ for i = 1:12
     numticks(ax, 'x', 7);
 
     % Edit top left textpatch to be two lines with date on top
-    tx.ulth.String = sprintf('%s\n%s', EQ.PreferredTime(1:19), tx.ul.String{:})
+    tx.ulth.String = sprintf('%s\n%s', irisstr2date(EQ.PreferredTime), tx.ul.String{:});
 
     if strcmp(name, 'mer')
         % Label the rounded max counts (they are non-integer due to filtering of the waveform).
