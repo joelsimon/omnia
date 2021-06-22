@@ -16,7 +16,7 @@ function write_simon2021gji_firstarrival_trad_rasp
 % Writes firstarrival text files for nearby (island traditional and Raspberry
 % Shake) and CPPT (island) stations, including an extra (not instrument
 % corrected or decimated, i.e., raw SAC file) 'cppt.firstarrpress.P..txt' which
-% is useful for simon2020_inspectzerflag.m to see which SAC files were zero
+% is useful for simon2021gji_inspectzerflag.m to see which SAC files were zero
 % filled within the firstarrival.m taper.
 %
 % NB, the poor naming "nearby" and "CPPT" occurred due to collecting data from
@@ -442,7 +442,7 @@ writefirstarrivalpressure(cppt_sac, true, cppt_det_txt2, wlen, lohi, ...
 % make sure not to decimate in firstarrival.m because that will also average
 % values and remove contiguous zeros.
 %
-% Use simon2020_inspectzerflag.m to review those SAC files with potential
+% Use simon2021gji_inspectzerflag.m to review those SAC files with potential
 % data-gaps in the firstarrival tapers.  Make the complementary text file with
 % the raw CPPT data using firstarrivalpressure.m because it sees the same segment as
 % firstarrrrival.m, but it doesn't have to compute error estimates (time

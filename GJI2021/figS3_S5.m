@@ -3,7 +3,7 @@ function figS3_S5(commonID)
 %
 % Plots top 12 highest SNRs from each instrument class.
 %
-% !! Must first run: ./scriptish/simon2020_data_exists.m !!
+% !! Must first run: simon2021gji_data_exists.m !!
 %
 % Input:
 % commonID    True to only compare residuals for events for which Raspbery
@@ -77,7 +77,7 @@ perc
 % Possible further winnowing to only include event IDs for which data exists for
 % all stations.
 if commonID
-    % These files written with simon2020_data_exists.m
+    % These files written with simon2021gji_data_exists.m
     mer_data_exists = readtext(fullfile(datadir, 'data_exists.mer.txt'));
     trad_data_exists = readtext(fullfile(datadir, 'data_exists.trad.txt'));
     rasp_data_exists = readtext(fullfile(datadir, 'data_exists.rasp.txt'));

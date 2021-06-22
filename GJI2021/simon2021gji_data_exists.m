@@ -13,7 +13,7 @@ function simon2021gji_data_exists
 % Also, there are more NEARBY SAC files (if you ls */AM*SAC) there than are
 % returned here because those data go into 2020.
 %
-% Develed as: ./scriptish/simon2020_data_exists.m
+% Developed as: ./scriptish/simon2020_data_exists.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
