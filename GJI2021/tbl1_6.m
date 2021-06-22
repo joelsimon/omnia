@@ -36,7 +36,7 @@ floatnum = {'08' '09' '10' '11', '12', '13', '16', '17', '18', '19', ...
 magval = [4:8];
 
 % 30-yr average seismicity rates (Jan 1985 through Dec 2014) per
-% magnitude unit from 4-8 (see ./data/M?.txt)
+% magnitude unit from 4-8 (see ./data/1985-2015/M?.txt)
 historical_num_ev = [365378 48511 3650 396 28]; % DOUBLY verified 17-Jan-2020/29-Mar-2020
 historical_num_ev_per_yr = historical_num_ev / 30;
 fprintf('\nM4--M8 average annual seismicity rate: %i %i %i %i %i\n', round(historical_num_ev_per_yr))
