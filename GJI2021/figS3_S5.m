@@ -182,7 +182,7 @@ for i = 1:12
         ax.YLabel.String{2} = sprintf('[max. %i]', max_counts);
 
         % Edit top right textpatch to include station name
-        tx.urth.String = sprintf('%s\nP0%s', tx.urth.String, getmerser(s));
+        tx.urth.String = sprintf('%s\nP00%s', tx.urth.String, getmerser(s));
 
     else
         % Edit top right textpatch to include station name

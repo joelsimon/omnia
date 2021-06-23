@@ -179,7 +179,7 @@ else
 end
 depthstr = sprintf('%.2f~km', EQ(1).PreferredDepth);
 diststr = sprintf('%.2f$^{\\circ}$', EQ(1).TaupTimes(1).distance);
-merstr = sprintf('P0%s', getmerser(EQ(1).Filename));
+merstr = sprintf('P00%s', getmerser(EQ(1).Filename));
 
 [F.f.lgmag, F.f.lgmagtx] = textpatch(ax, 'NorthWest', magstr);
 [F.f.lgdist, F.lgdisttx] = textpatch(ax, 'SouthWest', [ depthstr ', ' diststr ', ' merstr]);
