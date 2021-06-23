@@ -7,7 +7,7 @@ function fig8
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 22-Apr-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 23-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -44,12 +44,17 @@ shrink(ha(5:end), 1, 1)
 p = fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified', 'txt');
 mercatfile = {'M4_DET.txt', 'M5_DET.txt', 'M6_DET.txt', 'M7_DET.txt', 'M8_DET.txt'};
 
-% The first MERMAID deployed was P008 -- get that deployment date and
-% use that as the start date.
+% The first MERMAID deployed was P008(P0008) -- get that deployment date and use
+% that as the start date.
 supplement_directory = fullfile(getenv('GJI21_CODE'), 'data', 'supplement');
+
+%% Unfortunately we had not agreed on four- or five-character station names
+%% at the time of writing the GJI paper; those returned by readmerloc are, at
+%% this point, 4 characters long ("P008"), while those from
+%% read_simon2021gji_supplement_gps.m are five characters long ("P0008").
 mer = read_simon2021gji_supplement_gps(supplement_directory);
-mer = readmerloc;
-startdate = mer.P008.locdate(1);
+mer = readmerloc; % 4-character station names
+startdate = mer.P008.locdate(1); % 5-character station names
 
 P025_deploy = datetime('14-Sep-2018 11:57:12', 'TimeZone', 'UTC');
 
@@ -66,7 +71,7 @@ for i = 1:5
         ha2_4.Title.Position(2) = 103;
 
         % This plot isn't including in the paper, but I want to say biased detection was for P008.
-        fprintf('\n\n!! P008 recorded %i of %i M4 events !!\n\n', F2_4.h.BinCounts(1), sum(F2_4.h.BinCounts))
+        fprintf('\n\n!! P0008 recorded %i of %i M4 events !!\n\n', F2_4.h.BinCounts(1), sum(F2_4.h.BinCounts))
 
         set(F2_4.h, 'FaceAlpha', 1,  'FaceColor', [0.5 0.5 0.5])
         savepdf('fig8_M4.pdf', F2_4.f);
@@ -126,7 +131,7 @@ tx5.HorizontalAlignment = 'Center';
 % Delete redundant xlabels.
 set(ha1(2:4), 'XLabel', [])
 set(ha2(2:4), 'XLabel', [])
-ha2(end).XLabel.String = 'MERMAID (excluding ``P0'''' prefix)';
+ha2(end).XLabel.String = 'MERMAID (excluding ``P00'''' prefix)';
 
 movev(ha, .03)
 axesfs(f, 10, 10)

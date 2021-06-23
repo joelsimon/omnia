@@ -36,14 +36,14 @@ mer = read_simon2021gji_supplement_gps(supplement_directory);
 
 %% Do everthing once for P008, the starndard for logest deployed.
 name = fieldnames(mer);
-if ~isequaln(mer.(name{1}), mer.P008);
+if ~isequaln(mer.(name{1}), mer.P0008);
     keyboard
     error('P008 is not the first float in the list')
 
 end
 
-% We know mer.P008 is the first station in the list.
-sta  = mer.P008;
+% We know mer.P0008 is the first station in the list.
+sta  = mer.P0008;
 locdate = sta.locdate;
 lon = sta.lon;
 lat = sta.lat;
