@@ -10,7 +10,7 @@ function tbl1_6
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 16-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 23-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Define paths.
 merdir = getenv('MERMAID');
@@ -24,8 +24,6 @@ system('git checkout GJI21');
 cd(evtdir)
 system('git checkout GJI21');
 cd(startdir)
-
-
 
 enddate = datetime('31-Dec-2019 23:59:59.999', 'TimeZone', 'UTC');
 returntype = 'DET';
@@ -42,10 +40,13 @@ historical_num_ev_per_yr = historical_num_ev / 30;
 fprintf('\nM4--M8 average annual seismicity rate: %i %i %i %i %i\n', round(historical_num_ev_per_yr))
 
 % Load the MERMAID locations/dates.
+%% MERMAID structure -- currently uses (old) four-character station names "P008"
+%% Eventually we will want to update to all five-character station names
 mer = readmerloc;
 
 % Text file formats.
-fmt11 = ' P0%2s: & %6i & %3i & %5.1f%s & %3i & %3i & %3i & %3i \\\\\n';
+%% TEXTFILES -- write with five-character station names "P0008"
+fmt11 = ' P00%2s: & %6i & %3i & %5.1f%s & %3i & %3i & %3i & %3i \\\\\n';
 fmt12 = '%5s: & %6i & %3i & %5.1f%s & %3i & %3i & %3i & %3i \\\\\n';
 
 %  Write stats per magnitude per float:
@@ -69,7 +70,7 @@ for i = 1:length(magval)
 
     %% For each float.
     for j = 1:length(floatnum)
-        deploydate{j} = mer.(sprintf('P0%s', floatnum{j})).locdate(1);
+        deploydate{j} = mer.(sprintf('P0%2s', floatnum{j})).locdate(1);
 
         % Winnow the events to just those within the requested time range
         idx = find(isbetween(eqdate_master, deploydate{j}, enddate));
@@ -203,7 +204,7 @@ incl_prelim = false;
 all_det_sac = readevt2txt([], [], enddate, 'DET', incl_prelim);
 id_det_sac = readidentified([], [], enddate, 'SAC', 'DET', incl_prelim); % reftime = 'SAC' in keeping with readevt2txt.m restriction barring 'EVT'
 
-fmt21 = ' P0%2s: & %11s & %6.1f & %4i & %3i & %6.1f%s \\\\\n';
+fmt21 = ' P00%2s: & %11s & %6.1f & %4i & %3i & %6.1f%s \\\\\n';
 filename = sprintf(fullfile(savepath, 'ALL_stats.txt'));
 writeaccess('unlock', filename, false)
 fid = fopen(filename, 'w');
@@ -252,7 +253,7 @@ fprintf('%s\n', filename);
 
 %% All statistics, with the per yr breakdown.
 
-fmt31 = ' P0%2s: & %11s & %6.1f & %4i & %3i & %6.1f%s & %5i & %4i \\\\\n';
+fmt31 = ' P00%2s: & %11s & %6.1f & %4i & %3i & %6.1f%s & %5i & %4i \\\\\n';
 filename = sprintf(fullfile(savepath, 'ALL_stats_yr.txt'));
 writeaccess('unlock', filename, false)
 fid = fopen(filename, 'w');
