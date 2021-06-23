@@ -4,8 +4,8 @@ function gps = read_simon2021gji_supplement_gps(supplement_directory)
 % Read MERMAID GPS locations from Joel D. Simon's 2021 GJI paper???
 %
 % Those GPS files were output by automaid v3.4.0-7. They are not trimmed
-% "http://geoweb.princeton.edu/people/simons/SOM/P0??_all.txt" files (written by
-% FJS' vit2tbl.m), as was done with first original submission to GJI.
+% "http://geoweb.princeton.edu/people/simons/SOM/P00??_all.txt" files (written
+% by FJS' vit2tbl.m), as was done with first original submission to GJI.
 %
 % NB, P023 was out of the water during GPS dates:
 % 2019-08-17T03:18:29Z
@@ -25,7 +25,7 @@ function gps = read_simon2021gji_supplement_gps(supplement_directory)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 19-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 23-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default path.
 defval('supplement_directory', ...
@@ -47,7 +47,7 @@ d = dir(fullfile(supplement_directory, '*gps.txt'));
 
 for i = 1:length(d)
         % Dynamically name gps.(field) for individual MERMAIDs.
-        mermaid = d(i).name(25:28);
+        mermaid = d(i).name(25:29);
 
         % Read text file.
         fid = fopen(fullfile(d(i).folder, d(i).name), 'r');
