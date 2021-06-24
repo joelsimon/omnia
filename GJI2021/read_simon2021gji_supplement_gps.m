@@ -1,4 +1,4 @@
-function gps = read_simon2021gji_supplement_gps(supplement_directory)
+ function gps = read_simon2021gji_supplement_gps(supplement_directory)
 % gps = READ_SIMON2021GJI_SUPPLEMENT_GPS(supplement_directory)
 %
 % Read MERMAID GPS locations from Joel D. Simon's 2021 GJI paper???
@@ -38,6 +38,7 @@ fmt = ['%s' ...
        '%f' ...
        '%f' ...
        '%f' ...
+       '%f' ...
        '%s' ...
        '%s' ...
        '%s\n'];
@@ -61,9 +62,10 @@ for i = 1:length(d)
         gps.(mermaid).lon = C{3};
         gps.(mermaid).hdop = C{4};
         gps.(mermaid).vdop = C{5};
-        gps.(mermaid).clockdrift = C{6}; % GPS_time - MERMAID_time
-        gps.(mermaid).source = C{7};
-        gps.(mermaid).rawstr_lat = C{8}; % "[degrees]_[decimal minutes]"
-        gps.(mermaid).rawstr_lon = C{9};  % "[degrees]_[decimal minutes]"
+        gps.(mermaid).clockdrift = C{6};
+        gps.(mermaid).clockfreq = C{7};
+        gps.(mermaid).source = C{8};
+        gps.(mermaid).rawstr_lat = C{9};
+        gps.(mermaid).rawstr_lon = C{10};
 
 end
