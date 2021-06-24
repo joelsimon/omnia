@@ -9,7 +9,7 @@ function simon2021gji_1D_travtimediff
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 19-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 23-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -18,7 +18,7 @@ close all
 merdir = getenv('MERMAID');
 procdir = fullfile(merdir, 'processed');
 evtdir = fullfile(merdir, 'events');
-datadir = fullfile(getenv('SIMON2020_CODE'), 'data');
+datadir = fullfile(getenv('GJI21_CODE'), 'data');
 
 % Ensure in GJI21 git branch -- complimentary paper w/ same data set.
 startdir = pwd;

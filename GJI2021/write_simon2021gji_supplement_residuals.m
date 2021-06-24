@@ -3,7 +3,7 @@ function write_simon2021gji_supplement_residuals
 %
 % All diffs (time and distance adjustments) are in reference to ak135 values.
 %
-% Must first run: simon2020_writefirstarrival.m
+% Must first run: write_simon2020gji_firstarrival_mer.m
 %
 % RULE: tadj will only be used when referring to things computed in an adjusted
 % ak135 model. Otherwise everything is quoted as a difference.

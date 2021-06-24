@@ -307,8 +307,8 @@ writeaccess('lock', filename)
 fprintf('%s\n', filename);
 
 %% I've removed this inside rounding -- I think I'd rather the totals/means be
-%% accurate than necessarily consistent with the rows; i.e., a column not not sum
-%% exactly to the "total" row.  This not is no longer true, see 30-Mar-2020 change.
+%% accurate than necessarily consistent with the rows; i.e., a column need not sum
+%% exactly to the "total" row.  This note is no longer true, see 30-Mar-2020 change.
 % *1: We must round inside the sum/mean operator because it is the sum
 %     of the column, whose values are already rounded --
 %
