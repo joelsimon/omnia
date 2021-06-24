@@ -7,7 +7,7 @@ function figS1
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 24-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -29,8 +29,8 @@ s = fullsac('20190703T034602.08_5D1F627A.MER.DET.WLT5.sac', procdir);
 
 F = plotit(s);
 
-txfs = 15;
-tlfs = 20;
+txfs = 12;
+tlfs = 16;
 F.f.ha(1).Title.FontSize = tlfs;
 
 for i = 1:length(F.f.ha)
