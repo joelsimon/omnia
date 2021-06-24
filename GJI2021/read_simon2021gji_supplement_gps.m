@@ -3,11 +3,11 @@
 %
 % Read MERMAID GPS locations from Joel D. Simon's 2021 GJI paper???
 %
-% Those GPS files were output by automaid v3.4.0-7. They are not trimmed
-% "http://geoweb.princeton.edu/people/simons/SOM/P00??_all.txt" files (written
-% by FJS' vit2tbl.m), as was done with first original submission to GJI.
+% Those GPS files were output by automaid v3.4.0-Z -- they are not trimmed
+% "http://geoweb.princeton.edu/people/simons/SOM/P0??_all.txt" files (written by
+% FJS' vit2tbl.m), as was done with first original submission to GJI.
 %
-% NB, P023 was out of the water during GPS dates:
+% NB, P023(P0023) was out of the water during GPS dates:
 % 2019-08-17T03:18:29Z
 % 2019-08-17T03:22:02Z
 % but those locations are NOT removed here. Be sure to remove them before
