@@ -216,8 +216,8 @@ fmt = [sac_fmt ...                        %  1
 
 filename = fullfile(datadir, 'supplement', 'simon2021gji_supplement_residuals.txt');
 
-hdrline1 = 'COLUMN:                                    1                             2                3               4          5            6             7                             8                9              10           11           12             13            14             15             16             17            18            19             20            21            22           23             24            25            26           27             28            29            30            31            32               33          34                35              36';
-hdrline2 = ['DESCRIPTION:                        FILENAME                    ' ...
+hdrline1 =  '#COLUMN:                                   1                             2                3               4          5            6             7                             8                9              10           11           12             13            14             15             16             17            18            19             20            21            22           23             24            25            26           27             28            29            30            31            32               33          34                35              36';
+hdrline2 = ['#DESCRIPTION:                       FILENAME                    ' ...
             'EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP       1D_GCARC 1D*_GCARC_adj      1D*_GCARC   3D_GCARC_adj       3D_GCARC  OBS_TRAVTIME  OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES 1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES  3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR           SNR       MAX_COUNTS    MAX_TIME           NEIC_ID         IRIS_ID'];
 
 writeaccess('unlock', filename);

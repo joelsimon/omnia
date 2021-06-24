@@ -86,8 +86,8 @@ filename = fullfile(datadir, 'supplement', 'simon2021gji_supplement_events.txt')
 writeaccess('unlock', filename);
 fid = fopen(filename, 'w');
 
-hdrline1 = 'COLUMN:                                    1                             2                3               4          5            6             7                             8                9              10           11           12              13                14              15';
-hdrline2 = 'DESCRIPTION:                        FILENAME                    EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP        1D_GCARC           NEIC_ID         IRIS_ID';
+hdrline1 = '#COLUMN:                                   1                             2                3               4          5            6             7                             8                9              10           11           12              13                14              15';
+hdrline2 = '#DESCRIPTION:                       FILENAME                    EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP        1D_GCARC           NEIC_ID         IRIS_ID';
 
 fprintf(fid, '%s\n', hdrline1);
 fprintf(fid, '%s\n', hdrline2);
