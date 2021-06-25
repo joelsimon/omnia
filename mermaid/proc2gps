@@ -1,0 +1,21 @@
+#! /bin/zsh
+#
+# Copies 452.020-P-08/gps.txt from $MERMAID/processed/ and renames it
+# P0008_gps.txt in $MERMAID/websites/gps/.
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 25-Jun-2021, Darwin Kernel Version 18.7.0
+
+merdir=$MERMAID
+procdir=$merdir/processed
+gpsdir=$merdir/websites/gps
+
+cd $procdir
+
+for gps in 452*/gps.txt; do
+
+    num=$( echo $gps | cut -c11-12 )
+    cp -v $gps $gpsdir/P00${num}_gps.txt
+
+done
