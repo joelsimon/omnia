@@ -7,7 +7,7 @@ function fig4a
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 11-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 24-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -37,8 +37,7 @@ mer = read_simon2021gji_supplement_gps(supplement_directory);
 %% Do everthing once for P008, the starndard for logest deployed.
 name = fieldnames(mer);
 if ~isequaln(mer.(name{1}), mer.P0008);
-    keyboard
-    error('P008 is not the first float in the list')
+    error('P008(P0008) is not the first float in the list')
 
 end
 
@@ -120,7 +119,7 @@ for i = 2:length(name)
 
     % Mark for removal the location taken while on the ship(?),
     % 17-Aug-2019 03:26:55 -- represents huge jump in location.
-    if strcmp(name{i}, 'P023')
+    if strcmp(name{i}(end-1:end), '23')
         rm_idx = find(lon == -149.641567 + 360);
         locdate(rm_idx) = [];
         lon(rm_idx) = [];
@@ -135,7 +134,7 @@ for i = 2:length(name)
     col = x2color(days_deployed, [], max_days_deployed, cmap, false);
 
     sc(i) = scatter(ha, lon, lat, scsize, col, 'filled');
-    mer_tx(i) = text(ha, lon(1), lat(1)+1, name{i}(3:4), 'FontSize', tsize);
+    mer_tx(i) = text(ha, lon(1), lat(1)+1, name{i}(end-1:end), 'FontSize', tsize);
 
 end
 
@@ -233,16 +232,9 @@ nb_tx(25).Position = [208.5 -23.6]; % TBI
 
 % Collect the station names will keep.
 kpr = [2 15 16 17 18 20 21 22];
+patch_str = '';
 for i = kpr
-    if i == 2
-        % Don't move this out as initial value -- I want complete list in
-        % 'kpr'.
-        patch_str =  nb_tx(i).String;
-
-    else
-        patch_str = [patch_str newline nb_tx(i).String];
-
-    end
+    patch_str = [patch_str newline nb_tx(i).String];
 
 end
 
@@ -261,6 +253,7 @@ latimes
 
 tx = text(ha, 170, 5, '(a)', 'FontSize', 18, 'FontName', 'Times', 'Interpreter', 'LaTex');
 moveh(cb.Label, 0.25)
+lg.Position = [0.7310    0.5410    0.1032    0.1969];
 savepdf('fig4a')
 
 %______________________________________________________________________________%
