@@ -16,7 +16,7 @@ function fig10_S2(commonID)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 22-Apr-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 30-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('commonID', false)
 
@@ -100,6 +100,10 @@ if commonID
     rasp_inter = intersect(rasp_FA.ID, all_instruments_data_exists);
     rasp_idx = find(ismember(rasp_FA.ID, rasp_inter));
 
+    % Compute max. decibel difference between stations
+    trad2mer = decibel(max(trad_FA.SNR(trad_idx)), max(mer_FA.SNR(mer_idx)));
+    mer2rasp = decibel(max(mer_FA.SNR(mer_idx)), max(rasp_FA.SNR(rasp_idx)));
+
 else
     % Keep all of them.
     mer_idx = [1:length(mer_FA.ID)];
@@ -109,18 +113,18 @@ else
 end
 
 % "Tradtiional" seismometers.
-titstr = 'Traditional seismometer'
+titstr = 'Traditional seismometer';
 plotem(ha(1), ha(2), ha(3), trad_FA.tres(trad_idx), trad_FA.SNR(trad_idx), ...
        trad_FA.twosd(trad_idx), titstr, [0.133 0.545 0.133], 1);
 
 % MERMAID.
-titstr = 'MERMAID'
+titstr = 'MERMAID';
 plotem(ha(4), ha(5), ha(6), mer_FA.tres(mer_idx) , mer_FA.SNR(mer_idx), ...
        mer_FA.twosd(mer_idx), titstr, 'blue', 0.7);
 ha(4).XLabel.String = '$t^\star_{\mathrm{res}}$ (s)';
 
 % Raspberry Shake.
-titstr = 'Raspberry Shake'
+titstr = 'Raspberry Shake';
 plotem(ha(7), ha(8), ha(9), rasp_FA.tres(rasp_idx), rasp_FA.SNR(rasp_idx), ...
        rasp_FA.twosd(rasp_idx), titstr, raspberry, 1);
 
@@ -158,6 +162,9 @@ if ~commonID
 
 else
     savepdf('figS2')
+    clc
+    fprintf('dB gain max. SNR traditional over MERMAID: %.1f\n', trad2mer)
+    fprintf('dB gain max. SNR MERMAID over Raspberry Shake: %.1f\n', mer2rasp)
 
 end
 
