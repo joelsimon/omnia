@@ -60,7 +60,7 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 06-Jul-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
- 
+
 % Defaults.
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('revdir', fullfile(getenv('MERMAID'), 'events'))
@@ -98,7 +98,7 @@ else
 end
 
 % Fetch and format data.
-allsactimes = {};
+allsac = {};
 review_status = {'identified', 'unidentified'};
 for i = 1:2
     status = review_status{i};
@@ -126,26 +126,15 @@ for i = 1:2
     % prelim_idx = find(contains(sac, 'prelim'));
     % sac(prelim_idx) = [];
     % evt(prelim_idx) = [];
-    
-    % Sort the events based on the time assigned the first sample in the seismogram.
 
-    % !! Edit this line to accommodate different SAC naming schemes.  In
-    % our case the first 15 chars of the filename tag the time of the
-    % first sample of the seismogram.
-    if ~geoazur
-        sactime = cellfun(@(xx) xx(1:15), sac, 'UniformOutput', false);
-
-    else
-        sactime = cellfun(@(xx) xx(5:19), sac, 'UniformOutput', false);
-
-    end
-    [~, idx] = sort(sactime);
+    % Sort based on filename (time of first sample of seismogram).
+    [~, idx] = sort(sac);
     sac = sac(idx);
     evt = evt(idx);
 
     % Keep track of identified and unidentified sactimes in single array
     % sorting after concatenation.
-    allsactimes = [allsactimes; sactime];
+    allsac = [allsac; sac];
 
     for j = 1:length(evt)
         tmp = load(evt{j}, '-mat');
@@ -216,7 +205,7 @@ end
 % Write 'all.txt' by concatenating identified and unidentified text.
 % Sort again based on time assigned to first sample.
 txt.all = [txt.identified txt.unidentified];
-[~, idx] = sort(allsactimes);
+[~, idx] = sort(allsac);
 txt.all = txt.all(idx);
 
 fout  = fullfile(revdir, 'reviewed', 'all.txt');
