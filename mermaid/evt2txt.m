@@ -2,7 +2,7 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 % txt = EVT2TXT(sacdir, revdir, geoazur)
 %
 % EVT2TXT converts reviewed .evt files (which are really .mat files) to human
-% readable textfiles.  Completely overwrites the all files at every execution.
+% readable text files.  Completely overwrites the all files at every execution.
 %
 % EVT2TXT overwrites:
 %    [revdir]/reviewed/identified/txt/identified.txt
@@ -20,11 +20,22 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 %               (def: false)
 %
 % Output:
-% *N/A*     Writes formatted textfiles
+% *N/A*     Writes formatted text files
 % txt       Formatted text structure with fields:
 %           .identified
 %           .unidentified
 %           .all
+% The columns of the output text files are:
+%    SAC filename
+%    EQ origin time
+%    EQ latitude,
+%    EQ longitude
+%    EQ Flinn-Engdahl region name
+%    EQ depth
+%    EQ distance
+%    EQ magnitude
+%    First-arriving phase name
+%    IRIS public ID <-- (e.g., http://ds.iris.edu/ds/nodes/dmc/tools/event/11224472)
 %
 % GeoAzur naming scheme example:
 %    'm12.20130416T105310.sac'
@@ -48,7 +59,7 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 06-Jul-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
  
 % Defaults.
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
