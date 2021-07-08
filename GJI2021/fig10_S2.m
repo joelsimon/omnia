@@ -16,7 +16,7 @@ function fig10_S2(commonID)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 30-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 07-Jul-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('commonID', false)
 
@@ -210,7 +210,7 @@ text(-9.5, 0.2325, sprintf('St. Dev. = %.2f', std(tres, 1)), 'HorizontalAlignmen
 axes(ha2);
 hold(ha2, 'on')
 log10SNR = log10(SNR);
-histogram(log10SNR, 'Normalization', 'Probability', 'BinWidth', 1/5, 'FaceColor', col, 'FaceAlpha', falph);
+H = histogram(log10SNR, 'Normalization', 'Probability', 'BinWidth', 1/5, 'FaceColor', col, 'FaceAlpha', falph);
 plot(repmat(mean(log10SNR), 1, 2), ylim2, 'k--');
 hold(ha2, 'off')
 
@@ -220,6 +220,15 @@ xlim(xlim2)
 ylim(ylim2)
 numticks([], 'x', 5);
 numticks([], 'y', 3);
+
+% Find mode as displayed.
+hold(ha2, 'on')
+[~, mode_val] = max(H.Values);
+mode_edges = [H.BinEdges(mode_val) H.BinEdges(mode_val+1)];
+middle_mode = mean(mode_edges);
+%vertline(middle_mode); % uncomment to verify correct bin selected
+fprintf('%s mean-mode distance: %.2f\n',  titstr, mean(log10SNR) - middle_mode);
+hold(ha2, 'off')
 
 text(3.9, 0.324, sprintf('Min. = %.2f', min(log10SNR)), 'HorizontalAlignment', 'Right');
 text(3.9, 0.279, sprintf('Med. = %.2f', median(log10SNR)), 'HorizontalAlignment', 'Right');
