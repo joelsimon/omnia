@@ -7,7 +7,7 @@ function fig11
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 17-Aug-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -437,8 +437,8 @@ if strcmp(res_type, 'tres_3D')
 
     fprintf('Nearby box: number smeared = %i\n', bnum_smeared)
     fprintf('Nearby box: number hisogram = %i\n', bnum_hist)
-    fprintf('Nearby box: mean = %.1f\n', bM)
-    fprintf('Nearby box: std = %.1f\n', bS)
+    fprintf('Nearby box: mean = %.2f\n', bM)
+    fprintf('Nearby box: std = %.2f\n', bS)
 
     plot([bM bM], ylim, 'k--',  'LineWidth', 1);
 
