@@ -131,7 +131,7 @@ end
 % Separate 'DET' (triggered) and 'REQ' (requested) data for MERMAID.
 switch upper(returntype)
   case 'DET'
-    idx = cellstrfind(s, 'MER.DET.*.sac');
+    idx = cellstrfind(s, 'MER.*DET.*.sac');
     if isempty(idx)
         warning('No triggered (''DET'') SAC files found')
         s = [];
@@ -140,7 +140,7 @@ switch upper(returntype)
     end
 
   case 'REQ'
-    idx = cellstrfind(s, 'MER.REQ.*.sac');
+    idx = cellstrfind(s, 'MER.*REQ.*.sac');
     if isempty(idx)
         warning('No requested (''REQ'') SAC files found')
         s = [];
