@@ -1,5 +1,5 @@
 function [c, mc, xat, yat, dx, dy, px, py, sx, sy] = alignxcorr(x, y)
-% [c, mc, xat, yat, dx, dy, px, py, tx, ty, sx, sy] = ALIGNXCORR(x, y)
+% [c, mc, xat, yat, dx, dy, px, py, sx, sy] = ALIGNXCORR(x, y)
 %
 % Aligns common signals in x and y, reports their delays, truncates the aligned
 % signals so they are equal length, and reports their normalized cross
