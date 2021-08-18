@@ -5,19 +5,26 @@ function [h1, h2] = sacdiff(s1, s2)
 % * UTC timing according to their header
 % * Cross correlation between their data
 %
+% Useful for comparing MERMAID DET and (supposedly the same) REQ files.
+%
+% This will attempt to decimate SAC files with different sampling frequencies.
+% Be wary of output headers in those cases, not all relevant variables updated.
+%
 % Input:
 % s1/2    SAC files to be compared
 %             (def: '20200805T121329.22_5F2AF4E8.MER.DET.WLT5.sac', ...
-%                   '20200805T121328.22_5F62A85C.MER.REQ.WLT5.sac')
+%                   '20200805T121328.22_5F62A85C.MER.REQ.WLT5.sac');
 %
 % Output:
 % h1/2    Header structures from input SAC files
 %
-% Useful for comparing MERMAID DET and (supposedly the same) REQ files.
+% Ex:
+%    SACDIFF('20180728T225619.06_5B773AE6.MER.REQ.WLT5.sac', ...
+%            '20180728T225619.06_5B773AE6.MER1.REQ.WLT5.sac');
 %
-% Author: Dr. Joel D. Simon
+% Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 09-Oct-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 18-Aug-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s1', fullsac('20200805T121329.22_5F2AF4E8.MER.DET.WLT5.sac', ...
@@ -25,16 +32,39 @@ defval('s1', fullsac('20200805T121329.22_5F2AF4E8.MER.DET.WLT5.sac', ...
 defval('s2', fullsac('20200805T121328.22_5F62A85C.MER.REQ.WLT5.sac', ...
                      fullfile(getenv('MERMAID'), 'processed')))
 
+% Read the data
+[x1, h1] = readsac(s1);
+[x2, h2] = readsac(s2);
+
+% Decimate signals so that sampling intervals may be compared
+fs1 = efes(h1);
+fs2 = efes(h2);
+% This is imperfect because it only adjusts the SAC header variables related to
+% timing. Other values (e.g., depmin/max) are not also updated here.
+if fs1 > fs2
+    R = fs1/fs2;
+    x1 = decimate(x1, fs1/fs2);
+    h1.DELTA = h1.DELTA*R;
+    h1.NPTS = length(x1);
+    warning('S1 decimated %i times', R)
+
+elseif fs2 > fs1
+    R = fs2/fs1;
+    x2 = decimate(x2, fs2/fs1);
+    h2.DELTA = h2.DELTA * R;
+    h2.NPTS = length(x2);
+    warning('S2 decimated %i times', R)
+
+end
+
 %%______________________________________________________________________________________%%
 % S1
-[x1, h1] = readsac(s1);
 xax1 = xaxis(h1.NPTS, h1.DELTA, 0);
 seisdate1 = seistime(h1);
 s1_date = seisdate1.B;
 
 %%______________________________________________________________________________________%%
 % S2
-[x2, h2] = readsac(s2);
 xax2 = xaxis(h2.NPTS, h2.DELTA, 0);
 seisdate2 = seistime(h2);
 s2_date = seisdate2.B;
@@ -59,6 +89,7 @@ box on
 hold off
 title('S1 and S2 in UTC time')
 
+
 %%______________________________________________________________________________________%%
 %% PLOT IN ARBITRARY TIME
 
@@ -70,28 +101,27 @@ pl1 = plot(ha1(1), xax1, x1, 'k');
 hold(ha1(1), 'on')
 pl2 = plot(ha1(1), xax2, x2, 'r');
 xlim(ha1(1), [1 max([xax1(end) xax2(end)])])
-xlabel(ha1(1), 'Seconds into S1 and S2 seismograms')
+xlabel(ha1(1), 'Seconds into S1 and S2 seismograms, first sample set to 0 s in both')
 ylabel(ha1(1), 'Counts')
 lg1 = legend(ha1(1), [pl1 pl2], 'S1', 'S2');
 
-
+%%______________________________________________________________________________________%%
 %% PLOT ALIGNED AND TRUNCATED
 
 % Compute their cross correlation.
-[xcorr_norm, max_xcorr, xat1, xat2, dx1, dx2, px1, px2] = ...
+[xcorr_norm, max_xcorr, xat1, xat2, dx1, dx2, px1, px2, sx1, sx2] = ...
     alignxcorr(x1, x2);
 
-
-%% PLOT
 % Delays form alignxcorr.m are always positive.
+% Do not remove 1 from dx---its units are sample offsets (intervals).
 if dx1 > 0
     % S2 is advanced w.r.t. S1.
-    delay_time = (dx1-1) * h1.DELTA;
+    delay_time = dx1 * h1.DELTA;
     delay_time = -delay_time;
 
 elseif dx2 > 0
     % S2 is delayed w.r.t. S1.
-    delay_time = (dx2-1) * h2.DELTA;
+    delay_time = dx2 * h2.DELTA;
 
 else
     delay_time = 0;
@@ -105,7 +135,7 @@ xax2_delayed = xax2 + delay_time;
 pl21 = plot(ha1(2), xax1, x1, 'k');
 hold(ha1(2), 'on')
 pl22 = plot(ha1(2), xax2_delayed, x2, 'r');
-xlabel(ha1(2), 'Time shift of S2  w.r.t S1 required for alignment (s)')
+xlabel(ha1(2), 'Aligned, not truncated, S2 shifted so that S1 starts at 0 s')
 ylabel(ha1(2), 'Counts')
 xlim(ha1(2), minmax([xax1' xax2_delayed']))
 lg2 = legend(ha1(2), [pl21 pl22], 'S1', 'S2');
@@ -119,7 +149,7 @@ hold(ha1(3), 'on')
 pl32 = plot(ha1(3), xax_xat2, xat2, 'r');
 xlim(ha1(3), minmax([0 xax_xat1' xax_xat2']))
 lg1 = legend(ha1(3), [pl31 pl32], 'S1', 'S2');
-xlabel(ha1(3), 'Aligned and truncated')
+xlabel(ha1(3), 'Aligned and truncated (keeping only the overlapping portion from above)')
 ylabel(ha1(3), 'Counts')
 
 % Format plots.
@@ -132,28 +162,26 @@ if start_time_diff == 0
     fprintf('* S2 and S1 seismogram start at exactly the same UTC time\n')
 
 elseif start_time_diff < 0
-    fprintf('* S2 starts %.2f s before the S1 seismogram\n', -start_time_diff)
+    fprintf('* S2 starts %.3f s before the S1 seismogram\n', -start_time_diff)
 
 else
-    fprintf('* S2 starts %.2f s after the S1 seismogram\n', start_time_diff)
+    fprintf('* S2 starts %.3f s after the S1 seismogram\n', start_time_diff)
 
 end
-fprintf('* the sampling frequency of S1 is %i Hz, and S2 is %i Hz\n', efes(h1), efes(h2))
 
-fprintf('\n---------------------------------------------------------------------\n')
+fprintf('\n')
 
-fprintf('Comparing their arrays in arbitrary time:\n')
+fprintf('After aligning S1 and S2, and truncating them to be equal length:\n')
 if isequal(x1, x2)
     fprintf('* S2 and S1 data are exactly equal\n');
 
+elseif delay_time
+    fprintf('* S2 is delayed w.r.t to S1 by %.3f s (%i %s)\n', delay_time, max([dx1 dx2]), plurals('sample', max([dx1 dx2])));
 else
-    fprintf('* S2 is delayed w.r.t to S1 %.2f s\n', delay_time);
 
 end
-
-fprintf('\n---------------------------------------------------------------------\n')
-
-fprintf('After aligning S1 and S2, and truncating them to be equal length:\n')
 fprintf('* their normalized max cross correlation is %.2f %s\n', 100*max_xcorr, '%')
-fprintf('* %.2f %s of S1 was cut to match the signal common to S2\n', px1, '%')
-fprintf('* %.2f %s of S2 was cut to match the signal common to S1\n\n', px2, '%')
+fprintf('* %.2f%s (%i %s) of S1 was cut to match the signal common to S2\n', ...
+        px1, '%', sx1, plurals('sample', sx1))
+fprintf('* %.2f%s (%i %s) of S2 was cut to match the signal common to S1\n\n', ...
+        px2, '%', sx2, plurals('sample', sx2))
