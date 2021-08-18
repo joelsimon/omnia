@@ -36,6 +36,10 @@ function [c, mc, xat, yat, dx, dy, px, py, sx, sy] = alignxcorr(x, y)
 % sx       Number of samples cut from x to generate xat
 % sy       Number of samples cut from y to generate yat
 %
+% NB, dx/y are in units of sampling offsets or intervals, ergo, do not remove 1
+% from them before multiplying by the sampling interval to convert to time, as
+% you would when generating a time axis where the first sample is tacked to 0 s.
+%
 % Ex1:
 %    x = [1 2];
 %    y = [0 0 1 2 0 0];
