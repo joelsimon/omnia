@@ -1,4 +1,4 @@
-}function [s, dates] = bumps(plotit)
+function [s, dates] = bumps(plotit)
 % [s, dates] = BUMPS(plotit)
 %
 % Returns a list of MERMAID glitches(?), and optionally plots their dates.
@@ -12,7 +12,7 @@
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 20-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 23-Aug-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('plotit', false)
 
@@ -515,6 +515,7 @@ s = {'20181231T114420.20_5C2A50AD.MER.DET.WLT5.sac', ...
      '20210419T053523.24_607F87E6.MER.DET.WLT5.sac', ...
      '20210419T204145.24_607F87E6.MER.DET.WLT5.sac', ...
      '20210609T225256.19_60C1647C.MER.DET.WLT5.sac', ...
+     '20210728T114914.18_61018802.MER.DET.WLT5.sac', ...
     };
 
 s = unique(s);
