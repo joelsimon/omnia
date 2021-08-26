@@ -35,8 +35,7 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 %              to skip decimation (def: [])
 % popas    1 x 2 array of number of poles and number of passes for bandpass,
 %              or NaN if no bandpass (def: [4 1])
-% pt0      Time in seconds assigned to first sample of X-xaxis (def: SAC header
-%             field "B" so that all times are relative to SAC reference time)
+% pt0      Time in seconds assigned to first sample of X-xaxis (def: 0)
 %
 % Output:
 % Text file with the following columns (firstarrivalpressure.m outputs in parentheses):
@@ -61,7 +60,7 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 26-Aug-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', revsac(1))
