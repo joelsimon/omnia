@@ -42,7 +42,7 @@ old_EQ = tmp.EQ;
 sac_nopath = strippath(sacfile);
 sac_idx = strfind(lower(sac_nopath), 'sac');
 sac_nopath = sac_nopath(1:sac_idx+2);
-if ~strcmpi(sac_nopath, old_EQ.Filename)
+if ~all(strcmpi(sac_nopath, {old_EQ.Filename}));
     error('sacfile and evtfile do not correspond to one another')
 
 end
