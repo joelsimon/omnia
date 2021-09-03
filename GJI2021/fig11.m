@@ -7,7 +7,7 @@ function fig11
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Aug-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 03-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -365,11 +365,11 @@ if strcmp(res_type, 'tres_3D')
 
     bax.XTick = box_XTick;
     bax.XLabel.String = box_XLabel_String;
-    bax.XTickLabel = box_XTickLabel
+    bax.XTickLabel = box_XTickLabel;
 
     bax.YTick = box_YTick;
     bax.YLabel.String = box_YLabel_String;
-    bax.YTickLabel = box_YTickLabel
+    bax.YTickLabel = box_YTickLabel;
 
     % Add colorbar and tick labels.
     bcb = colorbar;
@@ -485,17 +485,17 @@ if strcmp(res_type, 'tres_3D')
     ylim([minlat maxlat])
     colormap(flip(jet(len_cmap)))
 
-    sax.YDir = 'normal'
+    sax.YDir = 'normal';
     caxis([-2 2])
     set(sax, 'DataAspectRatio', [1 1 1])
 
     sax.XTick = box_XTick;
     sax.XLabel.String = box_XLabel_String;
-    sax.XTickLabel = box_XTickLabel
+    sax.XTickLabel = box_XTickLabel;
 
     sax.YTick = box_YTick;
     sax.YLabel.String = box_YLabel_String;
-    sax.YTickLabel = box_YTickLabel
+    sax.YTickLabel = box_YTickLabel;
 
     scb = colorbar;
     scb.Ticks = [-2:.5:2];
