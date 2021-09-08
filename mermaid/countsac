@@ -5,14 +5,14 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified by JDS: 05-Mar-2021, Darwin Kernel Version 18.7.0
+# Last modified by JDS: 08-Sep-2021, Darwin Kernel Version 18.7.0
 # (previously modified by fjsimons-at-alum.mit.edu, 02/12/2019)
 
 set MERMAID = $MERMAID
 find $MERMAID/processed/ -maxdepth 3 -type f -name '*sac' > $MERMAID/all_sac
 
 # Count only Princeton SAC files
-set floatnum = (08 09 10 11 12 13 16 17 18 19 20 21 22 23 24 25)
+set floatnum = (06 07 08 09 10 11 12 13 16 17 18 19 20 21 22 23 24 25)
 set sac_count = 0
 printf "\n                ...Tallying the SAC files...                \n"
 printf "\n             All      DET       LAST DET      REQ       LAST REQ\n"
