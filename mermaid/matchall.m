@@ -13,7 +13,7 @@ function matchall(writecp)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 11-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 07-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default.
 defval('writecp', false)
@@ -31,6 +31,12 @@ fail = [];
 s = allsac(idx);
 fprintf('Searching for unmatched SAC files...\n')
 for i = 1:length(s)
+    % Skip the French floats.
+    if contains(s{i}, '452.020-P-06') || contains(s{i}, '452.020-P-07')
+        continue
+
+    end
+
     % Get wavelet scale
     scale_idx = strfind(s{i}, 'WLT');
     if ~isempty(scale_idx)
@@ -50,7 +56,7 @@ for i = 1:length(s)
         continue;
 
     end
-    
+
     % Write raw event (.raw.evt) files.
     try
         cpsac2evt(s{i}, false, 'time', n);
