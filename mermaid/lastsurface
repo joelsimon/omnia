@@ -63,7 +63,7 @@ for out_file in $MERMAID/server/452*.out; do
     fi
 
     # Parse the float name from the serial number.
-    float_name=$(cut -c9-12 <<< $serial_number | sed 's/-/0/')
+    float_name=$(cut -c9-12 <<< $serial_number | sed 's/-/00/')
 
     # Compute the number of days elapsed since the last transmission.
     # WARNING: ignores leap seconds.
