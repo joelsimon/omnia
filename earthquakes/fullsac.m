@@ -56,9 +56,9 @@ function s = fullsac(singl, diro, returntype, ofuse)
 %
 % See also: mermaid_sacf.m
 %
-% Author: Dr. Joel D. Simon
+% Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 11-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 08-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default is to return all SAC filenames in $MERMAID/processed.
 defval('singl', [])
@@ -69,7 +69,7 @@ defval('ofuse', [])
 % Main.
 if isempty(singl)
     % Nab all SAC files (**/* means search all subfolders).
-    d = dir(fullfile(diro, '**/*sac'));
+    d = dir(fullfile(diro, '**/*.sac'));
     if ~isempty(d)
         s = fullfile({d.folder}, {d.name});
 
