@@ -1,0 +1,41 @@
+#! /bin/zsh
+#
+# Return the "generic name of recording instrument" (KINST), defined as the
+# string which precedes the first hyphen in the Osean-defined names, and a
+# five-character station name (KSTNM), zero-padded between the letter and number
+# defining the unique MERMAID (if required) --
+#
+# 452.112-N-01:   kinst, kstnm = '452.112', 'N0001'
+# 452.020-P-08:   kinst, kstnm = '452.020', 'P0008'
+# 452.020-P-0050: kinst, kstnm = '452.020', 'P0050'
+#
+# Shell-script version of Dive.attach_kstnm_kinst() in automaid.
+#
+# Station names may be a max of five characters:
+# https://ds.iris.edu/ds/newsletter/vol1/no1/1/specification-of-seismograms-the-location-identifier/
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 08-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+# 452.020-P-06 --> 452.020 P0006
+osean=$1
+split_name=("${(@s/-/)osean}")
+kinst=$split_name[1]
+len_kstnm=$( echo -n $split_name[2]$split_name[3] | wc -m )
+if [[ len_kstnm -gt 5 ]]; then
+    echo "Unexpected input: kstnm greater than five characters"
+    return 1
+
+elif [[ len_kstnm -eq 5 ]]; then
+    kstnm=$split_name[2]$split_name[3]
+
+else
+    len_zeropad=$(( 5 - len_kstnm ))
+    zeros=$( printf '0%.0s' {1..$len_zeropad} )
+    kstnm=$split_name[2]$zeros$split_name[3]
+
+fi
+
+printf '%s %s\n' $kinst $kstnm
+return 0
