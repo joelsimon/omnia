@@ -46,7 +46,8 @@ sac = sac(idx);
 
 % Loop over in sequential (time) order.
 fail = [];
-sac = sort(strippath(sac));
+[~, sort_idx] = sort(strippath(sac));
+sac = sac(sort_idx);
 for i = 1:length(sac)
     % Skip the French floats.
     if contains(sac{i}, '452.020-P-06') || contains(sac{i}, '452.020-P-07')
@@ -89,7 +90,7 @@ if writecp
 end
 
 if ~isempty(fail)
-    failsac = sac(fail);
+    failsac = strippath(sac(fail));
     failsac = cellfun(@(xx) strippath(xx), failsac, 'UniformOutput', ...
                       false);
     warning(['These SAC files were not reviewed:\n' ...
