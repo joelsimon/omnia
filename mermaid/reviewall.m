@@ -16,7 +16,7 @@ function reviewall(writecp, floatnum)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 16-Feb-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 08-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('writecp', false)
@@ -48,8 +48,14 @@ sac = sac(idx);
 fail = [];
 sac = sort(strippath(sac));
 for i = 1:length(sac)
+    % Skip the French floats.
+    if contains(sac{i}, '452.020-P-06') || contains(sac{i}, '452.020-P-07')
+        continue
+
+    end
+
     try
-    reviewevt(sac{i}, [], [], viewr);
+        reviewevt(sac{i}, [], [], viewr);
 
     catch
         fail = [fail; i];
