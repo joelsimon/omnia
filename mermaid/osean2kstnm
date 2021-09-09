@@ -1,4 +1,5 @@
 #! /bin/zsh
+# usage: osean2kstnm [floatname]
 #
 # Return the five-character station name (KSTNM), zero-padded between the letter
 # and number defining the unique MERMAID (if required) --
@@ -12,12 +13,22 @@
 # Station names may be a max of five characters:
 # https://ds.iris.edu/ds/newsletter/vol1/no1/1/specification-of-seismograms-the-location-identifier/
 #
+# example: osean2kstnm 452.020-P-06
+#
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 08-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+# Last modified: 09-Sep-2021, Darwin Kernel Version 18.7.0
 
 # 452.020-P-06 --> P0006
-osean=$1
+if [[ $# -eq 0 ]]; then
+    echo "Error: no arguments supplied"
+    return 0
+
+else
+    osean=$1
+
+fi
+
 split_name=("${(@s/-/)osean}")
 len_kstnm=$( echo -n $split_name[2]$split_name[3] | wc -m )
 if [[ len_kstnm -gt 5 ]]; then
