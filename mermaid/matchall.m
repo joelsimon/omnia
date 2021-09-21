@@ -13,7 +13,7 @@ function matchall(writecp)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 07-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 20-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default.
 defval('writecp', false)
@@ -43,7 +43,8 @@ for i = 1:length(s)
         n = str2double(s{i}(scale_idx + 3));
 
     else
-        % It's a raw signal, which is sampled at 6 scales
+        % It's a raw 40-Hz signal; decompose to 6 wavelet scales in keeping with
+        % 3 scales -> 5 Hz; 4 scales -> 10 Hz; 5 scales -> 20 Hz etc.
         n = 6;
 
     end
@@ -52,8 +53,13 @@ for i = 1:length(s)
     %% routines to handle longer time series / shortcut those functions?).
     x = readsac(s{i});
     if length(x) > 10000
-        fail = [fail i];
-        continue;
+        % Check if I have manually added a reviewed-only .evt file.
+        EQ = getrevevt(s{i});
+        if ~isstruct(EQ) && isnan(EQ)
+                fail = [fail i];
+
+        end
+        continue
 
     end
 
