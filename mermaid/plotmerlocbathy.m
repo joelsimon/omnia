@@ -3,7 +3,7 @@ function plotmerlocbathy(mername, legendloc)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 18-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 21-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults
 merpath = getenv('MERMAID');
@@ -17,7 +17,7 @@ ax_fs = 13;
 cb_fs = 10;
 
 % Read GPS points for requested MERMAID.
-gps = readgps(procdir);
+gps = readgps(procdir, false);
 mer = gps.(mername);
 lat = mer.lat;
 lon = mer.lon;
@@ -26,8 +26,10 @@ lon(find(lon<0)) = lon(find(lon<0)) + 360;
 locdate = mer.locdate;
 cum_days = [0 ; cumsum(days(diff(locdate)))];
 
-% Remove GPS fixes taken by P023 while out of water (on the ship).
-if strcmp(mername, 'P023')
+% Remove GPS fixes taken by P0023 while out of water (on the ship).
+% !! NB, don't use option to remove in readgps.m because that sets NaTs and
+% !! NaNs which screws up cum funcs; use this ad hoc removal.
+if strcmp(mername, 'P0023')
     bad_dates = iso8601str2date({'2019-08-17T03:18:29Z' '2019-08-17T03:22:02Z'});
     [~, rm_idx] = intersect(locdate, bad_dates);
     lat(rm_idx) = [];
