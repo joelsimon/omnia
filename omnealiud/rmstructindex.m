@@ -23,7 +23,7 @@ function S = rmstructindex(S, index, skipfield)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Jul-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 17-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default.
 defval('skipfield', [])
@@ -34,7 +34,7 @@ if ~isstruct(S)
 
 end
 
-if ~all(isint(index))
+if ~all(isint(index)) && ~isempty(index)
     error('''index'' must be an array of integers (indices)')
 
 end
