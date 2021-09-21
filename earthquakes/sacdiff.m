@@ -1,5 +1,5 @@
-function [h1, h2] = sacdiff(s1, s2)
-% [h1, h2] = SACDIFF(s1, s2)
+function [h1, h2] = sacdiff(s1, s2, dmate)
+% [h1, h2] = SACDIFF(s1, s2, dmate)
 %
 % Compares two SAC files:
 % * UTC timing according to their header
@@ -14,6 +14,7 @@ function [h1, h2] = sacdiff(s1, s2)
 % s1/2    SAC files to be compared
 %             (def: '20200805T121329.22_5F2AF4E8.MER.DET.WLT5.sac', ...
 %                   '20200805T121328.22_5F62A85C.MER.REQ.WLT5.sac');
+% dmate   Decimate to attempt to match sampling frequencies (def: false)
 %
 % Output:
 % h1/2    Header structures from input SAC files
@@ -31,30 +32,33 @@ defval('s1', fullsac('20200805T121329.22_5F2AF4E8.MER.DET.WLT5.sac', ...
                      fullfile(getenv('MERMAID'), 'test_processed')))
 defval('s2', fullsac('20200805T121328.22_5F62A85C.MER.REQ.WLT5.sac', ...
                      fullfile(getenv('MERMAID'), 'processed')))
+defval('dmate', false)
 
 % Read the data
 [x1, h1] = readsac(s1);
 [x2, h2] = readsac(s2);
 
 % Decimate signals so that sampling intervals may be compared
-fs1 = efes(h1);
-fs2 = efes(h2);
-% This is imperfect because it only adjusts the SAC header variables related to
-% timing. Other values (e.g., depmin/max) are not also updated here.
-if fs1 > fs2
-    R = fs1/fs2;
-    x1 = decimate(x1, fs1/fs2);
-    h1.DELTA = h1.DELTA*R;
-    h1.NPTS = length(x1);
-    warning('S1 decimated %i times', R)
+if dmate
+    fs1 = efes(h1);
+    fs2 = efes(h2);
+    % This is imperfect because it only adjusts the SAC header variables related to
+    % timing. Other values (e.g., depmin/max) are not also updated here.
+    if fs1 > fs2
+        R = fs1/fs2;
+        x1 = decimate(x1, fs1/fs2);
+        h1.DELTA = h1.DELTA*R;
+        h1.NPTS = length(x1);
+        warning('S1 decimated %i times', R)
 
-elseif fs2 > fs1
-    R = fs2/fs1;
-    x2 = decimate(x2, fs2/fs1);
-    h2.DELTA = h2.DELTA * R;
-    h2.NPTS = length(x2);
-    warning('S2 decimated %i times', R)
+    elseif fs2 > fs1
+        R = fs2/fs1;
+        x2 = decimate(x2, fs2/fs1);
+        h2.DELTA = h2.DELTA * R;
+        h2.NPTS = length(x2);
+        warning('S2 decimated %i times', R)
 
+    end
 end
 
 %%______________________________________________________________________________________%%
@@ -88,7 +92,6 @@ lg = legend( 'S1', 'S2');
 box on
 hold off
 title('S1 and S2 in UTC time')
-
 
 %%______________________________________________________________________________________%%
 %% PLOT IN ARBITRARY TIME
