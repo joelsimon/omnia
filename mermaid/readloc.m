@@ -16,7 +16,7 @@ function loc = readloc(processed)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 23-Nov-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 21-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default path.
 merpath = getenv('MERMAID');
@@ -36,7 +36,7 @@ for i = 1:length(d)
         fclose(fid);
 
         % Dynamically name gps.(field) for individual MERMAIDs
-        mermaid = strrep(d(i).name(end-3:end), '-', '0');
+        mermaid = osean2fdsn(d(i).name);
 
         % Parse
         loc.(mermaid).sac = cellfun(@(xx) [xx '.sac'], C{1}, 'UniformOutput', false);
