@@ -4,7 +4,7 @@ function [isupdated, new_EQ, old_EQ] = updatestloc(sacfile, evtdir)
 % Overwrite reviewed EQ.TaupTimes.
 %
 % Wrapper for `updatetauptimes.m` that takes evt/ directory rather than the
-% assocaited .evt file as second input.
+% associated .evt file as second input.
 %
 % Input:
 % sacfile     Fullpath SAC filename
@@ -20,13 +20,13 @@ function [isupdated, new_EQ, old_EQ] = updatestloc(sacfile, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 04-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 20-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default path to raw and reviewed .evt files.
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 
 % Collect ONLY the reviewed EQ structure(s) path.
-[~, ~, ~, ~, evtfile] = getevt(sacfile, evtdir);
+[~, evtfile] = getrevevt(sacfile, evtdir);
 
 % Update EQ.TaupTimes.
 [isupdated, new_EQ, old_EQ] = updatetauptimes(sacfile, evtfile);
