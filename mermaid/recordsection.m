@@ -110,7 +110,7 @@ phase_cell = {};
 for i = 1:length(sac)
     % Retrieve the event data associated with that SAC file, as
     % found through sac2evt.m
-    EQ{i} = getevt(sac{i}, evtdir);
+    EQ{i} = getrevevt(sac{i}, evtdir);
 
     % Parse the event info.
     dist(i) = EQ{i}(1).TaupTimes(1).distance;

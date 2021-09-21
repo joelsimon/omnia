@@ -29,7 +29,7 @@ function writelatlon(sacdir, evtdir, returntype, filename, precision)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 20-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 merpath = getenv('MERMAID');
@@ -75,7 +75,7 @@ for i = 1:length(s)
 
     end
 
-    EQ = getevt(sac);
+    EQ = getrevevt(sac, evtdir);
     EQ(1).TaupTimes(1).phaseName;
 
     evla = EQ.PreferredLatitude;
