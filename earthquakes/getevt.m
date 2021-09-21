@@ -26,7 +26,7 @@ function [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = getevt(sac, evtdir, o
 %      revEQ = [] means that none of the possible events found by
 %              cpsac2evt.m are matches after review with reviewevt.m
 %
-%      revEQ = NAN means this SAC file hasn't been reviewed
+%      revEQ = NaN means this SAC file hasn't been reviewed
 %              (there exists no matching .evt file in the 'reviewed' directory)
 %
 % Before running the example below run the example in reviewevt.m
@@ -36,7 +36,7 @@ function [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = getevt(sac, evtdir, o
 %    evtdir = '~/cpsac2evt_example';
 %    EQ  = GETEVT(sac, evtdir)
 %
-% See also: reviewevt.m, revsac.m, cpsac2evt.m
+% See also: getrevevt.m, reviewevt.m, revsac.m, cpsac2evt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
@@ -69,7 +69,7 @@ if isfield(raw_tmp, 'CP')
     rawCP = raw_tmp.CP;
 
 else
-    rawCP = [];
+    rawCP = NaN;
 
 end
 
