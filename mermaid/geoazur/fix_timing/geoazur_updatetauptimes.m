@@ -7,7 +7,7 @@ function geoazur_updatetauptimes
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 25-Aug-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 21-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Load data.
 defval('sac_diro', getenv('MERAZUR'));
@@ -25,7 +25,7 @@ fid_press = fopen(fname_press, 'w+');
 for i = 1:length(s)
     i
     sac_file = s{i};
-    sac_str = sprintf('%s'' (i = %i)\n', strippath(sac_file), i);
+    sac_str = sprintf('%s (i = %3i)\n', strippath(sac_file), i);
 
     evt_name = strrep(strippath(sac_file), '.sac', '.evt');
     evt_file = fullfile(evt_diro, evt_name);
@@ -55,3 +55,6 @@ end
 
 writeaccess('lock', fname_time)
 writeaccess('lock', fname_press)
+
+fprintf('Wrote %s\n', fname_time)
+fprintf('Wrote %s\n', fname_press)
