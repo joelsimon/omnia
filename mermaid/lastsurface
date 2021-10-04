@@ -3,9 +3,9 @@
 #
 # Print dates of MERMAIDs' last transmissions as recorded in their *.out files.
 #
-# Author: Dr. Joel D. Simon
+# Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 04-Sep-2020, Darwin Kernel Version 18.7.0
+# Last modified: 04-Oct-2021, Darwin Kernel Version 18.7.0
 
 # Print help doc.
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -68,7 +68,7 @@ for out_file in $MERMAID/server/452*.out; do
     # Compute the number of days elapsed since the last transmission.
     # WARNING: ignores leap seconds.
     day_diff=$(bc <<< "scale=2; ($current_epoch - $last_surface_epoch) / (60*60*24)")
-    day_diff=$(printf '%6.2f\n' $day_diff) # left pad with spaces
+    day_diff=$(printf '%6.1f\n' $day_diff) # left pad with spaces
 
     # Print the output.
     if [ $computer = Darwin ]; then
