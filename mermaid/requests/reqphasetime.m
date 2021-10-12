@@ -13,7 +13,7 @@ function [req_str, start_date, req_secs, tt] = reqphasetime(evt_date, evt_dep, .
 % evt_latlon   Event latitude and longitude as 1x2 array
 % sta_latlon   Station latitude and longitude as 1x2 array
 % phases       Comma-separated phase list
-% buf_secs     Seconds (numeric; not of Class 'duration') to
+% buf_secs*    Seconds (numeric; not of Class 'duration') to
 %                 start(end) before(after) first(last) phase
 %
 % Outputs:
@@ -23,14 +23,24 @@ function [req_str, start_date, req_secs, tt] = reqphasetime(evt_date, evt_dep, .
 % req_secs     Length of request (in seconds) as double
 % tt           TaupTime structure of first(last) retained phase
 %
+% * Both times must be positive; buf_secs = [60 120] means "request from 60
+%   seconds BEFORE the first phase to 120 seconds AFTER the last phase"
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 16-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 11-Oct-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default outputs
 starttime = [];
 req_secs = [];
 warn = false;
+
+% To avoid ambiguity both buffer times must be positive; the first goes
+% backwards in time from the start and the second goes forward from the end
+if ~all(buf_secs >= 0)
+    error('Both times in `buf_secs` must be positive')
+
+end
 
 % Compute travel times.
 tt = taupTime('ak135', evt_dep, phases, 'evt', evt_latlon, 'sta', sta_latlon);
