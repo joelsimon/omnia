@@ -7,7 +7,7 @@ function plotmerlocbathy(mername, legendloc)
 
 % Defaults
 merpath = getenv('MERMAID');
-defval('mername', 'P008')
+defval('mername', 'P0008')
 defval('legendloc', 'SouthEast');
 defval('procdir', fullfile(merpath, 'processed'))
 defval('evtfile', fullfile(merpath, 'events', 'reviewed', 'all.txt'))
@@ -42,7 +42,7 @@ end
 %%______________________________________________________________________________________%%
 %% (1) Plot bathymetric base map one separate axis
 %%______________________________________________________________________________________%%
-
+ 
 % Let MATLAB determine the x/ylims of the ultimate base map: scatter the data then delete the plot.
 scatter(lon, lat, [], 'w');
 xl = xlim;
