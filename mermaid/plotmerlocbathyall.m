@@ -1,5 +1,5 @@
-function plotmerlocbathyall
-% PLOTMERLOCBATHYALL
+function plotmerlocbathyall(skip_french)
+% PLOTMERLOCBATHYALL(skip_french)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
@@ -7,6 +7,7 @@ function plotmerlocbathyall
 
 clc
 close all
+defval('skip_french', true)
 
 % Paths.
 merpath = getenv('MERMAID');
@@ -81,6 +82,12 @@ tsize = fs - 2;
 
 % Plot MERMAID tracks.
 mer = readgps(procdir, false);
+
+% Remove French floats, P0006 and P0007
+if skip_french
+    mer = rmfield(mer, {'P0006', 'P0007'})
+
+end
 
 % Figure out the longest deployment time to generate the colorbar reference saturation
 name = fieldnames(mer);
