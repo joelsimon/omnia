@@ -3,7 +3,7 @@ function plotmerlocbathyall
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 24-Oct-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -23,7 +23,7 @@ deplim = [-7000 1500];
 %%______________________________________________________________________________________%%
 %% (1) Plot bathymetric base map
 %%______________________________________________________________________________________%%
-[ax_bathy, cb_bathy] = plotsouthpacificbathy([176 251], [4 -33], deplim);
+[ax_bathy, cb_bathy] = plotsouthpacificbathy(lonlim, flip(latlim), deplim);
 fig2print(gcf, 'flandscape')
 
 %% Cosmetics to bathymetric base map.
@@ -80,7 +80,7 @@ scsize = 10;
 tsize = fs - 2;
 
 % Plot MERMAID tracks.
-mer = readgps(procdir);
+mer = readgps(procdir, false);
 
 % Figure out the longest deployment time to generate the colorbar reference saturation
 name = fieldnames(mer);
@@ -131,7 +131,7 @@ for i = 1:length(name)
     col = x2color(cum_days, [], longest_deployment, cmap, false);
     col(end,:)
     sc(i) = scatter(ax_mer, lon, lat, scsize, col, 'filled');
-    mer_tx(i) = text(ax_mer, lon(1), lat(1)+1, name{i}(3:4), 'FontSize', tsize);
+    mer_tx(i) = text(ax_mer, lon(1), lat(1)+1, name{i}(end-1:end), 'FontSize', tsize);
 
 end
 
