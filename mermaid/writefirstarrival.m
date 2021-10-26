@@ -21,9 +21,8 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 %              of .sac files (def: $MERMAID/processed)
 % evtdir   Directory containing (possibly subdirectories)
 %              of .evt files (def: $MERMAID/events)
-% EQ      Cell array (same size as 's') of EQ structs, if they are
-%             not reviewed, or one different from saved is preferred
-%             (def: [] to retrieve reviewed EQ struct from evtdir with getevt.m)
+% EQ      Cell array (same size as 's') of corresponding EQ structs
+%             (def: []; retrieve via `getrevevt(s, evtdir)` in firstarrival.m)
 % bathy    logical true apply bathymetric travel time correction,
 %              computed with bathtime.m (def: true)
 % wlen2    Length of second window, starting at the 'dat', the time of

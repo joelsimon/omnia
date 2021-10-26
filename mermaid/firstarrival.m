@@ -34,9 +34,8 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ..
 %              of .sac files (def: $MERMAID/processed)
 % evtdir   Directory containing (possibly subdirectories)
 %              of .evt files (def: $MERMAID/events)
-% EQ       EQ structure if event not reviewed, or [] if
-%              event reviewed and to be retrieved with
-%              getevt.m (def: [])
+% EQ       EQ structure if event not reviewed, or [] if event reviewed
+%              and to be retrieved with getrevevt.m (def: [])
 % bathy    logical true apply bathymetric travel time correction,
 %              computed with bathtime.m (def: true)
 %              [NB, does not adjust EQ.TaupTimes]***
@@ -72,7 +71,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ..
 % SNR      SNR, defined as ratio of biased variance of signal and
 %              noise segments (see wtsnr.m)
 % EQ       Input EQ structure or reviewed EQ struct associated with SAC file
-%              via getevt.m
+%              via getrevevt.m
 % W1       timewindow.m struct of length wlen [s] centered on theoretical
 %              first arrival-time -- all the data considered for AIC pick
 % xw2      Windowed segment of x (maybe filtered) contained in W2 --
@@ -110,7 +109,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ..
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 08-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 26-Oct-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -119,7 +118,7 @@ defval('wlen', 30)
 defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
-defval('EQ', []) % defaults to `getevt(s, evtdir)`, later
+defval('EQ', []) % defaults to `getrevevt(s, evtdir)`, later
 defval('bathy', true)
 defval('wlen2', 1)
 defval('fs', []) % defaults to not bandpass filter
@@ -148,11 +147,11 @@ if isempty(fileparts(s))
 end
 [x, h] = readsac(s);
 
-% Nab EQ structure, if not supplied (assuming MERMAID data here; getevt.m at
+% Nab EQ structure, if not supplied (assuming MERMAID data here; getrevevt.m at
 % this time assumes MERMAID event directory structure.  If, for example, you
 % want to use this function for a 'nearby' EQ you must supply it directly).
 if isempty(EQ)
-    EQ = getevt(s, evtdir);
+    EQ = getrevevt(s, evtdir);
 
 else
     % Verify the filename in the supplied EQ structure matches the SAC file.
