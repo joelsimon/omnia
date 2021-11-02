@@ -1,4 +1,11 @@
- ## Installation:
+__Omnia__, to analyze complex and noisy time series with particular emphasis
+given to seismoacoustic MERMAID signals.
+
+Developed by Joel D. Simon, a  postdoc at Princeton University (jdsimon@princeton.edu).
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5637492.svg)](https://doi.org/10.5281/zenodo.5637492)
+
+## Installation:
 \
 [0]. OMNIA relies on various environmental variables being known to MATLAB, which requires
 they be set and MATLAB be launched from an updated shell.  The examples below assume zsh.
@@ -24,3 +31,8 @@ The last is required for many functions in $OMNIA and may be cloned at:
     ln -s $OMNIA/omnealiud/startup.m ~/Documents/MATLAB/startup.m
 \
 [4]. Exit and reload terminal (or source your new config files) and launch MATLAB.
+
+## Citation:
+
+Joel D. Simon. (2021). joelsimon/omnia:
+(v1.1.0). Zenodo. https://doi.org/10.5281/zenodo.5637492
