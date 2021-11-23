@@ -11,7 +11,7 @@ function [contrib_eventid, contrib_author, iris_eventid] = eventid(EQ)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 10-Jul-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 23-Nov-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % IRIS public ID in first level of structure.
 iris_eventid = fx(strsplit(EQ.PublicId, '='),  2);
@@ -28,8 +28,14 @@ if length(contrib_eventid) > 1
     if length(contrib_eventid) > 1
 
         % *(see Example 2)
-        [~, contrib_eventid]  = cellstrfind(contrib_eventid, EQ.PreferredOrigin.ContributorOriginId);
+        id_match = cellstrfind(contrib_eventid, EQ.PreferredOrigin.ContributorOriginId);
+        if ~isempty(id_match)
+            contrib_eventid = id_match;
 
+        else
+            contrib_eventid = contrib_eventid(1);
+
+        end
     end
 end
 contrib_eventid = contrib_eventid{:};
