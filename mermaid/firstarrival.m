@@ -109,7 +109,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ..
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-Oct-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 24-Nov-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -239,9 +239,9 @@ pt0_diff = EQ(1).TaupTimes(1).pt0 - pt0;
 syn = syn - pt0_diff;
 fprintf('Reporting arrivals on an X-xaxis whose first sample is set to time: %.6f s\n', pt0)
 
-% Correct the travel time for bathymetry.
+% Correct the travel time for bathymetry (skipping surface-waves).
 ph = EQ(1).TaupTimes(1).phaseName;
-if bathy
+if bathy && ~endsWith(ph, 'kmps')
     z_ocean = gebco(h.STLO, h.STLA, '2014');
     if h.STDP == -12345 || isnan(h.STDP)
         warning('MERMAID depth not contained in header -- using 1500 m below sea surface')
