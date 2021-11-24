@@ -35,11 +35,12 @@ function tt=taupCurve(model,depth,phase)
 %   qinli@u.washington.edu
 %   Nov, 2002
 %
-% Last modified by jdsimon@princeton.edu, 06-Dec-2018 in Ver. 2017b
+% Last modified by jdsimon@princeton.edu, 23-Nov-2021 in Ver. 2017b
 
 % JDS changelog
 %
-% Was returning tt_curve (empty) and not tt.  Fixed to return tt.
+% *Change tt.distance from [0 0] to [0 360] for "*kmps" phases
+% *Edit to return tt structure as opposed to empty
 
 import edu.sc.seis.TauP.*;
 import java.io.*;
@@ -107,4 +108,20 @@ if nargout==0
     ylabel('Travel Time (s)');
     return;
 end;
+
+% jdsimon@princeton.edu edit to compute linear (assuming 0 km deep event)
+% distance for "surface" (kmps) waves.
+for i = 1:length(tt)
+    if contains(tt(i).phaseName, 'kmps')
+        tt(i).distance = [0 ; 360]
+        %% Verify [0 360] with the following calculation
+        % for j = 1:length(tt(i).distance)
+        %     vel = strsplit(tt(1).phaseName, 'kmps');
+        %     vel = str2double(vel{1});
+        %     dist_km = vel * tt(i).time(j);
+        %     tt(i).distance(j) = km2deg(dist_km); % degrees
+
+        % end
+    end
+end
 
