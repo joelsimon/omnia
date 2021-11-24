@@ -72,7 +72,7 @@ end
 %% N.B.: Do not swap for textscan.m, fscanf.m etc (*see note below).
 lynes = readtext(filename);
 
-% Parse.
+% Parse (+7 is length of "prelim.")
 sac = cellfun(@(xx) strtrim(xx(1:44+7)), lynes, 'UniformOutput', false);
 eqtime = cellfun(@(xx) xx(49+7:67+7), lynes, 'UniformOutput', false);
 eqlat = cellfun(@(xx) str2double(xx(72+7:78+7)), lynes, 'UniformOutput', true);
@@ -81,8 +81,8 @@ eqregion = strtrim(cellfun(@(xx) xx(95+7:128+7), lynes, 'UniformOutput', false))
 eqdepth  = cellfun(@(xx) str2double(xx(133+7:138+7)), lynes, 'UniformOutput', true);
 eqdist = cellfun(@(xx) str2double(xx(143+7:149+7)), lynes, 'UniformOutput', true);
 eqmag = cellfun(@(xx) str2double(xx(154+7:157+7)), lynes, 'UniformOutput', true);
-eqphase1 = strtrim(cellfun(@(xx) xx(162+7:167+7), lynes, 'UniformOutput', false));
-eqid = strtrim(cellfun(@(xx) xx(172+7:184+7), lynes, 'UniformOutput', false));
+eqphase1 = strtrim(cellfun(@(xx) xx(162+7:168+7), lynes, 'UniformOutput', false));
+eqid = strtrim(cellfun(@(xx) xx(173+7:185+7), lynes, 'UniformOutput', false));
 
 % Get SAC (time at first sample) and EQ (hypocenter time) datetimes.
 sacdate = mersac2date(sac);
