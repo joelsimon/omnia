@@ -38,7 +38,7 @@ function tt=taupCurve(model,depth,phase)
 % Last modified by jdsimon@princeton.edu, 23-Nov-2021 in Ver. 2017b
 
 % JDS changelog
-%
+% *Return sorted by travel time (using longest time for each phase as reference)
 % *Change tt.distance from [0 0] to [0 360] for "*kmps" phases
 % *Edit to return tt structure as opposed to empty
 
@@ -124,4 +124,13 @@ for i = 1:length(tt)
         % end
     end
 end
+
+% jdsimon@princeton.edu edit -- sort the rows in ascending order
+% (first arriving phases first). 
+for i = 1:length(tt)
+    dt(i) = tt(i).time(end);
+
+end
+[~, idx] = sort(dt, 'ascend');
+tt = tt(idx);
 
