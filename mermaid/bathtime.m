@@ -57,7 +57,7 @@ function [tadj, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 11-Jul-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 24-Nov-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 % Documented pp. 73-75, 127 2017.2
 
 % Defaults.
@@ -69,15 +69,14 @@ defval('z_mermaid', -1500)
 
 % Sanity.
 %__________________________________________________________________________________%
-% See Taup_Instructions.pdf pg. 17, item 10.  This suffix is generally
-% used for surface wave travel-time estimation.
-if endsWith(ph, 'kmps', 'IgnoreCase', true)
-    error('input phase must be body wave; surface wave phase given')
+if z_ocean > 0 || z_mermaid > 0
+    error('bathymetric (z_ocean) and MERMAID (z_mermaid) depths must be negative')
 
 end
 
-if z_ocean > 0 || z_mermaid > 0
-    error('bathymetric (z_ocean) and MERMAID (z_mermaid) depths must be negative')
+
+if theta1 < 0 || theta1 >= 90
+    error('incidence angle must be between 0 (inclusive) and 90 (exclusive) degrees')
 
 end
 
@@ -89,10 +88,16 @@ if z_mermaid < z_ocean
 
 end
 
-if theta1 < 0 || theta1 >= 90
-    error('incidence angle must be between 0 (inclusive) and 90 (exclusive) degrees')
+% See Taup_Instructions.pdf pg. 17, item 10.  This suffix is generally
+% used for surface wave travel-time estimation.
+if endsWith(ph, 'kmps', 'IgnoreCase', true)
+    warning('input phase must be body wave (surface wave phase given); returning NaNs')
+    tadj = NaN;
+    theta2 = NaN;
+    return
 
 end
+
 %__________________________________________________________________________________%
 
 
