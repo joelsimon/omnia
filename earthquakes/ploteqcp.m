@@ -62,8 +62,8 @@ switch CP.inputs.n
   otherwise
     % Add to this list with trial and error given more examples with
     % differing sampling frequencies.
-    warning('No figure formatting scheme available for %i %s', CP.n, ...
-            plurals('scale', CP.n))
+    warning('No figure formatting scheme available for %i %s', CP.inputs.n, ...
+            plurals('scale', CP.inputs.n))
 
 end
 
