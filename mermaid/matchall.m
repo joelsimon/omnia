@@ -13,7 +13,7 @@ function matchall(writecp)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 20-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 06-Dec-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default.
 defval('writecp', false)
@@ -54,8 +54,7 @@ for i = 1:length(s)
     x = readsac(s{i});
     if length(x) > 10000
         % Check if I have manually added a reviewed-only .evt file.
-        EQ = getrevevt(s{i});
-        if ~isstruct(EQ) && isnan(EQ)
+        if ~isreviewed(s{i})
                 fail = [fail i];
 
         end
