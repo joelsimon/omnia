@@ -6,7 +6,8 @@ function [EQ, evtfile] = matchreq2evt(sacfile, eventid, model, phases, eventdir)
 %
 % Input:
 % sacfile    .sac filename (or cell array of filenames)
-% eventid    IRIS event ID to associated with SAC filename
+% eventid    IRIS event ID to associated with SAC filename,
+%                or [] to mark as "unidentified"
 % eventdir   Path to directory containing 'raw/' and 'reviewed'
 %                subdirectories (def: $MERMAID/events/)
 % model      Model in which to compute phase arrival times (def: 'ak135')
@@ -23,7 +24,7 @@ function [EQ, evtfile] = matchreq2evt(sacfile, eventid, model, phases, eventdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 23-Nov-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 06-Dec-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% Recursive
 
@@ -44,12 +45,19 @@ if iscell(sacfile)
 
 end
 
-% Fetch most up-to-date info from IRIS.
-EQ = sac2evt(sacfile, model, phases, [], 'eventid', num2str(eventid));
+if ~isempty(eventid)
+    % Fetch most up-to-date info from IRIS.
+    EQ = sac2evt(sacfile, model, phases, [], 'eventid', num2str(eventid));
+    status = 'identified';
+else
+    EQ = [];
+    status = 'unidentified';
+
+end
 
 % Save EQ struct in .evt file.
 evtfile = strrep(strippath(sacfile), '.sac', '.evt');
-evtfile = fullfile(eventdir, 'reviewed', 'identified', 'evt', evtfile);
+evtfile = fullfile(eventdir, 'reviewed', status, 'evt', evtfile);
 save(evtfile, 'EQ', '-mat')
 
 fprintf('Wrote %s\n', evtfile)
