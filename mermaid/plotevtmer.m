@@ -17,43 +17,14 @@ defval('incl_prelim', true)
 % Collect .sac files first.
 sac = getsac(id, evtdir, sacdir, returntype, incl_prelim);
 
-% Determine which are requested and which are detected.
-[~, det_sac] = cellstrfind(sac, 'DET');
-[~, req_sac] = cellstrfind(sac, 'REQ');
-
-% Winnow SAC files down to unique floats -- there may be requested data, for
-% example, for the same event with slightly different interpolated locations.
-if ~isempty(det_sac)
-    det_ser = getmerser(det_sac);
-
-else
-    det_ser = {};
-
-end
-if ~isempty(req_sac)
-    req_ser = getmerser(req_sac);
-
-else
-    req_ser = {};
-
-end
-
-% Only plot MERMAID location once if multiple files exists for each event
-% (e.g., REQ multiple phases for same event with slightly different
-% interpolated locations).
-[det_ser, det_idx] = unique(det_ser);
-det_sac = det_sac(det_idx);
-
-[req_ser, req_idx] = unique(req_ser);
-req_sac = req_sac(req_idx);
-
-% Determine which SAC files only exist as requests.
-[req_only_ser, req_only_idx] = setdiff(req_ser, det_ser);
-req_only_sac = req_sac(req_only_idx);
+% Parse DET and REQ SAC files, and only plot MERMAID location once if multiple
+% files exists for each event (e.g., multiple REQ phases for same event with
+% slightly different interpolated locations).
+[det, req] = parsedetreq(sac);
 
 % Collect a single matching .evt file (the event location is the same for all
 % SAC and it's the only event info we need).
-EQ = getrevevt(det_sac{1}, evtdir);
+EQ = getrevevt(det.uniq_sac{1}, evtdir);
 EQ = EQ(1);
 
 evt_lon = EQ.PreferredLongitude;
@@ -75,15 +46,15 @@ F.evt = plot(F.ha, longitude360(EQ.PreferredLongitude), EQ.PreferredLatitude, ..
 % file (update as needed; better use kstnm...).
 gps = readgps([], false);
 all_mer_ser = {'08', '09', '10', '11', '12', '13', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25'};
-miss_ser = setdiff(all_mer_ser, [det_ser req_only_ser]);
+miss_ser = setdiff(all_mer_ser, [det.uniq_ser req.only_req_ser]);
 F.miss = plotmiss(F.ha, miss_ser, gps, evt_date);
 
 % Plot MERMAID DET locations (triggered) in black.
-F.det = plotsac(F.ha, det_sac, evt_lat, evt_lon);
+F.det = plotsac(F.ha, det.uniq_sac, evt_lat, evt_lon);
 
 % Plot only those MERMAID REQ (requested) locations in red only if that MERMAID
 % was not also triggered (not necessarily to surface).
-F.req = plotsac(F.ha, req_only_sac, evt_lat, evt_lon);
+F.req = plotsac(F.ha, req.only_req_sac, evt_lat, evt_lon);
 
 % Cosmetics.
 magtype = EQ.PreferredMagnitudeType;
