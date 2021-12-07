@@ -23,8 +23,20 @@ sac = getsac(id, evtdir, sacdir, returntype, incl_prelim);
 
 % Winnow SAC files down to unique floats -- there may be requested data, for
 % example, for the same event with slightly different interpolated locations.
-det_ser = getmerser(det_sac);
-req_ser = getmerser(req_sac);
+if ~isempty(det_sac)
+    det_ser = getmerser(det_sac);
+
+else
+    det_ser = {};
+
+end
+if ~isempty(req_sac)
+    req_ser = getmerser(req_sac);
+
+else
+    req_ser = {};
+
+end
 
 % Keep only uniq
 [det_ser, det_idx] = unique(det_ser);
