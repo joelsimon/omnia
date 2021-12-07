@@ -30,6 +30,8 @@ prev_next = [];
 
 % Sanity checks
 if ~issorted(mer_struct.locdate)
+    % This probably happened because you set 'rm23=True' in readgps.m
+    % (set it to false)
     error('mer_struct.locdate is not sorted')
 
 end
