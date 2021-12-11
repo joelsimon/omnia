@@ -43,6 +43,7 @@ function varargout=gebco(lon,lat,vers,npc,method,xver,jig)
 % 9.0.0.341360 (R2016a)
 %
 % Last modified by fjsimons-at-alum.mit.edu, 07/18/2019
+% Last modified by jdsimon-at-alumni.princeton.edu, 12/10/2021
 
 if ~isstr(lon)
     % Default lon and lat, for good measure, take those from the examples of 
@@ -79,7 +80,7 @@ if ~isstr(lon)
     if length(lon)~=1 || length(lat)~=1
       [zz,lonz,latz]=deal(nan(size(lon)));
       % Should probably take advantage of the parallellization here
-      parfor index=1:prod(size(lon))
+ for index=1:prod(size(lon))
           if xver==1; disp(sprintf('Making WMS request %3.3i/%3.3i',index,prod(size(lon)))); end
           [zz(index),lonz(index),latz(index)]=gebco(lon(index),lat(index),vers,[],[],xver);
       end
@@ -253,7 +254,7 @@ if ~isstr(lon)
     zz=cellnan([length(utile) 1],witsz(:),ones(length(witsz)));
     
     % Loop over the unique tiles
-    parfor index=1:length(utile)
+    for index=1:length(utile)
         % If you are doing this right, you NOW end up in unique tiles
       zz{index}=gebco(lon(witsj{index}),lat(witsj{index}),vers,npc,method,xver);
     end
