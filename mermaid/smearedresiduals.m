@@ -38,6 +38,10 @@ for i = 1:length(fields)
     end
 end
 
+% Remove any 'prelim.sac' files.
+prelim_idx = cellstrfind(MER.s, 'prelim.sac');
+MER = rmstructindex(MER, prelim_idx);
+
 % Remove the indices (all arrays are indexed the same) corresponding to 2STD_ERR
 % estimates beyond the allowable 0.15 s.  NB, the uncertainty is the same for
 % all residual types.
