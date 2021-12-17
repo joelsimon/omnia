@@ -1,16 +1,6 @@
-* Set all $SIMON2020_CODE --> $GJI21_CODE
+* fig11.m
 
-* Really, comb all code for occurences of 'SIMON2020'
+>> high_tres = find(abs(MER.(res_type) > max_tres));
+>> high_tres = find(abs(MER.(res_type)) > max_tres);
 
-* % Define paths.
-  merdir = getenv('MERMAID');
-  procdir = fullfile(merdir, 'processed');
-  evtdir = fullfile(merdir, 'events');
-
-  % Ensure in GJI21 git branch -- complimentary paper w/ same data set.
-  startdir = pwd;
-  cd(procdir)
-  system('git checkout GJI21');
-  cd(evtdir)
-  system('git checkout GJI21');
-  cd(startdir)
+(Hopefully does not make a difference because I have the `if ~isequal(num_smeared, sum(h.BinCounts))` check later...)
