@@ -7,12 +7,10 @@ function fig11
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 03-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 20-Dec-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
-
-defval('commonID', false)
 
 % Define paths.
 merdir = getenv('MERMAID');
@@ -79,7 +77,11 @@ fs = 20;
 %%______________________________________________________________________________________%%
 max_tres = 10;
 
-high_tres = find(abs(MER.(res_type) > max_tres));
+high_tres_old = find(abs(MER.(res_type) > max_tres));
+high_tres = find(abs(MER.(res_type)) > max_tres);
+if ~isequal(high_tres, high_tres_old)
+    keyboard
+end
 trla(:, high_tres) = [];
 trlo(:, high_tres) = [];
 

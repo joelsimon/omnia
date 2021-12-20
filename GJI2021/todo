@@ -1,6 +1,0 @@
-* fig11.m
-
->> high_tres = find(abs(MER.(res_type) > max_tres));
->> high_tres = find(abs(MER.(res_type)) > max_tres);
-
-(Hopefully does not make a difference because I have the `if ~isequal(num_smeared, sum(h.BinCounts))` check later...)
