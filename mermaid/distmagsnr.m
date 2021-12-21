@@ -310,5 +310,5 @@ tightmap
 latimes
 axis off
 
-savepdf(dytpe)
+savepdf(dtype)
 close
