@@ -63,6 +63,12 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 10-Dec-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
+%% !!
+%%
+%% To add: pt0 column
+%%
+%% !!
+
 % Defaults.
 defval('s', revsac(1))
 defval('redo', false)
