@@ -72,9 +72,9 @@ fprintf('Updating event text files...\n')
 evt2txt;
 writelatlon;
 
-fprintf('Updating first arrival text files...\n')
-writefirstarrival;
-writefirstarrivalpressure;
+%fprintf('Updating first arrival text files...\n')
+%writefirstarrival;
+%writefirstarrivalpressure;
 
 if writecp
     try
