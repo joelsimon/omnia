@@ -24,7 +24,7 @@ function [EQ, evtfile] = matchreq2evt(sacfile, eventid, model, phases, eventdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 06-Dec-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 04-Jan-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% Recursive
 
@@ -32,6 +32,8 @@ function [EQ, evtfile] = matchreq2evt(sacfile, eventid, model, phases, eventdir)
 defval('eventdir', fullfile(getenv('MERMAID'), 'events'));
 defval('model', 'ak135')
 defval('phases', [defphases  ',4kmps,1.5kmps'])
+
+eventid = num2str(eventid);
 
 if iscell(sacfile)
 
@@ -47,8 +49,14 @@ end
 
 if ~isempty(eventid)
     % Fetch most up-to-date info from IRIS.
-    EQ = sac2evt(sacfile, model, phases, [], 'eventid', num2str(eventid));
+    EQ = sac2evt(sacfile, model, phases, [], 'eventid', eventid);
+    if isempty(EQ)
+        error(['Event ID %s returned no results\n' ...
+               '(https://ds.iris.edu/ds/nodes/dmc/tools/event/%s)\n'], ...
+               eventid, eventid)
+    end
     status = 'identified';
+
 else
     EQ = [];
     status = 'unidentified';
