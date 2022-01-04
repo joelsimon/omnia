@@ -1,8 +1,7 @@
-function [req_str, start_date, req_secs, tt] = reqphasetime(evt_date, evt_dep, ...
-                                                      evt_latlon, sta_latlon, ...
-                                                      phases, buf_secs)
-% [req_str, start_date, req_secs, tt] = REQPHASETIME(evt_date, evt_dep, ...
-%                                         evt_latlon, sta_latlon, phases, buf_secs)
+function [req_str, start_date, req_secs, tt, end_date] = ...
+             reqphasetime(evt_date, evt_dep, evt_latlon, sta_latlon, phases, buf_secs)
+% [req_str, start_date, req_secs, tt, end_date] = ...
+%    REQPHASETIME(evt_date, evt_dep, evt_latlon, sta_latlon, phases, buf_secs)
 %
 % Return start time and duration strings for "mermaid REQUEST" for .cmd file,
 % given source/receiver information and phase list of interest.
@@ -22,13 +21,14 @@ function [req_str, start_date, req_secs, tt] = reqphasetime(evt_date, evt_dep, .
 % start_date   Starttime of request, as datetime
 % req_secs     Length of request (in seconds) as double
 % tt           TaupTime structure of first(last) retained phase
+% end_date     Endtime of request, as datetime
 %
 % * Both times must be positive; buf_secs = [60 120] means "request from 60
 %   seconds BEFORE the first phase to 120 seconds AFTER the last phase"
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 11-Oct-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 22-Dec-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default outputs
 starttime = [];
