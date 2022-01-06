@@ -21,10 +21,9 @@ function [CONSTANT, A0] = sacpzconstant(SD, fs, P, Z)
 % seismometer [V/(m/s^2)], and the second stage is the digitizer [counts/V].
 % These two sensitivities are multiplied in stage 0 to compute the total
 % sensitivity (SD) of the system (we are ignoring other digital stages (3+; FIR
-% filters etc.), which also contribute to the stage 0 sensitivity, but
-% negligibly).  Ultimately, the combined sensitivity, SD, of the system is
-% quoted in units like [counts/(m/s^2)], though here it must be input in terms
-% of counts/m.
+% filters etc.), which also contribute to total sensitivity, but negligibly).
+% Ultimately, the combined sensitivity, SD, of the system is quoted in units
+% like [counts/(m/s^2)], though here it must be input in terms of counts/m.
 %
 % Therefore, using eq. (6) on pg. 159, ignoring frequency effects after the
 % analog stage, and substituting the total sensitivity at SD for the
@@ -46,6 +45,7 @@ function [CONSTANT, A0] = sacpzconstant(SD, fs, P, Z)
 %     https://ds.iris.edu/ds/support/faq/24/what-are-the-fields-in-a-resp-file/
 % (3) Verified that relation through pers. comm. with Olivier Hyvernaud
 % (4) Concluded it must be so given the definition of the G(f)
+% (5) https://ds.iris.edu/message-center/thread/1088/
 %
 % SACPZCONSTANT assumes the input poles and zeros correspond to a a "Transfer
 % function type: A", i.e., "Laplace transform analog response, in rad/sec"
