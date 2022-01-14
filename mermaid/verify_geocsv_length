@@ -1,12 +1,23 @@
 #! /bin/zsh
 # usage: ./verify_geocsv_length [no inputs]
 #
+# DEFUNCT: automaid >= 3.4.0-B prints `complete_dive.gps*` merged GPS in GeoCSV,
+# not every (potentially "nonunique") `dive.gps*` for every .LOG and .MER.
+# Also, "geo.csv" -> "get_DET_REQ.csv" automaid >= v3.4.0-W so this script fails
+# or the complete DET+REQ GeoCSV file.  Ergo, this script is now outdated and
+# incorrect.
+#
 # Verifies that # mseed + # GPS points = # geo.csv lines in each of
 # $MERMAID/processed/452.020-P-*/
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 27-Apr-2021, Darwin Kernel Version 18.7.0
+# Last modified: 14-Jan-2022, Darwin Kernel Version 18.7.0
+
+clear
+
+printf "!!! This script only applies to $MERMAID/processed\
+generated with automaid < v3.4.0-B !!!\n"
 
 function verify {
     # Pass directory as first input
@@ -22,6 +33,7 @@ function verify {
     # Remove GPS header lines
     gps_lines=$(( gps_lines - gps_hdr_lines))
 
+    # BROKEN: geo.csv -> geo_DET_REQ.csv automaid >= v3.4.0-W
     geo_files=('geo.csv' 'geo_DET.csv' 'geo_REQ.csv')
     for geo_file in $geo_files; do
 
@@ -68,3 +80,6 @@ for dir in $dirs; do
     verify $dir
 
 done
+
+printf "\n!!! This script only applies to $MERMAID/processed\
+generated with automaid < v3.4.0-B !!!"
