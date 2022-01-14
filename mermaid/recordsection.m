@@ -60,7 +60,7 @@ function [F, EQ, sac] = recordsection(id, lohi, alignon, ampfac, evtdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 23-Nov-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 14-Jan-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Wish list:
 %
@@ -167,6 +167,13 @@ for i = 1:length(sac)
     if ~isnan(lohi)
         x{i} = bandpass(x{i}, 1/h{i}.DELTA, lohi(1), lohi(2), popas(1), popas(2), ...
                         'butter');
+
+        % Despite preconditioning, filtering can still introduce edge
+        % artifacts. Remove 1% from each end of trace.
+        len_cut = 0.01 * length(x{i});
+        x{i}(1:len_cut) = NaN;
+        x{i}(end-len_cut:end) = NaN;
+
 
     end
 end
