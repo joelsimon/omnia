@@ -1,6 +1,20 @@
 function [F, sac, EQ] = plotevt(sac, lohi, sacdir, evtdir)
 % [F, sac, EQ] = PLOTEVT(sac, lohi, sacdir, evtdir)
 %
+% Plot .sac waveform file and annotate with associated .evt phase arrivals.
+%
+% Input:
+% sac     .sac filename
+% lohi    Bandpass filter [low high] corner frequencies in Hz (def: [1 5])
+% sacdir  Directory containing (possibly in subdirectory) .sac file (
+%             (def: $MERMAID/processed/)
+% evtdir  Directory containing 'raw/' and 'reviewed' subdirectories
+%             (def: $MERMAID/events/)
+% Output:
+% F       Struct holding various figure/axis handles
+% sac     Fullfile .sac name
+% EQ      Matching EQ struct (from sac2evt.m), found in `evtdir)
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 10-Jan-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
@@ -30,7 +44,7 @@ end
 
 xax = xaxis(h.NPTS, h.DELTA, pt0);
 
-x = detrend(x, 'contsant');
+x = detrend(x, 'constant');
 x = detrend(x, 'linear');
 x = x.*tukeywin(length(x));
 xf = bandpass(x, efes(h), lohi(1), lohi(2));
@@ -55,7 +69,6 @@ if EQ_exists
 
 end
 hold(F.ax, 'off')
-
 
 F.tl = title(strippath(sac), 'FontWeight', 'Normal');
 F.xl = xlabel(F.ax, 'time (s)');
