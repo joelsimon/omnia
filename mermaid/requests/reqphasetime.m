@@ -12,8 +12,8 @@ function [req_str, start_date, req_secs, tt, end_date] = ...
 % evt_latlon   Event latitude and longitude as 1x2 array
 % sta_latlon   Station latitude and longitude as 1x2 array
 % phases       Comma-separated phase list
-% buf_secs*    Seconds (numeric; not of Class 'duration') to
-%                 start(end) before(after) first(last) phase
+% buf_secs*    1x2 array of seconds (numeric; not of Class 'duration')
+%                  to start(end) before(after) first(last) phase
 %
 % Outputs:
 % req_str      Timing string formatted for "mermaid REQUEST:"
@@ -26,9 +26,18 @@ function [req_str, start_date, req_secs, tt, end_date] = ...
 % * Both times must be positive; buf_secs = [60 120] means "request from 60
 %   seconds BEFORE the first phase to 120 seconds AFTER the last phase"
 %
+% Ex: 1 min. before surface, 5 min. after T-wave for station in Portland, OR (IRIS event 1141196)
+%    evt_date = iso8601str2date('2021-05-07T04:25:31Z');
+%    evt_dep = 35.0;
+%    evt_latlon = [-25.6649 -175.8501];
+%    sta_latlon = [+45.5152 -122.6784];
+%    phases = '4kmps, 1.5kmps';
+%    buf_secs = [60 5*60];
+%    REQPHASETIME(evt_date, evt_dep, evt_latlon, sta_latlon, phases, buf_secs)
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 22-Dec-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 24-Jan-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default outputs
 starttime = [];
