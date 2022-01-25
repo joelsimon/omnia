@@ -101,7 +101,7 @@ if endsWith(ph, 'kmps', 'IgnoreCase', true)
     trad = NaN;
     ideg = NaN;
     irad = NaN;
-    warning('No takeoff/incidence angle associated with phase: ''%s''', ph)
+    %warning('No takeoff/incidence angle associated with phase: ''%s''', ph)
     return
 
 end
