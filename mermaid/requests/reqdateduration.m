@@ -56,17 +56,24 @@ if req_duration < max_duration
 else
     % Otherwise split across multiple requests, the next starting where the previous
     % ends, with durations equal to the maximum-allowed request duration.
-    line_start(1) = start_date;
-    req_sec(1) = max_duration;
-    req_str{1} = sprintf('%s,%i', reqdate(line_start(1)), req_sec);
-    line_end(1) = line_start(1) + seconds(req_sec);
 
-    for i = 2:floor(req_duration / max_duration)
-        line_start(i) = line_end(i-1);
-        req_sec(i) = max_duration;
-        req_str{i} = sprintf('%s,%i', reqdate(line_start(i)), req_sec(i));
-        line_end(i) = line_start(i) + seconds(req_sec(i));
+    % First maximum-duration line (there may only be one).
+    i = 1;
+    line_start(i) = start_date;
+    req_sec(i) = max_duration;
+    req_str{i} = sprintf('%s,%i', reqdate(line_start(i)), req_sec);
+    line_end(i) = line_start(i) + seconds(req_sec);
 
+    % Maximum-duration lines 2 through N, if necessary.
+    num_max_lines = floor(req_duration / max_duration);
+    if num_max_lines >= 2
+        for i = 2:num_max_lines
+            line_start(i) = line_end(i-1);
+            req_sec(i) = max_duration;
+            req_str{i} = sprintf('%s,%i', reqdate(line_start(i)), req_sec(i));
+            line_end(i) = line_start(i) + seconds(req_sec(i));
+
+        end
     end
 
     % Finish the multiline request with whatever remaining time is leftover after
