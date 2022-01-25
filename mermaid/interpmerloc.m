@@ -1,5 +1,5 @@
-function [ilat, ilon, warn] = interpmerloc(mer_struct, ilocdate, plt)
-% [ilat, ilon, warn] = INTERPMERLOC(mer_struct, ilocdate, plt)
+function [ilat, ilon, warn, warn_str] = interpmerloc(mer_struct, ilocdate, plt)
+% [ilat, ilon, warn, warn_str] = INTERPMERLOC(mer_struct, ilocdate, plt)
 %
 % Interpolate MERMAID position at requested time.
 %
@@ -14,37 +14,38 @@ function [ilat, ilon, warn] = interpmerloc(mer_struct, ilocdate, plt)
 % ilat/lon      Interpolated latitude/longitude at requested `ilocdate`
 % warn          true if warning thrown (`ilocdate` out of range;
 %                   `ilocdate` possibly during surfacing/diving)
+% warn_str      String detailing warning, if any
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 20-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 25-Jan-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default input.
 defval('plt', false)
+defval('warn_str', '')
 
 % Default outputs.
 ilat = [];
 ilon = [];
 warn = false;
-prev_next = [];
+warn_str = '';
 
-% Sanity checks
+% Sanity checks.
 if ~issorted(mer_struct.locdate)
     % This probably happened because you set 'rm23=True' in readgps.m
-    % (set it to false)
+    % (set it to false).
     error('mer_struct.locdate is not sorted')
 
 end
 if ~isbetween(ilocdate, mer_struct.locdate(1), mer_struct.locdate(end))
-    warning('requested interpolation date outside measurement dates')
+    warn_str = 'Requested interpolation date outside measurement dates';
+    warning(warn_str)
     warn = true;
     return
 
 end
 
 % Remove redundant dates so that interp1.m does not get flustered.
-% Don't use rmstructindex.m because we want to return `prev_next` output
-% indexed the same as the original input.
 [~, uniq_idx] = unique(mer_struct.locdate);
 uniq_locdate = mer_struct.locdate(uniq_idx);
 uniq_lat = mer_struct.lat(uniq_idx);
@@ -54,13 +55,14 @@ uniq_lon = mer_struct.lon(uniq_idx);
 ilat = interp1(uniq_locdate, uniq_lat, ilocdate);
 ilon = interp1(uniq_locdate, uniq_lon, ilocdate);
 
-% Warn if previous/next GPS within 5 hours (implying MERMAID at the surface
-% or diving/ascending).
+% Warn if previous/next GPS within 5 hours
+% (implying MERMAID at the surface or diving/ascending).
 prev_idx = max(find(mer_struct.locdate < ilocdate));
 next_idx = prev_idx + 1;
 if seconds(ilocdate - mer_struct.locdate(prev_idx)) < 15 * 3600 || ...
         seconds(mer_struct.locdate(next_idx) - ilocdate) < 5*3600
-    warning('May have been at the surface or diving/ascending at %s', fdsndate2str(ilocdate))
+    warn_str = sprintf('May have been at the surface or diving/ascending at %s', fdsndate2str(ilocdate))
+    warning(warn_str)
     warn = true;
 
 end
