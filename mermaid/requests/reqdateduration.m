@@ -59,11 +59,11 @@ else
     line_start(1) = start_date;
     req_sec(1) = max_duration;
     req_str{1} = sprintf('%s,%i', reqdate(line_start(1)), req_sec);
-    line_end(1) = line_start(1) + seconds(req_sec)
+    line_end(1) = line_start(1) + seconds(req_sec);
 
     for i = 2:floor(req_duration / max_duration)
         line_start(i) = line_end(i-1);
-        req_sec(i) = req_sec(i-1);
+        req_sec(i) = max_duration;
         req_str{i} = sprintf('%s,%i', reqdate(line_start(i)), req_sec(i));
         line_end(i) = line_start(i) + seconds(req_sec(i));
 
@@ -75,6 +75,13 @@ else
     req_sec(i+1) = ceil(seconds(end_date - line_start(i+1)));
     req_str{i+1} = sprintf('%s,%i', reqdate(line_start(i+1)), req_sec(i+1));
     line_end(i+1) = line_start(i+1) + seconds(req_sec(i+1));
+
+    % Verify the numbers all sum as they should.
+    if abs(seconds(line_start(1) - start_date)) > 1  ...
+            || abs(seconds(line_end(end) - end_date)) > 1
+        error('Line dates do not start/end correctly')
+
+    end
 
     req_str = req_str';
     start_date = line_start';
