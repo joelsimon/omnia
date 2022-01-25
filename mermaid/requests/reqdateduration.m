@@ -1,5 +1,5 @@
 function [req_str, start_date, req_sec, end_date] = reqdateduration(start_date, end_date)
-%  [req_str, start_date, req_sec, end_date] = REQDATEDURATION(start_date, end_date)
+% [req_str, start_date, req_sec, end_date] = REQDATEDURATION(start_date, end_date)
 %
 % Returns partial .cmd request*, the start date and duration only, formatted
 % properly and split into multiple requests if the duration is greater than 1800
