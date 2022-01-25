@@ -1,6 +1,6 @@
-function [req_str, start_date, req_secs, tt, end_date] = ...
+function [req_str, start_date, req_sec, tt, end_date] = ...
              reqphasetime(evt_date, evt_dep, evt_latlon, sta_latlon, phases, buf_secs)
-% [req_str, start_date, req_secs, tt, end_date] = ...
+% [req_str, start_date, req_sec, tt, end_date] = ...
 %    REQPHASETIME(evt_date, evt_dep, evt_latlon, sta_latlon, phases, buf_secs)
 %
 % Return start time and duration strings for "mermaid REQUEST" for .cmd file,
@@ -11,7 +11,7 @@ function [req_str, start_date, req_secs, tt, end_date] = ...
 % evt_dep      Event depth in km
 % evt_latlon   Event latitude and longitude as 1x2 array
 % sta_latlon   Station latitude and longitude as 1x2 array
-% phases       Comma-separated phase list
+% phases       Comma-separated phase list, or [] (or '')
 % buf_secs*    1x2 array of seconds (numeric; not of Class 'duration')
 %                  to start(end) before(after) first(last) phase
 %
@@ -19,14 +19,14 @@ function [req_str, start_date, req_secs, tt, end_date] = ...
 % req_str      Timing string formatted for "mermaid REQUEST:"
 %                  (e.g., "2020-10-19T21_04_44,1903")
 % start_date   Starttime of request, as datetime
-% req_secs     Length of request (in seconds) as double
+% req_sec      Length of request (in seconds) as double
 % tt           TaupTime structure of first(last) retained phase
 % end_date     Endtime of request, as datetime
 %
 % *Both times must be positive; buf_secs = [60 120] means "request from 60
 %  seconds BEFORE the first phase to 120 seconds AFTER the last phase"
 %
-% Ex: 1 min. before surface, 5 min. after T-wave for station in Portland, OR (IRIS event 1141196)
+% Ex: 1 min. before Rayleigh, 5 min. after T-wave for station in Portland, OR (IRIS event 1141196)
 %    evt_date = iso8601str2date('2021-05-07T04:25:31Z');
 %    evt_dep = 35.0;
 %    evt_latlon = [-25.6649 -175.8501];
@@ -42,7 +42,7 @@ function [req_str, start_date, req_secs, tt, end_date] = ...
 % Default outputs
 req_str = {};
 start_date = datetime('NaT', 'TimeZone', 'UTC');
-req_secs = [];
+req_sec = [];
 tt = [];
 end_date = datetime('NaT', 'TimeZone', 'UTC');
 
@@ -94,4 +94,4 @@ end_date = arr_date(2) + seconds(buf_secs(2));
 % Format as required for .cmd file, e.g.
 % "mermaid REQUEST:2018-07-28T22_56_20,180,5"
 % possibly split over multiple lines if long duration
-[req_str, start_date, end_date] = reqdateduration(start_date, end_date);
+[req_str, start_date, req_sec, end_date] = reqdateduration(start_date, end_date);
