@@ -23,8 +23,8 @@ function [req_str, start_date, req_secs, tt, end_date] = ...
 % tt           TaupTime structure of first(last) retained phase
 % end_date     Endtime of request, as datetime
 %
-% * Both times must be positive; buf_secs = [60 120] means "request from 60
-%   seconds BEFORE the first phase to 120 seconds AFTER the last phase"
+% *Both times must be positive; buf_secs = [60 120] means "request from 60
+%  seconds BEFORE the first phase to 120 seconds AFTER the last phase"
 %
 % Ex: 1 min. before surface, 5 min. after T-wave for station in Portland, OR (IRIS event 1141196)
 %    evt_date = iso8601str2date('2021-05-07T04:25:31Z');
@@ -37,15 +37,23 @@ function [req_str, start_date, req_secs, tt, end_date] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 24-Jan-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 25-Jan-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default outputs
-starttime = [];
+req_str = {};
+start_date = datetime('NaT', 'TimeZone', 'UTC');
 req_secs = [];
-warn = false;
+tt = [];
+end_date = datetime('NaT', 'TimeZone', 'UTC');
+
+% Verify UTC timezone.
+if ~strcmp(evt_date.TimeZone, 'UTC')
+    error('`evt_date.TimeZone` must be ''UTC''')
+
+end
 
 % To avoid ambiguity both buffer times must be positive; the first goes
-% backwards in time from the start and the second goes forward from the end
+% backwards in time from the start and the second goes forward from the end.
 if ~all(buf_secs >= 0)
     error('Both times in `buf_secs` must be positive')
 
@@ -85,5 +93,5 @@ end_date = arr_date(2) + seconds(buf_secs(2));
 
 % Format as required for .cmd file, e.g.
 % "mermaid REQUEST:2018-07-28T22_56_20,180,5"
-req_secs = ceil(seconds(end_date - start_date));
-req_str = sprintf('%s,%i', reqdate(start_date), req_secs);
+% possibly split over multiple lines if long duration
+[req_str, start_date, end_date] = reqdateduration(start_date, end_date);
