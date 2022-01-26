@@ -61,7 +61,7 @@ prev_idx = max(find(mer_struct.locdate < ilocdate));
 next_idx = prev_idx + 1;
 if seconds(ilocdate - mer_struct.locdate(prev_idx)) < 15 * 3600 || ...
         seconds(mer_struct.locdate(next_idx) - ilocdate) < 5*3600
-    warn_str = sprintf('May have been at the surface or diving/ascending at %s', fdsndate2str(ilocdate))
+    warn_str = sprintf('May have been at the surface or diving/ascending at %s', fdsndate2str(ilocdate));
     warning(warn_str)
     warn = true;
 
