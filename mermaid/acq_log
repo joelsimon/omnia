@@ -1,0 +1,21 @@
+#! /bin/zsh
+#
+# Generate `acq started`, `acq stopped` logs in $MEMAID/processed.
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 04-Feb-2022, Darwin Kernel Version 18.7.0
+
+# Loop over all MERMAID subdirectories
+# NB, the final forward slash ("/") is muy importante here
+proc_dir=$MERMAID/processed/
+for mer_dir in $( ls -1d $proc_dir/*/ ); do
+    # Grep "acq" line
+    acq=$( grep --no-filename "acq" $mer_dir/**/*.LOG.h )
+
+    # Remove [MRMAID,557] and [MRMAID,594]
+    log=$mer_dir/acq_log.txt
+    echo $line | sed 's/:.*\[MRMAID,.*\]/ /g' > $log
+    printf "Wrote %s\n" $log
+
+done
