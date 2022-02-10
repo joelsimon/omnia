@@ -17,14 +17,14 @@ function [F, sac, EQ] = plotevt(sac, lohi, sacdir, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 10-Jan-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 10-Feb-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 
 sac = fullsac(sac, sacdir);
-[x,h] = readsac(sac);
+[x, h] = readsac(sac);
 
 pt0 = 0;
 EQ_exists = false;
@@ -42,7 +42,10 @@ if isreviewed(sac, evtdir)
     end
 end
 
-xax = xaxis(h.NPTS, h.DELTA, pt0);
+%xax = xaxis(h.NPTS, h.DELTA, pt0);
+seisdate = seistime(h);
+starttime = seisdate.B;
+dax = datexaxis(h.NPTS, h.DELTA, starttime);
 
 x = detrend(x, 'constant');
 x = detrend(x, 'linear');
@@ -55,13 +58,14 @@ F.f = figure;
 F.ax = gca;
 hold(F.ax, 'on')
 
-F.pl = plot(xax, xf);
+F.pl = plot(dax, xf);
 shrink(F.ax, 1, 2)
 axesfs(F.f, 15, 15)
 symaxes(F.ax, 'y');
 if EQ_exists
     for i = 1:length(EQ.TaupTimes)
-        F.plph(i) = plot(repmat(EQ.TaupTimes(i).truearsecs, 1, 2), F.ax.YLim);
+        %F.plph(i) = plot(repmat(EQ.TaupTimes(i).truearsecs, 1, 2), F.ax.YLim);
+        F.plph(i) = plot(repmat(EQ.TaupTimes(i).arrivaldatetime, 1, 2), F.ax.YLim);
         F.txph{i} = EQ.TaupTimes(i).phaseName;
 
     end
@@ -70,8 +74,8 @@ if EQ_exists
 end
 hold(F.ax, 'off')
 
-F.tl = title(strippath(sac), 'FontWeight', 'Normal');
-F.xl = xlabel(F.ax, 'time (s)');
+%F.tl = title(strippath(sac), 'FontWeight', 'Light');
+F.xl = xlabel(F.ax, 'time (UTC)');
 F.yl = ylabel(F.ax, 'counts');
 
 box(F.ax, 'on')
