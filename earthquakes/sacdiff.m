@@ -1,5 +1,5 @@
-function [h1, h2] = sacdiff(s1, s2, dmate)
-% [h1, h2] = SACDIFF(s1, s2, dmate)
+function [h1, h2] = sacdiff(s1, s2, dmate, lohi, flipstack)
+% [h1, h2] = SACDIFF(s1, s2, dmate, lohi, flipstack)
 %
 % Compares two SAC files:
 % * UTC timing according to their header
@@ -15,6 +15,10 @@ function [h1, h2] = sacdiff(s1, s2, dmate)
 %             (def: '20200805T121329.22_5F2AF4E8.MER.DET.WLT5.sac', ...
 %                   '20200805T121328.22_5F62A85C.MER.REQ.WLT5.sac');
 % dmate   Decimate to attempt to match sampling frequencies (def: false)
+% lohi    2x1 array of [low, high] corner frequencies for `bandpass`,
+%             or [] to leave unfiltered (def: [])
+% flipstack true to reverse line stack order and send red to back
+%           (def: false)
 %
 % Output:
 % h1/2    Header structures from input SAC files
@@ -23,16 +27,20 @@ function [h1, h2] = sacdiff(s1, s2, dmate)
 %    SACDIFF('20180728T225619.06_5B773AE6.MER.REQ.WLT5.sac', ...
 %            '20180728T225619.06_5B773AE6.MER1.REQ.WLT5.sac');
 %
+% See also: alignxcorr.m
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 18-Aug-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 01-Mar-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s1', fullsac('20200805T121329.22_5F2AF4E8.MER.DET.WLT5.sac', ...
-                     fullfile(getenv('MERMAID'), 'test_processed')))
+                     fullfile(getenv('MERMAID'), 'processed')))
 defval('s2', fullsac('20200805T121328.22_5F62A85C.MER.REQ.WLT5.sac', ...
                      fullfile(getenv('MERMAID'), 'processed')))
 defval('dmate', false)
+defval('lohi', [])
+defval('flipstack', false)
 
 % Read the data
 [x1, h1] = readsac(s1);
@@ -61,6 +69,12 @@ if dmate
     end
 end
 
+if lohi
+    x1 = bandpass(x1, efes(h1), lohi(1), lohi(2));
+    x2 = bandpass(x2, efes(h2), lohi(1), lohi(2));
+
+end
+
 %%______________________________________________________________________________________%%
 % S1
 xax1 = xaxis(h1.NPTS, h1.DELTA, 0);
@@ -82,8 +96,8 @@ xax_date2 = linspace(seisdate2.B, seisdate2.E, h2.NPTS);
 
 figure
 hold on
-plot(xax_date1, x1, 'k')
-plot(xax_date2, x2, 'r')
+pl01 = plot(xax_date1, x1, 'k')
+pl02 = plot(xax_date2, x2, 'r')
 % minmax.m does not accept datetime arrays.
 xl1 = min([xax_date1(1) xax_date2(1)]);
 xl2 = max([xax_date1(end) xax_date2(end)]);
@@ -100,13 +114,13 @@ figure
 
 % Seismograms.
 [~, ha1] = krijetem(subnum(3,1));
-pl1 = plot(ha1(1), xax1, x1, 'k');
+pl11 = plot(ha1(1), xax1, x1, 'k');
 hold(ha1(1), 'on')
-pl2 = plot(ha1(1), xax2, x2, 'r');
+pl12 = plot(ha1(1), xax2, x2, 'r');
 xlim(ha1(1), [1 max([xax1(end) xax2(end)])])
 xlabel(ha1(1), 'Seconds into S1 and S2 seismograms, first sample set to 0 s in both')
 ylabel(ha1(1), 'Counts')
-lg1 = legend(ha1(1), [pl1 pl2], 'S1', 'S2');
+lg1 = legend(ha1(1), [pl11 pl12], 'S1', 'S2');
 
 %%______________________________________________________________________________________%%
 %% PLOT ALIGNED AND TRUNCATED
@@ -157,6 +171,14 @@ ylabel(ha1(3), 'Counts')
 
 % Format plots.
 latimes
+
+if flipstack
+    uistack(pl02, 'bottom')
+    uistack(pl12, 'bottom')
+    uistack(pl22, 'bottom')
+    uistack(pl32, 'bottom')
+
+end
 
 %%______________________________________________________________________________________%%
 fprintf('\nAccording to the SAC headers:\n')
