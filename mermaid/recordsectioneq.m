@@ -1,7 +1,7 @@
 function [F, EQ, sac] = recordsectioneq(sac, EQ, lohi, alignon, ampfac, normlize, ...
                                        ph, popas, taper)
 % [F, EQ, sac] = RECORDSECTIONEQ(sac, EQ, lohi, alignon, ampfac, normlize, ...
-%                               ph, popas, taper)    
+%                               ph, popas, taper)
 %
 % Plot record section given lists of SAC and their assocaited identified EQ structs
 %
@@ -40,11 +40,11 @@ function [F, EQ, sac] = recordsectioneq(sac, EQ, lohi, alignon, ampfac, normlize
 % be the same across all seismograms, but this is something to be aware
 % of. Overlaid travel time curves for 'atime' option are on the wish list.
 %
-% See also: recordsectionid.m, evt2txt.m, getevt.m
+% See also: recordsection.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 24-Feb-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 28-Feb-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Wish list:
 %
@@ -140,11 +140,11 @@ for i = 1:length(sac)
         x{i} = bandpass(x{i}, 1/h{i}.DELTA, lohi(1), lohi(2), popas(1), popas(2), ...
                         'butter');
 
-        % Despite preconditioning, filtering can still introduce edge
-        % artifacts. Remove 1% from each end of trace.
-        len_cut = 0.01 * length(x{i});
-        x{i}(1:len_cut) = NaN;
-        x{i}(end-len_cut:end) = NaN;
+        % % Despite preconditioning, filtering can still introduce edge
+        % % artifacts. Remove 1% from each end of trace.
+        % len_cut = 0.01 * length(x{i});
+        % x{i}(1:len_cut) = NaN;
+        % x{i}(end-len_cut:end) = NaN;
 
     end
 end
@@ -170,15 +170,8 @@ for i = 1:length(x)
         x{i} = x{i} / maxx;
 
     end
-
-    % Assumes Princeton MERMAID float naming convention, where the float
-    % number is the two digits immediately following the first period
-    % in the SAC filename.
-    floatnum = fx(strsplit(strippath(sac{i}), '.'), 2);
-    floatnum = floatnum(1:2);
-
     F.pltr(i) = plot(F.ax, xax{i}, ampfac * x{i} + dist(i));
-    F.pltx(i) = text(F.ax, 0, dist(i), num2str(floatnum));
+    F.pltx(i) = text(F.ax, 0, dist(i), h{i}.KSTNM);
     F.pltx(i).Color = F.pltr(i).Color;
 
 end
@@ -231,10 +224,15 @@ else
     % Overlay travel time curves.
     phases_plotted = {};
     for i = 1:length(tt)
-        F.ph(i) = plot(F.ax, tt(i).time, tt(i).distance, 'LineWidth', ...
+        if ~isempty(tt(i).time)
+            F.ph(i) = plot(F.ax, tt(i).time, tt(i).distance, 'LineWidth', ...
                        1, 'LineStyle', '-');
-        phases_plotted = [phases_plotted tt(i).phaseName];
+            phases_plotted = [phases_plotted tt(i).phaseName];
 
+        else
+            warning('Requested phase ''%s'' not plotted (empty taupCurve)\n', tt(i).phaseName)
+
+        end
     end
 
     % XLabel specific to aligning on event-rupture time.
