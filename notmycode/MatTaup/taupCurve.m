@@ -8,7 +8,7 @@ function tt=taupCurve(model,depth,phase)
 %   Model:      Global velocity model. Default is "iasp91".
 %   Depth:      Event depth in km
 %   Phase:      Phase list separated by comma
-% 
+%
 % Output argumet:
 %   tt is a structure array with fields:
 %   tt(index).phaseName
@@ -21,7 +21,7 @@ function tt=taupCurve(model,depth,phase)
 %   taupCurve([],50,'P,sS')
 %   taupCurve('prem',0,'P,PKP,PKIKP,PKiKP')
 %
-% This program calls TauP toolkit for calculation, which is 
+% This program calls TauP toolkit for calculation, which is
 % developed by:
 %   H. Philip Crotwell, Thomas J. Owens, Jeroen Ritsema
 %   Department of Geological Sciences
@@ -30,14 +30,15 @@ function tt=taupCurve(model,depth,phase)
 %   crotwell@seis.sc.edu
 %
 % Written by:
-%   Qin Li 
+%   Qin Li
 %   Unverisity of Washington
 %   qinli@u.washington.edu
 %   Nov, 2002
 %
-% Last modified by jdsimon@princeton.edu, 23-Nov-2021 in Ver. 2017b
+% Last modified by jdsimon@princeton.edu, 28-Feb-2022 in Ver. 2017b
 
 % JDS changelog
+% *Fix traveltime sort in empty cases
 % *Return sorted by travel time (using longest time for each phase as reference)
 % *Change tt.distance from [0 0] to [0 360] for "*kmps" phases
 % *Edit to return tt structure as opposed to empty
@@ -80,7 +81,7 @@ for ii=1:matCurve.length
 end;
 
 c={'b','r','g','m','c','y', ...
-   'b--','r--','g--','m--','c--','y--', ... 
+   'b--','r--','g--','m--','c--','y--', ...
    'b-.','r-.','g-.','m-.','c-.','y-.', ...
    'b:','r:','g:','m:','c:','y:'};
 p={};
@@ -113,7 +114,7 @@ end;
 % distance for "surface" (kmps) waves.
 for i = 1:length(tt)
     if contains(tt(i).phaseName, 'kmps')
-        tt(i).distance = [0 ; 360]
+        tt(i).distance = [0 ; 360];
         %% Verify [0 360] with the following calculation
         % for j = 1:length(tt(i).distance)
         %     vel = strsplit(tt(1).phaseName, 'kmps');
@@ -126,11 +127,16 @@ for i = 1:length(tt)
 end
 
 % jdsimon@princeton.edu edit -- sort the rows in ascending order
-% (first arriving phases first). 
+% (first arriving phases first; empties at end) .
 for i = 1:length(tt)
-    dt(i) = tt(i).time(end);
+    if ~isempty(tt(i).time)
+        maxt(i) = tt(i).time(end);
 
+    else
+        % Fake it
+        maxt(i) = inf;
+
+    end
 end
-[~, idx] = sort(dt, 'ascend');
+[~, idx] = sort(maxt, 'ascend');
 tt = tt(idx);
-
