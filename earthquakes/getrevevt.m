@@ -8,25 +8,39 @@ function [revEQ, rev_evt] = getrevevt(sac, evtdir)
 % omissions that would otherwise break getevt.m.
 %
 % Input:
-% sac       SAC filename
+% sac       SAC filename (or cell array assuming all share single `evtdir`)
 %               (def: '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 % evtdir    Path to directory containing 'raw/' and 'reviewed'
 %               subdirectories (def: $MERMAID/events/)
 % Output:
-% revEQ     Reviewed EQ structure
+% revEQ     Reviewed EQ structure (or cell array, if `sac` is cell)
 %               EQ = [] means .evt file exists and event unidentified
 %               EQ = NaN means .evt file does not exist
 % rev_evt   Full path to .evt file containing EQ structure
-%
+%               (or cell array, if `sac` is cell)
 % See also: getevt.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 20-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 28-Feb-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+%% Recursive.
 
 % Defaults.
 defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
+
+if iscell(sac)
+
+    %% Recursion.
+
+    for i = 1:length(sac)
+        [revEQ{i}, rev_evt{i}] = getrevevt(sac{i}, evtdir);
+
+    end
+    return
+
+end
 
 % Use dir.m recursive search to look through 'identified/', 'unidentified/, and
 % 'purgatory/' subdirectories in 'reviewed'.
