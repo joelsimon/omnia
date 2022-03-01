@@ -51,7 +51,7 @@ function [c, mc, xat, yat, dx, dy, px, py, sx, sy] = alignxcorr(x, y)
 %    % Delay the signal in x by 100 samples, append 100 more, and add noise.
 %    x = [zeros(1,100) x zeros(1,100)]; x = x + 0.1*randn(1,length(x));
 %    % Compute aligned cross correlation.
-%    c = ALIGNXCORR(x, y)
+%    [c, mc, xat, yat, dx, dy, px, py, sx, sy] = ALIGNXCORR(x, y)
 %    % Plot inputs.
 %    subplot(3,1,1); plot(x, 'k'); legend('x'); xlim([1 length(x)]);
 %    yl = get(gca, 'YLim');
