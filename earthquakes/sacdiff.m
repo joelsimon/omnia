@@ -31,7 +31,11 @@ function [h1, h2] = sacdiff(s1, s2, dmate, lohi, flipstack)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 01-Mar-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 03-Mar-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+%% Wishlist:
+%%
+%% *Double x-axis, plotted in UTC time
 
 % Defaults.
 defval('s1', fullsac('20200805T121329.22_5F2AF4E8.MER.DET.WLT5.sac', ...
@@ -102,7 +106,8 @@ pl02 = plot(xax_date2, x2, 'r')
 xl1 = min([xax_date1(1) xax_date2(1)]);
 xl2 = max([xax_date1(end) xax_date2(end)]);
 xlim([xl1 xl2])
-lg = legend( 'S1', 'S2');
+%lg = legend( 'S1', 'S2');
+lg = legend(h1.KSTNM, h2.KSTNM)
 box on
 hold off
 title('S1 and S2 in UTC time')
@@ -118,9 +123,11 @@ pl11 = plot(ha1(1), xax1, x1, 'k');
 hold(ha1(1), 'on')
 pl12 = plot(ha1(1), xax2, x2, 'r');
 xlim(ha1(1), [1 max([xax1(end) xax2(end)])])
-xlabel(ha1(1), 'Seconds into S1 and S2 seismograms, first sample set to 0 s in both')
+xlabel(ha1(1), sprintf('Seconds into %s and %s seismograms, first sample set to 0 s in both', ...
+                       h1.KSTNM, h2.KSTNM))
 ylabel(ha1(1), 'Counts')
-lg1 = legend(ha1(1), [pl11 pl12], 'S1', 'S2');
+%lg1 = legend(ha1(1), [pl11 pl12], 'S1', 'S2');
+lg1 = legend(ha1(1), [pl11 pl12], h1.KSTNM, h2.KSTNM);
 
 %%______________________________________________________________________________________%%
 %% PLOT ALIGNED AND TRUNCATED
@@ -152,10 +159,12 @@ xax2_delayed = xax2 + delay_time;
 pl21 = plot(ha1(2), xax1, x1, 'k');
 hold(ha1(2), 'on')
 pl22 = plot(ha1(2), xax2_delayed, x2, 'r');
-xlabel(ha1(2), 'Aligned, not truncated, S2 shifted so that S1 starts at 0 s')
+xlabel(ha1(2), sprintf('Aligned, not truncated, %s shifted so that %s starts at 0 s', ...
+                       h2.KSTNM, h1.KSTNM))
 ylabel(ha1(2), 'Counts')
 xlim(ha1(2), minmax([xax1' xax2_delayed']))
-lg2 = legend(ha1(2), [pl21 pl22], 'S1', 'S2');
+%lg2 = legend(ha1(2), [pl21 pl22], 'S1', 'S2');
+lg2 = legend(ha1(2), [pl21 pl22], h1.KSTNM, h2.KSTNM);
 
 %% Plot the aligned traces on top of one another.
 xax_xat1 = xaxis(length(xat1), h1.DELTA, 0);
@@ -165,9 +174,12 @@ pl31 = plot(ha1(3), xax_xat1, xat1, 'k');
 hold(ha1(3), 'on')
 pl32 = plot(ha1(3), xax_xat2, xat2, 'r');
 xlim(ha1(3), minmax([0 xax_xat1' xax_xat2']))
-lg1 = legend(ha1(3), [pl31 pl32], 'S1', 'S2');
+%lg3 = legend(ha1(3), [pl31 pl32], 'S1', 'S2');
+lg3 = legend(ha1(3), [pl31 pl32], h1.KSTNM, h2.KSTNM);
 xlabel(ha1(3), 'Aligned and truncated (keeping only the overlapping portion from above)')
 ylabel(ha1(3), 'Counts')
+
+textpatch(ha1(3), 'NorthWest', sprintf('xcorr: %.2f%s', 100*max_xcorr, '%'));
 
 % Format plots.
 latimes
