@@ -35,11 +35,11 @@ function [tot, surf, deep] = driftstats(gps, name, surftime, deeptime)
 %
 % meaning that the first deep-drift leg occurred between the dates of
 %
-%    gps.P008.locdate(4:5) = [2018-08-05T13:32:46Z  2018-08-06T13:47:20Z]
+%    gps.P008.date(4:5) = [2018-08-05T13:32:46Z  2018-08-06T13:47:20Z]
 %
 % The index-vectors `.idx`, `.dist`, `.time`, `.vel` go as, e.g.:
 %
-%    tot.time(N) == seconds(gps.(name).locdate(N) - gps.(name).locdate(N-1))
+%    tot.time(N) == seconds(gps.(name).date(N) - gps.(name).date(N-1))
 %
 % See also: readgps.m
 %
@@ -56,7 +56,7 @@ defval('deeptime', 6.5*3600)
 gps = gps.(name);
 lat = gps.lat;
 lon = gps.lon;
-locdate = gps.locdate;
+locdate = gps.date;
 
 % Compute the time difference between each GPS fix.
 % leg_time(N) == seconds(locdate(N) - locdate(N-1))

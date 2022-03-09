@@ -70,7 +70,7 @@ for i = 1:length(magval)
 
     %% For each float.
     for j = 1:length(floatnum)
-        deploydate{j} = mer.(sprintf('P0%2s', floatnum{j})).locdate(1);
+        deploydate{j} = mer.(sprintf('P0%2s', floatnum{j})).date(1);
 
         % Winnow the events to just those within the requested time range
         idx = find(isbetween(eqdate_master, deploydate{j}, enddate));

@@ -17,7 +17,7 @@
 %
 % Input:
 % supplement_directory  Directory where simon2021gji_supplement_????_gps.txt reside
-%
+%                           (def: $GJI21_CODE/data/supplement/)
 % Output:
 % gps                   GPS structure that parses *gps*.txt, organized by float name
 %
@@ -28,8 +28,7 @@
 % Last modified: 23-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default path.
-defval('supplement_directory', ...
-       fullfile(getenv('GJI21'), 'supplement', 'data', 'textfiles'))
+defval('supplement_directory', fullfile(getenv('GJI21_CODE'), 'data', 'supplement'))
 
 % gps.csv format.
 fmt = ['%s' ...
@@ -57,7 +56,7 @@ for i = 1:length(d)
 
         % Parse.
         gps.(mermaid).time = C{1};
-        gps.(mermaid).locdate = iso8601str2date(C{1});
+        gps.(mermaid).date = iso8601str2date(C{1});
         gps.(mermaid).lat = C{2};
         gps.(mermaid).lon = C{3};
         gps.(mermaid).hdop = C{4};

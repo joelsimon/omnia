@@ -46,11 +46,11 @@ for i = 1:length(floatstr)
     % datetime.  I prefer a loop here to cellfun because I find it
     % easier to read, though the latter would work too.
     for j = 1:length(loc_day)
-        mer.(mername).locdate(j) = datetime([loc_day{j} loc_time{j}], ...
+        mer.(mername).date(j) = datetime([loc_day{j} loc_time{j}], ...
                                             'InputFormat', locdate_fmt, ...
                                             'TimeZone', 'UTC');
     end
-    mer.(mername).locdate = mer.(mername).locdate';
+    mer.(mername).date = mer.(mername).date';
 
     % Tack on the latitudes and longitudes.
     mer.(mername).lat = c{4}(:);

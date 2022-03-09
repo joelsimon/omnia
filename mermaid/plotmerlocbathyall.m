@@ -93,7 +93,7 @@ end
 name = fieldnames(mer);
 longest_deployment = 0;
 for i = 1:length(name)
-    days_deployed = days(mer.(name{i}).locdate(end) - mer.(name{i}).locdate(1));
+    days_deployed = days(mer.(name{i}).date(end) - mer.(name{i}).date(1));
     if days_deployed > longest_deployment
         longest_deployment = days_deployed;
 
@@ -113,12 +113,12 @@ for i = 1:length(name)
     lon = sta.lon;
     lon(find(lon<0)) = lon(find(lon<0)) + 360; % convert longitudes from GPS coordinates to 0:360
     lat = sta.lat;
-    cum_days = [0 ; cumsum(days(diff(mer.(name{i}).locdate)))];
+    cum_days = [0 ; cumsum(days(diff(mer.(name{i}).date)))];
 
     % Remove indices when MERMAID P023 was out of the water (on the ship).
     if strcmp(name{i}, 'P023')
         bad_dates = iso8601str2date({'2019-08-17T03:18:29Z' '2019-08-17T03:22:02Z'});
-        [~, rm_idx] = intersect(sta.locdate, bad_dates);
+        [~, rm_idx] = intersect(sta.date, bad_dates);
         lon(rm_idx) = [];
         lat(rm_idx) = [];
         cum_days(rm_idx) = [];

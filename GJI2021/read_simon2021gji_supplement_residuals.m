@@ -11,7 +11,7 @@ function MERMAID = read_simon2021gji_supplement_residuals(filename)
 %
 % Input:
 % filename       Filename
-%                (def: $GJI/data/supplement/simon2021gji_supplement_residuals.txt)
+%                (def: $GJI21_CODE/data/supplement/simon2021gji_supplement_residuals.txt)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com

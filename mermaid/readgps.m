@@ -2,7 +2,7 @@ function gps = readgps(processed, rm23)
 % gps = READGPS(processed, rm23)
 %
 % Read MERMAID GPS locations from 'gps.csv' file output by automaid v3.4.0-K+
-% (when "clockfreq" column was added). Note that gps.(mermaid).locdate may
+% (when "clockfreq" column was added). Note that gps.(mermaid).date may
 % include redundant datetimes.
 %
 % NB, P0023 was out of the water around the GPS dates of --
@@ -60,7 +60,7 @@ for i = 1:length(d)
 
         % Parse.
         gps.(mermaid).time = C{1};
-        gps.(mermaid).locdate = iso8601str2date(C{1});
+        gps.(mermaid).date = iso8601str2date(C{1});
         gps.(mermaid).lat = C{2};
         gps.(mermaid).lon = C{3};
         gps.(mermaid).hdop = C{4};
@@ -72,7 +72,7 @@ for i = 1:length(d)
         gps.(mermaid).rawstr_lon = C{10};  % "[degrees]_[decimal minutes]"
 
         % Verify sorting.
-        if ~isequal(gps.(mermaid).locdate, sort(gps.(mermaid).locdate))
+        if ~isequal(gps.(mermaid).date, sort(gps.(mermaid).date))
             error('GPS unsorted')
 
         end
@@ -114,10 +114,10 @@ if rm23
     %  -157.9971
 
     bad_dates = iso8601str2date({'2019-08-17T03:18:29Z' '2019-08-17T03:22:02Z'});
-    [~, bad_idx] = intersect(gps.P0023.locdate, bad_dates);
+    [~, bad_idx] = intersect(gps.P0023.date, bad_dates);
 
     gps.P0023.time(bad_idx) = {''};
-    gps.P0023.locdate(bad_idx) = NaT;
+    gps.P0023.date(bad_idx) = NaT;
     gps.P0023.lat(bad_idx) = NaN;
     gps.P0023.lon(bad_idx) = NaN;
     gps.P0023.hdop(bad_idx) = NaN;

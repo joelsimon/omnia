@@ -54,7 +54,7 @@ supplement_directory = fullfile(getenv('GJI21_CODE'), 'data', 'supplement');
 %% read_simon2021gji_supplement_gps.m are five characters long ("P0008").
 mer = read_simon2021gji_supplement_gps(supplement_directory);
 mer = readmerloc; % 4-character station names
-startdate = mer.P008.locdate(1); % 5-character station names
+startdate = mer.P008.date(1); % 5-character station names
 
 P025_deploy = datetime('14-Sep-2018 11:57:12', 'TimeZone', 'UTC');
 

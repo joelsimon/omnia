@@ -82,7 +82,7 @@ eqdepth  = cellfun(@(xx) str2double(xx(133+7:138+7)), lynes, 'UniformOutput', tr
 eqdist = cellfun(@(xx) str2double(xx(143+7:149+7)), lynes, 'UniformOutput', true);
 eqmag = cellfun(@(xx) str2double(xx(154+7:157+7)), lynes, 'UniformOutput', true);
 eqphase1 = strtrim(cellfun(@(xx) xx(162+7:168+7), lynes, 'UniformOutput', false));
-eqid = strtrim(cellfun(@(xx) xx(173+7:185+7), lynes, 'UniformOutput', false));
+eqid = strtrim(cellfun(@(xx) xx(173+7:end), lynes, 'UniformOutput', false));
 
 % Get SAC (time at first sample) and EQ (hypocenter time) datetimes.
 sacdate = mersac2date(sac);

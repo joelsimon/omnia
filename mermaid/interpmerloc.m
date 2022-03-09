@@ -31,13 +31,13 @@ warn = false;
 warn_str = '';
 
 % Sanity checks.
-if ~issorted(mer_struct.locdate)
+if ~issorted(mer_struct.date)
     % This probably happened because you set 'rm23=True' in readgps.m
     % (set it to false).
-    error('mer_struct.locdate is not sorted')
+    error('mer_struct.date is not sorted')
 
 end
-if ~isbetween(ilocdate, mer_struct.locdate(1), mer_struct.locdate(end))
+if ~isbetween(ilocdate, mer_struct.date(1), mer_struct.date(end))
     warn_str = 'Requested interpolation date outside measurement dates';
     warning(warn_str)
     warn = true;
@@ -46,8 +46,8 @@ if ~isbetween(ilocdate, mer_struct.locdate(1), mer_struct.locdate(end))
 end
 
 % Remove redundant dates so that interp1.m does not get flustered.
-[~, uniq_idx] = unique(mer_struct.locdate);
-uniq_locdate = mer_struct.locdate(uniq_idx);
+[~, uniq_idx] = unique(mer_struct.date);
+uniq_locdate = mer_struct.date(uniq_idx);
 uniq_lat = mer_struct.lat(uniq_idx);
 uniq_lon = mer_struct.lon(uniq_idx);
 
@@ -57,10 +57,10 @@ ilon = interp1(uniq_locdate, uniq_lon, ilocdate);
 
 % Warn if previous/next GPS within 5 hours
 % (implying MERMAID at the surface or diving/ascending).
-prev_idx = max(find(mer_struct.locdate < ilocdate));
+prev_idx = max(find(mer_struct.date < ilocdate));
 next_idx = prev_idx + 1;
-if seconds(ilocdate - mer_struct.locdate(prev_idx)) < 15 * 3600 || ...
-        seconds(mer_struct.locdate(next_idx) - ilocdate) < 5*3600
+if seconds(ilocdate - mer_struct.date(prev_idx)) < 15 * 3600 || ...
+        seconds(mer_struct.date(next_idx) - ilocdate) < 5*3600
     warn_str = sprintf('May have been at the surface or diving/ascending at %s', fdsndate2str(ilocdate));
     warning(warn_str)
     warn = true;
@@ -69,7 +69,7 @@ end
 
 if plt
     % Figure out the cumulative drift days.
-    locdate = mer_struct.locdate;
+    locdate = mer_struct.date;
     lat = mer_struct.lat;
     lon = mer_struct.lon;
     cum_days = [0 ; cumsum(days(diff(locdate)))];
@@ -80,7 +80,7 @@ if plt
     % !! use this ad hoc removal.
     if strcmp(mer_struct.source{1}(1:2), '23')
         bad_dates = iso8601str2date({'2019-08-17T03:18:29Z' '2019-08-17T03:22:02Z'});
-        [~, rm_idx] = intersect(mer_struct.locdate, bad_dates);
+        [~, rm_idx] = intersect(mer_struct.date, bad_dates);
         locdate(rm_idx) = [];
         lat(rm_idx) = [];
         lon(rm_idx) = [];
@@ -112,11 +112,11 @@ if plt
 
     plot(ax, mer_struct.lon(prev_idx), mer_struct.lat(prev_idx), 'kx', 'MarkerSize', 12);
     text(ax, mer_struct.lon(prev_idx), mer_struct.lat(prev_idx), ...
-         datestr(mer_struct.locdate(prev_idx)), 'FontSize', 18);
+         datestr(mer_struct.date(prev_idx)), 'FontSize', 18);
 
     plot(ax, mer_struct.lon(next_idx), mer_struct.lat(next_idx), 'kx', 'MarkerSize', 12);
     text(ax, mer_struct.lon(next_idx), mer_struct.lat(next_idx), ...
-         datestr(mer_struct.locdate(next_idx)), 'FontSize', 18);
+         datestr(mer_struct.date(next_idx)), 'FontSize', 18);
 
 
     plot(ax, ilon, ilat, 'rx', 'MarkerSize', 12);

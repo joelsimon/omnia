@@ -43,7 +43,7 @@ end
 
 % We know mer.P0008 is the first station in the list.
 sta  = mer.P0008;
-locdate = sta.locdate;
+locdate = sta.date;
 lon = sta.lon;
 lat = sta.lat;
 
@@ -93,7 +93,7 @@ cb.TickLabels = cbticklabels(1:20:end);
 %% Repeat for the other floats, assuming P008 was the first (verified above).
 for i = 2:length(name)
     sta = mer.(name{i});
-    locdate = sta.locdate;
+    locdate = sta.date;
     lon = sta.lon;
     lat = sta.lat;
 

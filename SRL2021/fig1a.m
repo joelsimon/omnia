@@ -128,7 +128,7 @@ mermaids = fieldnames(gps);
 C = x2color([1:16], 1, 16, jet(16*4-1), false);
 S = 1;
 for i = 1:length(mermaids)
-    rm_idx = find(gps.(mermaids{i}).locdate > endtime);
+    rm_idx = find(gps.(mermaids{i}).date > endtime);
     gps.(mermaids{i}) = rmstructindex(gps.(mermaids{i}), rm_idx);
     sc.(mermaids{i}) = scatterm(gps.(mermaids{i}).lat, gps.(mermaids{i}).lon, ...
                                 S, C(i,:), 'Filled');

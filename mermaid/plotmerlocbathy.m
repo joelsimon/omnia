@@ -23,7 +23,7 @@ lat = mer.lat;
 lon = mer.lon;
 % Convert longitudes to 0:360 convention:
 lon(find(lon<0)) = lon(find(lon<0)) + 360;
-locdate = mer.locdate;
+locdate = mer.date;
 cum_days = [0 ; cumsum(days(diff(locdate)))];
 
 % Remove GPS fixes taken by P0023 while out of water (on the ship).
