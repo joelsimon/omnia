@@ -8,7 +8,11 @@ function [h1, h2] = sacdiff(s1, s2, dmate, lohi, flipstack)
 % Useful for comparing MERMAID DET and (supposedly the same) REQ files.
 %
 % This will attempt to decimate SAC files with different sampling frequencies.
-% Be wary of output headers in those cases, not all relevant variables updated.
+% !! Be wary of output headers in those cases, not all relevant variables updated !!
+%
+% Note that "truncate" here refers to chopping off whatever data exist
+% before/after the signal common to both SAC files; it is not the same
+% "truncate" as optional input argument for `alignsignals`.
 %
 % Input:
 % s1/2    SAC files to be compared
