@@ -44,9 +44,9 @@ end
 req_duration = ceil(seconds(end_date - start_date));
 
 % Manual Réf : 452.000.852 Version 00 states a max duration of 1800 seconds
-% (let's use 95% of that quoted max just to be safe).
+% (let's use 95% of that quoted max just to be safe?).
 max_duration = 1800;
-max_duration = floor(max_duration * 0.95);
+%max_duration = floor(max_duration * 0.95);
 
 % If request less than the maximum duration, return in a single line.
 if req_duration < max_duration
@@ -76,12 +76,15 @@ else
         end
     end
 
-    % Finish the multiline request with whatever remaining time is leftover after
+    % Finish the multiline request with whatever remaining time is leftover (if any;
+    % the request may be an integer multiple of maximum-allowed time) after
     % requesting maximum-duration chunks.
     line_start(i+1) = line_end(i);
     req_sec(i+1) = ceil(seconds(end_date - line_start(i+1)));
-    req_str{i+1} = sprintf('%s,%i', reqdate(line_start(i+1)), req_sec(i+1));
-    line_end(i+1) = line_start(i+1) + seconds(req_sec(i+1));
+    if req_sec > 0
+        req_str{i+1} = sprintf('%s,%i', reqdate(line_start(i+1)), req_sec(i+1));
+        line_end(i+1) = line_start(i+1) + seconds(req_sec(i+1));
+    end
 
     % Verify the numbers all sum as they should.
     if abs(seconds(line_start(1) - start_date)) > 1  ...
