@@ -1,0 +1,17 @@
+#! /bin/zsh
+#
+# Pull all "????_all.txt" MERMAID-location text files from EarthScopeOceans.org
+#
+# Requires: `wget` and output directory $MERMAID/eso_locations/
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 09-Mar-2022, Darwin Kernel Version 18.7.0
+
+wget --recursive \
+     --no-parent \
+     --no-host-directories \
+     --cut-dirs=3 \
+     --directory-prefix=$MERMAID/eso_locations/ \
+     --accept '?????_all.txt' \
+     http://geoweb.princeton.edu/people/simons/SOM/
