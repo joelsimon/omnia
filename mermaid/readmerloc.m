@@ -1,6 +1,8 @@
 function mer = readmerloc(locdir)
 % mer = READMERLOC(locdir)
 %
+% Depreciated -- see `readesoloc`
+%
 % Return structure of Princeton-owned MERMAID locations and their
 % datetimes.
 %
@@ -18,6 +20,8 @@ function mer = readmerloc(locdir)
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 17-Mar-2020, Version 2017b on MACI64
+
+error('Depreciated -- use `readesoloc`')
 
 % Default.
 defval('locdir', fullfile(getenv('MERMAID'), 'locations'));

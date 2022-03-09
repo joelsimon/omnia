@@ -1,6 +1,8 @@
 function fetchmerloc(locdir)
 % FETCHMERLOC(locdir)
 %
+% Depreciated -- use `fetchesoloc`
+%
 % Pull MERMAID surfacing-location data off of EarthScopeOceans.org
 % and save as local textfiles.
 %
@@ -13,6 +15,8 @@ function fetchmerloc(locdir)
 % Author: Dr. Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 28-Aug-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+error('Depreciated -- use `fetchesoloc`')
 
 defval('locdir', fullfile(getenv('MERMAID'), 'locations'));
 
