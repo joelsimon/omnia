@@ -3,8 +3,7 @@ function [req_str, start_date, req_sec, end_date] = reqdateduration(start_date, 
 %
 % Returns partial .cmd request*, the start date and duration only, formatted
 % properly and split into multiple requests if the duration is greater than 1800
-% seconds (the maximum-allowed request duration).  To be safe, returns request
-% lines split into chunks 95% of allowed maximum duration (1710 seconds).
+% seconds (the maximum-allowed request duration).
 %
 % Input:
 % start_date    Datetime of start of request
@@ -44,9 +43,7 @@ end
 req_duration = ceil(seconds(end_date - start_date));
 
 % Manual Réf : 452.000.852 Version 00 states a max duration of 1800 seconds
-% (let's use 95% of that quoted max just to be safe?).
 max_duration = 1800;
-%max_duration = floor(max_duration * 0.95);
 
 % If request less than the maximum duration, return in a single line.
 if req_duration < max_duration
