@@ -38,7 +38,7 @@ addpath(rflexa)
 fs = 1/h.DELTA;
 if isempty(fl)
     % These are very important; must be in pass band?
-    fl = [1/10 1/5 fs/4 fs/2]
+    fl = [1/10 1/5 fs/4 fs/2];
 
 end
 
