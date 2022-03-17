@@ -34,7 +34,10 @@
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 18-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 17-Mar-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+% Open figs in right side of right monitor
+set(0, 'DefaultFigurePosition', [1100   450   560   420])
 
 % For my code, and code my code requires.
 addpath(genpath(getenv('OMNIA')))
