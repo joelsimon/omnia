@@ -1,5 +1,5 @@
-function [c, mc, delay, xat1, xat2, xat1_pt0, xat2_pt0, sx1, sx2, px1, px2] = alignxcorr(x1, x2)
-% [c, mc, delay, xat1, xat2, xat1_pt0, xat2_pt0, sx1, sx2, px1, px2] = ALIGNXCORR(x1, x2)
+function [delay, mc, xat1, xat2, xat1_pt0, xat2_pt0, sx1, sx2, px1, px2, c] = alignxcorr(x1, x2)
+% [delay, mc, xat1, xat2, xat1_pt0, xat2_pt0, sx1, sx2, px1, px2, c] = ALIGNXCORR(x1, x2)
 %
 % Aligns signals common to x1 and x2, reports their delays, returns truncated
 % and equal-length segments aligned on common signal, and reports the normalized
@@ -21,11 +21,9 @@ function [c, mc, delay, xat1, xat2, xat1_pt0, xat2_pt0, sx1, sx2, px1, px2] = al
 % x2        A signal with something in common with x1
 %
 % Output:
-% c        Normalized ('coeff' in xcorr.m) cross correlation of xat1,2
-%              (x1,2 after alignment and truncation)
-% mc       Maximum absolute value normalized [0:1] cross correlation of xat1,2
 % delay    How delayed the signal in x2 is, compared to x1, in samples
 %              (x2 is delayed, "late", w.r.t. x1 if delay is positive)
+% mc       Maximum absolute value normalized [0:1] cross correlation of xat1,2
 % xat1     Aligned and truncated x1 (the correlated signal portion common to x2)
 % xat2     Aligned and truncated x2 (the correlated signal portion common to x1)
 % xat1_pt0 Number of uncorrelated samples removed from start of x1 to make xat1
@@ -36,6 +34,8 @@ function [c, mc, delay, xat1, xat2, xat1_pt0, xat2_pt0, sx1, sx2, px1, px2] = al
 %              from x2 to generate xat2
 % px1      Percentage of samples cut from x1 to generate xat1
 % px2      Percentage of samples cut from x2 to generate xat2
+% c        Normalized ('coeff' in xcorr.m) cross correlation of xat1,2
+%              (x1,2 after alignment and truncation)
 %
 % *`delay` and `sx1\2` are sampling intervals [sec=delay*fs], not [sec=(delay-1)*fs]
 %   (do not remove 1 before multiplying by sampling frequency to convert to time)
@@ -43,7 +43,7 @@ function [c, mc, delay, xat1, xat2, xat1_pt0, xat2_pt0, sx1, sx2, px1, px2] = al
 % Ex1:
 %    x1 = [1 2]
 %    x2 = [0 0 1 2 0 0]
-%    [c, mc, delay, xat1, xat2, xat1_pt0, xat2_pt0, sx1, sx2, px1, px2] = ALIGNXCORR(x1, x2)
+%    [delay, mc, xat1, xat2, xat1_pt0, xat2_pt0, sx1, sx2, px1, px2, c] = ALIGNXCORR(x1, x2)
 %
 % Ex2: (find the signal x2, an ADVANCED (negative delay) pure sine wave, in x1)
 %    % Generate pure sin wave.
@@ -51,7 +51,7 @@ function [c, mc, delay, xat1, xat2, xat1_pt0, xat2_pt0, sx1, sx2, px1, px2] = al
 %    % Delay the signal in x1 by 100 samples, append 100 more, and add noise.
 %    x1 = [zeros(1,100) x1 zeros(1,100)]; x1 = x1 + 0.1*randn(1,length(x1));
 %    % Compute aligned cross correlation.
-%    [c, mc, delay, xat1, xat2, xat1_pt0, xat2_pt0, sx1, sx2, px1, px2] = ALIGNXCORR(x1, x2)
+%    [delay, mc, xat1, xat2, xat1_pt0, xat2_pt0, sx1, sx2, px1, px2, c] = ALIGNXCORR(x1, x2)
 %    % Plot inputs.
 %    xl = [1 300]; yl = [-2 2];
 %    subplot(3,1,1); plot(x1, 'k'); legend('x1'); xlim([1 length(x1)]);
