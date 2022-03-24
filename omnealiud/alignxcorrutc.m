@@ -143,6 +143,7 @@ if plt
     title('Correlated signal, truncated time series xat1 and xat2 ')
     legend('xat1', 'xat2')
     xlabel('UTC time')
+    textpatch(ax1, 'NorthWest', sprintf('Delay: %.2f\nXCorr: %.1f%s', delay, mc*100, '%'))
 
     % Plot xat1 in UTC time, shift xat2 to align/overlay
     shift_daxt2 = datexaxis(length(xat2), delta2, ...
