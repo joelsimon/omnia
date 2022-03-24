@@ -26,8 +26,8 @@ function [c, mc, delay, xat1, xat2, xat1_pt0, xat2_pt0, sx1, sx2, px1, px2] = al
 % mc       Maximum absolute value normalized [0:1] cross correlation of xat1,2
 % delay    How delayed the signal in x2 is, compared to x1, in samples
 %              (x2 is delayed, "late", w.r.t. x1 if delay is positive)
-% xat1     Aligned and truncated x1
-% xat2     Aligned and truncated x2
+% xat1     Aligned and truncated x1 (the correlated signal portion common to x2)
+% xat2     Aligned and truncated x2 (the correlated signal portion common to x1)
 % xat1_pt0 Number of uncorrelated samples removed from start of x1 to make xat1
 % xat2_pt0 Number of uncorrelated samples removed from start of x2 to make xat2
 % sx1*     Total number of samples cut (before and after correlated signal)
