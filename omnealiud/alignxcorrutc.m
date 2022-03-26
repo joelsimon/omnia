@@ -1,6 +1,6 @@
-function [delay, mc, xat1, xat2, daxt1, daxt2, dax1, dax2] = ...
+function [delay, mc, xat1, xat2, daxt1, daxt2, dax1, dax2, xat1_pt0, xat2_pt0, F] = ...
     alignxcorrutc(x1, start1, delta1, x2, start2, delta2, plt)
-% [delay, mc, xat1, xat2, daxt1, daxt2, dax1, dax2] = ...
+% [delay, mc, xat1, xat2, daxt1, daxt2, dax1, dax2, xat1_pt0, xat2_pt0, F] = ...
 %        alignxcorrutc(x1, start1, delta1, x2, start2, delta2, plt)
 %
 % Report signal cross correlation and delay in UTC time.
@@ -27,6 +27,9 @@ function [delay, mc, xat1, xat2, daxt1, daxt2, dax1, dax2] = ...
 % daxt2    UTC datetime axis corresponding to xat2
 % dax1     UTC datetime axis corresponding to x1
 % dax2     UTC datetime axis corresponding to x2
+% xat1_pt0 Number of uncorrelated samples removed from start of x1 to make xat1
+% xat2_pt0 Number of uncorrelated samples removed from start of x2 to make xat2
+% F        Figure handles, if plotted (def: [])
 %
 % Ex:
 %    s1 = '20220115T041444.0045_620D861C.MER.REQ.RAW.sac';
@@ -44,15 +47,17 @@ function [delay, mc, xat1, xat2, daxt1, daxt2, dax1, dax2] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 24-Mar-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 25-Mar-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+defval('F', [])
 
 % Sanity.
 if ~strcmp(start1.TimeZone, 'UTC')
-    start1.TimeZone = 'UTC'
+    start1.TimeZone = 'UTC';
 
 end
 if ~strcmp(start2.TimeZone, 'UTC')
-    start2.TimeZone = 'UTC'
+    start2.TimeZone = 'UTC';
 
 end
 
@@ -98,74 +103,75 @@ dax2 = datexaxis(length(x2), delta2, start2);
 daxt1 = datexaxis(length(xat1), delta1, start1+seconds(xat1_pt0*delta1));
 daxt2 = datexaxis(length(xat2), delta2, start2+seconds(xat2_pt0*delta2));
 
-plt = true
 if plt
     %% From `alignxcorr`, to align: add delay to x1 -or- subtract delay from x2
 
-    figure
-    ax1 = subplot(3,1,1);
+    F(1).f = figure;
+    set(gcf, 'Position', [961 529 960 448])
+    F(1).ax1 = subplot(3,1,1);
     plot(dax1, x1, 'r'); hold on
-    plot(dax2, x2, 'k');
+    plot(dax2, x2, 'k')
     %title(sprintf('Full time series, x1 (%s) and x2 (%s)', h1.KSTNM, h2.KSTNM))
     title('Full time series, x1 and x2')
     legend('x1', 'x2')
     xlabel('UTC time')
-    xl = ax1.XLim;
+    xl = F(1).ax1.XLim;
 
     % Plot x1 in UTC time, shift x2 to align/overlay
     shift_dax2 = datexaxis(length(x2), delta2, start2-seconds(delay));
-    ax2 = subplot(3,1,2);
+    F(1).ax2 = subplot(3,1,2);
     title('x1 in UTC time; x2 shifted to align')
     plot(dax1, x1, 'r'); hold on
-    plot(shift_dax2, x2, 'k');
+    plot(shift_dax2, x2, 'k')
     legend('x1', 'x2 (aligned by removing delay)')
-    xlabel('UTC time of x1 (invalid timing for x2, which has been shifted)');
-    xl = [xl ax2.XLim];
+    xlabel('UTC time of x1 (invalid timing for x2, which has been shifted)')
+    xl = [xl F(1).ax2.XLim];
 
     % Plot x2 in UTC time, shift x1 to align/overlay
     shift_dax1 = datexaxis(length(x1), delta1, start1+seconds(delay));
-    ax3 = subplot(3,1,3);
+    F(1).ax3 = subplot(3,1,3);
     title('x2 in UTC time; x2 shifted to align')
     plot(shift_dax1, x1, 'r'); hold on
-    plot(dax2, x2, 'k');
-    legend('x1 (aligned by adding delay)', 'x2');
-    xlabel('UTC time of x2 (invalid timing for x1, which has been shifted)');
+    plot(dax2, x2, 'k')
+    legend('x1 (aligned by adding delay)', 'x2')
+    xlabel('UTC time of x2 (invalid timing for x1, which has been shifted)')
+    xl = [xl F(1).ax3.XLim];
 
-    xl = [xl ax3.XLim];
-    set([ax1 ax2 ax3], 'XLim', [min(xl) max(xl)])
+    set([F(1).ax1 F(1).ax2 F(1).ax3], 'XLim', [min(xl) max(xl)])
     latimes
 
-    figure
-    ax1 = subplot(3,1,1);
+    F(2).f = figure;
+    set(gcf, 'Position', [961 4 960 448])
+    F(2).ax1 = subplot(3,1,1);
     plot(daxt1, xat1, 'r'); hold on
-    plot(daxt2, xat2, 'k');
+    plot(daxt2, xat2, 'k')
     %title(sprintf('Truncated time series, xat1 (%s) and xat2 (%s)', h1.KSTNM, h2.KSTNM))
     title('Correlated signal, truncated time series xat1 and xat2 ')
     legend('xat1', 'xat2')
     xlabel('UTC time')
-    textpatch(ax1, 'NorthWest', sprintf('Delay: %.2f\nXCorr: %.1f%s', delay, mc*100, '%'))
+    textpatch(F(1).ax1, 'NorthWest', sprintf('Delay: %.2f\nXCorr: %.1f%s', delay, mc*100, '%'));
 
     % Plot xat1 in UTC time, shift xat2 to align/overlay
     shift_daxt2 = datexaxis(length(xat2), delta2, ...
                             start2-seconds(delay)+seconds(xat2_pt0*delta2));
-    ax2 = subplot(3,1,2);
+    F(2).ax2 = subplot(3,1,2);
     title('xat1 in UTC time; xat2 shifted to align')
     plot(daxt1, xat1, 'r'); hold on
-    plot(shift_daxt2, xat2, 'k');
-    legend('xat1', 'xat2 (aligned by removing delay and ...')
+    plot(shift_daxt2, xat2, 'k')
+    legend('xat1', 'xat2 (aligned by removing delay and ...)')
     xlabel('UTC time of xat1 (invalid timing for xat2, which has been shifted)');
 
     % Plot xat2 in UTC time, shift xat1 to align/overlay
     shift_daxt1 = datexaxis(length(xat1), delta1, ...
                             start1+seconds(delay)+seconds(xat1_pt0*delta1));
-    ax3 = subplot(3,1,3);
+    F(2).ax3 = subplot(3,1,3);
     title('xat2 in UTC time; xat2 shifted to align')
     plot(shift_daxt1, xat1, 'r'); hold on
-    plot(daxt2, xat2, 'k');
-    legend('xat1 (aligned by adding delay and ...)', 'xat2');
-    xlabel('UTC time of xat2 (invalid timing for xat1, which has been shifted)');
+    plot(daxt2, xat2, 'k')
+    legend('xat1 (aligned by adding delay and ...)', 'xat2')
+    xlabel('UTC time of xat2 (invalid timing for xat1, which has been shifted)')
 
-    set([ax1 ax2 ax3], 'XLim', [min(xl) max(xl)])
+    set([F(2).ax1 F(2).ax2 F(2).ax3], 'XLim', F(1).ax1.XLim)
     latimes
 
 end
