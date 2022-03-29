@@ -18,17 +18,38 @@ function fs = efes(h, rd)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 21-Mar-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 28-Mar-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Find nominal sampling frequency.
 defval('rd', true)
-if any([h.NPTS h.E h.B] == -12345)
-    fs = 1 / h.DELTA;
+
+% Pull SAC-derived sampling interval ("DELTA) exists; otherwise compute
+if isfield(h, 'NPTS')
+    if any([h.NPTS h.E h.B] == -12345)
+        fs = 1 / h.DELTA;
+
+    else
+        fs = h.NPTS / (h.E - h.B);
+
+    end
+elseif isfield(h, 'npts')
+    % Yuck (but this this faster than, e.g., a `structfun` rename...)
+    if any([h.npts h.e h.b] == -12345)
+        fs = 1 / h.delta;
+
+    else
+        fs = h.npts / (h.e - h.b);
+
+    end
+    warning(sprintf(['Why are you using nonstandard (lowercase) SAC header fields?\n' ...
+                     'http://www.adc1.iris.edu/files/sac-manual/manual/file_format.html']))
 
 else
-    fs = h.NPTS / (h.E - h.B);
+    error('input does not appear to be SAC header')
 
 end
+
+% Round it, maybe
 if rd
     fs = round(fs);
 
