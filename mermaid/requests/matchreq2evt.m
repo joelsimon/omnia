@@ -28,7 +28,7 @@ function [EQ, evtfile] = matchreq2evt(sacfile, eventid, model, phases, eventdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 20-Jan-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 01-Apr-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% Recursive
 
@@ -75,7 +75,8 @@ else
 end
 
 % Save EQ struct in .evt file.
-evtfile = strrep(strippath(sacfile), '.sac', '.evt');
+[~, sans_sac] = fileparts(strtrim(sacfile));
+evtfile = [sans_sac '.evt'];
 evtfile = fullfile(eventdir, 'reviewed', status, 'evt', evtfile);
 save(evtfile, 'EQ', '-mat')
 
