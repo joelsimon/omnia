@@ -1,5 +1,5 @@
-function [F, sac, EQ] = plotevt(sac, lohi, sacdir, evtdir)
-% [F, sac, EQ] = PLOTEVT(sac, lohi, sacdir, evtdir)
+function [F, sac, EQ] = plotevt(sac, lohi, sacdir, evtdir, taper)
+% [F, sac, EQ] = PLOTEVT(sac, lohi, sacdir, evtdir, taper)
 %
 % Plot .sac waveform file and annotate with associated .evt phase arrivals.
 %
@@ -10,6 +10,8 @@ function [F, sac, EQ] = plotevt(sac, lohi, sacdir, evtdir)
 %             (def: $MERMAID/processed/)
 % evtdir  Directory containing 'raw/' and 'reviewed' subdirectories
 %             (def: $MERMAID/events/)
+% taper   true to taper waveform (def: true)
+%
 % Output:
 % F       Struct holding various figure/axis handles
 % sac     Fullfile .sac name
@@ -17,11 +19,12 @@ function [F, sac, EQ] = plotevt(sac, lohi, sacdir, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 10-Feb-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 31-Mar-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('lohi', [1 5])
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
+defval('taper', true)
 
 sac = fullsac(sac, sacdir);
 [x, h] = readsac(sac);
@@ -49,7 +52,10 @@ dax = datexaxis(h.NPTS, h.DELTA, starttime);
 
 x = detrend(x, 'constant');
 x = detrend(x, 'linear');
-x = x.*tukeywin(length(x));
+if taper
+    x = x.*tukeywin(length(x));
+
+end
 xf = bandpass(x, efes(h), lohi(1), lohi(2));
 xf(1:10) = NaN; % cut remaining edge effects
 xf(end-10:end) = NaN;
