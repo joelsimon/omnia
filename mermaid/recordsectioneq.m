@@ -227,7 +227,7 @@ else
         if ~isempty(tt(i).time)
             F.ph(i) = plot(F.ax, tt(i).time, tt(i).distance, 'LineWidth', ...
                        1, 'LineStyle', '-');
-            phases_plotted = [phases_plotted tt(i).phaseName];
+            phases_plotted = [phases_plotted strrep(tt(i).phaseName, 'kmps', ' km/s')];
 
         else
             warning('Requested phase ''%s'' not plotted (empty taupCurve)\n', tt(i).phaseName)
