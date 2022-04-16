@@ -1,5 +1,5 @@
-function [x, h, xraw] = mermaidtransfer(s, fl, sacpz, rflexa)
-% [x, h, xraw] = MERMAIDTRANSFER(s, fl, sacpz, rflexa)
+function [x, h, xraw] = mermaidtransfer(s, fl, sacpz, rflexa, taper)
+% [x, h, xraw] = MERMAIDTRANSFER(s, fl, sacpz, rflexa, taper)
 %
 % Remove MERMAID instrument response.
 %
@@ -13,6 +13,8 @@ function [x, h, xraw] = mermaidtransfer(s, fl, sacpz, rflexa)
 % sacpz     SACPZ filename (def: $MERMAID/response/MH.pz)
 % rflexa    Local path to Alex Burky's cloned rflexa repository
 %               (def: $RFLEXA; from https://github.com/alexburky/rflexa/)
+% taper     true to Tukey taper before removing the response (def: true)
+%
 % Output:
 % x         SAC trace data with instrument response removed
 % h         SAC header
@@ -27,6 +29,7 @@ function [x, h, xraw] = mermaidtransfer(s, fl, sacpz, rflexa)
 defval('fl', []) % defaulted later based on sampling freq
 defval('sacpz', fullfile(getenv('MERMAID'), 'response', 'MH.pz'))
 defval('rflexa', fullfile(getenv('RFLEXA'), 'transfer', 'matlab'))
+defval('taper', true)
 
 %% <Temporary solution until I decide how to integrate Alex Burky's code
 addpath(rflexa)
@@ -45,7 +48,10 @@ end
 % Precondition data for instrument response removal.
 x = detrend(xraw, 'constant');
 x = detrend(x, 'linear');
-x = x .* tukeywin(length(x), 0.1);
+if taper
+    x = x .* tukeywin(length(x), 0.1);
+
+end
 
 % Actually remove the instrument response (SAC-software equivalent `transfer`)
 x = transfer(x, h.DELTA, fl, 'mermaid', sacpz, 'sacpz');
