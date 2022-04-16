@@ -1,5 +1,5 @@
 function fname = globglob(varargin)
-% fname = GLOBGLOB(patter1, pattern, ..., patternN)
+% fname = GLOBGLOB(pattern1, pattern, ..., patternN)
 %
 % Return matched filename pattern, like Python's `glob.glob`
 % Beware of odd wildcard expansion, which may differ between systems.
