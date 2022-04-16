@@ -4,18 +4,19 @@ function ser = getmerser(sacfile)
 % Return MERMAID serial number given a SAC filename.
 %
 % Input:
-% sacfile     SAC filename following automaid v3.4+ convention
+% sacfile     SAC filename(s) following automaid v3.4+ convention
+%                 (accepts cells)
 %
 % Output:
-% ser        Two-digit MERMAID serial number
+% ser        Two- to four-digit MERMAID serial number(s)
 %
 % Ex:
-%    sacfile = '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac'
-%    ser = GETMERSER(sacfile)
+%    GETMERSER({'20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac', ...
+%               '20220115T043452.0026_623BE70D.MER.REQ.WLT5.sac'})
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 06-Dec-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 13-Apr-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% Recursive.
 
