@@ -11,7 +11,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 11-Dec-2020, Darwin Kernel Version 18.7.0
+# Last modified: 28-Apr-2022, Darwin Kernel Version 18.7.0
 
 # Print help with '-h' or '--help'.
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -79,6 +79,9 @@ print '\nGenerating preliminary match to global seismic catalogs...\n'
 /Applications/MATLAB_R2017b.app/bin/matlab -r \
    "run matchall.m; run lastdive.m; run exit" >& /dev/null
 print '\n..done with preliminary match to the seismic catalogs\n'
+
+# Write "acq started", "acq stopped" logs
+$OMNIA/mermaid/write_processed_acq_log
 
 # Print the last surfacing of each float.
 print '\nHere are the dates each float last surfaced:\n'
