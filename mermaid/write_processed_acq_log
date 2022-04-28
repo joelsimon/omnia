@@ -13,9 +13,15 @@ for mer_dir in $( ls -1d $proc_dir/*/ ); do
     # Grep "acq" line
     acq=$( grep --no-filename "acq" $mer_dir/**/*.LOG.h )
 
-    # Remove [MRMAID,557] and [MRMAID,594]
+    # Define and unlock log file
     log=$mer_dir/acq_log.txt
-    echo $acq | sed 's/:.*\[MRMAID,.*\]/ /g' > $log
+    chmod +w $log
+
+    # Remove [MRMAID,557] and [MRMAID,594]
+    echo $acq | sed 's/:\[MRMAID,.*\]/ /g' > $log
+
+    # Lock print log filename
+    chmod -w $log
     printf "Wrote %s\n" $log
 
 done
