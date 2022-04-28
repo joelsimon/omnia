@@ -4,10 +4,10 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 04-Feb-2022, Darwin Kernel Version 18.7.0
+# Last modified: 28-Apr-2022, Darwin Kernel Version 18.7.0
 
 # Loop over all MERMAID subdirectories
-# NB, the final forward slash ("/") is muy importante here
+# NB, the final forward slash ("/") is required here
 proc_dir=$MERMAID/processed/
 for mer_dir in $( ls -1d $proc_dir/*/ ); do
     # Grep "acq" line
@@ -15,7 +15,7 @@ for mer_dir in $( ls -1d $proc_dir/*/ ); do
 
     # Remove [MRMAID,557] and [MRMAID,594]
     log=$mer_dir/acq_log.txt
-    echo $line | sed 's/:.*\[MRMAID,.*\]/ /g' > $log
+    echo $acq | sed 's/:.*\[MRMAID,.*\]/ /g' > $log
     printf "Wrote %s\n" $log
 
 done
