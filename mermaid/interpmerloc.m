@@ -4,11 +4,12 @@ function [ilat, ilon, warn, warn_str] = interpmerloc(mer_struct, ilocdate, plt)
 % Interpolate MERMAID position at requested time.
 %
 % Inputs:
-% mer_struct    Individual-float substruct from readgps
+% mer_struct    Individual-float substruct from `readgps` or `readesoloc`
 %                   (i.e., gps = readgps; mer_struct = gps.P0008)
 % ilocdate      Datetime of requested location interpolation
 % plt           true to generate an ugly plot to verify interpolation
-%                   seems reasonable (def: false)
+%                   seems reasonable [only works with `readgps` output]
+%                   (def: false)
 %
 % Outputs:
 % ilat/lon      Interpolated latitude/longitude at requested `ilocdate`
@@ -18,7 +19,7 @@ function [ilat, ilon, warn, warn_str] = interpmerloc(mer_struct, ilocdate, plt)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 25-Jan-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 29-Apr-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default input.
 defval('plt', false)
