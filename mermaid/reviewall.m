@@ -16,11 +16,13 @@ function reviewall(writecp, floatnum)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 08-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 07-Jun-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('writecp', false)
 defval('floatnum', [])
+
+skip_french = true;
 
 % Switch the .pdf viewer depending on the platform.
 switch computer
@@ -44,17 +46,21 @@ sac = fullsac([], fullfile(getenv('MERMAID'), 'processed'));
 [~, idx] = setdiff(strippath(sac), evt);
 sac = sac(idx);
 
+% Skip French floats, maybe.
+if skip_french
+    rm_idx = find(contains(sac, {'452.020-P-06' '452.020-P-07'}));
+    sac(rm_idx) = [];
+
+end
+
 % Loop over in sequential (time) order.
 fail = [];
 [~, sort_idx] = sort(strippath(sac));
 sac = sac(sort_idx);
-for i = 1:length(sac)
-    % Skip the French floats.
-    if contains(sac{i}, '452.020-P-06') || contains(sac{i}, '452.020-P-07')
-        continue
-
-    end
-
+num_sac = length(sac);
+num_rev = num_sac;
+for i = 1:num_sac
+    fprintf('Remaining SAC to be reviewed: %3i\n', num_rev)
     try
         reviewevt(sac{i}, [], [], viewr);
 
@@ -62,6 +68,7 @@ for i = 1:length(sac)
         fail = [fail; i];
 
     end
+    num_rev = num_rev - 1;
     clc
 
 end
