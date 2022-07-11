@@ -1,0 +1,16 @@
+#! /bin/zsh
+#
+# Print last three dive-folder names.
+# Look for "*Init", "*NoDive", or "*IcDive" as error indicators.
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 27-Apr-2022, Darwin Kernel Version 18.7.0
+
+for d in $( ls -1d $MERMAID/processed/*/ ) ; do
+
+    printf "%s\n" $( basename $d )
+    printf "%s\n" $( basename $( ls -1d $d/*/  | tail -3 ))
+    printf "\n"
+
+done
