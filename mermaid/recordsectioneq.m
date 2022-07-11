@@ -141,8 +141,8 @@ for i = 1:length(sac)
                         'butter');
 
         % % Despite preconditioning, filtering can still introduce edge
-        % % artifacts. Remove 1% from each end of trace.
-        % len_cut = 0.01 * length(x{i});
+        % % artifacts. Remove percentage from each end of trace.
+        % len_cut = round(0.01 * length(x{i}));
         % x{i}(1:len_cut) = NaN;
         % x{i}(end-len_cut:end) = NaN;
 
