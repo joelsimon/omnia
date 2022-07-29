@@ -4,7 +4,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 28-Apr-2022, Darwin Kernel Version 18.7.0
+# Last modified: 29-Jul-2022, Darwin Kernel Version 18.7.0
 
 # Loop over all MERMAID subdirectories
 # NB, the final forward slash ("/") is required here
@@ -15,8 +15,11 @@ for mer_dir in $( ls -1d $proc_dir/*/ ); do
 
     # Define and unlock log file
     log=$mer_dir/acq_log.txt
-    chmod +w $log
+    if [[ -f $log ]]; then
+	chmod +w $log
 
+    fi 
+    
     # Remove [MRMAID,557] and [MRMAID,594]
     echo $acq | sed 's/:\[MRMAID,.*\]/ /g' > $log
 
