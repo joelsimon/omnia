@@ -16,14 +16,11 @@ function loc = readloc(processed)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 21-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 02-Aug-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default path.
 merpath = getenv('MERMAID');
 defval('processed', fullfile(merpath, 'processed'))
-
-% loc.txt format.
-fmt = '%40s    %10.6f    %11.6f    %6f\n';
 
 % Loop over every subdir in processed/ and read individual MERMAID's gps files.
 d = skipdotdir(dir(processed));
@@ -32,7 +29,8 @@ for i = 1:length(d)
         % Read gps.txt file within individual float directory
         file = fullfile(d(i).folder, d(i).name, 'loc.txt');
         fid = fopen(file, 'r');
-        C  = textscan(fid, fmt, 'HeaderLines', 3);
+        C  = textscan(fid, '%s%.6f%.6f%d\n', 'HeaderLines', 3, 'Delimiter', ' ', ...
+                      'MultipleDelimsAsOne', true);
         fclose(fid);
 
         % Dynamically name gps.(field) for individual MERMAIDs
