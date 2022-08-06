@@ -31,7 +31,7 @@ function [req_str, start_date, req_sec, end_date] = reqdateduration(start_date, 
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 25-Jan-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 05-Aug-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Sanity.
 if ~isdatetime(start_date) || ~isdatetime(end_date)
@@ -45,8 +45,12 @@ req_duration = ceil(seconds(end_date - start_date));
 % Manual Réf : 452.000.852 Version 00 states a max duration of 1800 seconds
 max_duration = 1800;
 
+% Build in some overlap between mutli-line (split) requests.
+% In my experience split (but continuous) requests are returned gappy.
+olap_sec = 5;
+
 % If request less than the maximum duration, return in a single line.
-if req_duration < max_duration
+if req_duration <= max_duration
     req_sec = ceil(seconds(end_date - start_date));
     req_str = {sprintf('%s,%i', reqdate(start_date), req_sec)};
 
@@ -66,6 +70,7 @@ else
     if num_max_lines >= 2
         for i = 2:num_max_lines
             line_start(i) = line_end(i-1);
+            line_start(i) = line_start(i) - seconds(olap_sec); % overlap
             req_sec(i) = max_duration;
             req_str{i} = sprintf('%s,%i', reqdate(line_start(i)), req_sec(i));
             line_end(i) = line_start(i) + seconds(req_sec(i));
@@ -77,6 +82,7 @@ else
     % the request may be an integer multiple of maximum-allowed time) after
     % requesting maximum-duration chunks.
     line_start(i+1) = line_end(i);
+    line_start(i+1) = line_start(i+1) - seconds(olap_sec);  % overlap
     req_sec(i+1) = ceil(seconds(end_date - line_start(i+1)));
     if req_sec > 0
         req_str{i+1} = sprintf('%s,%i', reqdate(line_start(i+1)), req_sec(i+1));
