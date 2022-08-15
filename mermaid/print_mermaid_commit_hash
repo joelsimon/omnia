@@ -1,0 +1,26 @@
+#! /bin/zsh
+# USAGE: print_mermaid_commit_hash
+#
+# Formatted print of most recent server, automaid, and omnia commits, for use
+# in Emacs "C-u M! print_mermaid_commit_hash" when committing $MERMAID/processed.
+#
+# Example output:
+#   server: 6721b897959471b6a55f0a110557949934ce16ba
+# automaid: decda38daa8d667a8dea1434fa64d5b3592caa30
+#    omnia: 02fe1aa1a9ec686443206a2f210b7e25fddb7bea
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 15-Aug-2022, Darwin Kernel Version 18.7.0
+
+cd $MERMAID/server/ >& /dev/null
+hash=$( git log -1  | grep commit | cut -d " " -f2 )
+printf "  server: %s\n" $hash
+
+cd $MERMAID/automaid/ >& /dev/null
+hash=$( git log -1  | grep commit | cut -d " " -f2 )
+printf "automaid: %s\n" $hash
+
+cd $OMNIA/ >& /dev/null
+hash=$( git log -1  | grep commit | cut -d " " -f2 )
+printf "   omnia: %s\n" $hash
