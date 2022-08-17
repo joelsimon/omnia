@@ -1,6 +1,6 @@
 #! /bin/zsh
 #
-# Generate acqusition "started" and "stopped" logs in $MEMAID/processed.
+# Generate acquisition "started" and "stopped" logs in $MERMAID/processed.
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
@@ -10,21 +10,19 @@
 # NB, the final forward slash ("/") is required here
 proc_dir=$MERMAID/processed/
 for mer_dir in $( ls -1d $proc_dir/*/ ); do
-    # Grep "acq" line
-    acq=$( grep --no-filename "acq" $mer_dir/**/*.LOG.h )
 
     # Define and unlock log file
-    log=$mer_dir/acq_log.txt
-    if [[ -f $log ]]; then
-	chmod +w $log
+    acq_log=$mer_dir/acq_log.txt
+    if [[ -f $acq_log ]]; then
+	chmod +w $acq_log
 
     fi
 
-    # Remove "[MRMAID,557]", "[MRMAID,594]", "already", and "acq"
-    echo $acq | sed 's/:\[MRMAID,.*\]/ /g' | sed 's/already//g' | sed 's/acq //g' >! $log
+    # Grep all "acq" lines from the LOG files
+    grep --no-filename "acq" $mer_dir/**/*.LOG.h >! $acq_log
 
-    # Lock print log filename
-    chmod -w $log
-    printf "Wrote %s\n" $log
+    # Lock and print log filename
+    chmod -w $acq_log
+    printf "Wrote %s\n" $acq_log
 
 done
