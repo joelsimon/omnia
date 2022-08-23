@@ -47,12 +47,12 @@ cd $MERMAID
 
 # Pull most recent data.
 print 'Copying server...\n'
-$OMNIA/mermaid/servercopy >& server_out
+$OMNIA/mermaid/servercopy #>& server_out
 print '\n...completed server copy\n'
 
-# Exit if no new data.
-#nosac=$(grep 'nothing to commit' server_out | wc -l)
-rm -f server_out
+# # Exit if no new data.
+# nosac=$(grep 'nothing to commit' server_out | wc -l)
+# rm -f server_out
 # if [ $nosac -eq 1 ]; then
 #     print '\nNo new files. Exiting MERMAIDfetch.'
 #     exit;
