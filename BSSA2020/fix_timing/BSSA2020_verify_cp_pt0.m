@@ -11,7 +11,6 @@ function BSSA2020_verify_cp_pt0
 defval('sac_diro', getenv('MERAZUR'));
 defval('rematch_diro', fullfile(getenv('MERAZUR'), 'rematch'));
 defval('evt_diro', fullfile(rematch_diro))
-defval('cp_diro', fullfile(rematch_diro, 'changepoints'))
 
 s = mermaid_sacf('id', sac_diro);
 
@@ -21,7 +20,7 @@ for i = 1:length(s)
 
     EQ = getevt(s{i}, evt_diro);
     CP = getcp(s{i}, evt_diro);
-
+    
     if all(h.B ~= [EQ.TaupTimes.pt0])
         error()
 
