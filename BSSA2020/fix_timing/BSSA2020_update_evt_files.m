@@ -1,6 +1,8 @@
 function BSSA2020_update_evt_files
 % BSSA2020_update_evt_files
 %
+% !! DOES NOT UPDATE raw/*.evt !!
+%
 % Single-use script to update timing of reviewed GeoAzur EQ structures, after it
 % was discovered they were written using the incorrect seistime.m (pre-v1.0.0),
 % which improperly formatted the header NZMSEC.
