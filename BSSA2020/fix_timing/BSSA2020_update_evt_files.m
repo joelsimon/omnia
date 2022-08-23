@@ -1,5 +1,5 @@
-function geoazur_updatetauptimes
-% GEOAZUR_UPDATETAUPTIMES
+function BSSA2020_update_evt_files
+% BSSA2020_update_evt_files
 %
 % Single-use script to update timing of reviewed GeoAzur EQ structures, after it
 % was discovered they were written using the incorrect seistime.m (pre-v1.0.0),
@@ -35,7 +35,9 @@ for i = 1:length(s)
     [~, h] = readsac(sac_file);
 
     if isupdated
-        if h.NZMSEC < 100
+        if h.NZMSEC < 100 && h.NZMSEC ~= 0
+            % Should update for NZMSEC <= 99 (length 2 number improperly formatted for
+            % length 3 str), except for h.NZMSEC = 0, whose formatting is irrelevant
             fprintf(fid_time, sac_str)
 
         elseif isequal(rmfield(new_EQ.TaupTimes, 'pressure'), rmfield(old_EQ.TaupTimes, 'pressure'))
@@ -66,7 +68,7 @@ for i = 1:length(s)
 
         end
     else
-        if h.NZMSEC < 100
+        if h.NZMSEC < 100 && h.NZMSEC ~= 0
             error(fprintf('%s should have updated\n', sac_str))
 
         end
