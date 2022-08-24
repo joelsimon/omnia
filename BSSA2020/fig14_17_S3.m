@@ -5,6 +5,16 @@
 % plotchangepoint.m (a local version) with travel-time-residual
 % annotations and some formatting.
 %
+% !! None of the five SAC files shown in these examples !!
+% !!  had their timing altered  with the h.NZMSEC fix   !!
+%
+% The 2*SD uncertainty estimates of the time-scale examples, if remade here with
+% `makenew = true` can obviously vary (loaded from ./Static/), as could the
+% time-domain cases (loaded from $MERAZUR/rematch) if they were remade there.
+% The relevant piece that would vary due to an h.NZMSEC fix would be the tres.
+%
+% 23-Aug-2022: I verified all tres the same as in published paper.
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
 % Last modified: 08-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
