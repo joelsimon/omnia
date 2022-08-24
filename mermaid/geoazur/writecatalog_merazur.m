@@ -12,6 +12,9 @@
 %
 % Finally, run this script to produce output catalog.
 %
+% NB; I later realized with this formatspec that things like "-0.00" were
+% printing; after the fact I replaced that with " 0.00" using `sed`.
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu
 % Last modified: 27-Mar-2019, Version 2017b
@@ -19,7 +22,7 @@
 clear
 close all
 
-% Load data. 
+% Load data.
 base_diro = getenv('MERAZUR');
 rematch_diro = fullfile(getenv('MERAZUR'), 'rematch');
 
@@ -29,7 +32,7 @@ for i = 1:length(s)
     [~, h{i}] = readsac(s{i});
     [seis_date{i}, ~, seis_datenum, ~, original_evtdate{i}] = seistime(h{i});
     first_sample(i) = seis_datenum.B;
-    
+
 end
 [first_sample, idx] = sort(first_sample);
 s = s(idx);
@@ -47,7 +50,7 @@ end
 base_diro = getenv('MERAZUR');
 rematch_diro = fullfile(getenv('MERAZUR'), 'rematch');
 filename = fullfile(rematch_diro, 'catalog.txt');
-    
+
 % Grant write access to file, if write-protected.
 if exist(filename, 'file') == 2
     fileattrib(filename, '+w')
@@ -84,7 +87,7 @@ function eb = eventblock_local(sac)
 % For tres.m; we only consider a single event associated with every
 % SAC file (I've manually verified only a single match per).
 multi = false;
- 
+
 % GeoAzur-specific paths.
 base_diro = getenv('MERAZUR');
 rematch_diro = fullfile(getenv('MERAZUR'), 'rematch');
@@ -104,7 +107,7 @@ last_queried_line = sprintf('Last updated %10s\n\n', strrep(EQ(1).QueryTime(1:10
 event_block = sprintf([event_line id_line last_queried_line]);
 
 %______________________________________________________%
-%% Date, location, depth, distance, and magnitude block. 
+%% Date, location, depth, distance, and magnitude block.
 
 date_header_line = '   Date       Time     Latitude Longitude  Depth Distance Magnitude\n';
 date_header_line = ['         ' date_header_line];
@@ -164,10 +167,10 @@ phase_info_line = sprintf('JDS multiscale phase picks: %1i scales at %i Hz\n', .
 phase_header_line = 'Phase  Time    Tres     SNR       Mu  2Sigma\n';
 
 phase_fmt = ['%5s '...
-             '%6.2f ' ... 
-             '%7.2f ' ... 
+             '%6.2f ' ...
+             '%7.2f ' ...
              '%9.3E ' ...
-             '%6.2f ' ... 
+             '%6.2f ' ...
              '%6.2f\n'];
 
 for j = 1:length(CP.arsecs)
