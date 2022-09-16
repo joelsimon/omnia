@@ -21,8 +21,8 @@ function [revEQ, rev_evt] = getrevevt(sac, evtdir)
 % See also: getevt.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 21-Apr-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 09-Sep-2022, Version 9.3.0.713579 (R2017b) on GLNXA64
 
 %% Recursive.
 
@@ -45,7 +45,7 @@ end
 % Use dir.m recursive search to look through 'identified/', 'unidentified/, and
 % 'purgatory/' subdirectories in 'reviewed'.
 sac_name = strippath(sac);
-evt_name = strrep(lower(sac_name), '.sac', '.evt');
+evt_name = [sac_name(1:end-4) '.evt'];
 
 rev_dir = dir(fullfile(evtdir, 'reviewed', '**/*', evt_name));
 if isempty(rev_dir)
