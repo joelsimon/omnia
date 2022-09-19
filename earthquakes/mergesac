@@ -2,6 +2,8 @@
 #
 # $ mergesac {SAC directory} {file glob} {merge filename}
 #
+# NEW USERS MAY BE REQUIRED TO MODIFY PATH VARIABLE TO EXECUTABLE BINARY: `sac`
+#
 # Merges an input list of SAC files into a single SAC file using the
 # 'gap zero' and 'overlap average' strategies via the SAC command:
 # 'merge'.
@@ -17,8 +19,11 @@
 #    mergesac $EXAMPLES/mergesac/ "IU.RAO.00.BHZ.*" IU.RAO.00.BHZ.merge.sac
 #
 # Author: Joel D. Simon
-# Contact: jdsimon@princeton.edu
-# Last modified: 04-Feb-2019
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 19-Sep-2022, Darwin Kernel Version 18.7.0
+
+# Define path to binary
+sac=/usr/local/sac/bin/sac
 
 # Collect input variables.
 sacdir=$1
@@ -28,14 +33,6 @@ outfname=$3
 # Note starting directory and move to relevant directory.
 startdir=`pwd`
 cd $sacdir
-
-# First verify SAC is installed and in $PATH.
-which sac >& /dev/null
-if [ $? != 0 ]; then
-    printf "\nError: cannot locate SAC program.\nVerify it is installed and in \$PATH.\n"
-    exit 1
-
-fi
 
 # Next ensure there are actually files to merge...
 ls $filelist >& /dev/null
@@ -56,9 +53,13 @@ if [ $numfiles == 1 ]; then
 fi
 
 # Merge input file list and write output SAC file.*
-sac << !
+# I do not know why I have to toggle LOVROK to TRUE when I'm writing a new
+# .merged.sac file (I'm not overwriting the consitutuant files)...only ran into
+# this SAC error 1303 when running on Mac.
+eval $sac << !
 read "$filelist"
 merge verbose gap zero overlap average
+chnhdr LOVROK TRUE
 write $outfname
 quit
 !

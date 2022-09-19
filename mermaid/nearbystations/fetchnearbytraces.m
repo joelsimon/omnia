@@ -1,10 +1,13 @@
-function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, model, ph)
-% [tr, merged] = FETCHNEARBYTRACES(id, redo, txtfile, evtdir, sacdir, model, ph)
+function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, model, ph, startend)
+% [tr, merged] = FETCHNEARBYTRACES(id, redo, txtfile, evtdir, sacdir, model, ph, startend)
 %
-% Fetches hour long traces from 'nearby stations' that begin five
+% Fetches hour long* traces from 'nearby stations' that begin five
 % minutes before the theoretical first-arriving phase of the
 % corresponding to event ID and saves the returned SAC files to
 % [sacdir]/[id]/*.SAC.
+%
+% *Unless, `startend` is given as 1x2 datetime array, at which point traces
+% are requested within that timewindow.
 %
 % If the traces are split (and thus saved as separate SAC files) due
 % to missing data they are merged into a single SAC file using
@@ -28,6 +31,10 @@ function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, mod
 %               (def: $MERMAID/events/nearbystations/sac/)
 % model     Taup model (def: 'ak135')
 % ph        Taup phases (def: defphases)
+% startend  Optional 1x2 datetime array to override default request time
+%               based on theoretical phase arrivals and instead request
+%               [starttime endtime] time window
+%               (leave empty or default before; def: [])
 %
 % Output: (both empty in case of redo = false and refetch not required)
 % tr        Cell of trace(s) returned by irisFetch.Traces,
@@ -42,8 +49,8 @@ function [tr, merged] = fetchnearbytraces(id, redo, txtfile, evtdir, sacdir, mod
 % See also: evt2txt.m, readidentified.m, mergenearbytraces.m, gitrmdir.m, mergesac
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 23-Nov-2019, Version 2017b on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 09-Sep-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('id', '11052554')
@@ -53,6 +60,8 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('sacdir', fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'sac'))
 defval('model', 'ak135')
 defval('ph', defphases)
+defval('startend', [])
+
 tr = {};
 merged = {};
 
@@ -141,35 +150,42 @@ for i = 1:length(station)
     % The sta structure will almost always be of length 1.  It is
     % larger when the station is turned off/on, and/or moved.
     for j = 1:length(sta)
-        % Compute theoretical arrival times of the requested phases at
-        % this station.
-        tt = taupTime(model, EQ.PreferredDepth, ph, ...
-                      'station', [sta(j).Latitude sta(j).Longitude], ...
-                      'event', [EQ.PreferredLatitude EQ.PreferredLongitude]);
+        if isempty(startend)
+            % Compute theoretical arrival times of the requested phases at
+            % this station.
+            tt = taupTime(model, EQ.PreferredDepth, ph, ...
+                          'station', [sta(j).Latitude sta(j).Longitude], ...
+                          'event', [EQ.PreferredLatitude EQ.PreferredLongitude]);
 
-        % Move to next station if there exist no phase arrivals of the type
-        % requested at this station for this event.
-        if isempty(tt)
-            continue
-
-        end
-
-        % Ensure the station was at the purported location at the
-        % time of the first arrival.
-        first_TaupTime = tt(1);
-        firstarrival_date = evtdate + seconds(first_TaupTime.time);
-        if  ~isempty(sta(j).EndDate) % assume still active if EndDate empty
-            if ~isbetween(firstarrival_date, ...
-                          irisstr2date(sta(j).StartDate), irisstr2date(sta(j).EndDate))
+            % Move to next station if there exist no phase arrivals of the type
+            % requested at this station for this event.
+            if isempty(tt)
                 continue
 
             end
-        end
 
-        % Base the query time for the traces off the time of the
-        % first-arriving phase.
-        starttime = irisdate2str(firstarrival_date - minutes(5));
-        endtime = irisdate2str(firstarrival_date + minutes(55));
+            % Ensure the station was at the purported location at the
+            % time of the first arrival.
+            first_TaupTime = tt(1);
+            firstarrival_date = evtdate + seconds(first_TaupTime.time);
+            if  ~isempty(sta(j).EndDate) % assume still active if EndDate empty
+                if ~isbetween(firstarrival_date, ...
+                              irisstr2date(sta(j).StartDate), irisstr2date(sta(j).EndDate))
+                    continue
+
+                end
+            end
+
+            % Base the query time for the traces off the time of the
+            % first-arriving phase.
+            starttime = irisdate2str(firstarrival_date - minutes(5));
+            endtime = irisdate2str(firstarrival_date + minutes(55));
+
+        else
+            starttime = irisdate2str(startend(1));
+            endtime = irisdate2str(startend(2));
+
+        end
 
         % Fetch and write.
         traces = irisFetch.Traces(network{i}, station{i}, location, ...
