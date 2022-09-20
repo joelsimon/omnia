@@ -36,7 +36,13 @@ xml=AM.$sta.Z.xml
 pz=AM.$sta.Z.pz
 
 # This fetches a station.xml response file.
-wget "https://fdsnws.raspberryshakedata.com/fdsnws/station/1/query?network=AM&station=$sta&location=*&channel=*Z&level=response&start=2018-06-01T01:01:01&format=xml" -O $xml
+# 19-Sep-2022 error/update ->
+#  "Resolving fdsnws.raspberryshakedata.com (fdsnws.raspberryshakedata.com)... 159.69.143.211
+#  Connecting to fdsnws.raspberryshakedata.com (fdsnws.raspberryshakedata.com)|159.69.143.211|:443... connected.
+#  ERROR: cannot verify fdsnws.raspberryshakedata.com's certificate, issued by ‘/C=US/O=Let's Encrypt/CN=R3’:
+#    Issued certificate has expired.
+#  To connect to fdsnws.raspberryshakedata.com insecurely, use `--no-check-certificate'."
+wget --no-check-certificate "https://fdsnws.raspberryshakedata.com/fdsnws/station/1/query?network=AM&station=$sta&location=*&channel=*Z&level=response&start=2018-06-01T01:01:01&format=xml" -O $xml
 
 # This converts the station.xml response file to a poles and zeros file for SAC.
 python $OMNIA/earthquakes/xml2pz.py $xml
