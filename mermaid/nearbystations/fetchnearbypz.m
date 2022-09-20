@@ -94,7 +94,7 @@ baseurl = 'http://service.iris.edu/irisws/sacpz/1/query?';
 
 % Activate MERMAID python environment 'pymaid' s.t. subroutine
 % xml2pz.py (called in wgetrasppz) executes properly.
-[~,~] = system('source activate pymaid');
+[~,~] = system('conda activate pymaid');
 
 % Loop over the stations and wget their pole-zero files.
 pzfiles = {};
