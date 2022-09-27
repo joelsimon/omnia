@@ -6,7 +6,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 09-Mar-2022, Darwin Kernel Version 18.7.0
+# Last modified: 26-Sep-2022, Darwin Kernel Version 18.7.0
 
 wget --recursive \
      --no-parent \
@@ -15,3 +15,5 @@ wget --recursive \
      --directory-prefix=$MERMAID/eso_locations/ \
      --accept '?????_all.txt' \
      http://geoweb.princeton.edu/people/simons/SOM/
+
+rm -rf $MERMAID/eso_locations/inprogress
