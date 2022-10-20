@@ -31,7 +31,20 @@ function lon = longitude360(lon)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-Jul-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 20-Oct-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+%% RECURSIVE.
+if ~isvector(lon)
+    % Work down each column in the case of an input matrix.
+
+    %% RECURSION.
+    for i = 1:size(lon, 2)
+        lon(:, i) = longitude360(lon(:, i));
+
+    end
+    return
+
+end
 
 if any(lon < -180) || any(lon > 180)
     error('Longitude must be within [-180:180], inclusive')
