@@ -6,8 +6,8 @@ function [fzlat, fzlon, gclat, gclon, fr] = fresnelzone(lat1, lon1, lat2, lon2, 
 % waves.
 %
 % Input:
-% lat1/lon1        Latitude and longitude of source
-% lat2/lon2        Latitude and longitude of receiver
+% lat1/lon1        Latitude and longitude of source [deg]
+% lat2/lon2        Latitude and longitude of receiver [deg]
 % v                Wave velocity [m/s]
 % f                Wave frequency [Hz]
 % npts_gc          Number of points along great circle (def: 100)
@@ -15,11 +15,11 @@ function [fzlat, fzlon, gclat, gclon, fr] = fresnelzone(lat1, lon1, lat2, lon2, 
 %
 % Output:
 % fzlat**          Latitude of Fresnel-zone tracks [deg]
-% fzlon**          Longitude of great-circle tracks [deg]
-% gclat            Latitude of Fresnel-zone tracks [deg]
-% gclon            Longitude of Fresnel-zone tracks [deg]
+% fzlon**          Longitude of Fresnel-zone tracks [deg]
+% gclat            Latitude of great-circle tracks [deg]
+% gclon            Longitude of great-circle tracks [deg]
 % fr               Fresnel radius at every point along great circle [deg]
-% plt              Plot output
+% plt              true to plot output (def: false)
 %
 % *Total number of Fresnel tracks returned is 2*npts_fr, where half are
 %  relatively "negative" south/west and half are relatively "positive"
