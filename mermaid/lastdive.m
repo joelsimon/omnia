@@ -15,6 +15,7 @@ function [errors, outfile] = lastdive(servdir, procdir)
 % errors       List of MERMAID serial numbers which have error in .out file,
 %                  associated with the last dive
 % outfile      The contents of each *.out file corresponding to the last dive
+%                  (fields are kstnm, e.g., "P0006", not OSEAN '452.020-P-16')
 % *N/A*        Writes lastdive.txt and lastdive_error.txt to 'procdir'
 %
 % Note that the same command file is sent multiple times while at the surface,
@@ -73,14 +74,14 @@ function [errors, outfile] = lastdive(servdir, procdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 30-Apr-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 10-Jan-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('servdir', fullfile(getenv('MERMAID'), 'server'))
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 
-% Collect all MERMAID *.out files.
-d = skipdotdir(dir(fullfile(servdir, '452*P-*.out')));
+% Collect all MERMAID *.out files using hyphens to skip nohup.out
+out = globglob(servdir, '*-*-*.out');
 
 % Write file of last dives for each float.
 f = fullfile(procdir, 'lastdive.txt');
@@ -94,12 +95,12 @@ errors = {};
 error_index = 0;
 
 % Loop over all floats and parse just last dive contents from *.out.
-for i = 1:length(d)
+for i = 1:length(out)
     % Read entire *.out file for this float.
-    tx = readtext(fullfile(d(i).folder, d(i).name));
+    tx = readtext(out{i});
 
     % Chop ".out" off of filename to get MERMAID serial number.
-    serial_number = d(i).name(1:end-4);
+    [~, serial_number] = fileparts(out{i});
 
     % Find all occurrences of "sending cmd...", which specifies new transmission.
     [cmd_index, cmd_datestr] = cellstrfind(tx, sprintf('sending cmd from %s.cmd', serial_number));
@@ -128,9 +129,11 @@ for i = 1:length(d)
 
     end
 
-    % Collect output in struct.
-    float_number = strrep(serial_number(end-3:end), '-', '0');
-    outfile.(float_number) = dive_block;
+    % Collect output in struct
+    % Convert OSEAN's naming convention to FDSN standards
+    % 452.020-P-08 -> kinst = '452.020', kstnm = 'P0008'
+    kstnm = osean2fdsn(serial_number);
+    outfile.(kstnm) = dive_block;
 
 end
 
