@@ -16,7 +16,7 @@ function reviewall(writecp, floatnum)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 07-Jun-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 10-Jan-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('writecp', false)
@@ -39,6 +39,11 @@ fprintf('Searching for unreviewed SAC files...\n')
 
 % Compile list of reviewed SAC files by inspecting the list of reviewed .evt files.
 d = recursivedir(dir(fullfile(getenv('MERMAID'), 'events', 'reviewed', '**/*.evt')));
+if isempty(d)
+    fprintf('No .evt files to review...exiting\n')
+    return
+    
+end
 evt = strrep(strippath(d), 'evt', 'sac');
 
 % Compile list of all SAC files and compare their differences.
