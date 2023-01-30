@@ -81,5 +81,5 @@ for dir in $dirs; do
 
 done
 
-printf "\n!!! This script only applies to $MERMAID/processed\
+printf "\n!!! This script only applies to $MERMAID/processed \
 generated with automaid < v3.4.0-B !!!"
