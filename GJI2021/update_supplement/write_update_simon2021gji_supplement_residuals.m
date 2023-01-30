@@ -16,7 +16,7 @@ function write_update_simon2021gji_supplement_residuals
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-Jan-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 30-Jan-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 llnl_exists = false;
 
@@ -31,7 +31,8 @@ evtdir = fullfile(merdir, 'events');
 datadir = fullfile(evtdir, 'reviewed', 'identified', 'txt');
 
 % Parameters for firstarrival text file.
-ci = false; % These are loaded from 'mer.firstarr.all.txt'
+%ci = false; % Load pre-computed confidence intervals from firstarrival txt file.
+ci = true; % Remake confidence intervals using a new call to `firstarrivals`
 wlen = 30;
 lohi = [1 5];
 bathy = true;
@@ -54,9 +55,12 @@ FA = winnowfirstarrival(mer_det_txt1, [], [], [], {'p' 'P'});
 req_idx = cellstrfind(FA.s, 'REQ');
 FA = rmstructindex(FA, req_idx, {'filename'});
 
+%% With update we want to remake these uncertainties; the uncertainties in the
+%% firstarrival file may have been generated using different parameters/window
+%% lengths
 % Keep the twosd uncertainties so that they match those quoted in paper (these
 % are random values so they do fluctuate somewhat).
-twosd_vector = FA.twosd;
+% twosd_vector = FA.twosd;
 
 % Read Jessica's LLNL text file.
 if llnl_exists
@@ -85,6 +89,11 @@ else
 
 end
 s = FA.s;
+
+% Let's just delete this old (who knows what parameters) `firstarrivals`
+% output; use it only to determine which SAC files we need to inspect.
+clearvars FA
+
 
 %%              Compute 1D ADJUSTED travel times and remove adjustment                  %%
 %%______________________________________________________________________________________%%
@@ -277,7 +286,7 @@ for i = 1:length(s);
     % These values (travel time residual and expected arrival time) are adjusted for
     % bathymetry and cruising depth because that is how I did it in the GJI paper.
     [tres_1Dadj, obs_arvltime, exp_arvltime_1Dadj, exp_arvltime_1Dadj_diff, ...
-     ~, max_delay, ~, ~, ~, ~, max_counts, SNR] = firstarrival(sac, ci, wlen, ...
+     ~, max_delay, twosd, ~, ~, ~, max_counts, SNR] = firstarrival(sac, ci, wlen, ...
                                                       lohi, procdir, ...
                                                       evtdir, EQ, bathy, ...
                                                       wlen2, fs, popas, pt0);
@@ -319,10 +328,15 @@ for i = 1:length(s);
     % meaningless to have a fractional count.
     max_counts = round(max_counts);
 
+    %% 30-Jan-2023 (after already sending first round of updates to Dalija)
+    %% Use recomputed `twosd` from firstarrival above, not from firstarrival
+    %% text file (that uncertainty estimate could have been generated using
+    %% different parameters or window lengths etc.
     % Use the saved uncertainty estimation (computed using the same firstarrival.m
     % and loaded with `winnowfirstarrival` above) so that the text file matches
     % example seismograms in the paper.
-    twosd = twosd_vector(i);
+    %twosd = twosd_vector(i);
+
 
     %%______________________________________________________________________________________%%
 
@@ -368,7 +382,6 @@ for i = 1:length(s);
     % directions, and most all other numbers are based off this 1D time so if
     % it's good, it follows that all others should be valid.
     tdiff_check = (EQ(1).TaupTimes(1).truearsecs - EQ(1).TaupTimes(1).pt0) - exp_arvltime_1D
-    eventid(EQ(1))
     if tdiff_check > 1e-7 % s
         error('pt0-timing issue')
 
