@@ -9,30 +9,25 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 % (found with cpest.m) is labeled "dat", while the theoretical arrival
 % time of the first-arriving phase is labeled "syn".
 %
-% Input:
+% Input: (see `firstarrival.m` for defaults)
 % s        Cell array of identified SAC filenames (def: revsac(1))
 % redo     true: delete and remake the text file
 %          false: append new lines to the existing text file unless
 %              that SAC file name already exists in the text file (def)
 % filename Output text file name (def: $MERMAID/.../firstarrival.txt)
-% wlen     Window length [s] (def: 30)
-% lohi     1x2 array of corner frequencies, or NaN to skip bandpass (def: [1 5]])
-% sacdir   Directory containing (possibly subdirectories)
-%              of .sac files (def: $MERMAID/processed)
-% evtdir   Directory containing (possibly subdirectories)
-%              of .evt files (def: $MERMAID/events)
+% wlen     Window length [s]
+% lohi     1x2 array of corner frequencies, or NaN to skip bandpass
+% sacdir   Directory containing (possibly subdirectories) of .sac files
+% evtdir   Directory containing (possibly subdirectories) of .evt files
 % EQ      Cell array (same size as 's') of corresponding EQ structs
-%             (def: []; retrieve via `getrevevt(s, evtdir)` in firstarrival.m)
 % bathy    logical true apply bathymetric travel time correction,
-%              computed with bathtime.m (def: true)
+%              computed with bathtime.m
 % wlen2    Length of second window, starting at the 'dat', the time of
 %              the first arrival, in which to search for maxc_y [s]
-%              (def: 1)
-% fs       Re-sampled frequency (Hz) after decimation, or []
-%              to skip decimation (def: [])
+% fs       Re-sampled frequency (Hz) after decimation, or [] to skip decimation
 % popas    1 x 2 array of number of poles and number of passes for bandpass,
-%              or NaN if no bandpass (def: [4 1])
-% pt0      Time in seconds assigned to first sample of X-xaxis (def: 0)
+%              or NaN if no bandpass
+% pt0      Time in seconds assigned to first sample of X-xaxis
 %
 % Output:
 % Text file with the following columns (firstarrivals.m outputs in parentheses):
@@ -61,13 +56,7 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 10-Dec-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
-
-%% !!
-%%
-%% To add: pt0 column
-%%
-%% !!
+% Last modified: 31-Jan-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', revsac(1))

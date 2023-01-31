@@ -41,13 +41,12 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ..
 %              [NB, does not adjust EQ.TaupTimes]***
 % wlen2    Length of second window, starting at the 'dat', the time of
 %              the first arrival, in which to search for maxc_y [s]
-%              (def: 1)
+%              (def: 1.75)
 % fs       Re-sampled frequency (Hz) after decimation, or []
 %              to skip decimation (def: [])
 % popas    1 x 2 array of number of poles and number of passes for bandpass,
 %              or NaN if no bandpass (def: [4 1])
-% pt0      Time in seconds assigned to first sample of X-xaxis (def: SAC header
-%             field "B" so that all times are relative to SAC reference time)
+% pt0      Time in seconds assigned to first sample of X-xaxis (def: 0)
 %
 % Output:
 % tres     Travel time residual [s] w.r.t first phase arrival:
@@ -109,7 +108,7 @@ function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, ..
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 24-Nov-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 31-Jan-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -120,10 +119,10 @@ defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', []) % defaults to `getrevevt(s, evtdir)`, later
 defval('bathy', true)
-defval('wlen2', 1)
+defval('wlen2', 1.75)
 defval('fs', []) % defaults to not bandpass filter
 defval('popas', [4 1])
-defval('pt0', []) % defaults to `EQ(1).TaupTimes(1).pt0` (== h.B in SAC header), later
+defval('pt0', 0)
 
 % Start with baseline assumption both time windows will be complete.
 incomplete1 = false;
@@ -161,13 +160,6 @@ else
         error('Supplied EQ structure does not match SAC file')
 
     end
-end
-
-% Default the output's zero-time (time at first sample) as seconds offset from
-% the SAC reference time, if no other time-offset is supplied.
-if isempty(pt0)
-    pt0 = h.B;
-
 end
 
 % Decimate, if requested.
@@ -233,8 +225,7 @@ syn = EQ(1).TaupTimes(1).truearsecs;
 % time, i.e., the the first sample is assigned h.B seconds. Determine the
 % difference between the assigned first-sample time and the requested
 % first-sample time to correct the synthetic arrival time on on the same x-axis
-% as requested in the output.  If pt0 is left as the default (`pt0=h.B`) this
-% difference is 0 seconds.
+% as requested in the output.  If `pt0=h.B` this difference is 0 seconds.
 pt0_diff = EQ(1).TaupTimes(1).pt0 - pt0;
 syn = syn - pt0_diff;
 fprintf('Reporting arrivals on an X-xaxis whose first sample is set to time: %.6f s\n', pt0)
