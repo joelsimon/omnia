@@ -9,7 +9,7 @@ function [danger, dates, stdp, ocdp, stla, stlo] = intoodeep(s, mbuffer, vers, s
 % mbuffer    Depth buffer -- ocean must be at least 'mbuffer' deeper than
 %                MERMAID to not be flagged [m] (def: 500)
 % vers       GEBCO bathymetric version (see gebco.m) (def: '2014')
-% sav        true to write output to text file in pwd (false)
+% sav        true to write output to CSV file in pwd (false)
 %
 % Output:
 % danger     SAC files flagged for being too close to the seafloor
@@ -60,7 +60,7 @@ if ~isempty(danger)
 end
 
 if sav
-    fname = fullfile(pwd, sprintf('%s.txt', mfilename));
+    fname = fullfile(pwd, sprintf('%s.csv', mfilename));
     fid = fopen(fname, 'w');
     fmt = '%s,%s,%i,%i,%.4f,%.4f\n';
     for i = 1:length(danger)
