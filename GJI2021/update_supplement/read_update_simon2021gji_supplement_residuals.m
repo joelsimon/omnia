@@ -1,12 +1,21 @@
 function MERMAID = read_update_simon2021gji_supplement_residuals(filename)
 % MERMAID = READ_UPDATE_SIMON2021GJI_SUPPLEMENT_RESIDUALS(filename)
 %
+% Input:
+% filename   Filename to updated residual formatted text file
+%                (def: $MERMAID/events/reviewed/identified/txt/update_simon2021gji_supplement_residuals.txt)
+%
+% Output:
+% MERMAID    Structure with fieldnames that which mirror the columns in the text file
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-Jan-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 31-Jan-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-file = '~/Desktop/update_simon2021gji_supplement_residuals.txt';
-fid = fopen(file, 'r');
+defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified', 'txt', ...
+                                   'update_simon2021gji_supplement_residuals.txt'));
+
+fid = fopen(filename, 'r');
 C = textscan(fid, ...
              ['%s' ...
               '%s' ...
