@@ -35,7 +35,7 @@ function [h1, h2] = sacdiff(s1, s2, dmate, lohi, flipstack)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 11-Apr-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 08-Feb-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% Wishlist:
 %%
@@ -65,14 +65,16 @@ if dmate
         x1 = decimate(x1, fs1/fs2);
         h1.DELTA = h1.DELTA*R;
         h1.NPTS = length(x1);
-        warning('%s decimated %i times', h1.KSTNM, R)
+        %warning('%s decimated %i times', h1.KSTNM, R)
+        warning('s1 decimated %i times', R)
 
     elseif fs2 > fs1
         R = fs2/fs1;
         x2 = decimate(x2, fs2/fs1);
         h2.DELTA = h2.DELTA * R;
         h2.NPTS = length(x2);
-        warning('%s decimated %i times',  h2.KSTNM, R)
+        %warning('%s decimated %i times',  h2.KSTNM, R)
+        warning('s2 decimated %i times', R)
 
     end
 end
@@ -87,13 +89,16 @@ end
 % S1
 xax1 = xaxis(h1.NPTS, h1.DELTA, 0);
 seisdate1 = seistime(h1);
-s1_date = seisdate1.B;
+s1_sdate = seisdate1.B;
+s1_edate = seisdate1.E;
 
 %%______________________________________________________________________________________%%
 % S2
 xax2 = xaxis(h2.NPTS, h2.DELTA, 0);
 seisdate2 = seistime(h2);
-s2_date = seisdate2.B;
+s2_sdate = seisdate2.B;
+s2_edate = seisdate2.E;
+
 
 %%______________________________________________________________________________________%%
 %% PLOT UTC TIME
@@ -109,11 +114,12 @@ pl02 = plot(xax_date2, x2, 'r');
 xl1 = min([xax_date1(1) xax_date2(1)]);
 xl2 = max([xax_date1(end) xax_date2(end)]);
 xlim([xl1 xl2])
-%lg = legend( 'S1', 'S2');
-lg = legend(h1.KSTNM, h2.KSTNM);
+lg = legend( 's1', 's2');
+%lg = legend(h1.KSTNM, h2.KSTNM);
 box on
 hold off
-title(sprintf('%s and %s in UTC time', h1.KSTNM, h2. KSTNM))
+%title(sprintf('%s and %s in UTC time', h1.KSTNM, h2. KSTNM))
+title('s1 and s2 in UTC time')
 
 %%______________________________________________________________________________________%%
 %% PLOT IN ARBITRARY TIME
@@ -126,11 +132,12 @@ pl11 = plot(ha1(1), xax1, x1, 'k');
 hold(ha1(1), 'on')
 pl12 = plot(ha1(1), xax2, x2, 'r');
 xlim(ha1(1), [1 max([xax1(end) xax2(end)])])
-xlabel(ha1(1), sprintf('Seconds into %s and %s seismograms, first sample set to 0 s in both', ...
-                       h1.KSTNM, h2.KSTNM))
+% xlabel(ha1(1), sprintf('Seconds into %s and %s seismograms, first sample set to 0 s in both', ...
+%                        h1.KSTNM, h2.KSTNM))
+xlabel(ha1(1), 'Seconds into s1 and s2 seismograms, first sample set to 0 s in both')
 ylabel(ha1(1), 'Counts')
-%lg1 = legend(ha1(1), [pl11 pl12], 'S1', 'S2');
-lg1 = legend(ha1(1), [pl11 pl12], h1.KSTNM, h2.KSTNM);
+lg1 = legend(ha1(1), [pl11 pl12], 's1', 's2');
+%lg1 = legend(ha1(1), [pl11 pl12], h1.KSTNM, h2.KSTNM);
 
 %%______________________________________________________________________________________%%
 %% PLOT ALIGNED AND TRUNCATED
@@ -146,12 +153,13 @@ xax2_delayed = xax2 - delay_time;
 pl21 = plot(ha1(2), xax1, x1, 'k');
 hold(ha1(2), 'on')
 pl22 = plot(ha1(2), xax2_delayed, x2, 'r');
-xlabel(ha1(2), sprintf('Aligned, not truncated, %s shifted so that %s starts at 0 s', ...
-                       h2.KSTNM, h1.KSTNM))
+% xlabel(ha1(2), sprintf('Aligned, not truncated, %s shifted so that %s starts at 0 s', ...
+%                        h2.KSTNM, h1.KSTNM))
+xlabel(ha1(2), 'Aligned, not truncated, s2 shifted so that s1 starts at 0 s')
 ylabel(ha1(2), 'Counts')
 xlim(ha1(2), minmax([xax1' xax2_delayed']))
-%lg2 = legend(ha1(2), [pl21 pl22], 'S1', 'S2');
-lg2 = legend(ha1(2), [pl21 pl22], h1.KSTNM, h2.KSTNM);
+lg2 = legend(ha1(2), [pl21 pl22], 's1', 's2');
+%lg2 = legend(ha1(2), [pl21 pl22], h1.KSTNM, h2.KSTNM);
 
 %% Plot the aligned traces on top of one another.
 xax_xat1 = xaxis(length(xat1), h1.DELTA, 0);
@@ -161,8 +169,8 @@ pl31 = plot(ha1(3), xax_xat1, xat1, 'k');
 hold(ha1(3), 'on')
 pl32 = plot(ha1(3), xax_xat2, xat2, 'r');
 xlim(ha1(3), minmax([0 xax_xat1' xax_xat2']))
-%lg3 = legend(ha1(3), [pl31 pl32], 'S1', 'S2');
-lg3 = legend(ha1(3), [pl31 pl32], h1.KSTNM, h2.KSTNM);
+lg3 = legend(ha1(3), [pl31 pl32], 's1', 's2');
+%lg3 = legend(ha1(3), [pl31 pl32], h1.KSTNM, h2.KSTNM);
 xlabel(ha1(3), 'Aligned and truncated (keeping only the overlapping portion from above)')
 ylabel(ha1(3), 'Counts')
 
@@ -182,30 +190,72 @@ end
 %%______________________________________________________________________________________%%
 fprintf('\nAccording to the SAC headers:\n')
 
-start_time_diff = seconds(s2_date - s1_date);
+start_time_diff = seconds(s2_sdate - s1_sdate);
 if start_time_diff == 0
-    fprintf('* %s and %s seismogram start at exactly the same UTC time\n', ...
-            h2.KSTNM, h1.KSTNM)
+    fprintf('* s1 and s2 seismogram start at exactly the same UTC time\n')
 
 else
-    fprintf('* %s starts %.3f seconds after %s\n', ...
-            h2.KSTNM, start_time_diff, h1.KSTNM)
+    fprintf('* s2 starts %.3f seconds after s1\n', start_time_diff)
+end
+
+end_time_diff = seconds(s2_edate - s1_edate);
+if end_time_diff == 0
+    fprintf('* s1 and s2 seismogram end at exactly the same UTC time\n')
+
+else
+    fprintf('* s2   ends %.3f seconds after s1\n', end_time_diff)
 end
 
 fprintf('\n')
 
-fprintf('After aligning %s and %s, and truncating them to be equal length:\n', ...
-        h1.KSTNM, h2.KSTNM)
+fprintf('After aligning s1 and s2, and truncating them to be equal length:\n')
 if isequal(x1, x2)
-    fprintf('* %s and %s data are exactly equal\n', h2.KSTNM, h1.KSTNM);
+    fprintf('* s1 and s2 data are exactly equal\n')
 
 else
-    fprintf('* %s is %.3f seconds delayed w.r.t. to %s\n', h2.KSTNM, delay_time, h1.KSTNM)
+    fprintf('* s2 is %.3f seconds delayed w.r.t. to s1\n', delay_time)
 
 end
 fprintf('* their normalized max cross correlation is %.2f %s\n', 100*mc, '%')
-fprintf('* %.2f%s (%i %s) of %s was cut to match the signal common to %s\n', ...
-        px1, '%', sx1, plurals('sample', sx1), h1.KSTNM, h2.KSTNM)
-fprintf('* %.2f%s (%i %s) of %s was cut to match the signal common to %s\n\n', ...
-        px2, '%', sx2, plurals('sample', sx2), h2.KSTNM, h1.KSTNM)
+fprintf('* %.2f%s (%i %s) of s1 was cut to match the signal common to s2\n', ...
+        px1, '%', sx1, plurals('sample', sx1))
+fprintf('* %.2f%s (%i %s) of s2 was cut to match the signal common to s1\n\n', ...
+        px2, '%', sx2, plurals('sample', sx2))
 
+%% ___________________________________________________________________________ %%
+
+% if start_time_diff == 0
+%     fprintf('* %s and %s seismogram start at exactly the same UTC time\n', ...
+%             h2.KSTNM, h1.KSTNM)
+
+% else
+%     fprintf('* %s starts %.3f seconds after %s\n', ...
+%             h2.KSTNM, start_time_diff, h1.KSTNM)
+% end
+
+% end_time_diff = seconds(s2_edate - s1_edate);
+% if end_time_diff == 0
+%     fprintf('* %s and %s seismogram end at exactly the same UTC time\n', ...
+%             h2.KSTNM, h1.KSTNM)
+
+% else
+%     fprintf('* %s ends %.3f seconds after %s\n', ...
+%             h2.KSTNM, end_time_diff, h1.KSTNM)
+% end
+
+% fprintf('\n')
+
+% fprintf('After aligning %s and %s, and truncating them to be equal length:\n', ...
+%         h1.KSTNM, h2.KSTNM)
+% if isequal(x1, x2)
+%     fprintf('* %s and %s data are exactly equal\n', h2.KSTNM, h1.KSTNM);
+
+% else
+%     fprintf('* %s is %.3f seconds delayed w.r.t. to %s\n', h2.KSTNM, delay_time, h1.KSTNM)
+
+% end
+% fprintf('* their normalized max cross correlation is %.2f %s\n', 100*mc, '%')
+% fprintf('* %.2f%s (%i %s) of %s was cut to match the signal common to %s\n', ...
+%         px1, '%', sx1, plurals('sample', sx1), h1.KSTNM, h2.KSTNM)
+% fprintf('* %.2f%s (%i %s) of %s was cut to match the signal common to %s\n\n', ...
+%         px2, '%', sx2, plurals('sample', sx2), h2.KSTNM, h1.KSTNM)
