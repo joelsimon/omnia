@@ -1,12 +1,12 @@
 function [delay, mc, xat1, xat2, daxt1, daxt2, dax1, dax2, xat1_pt0, xat2_pt0, F] = ...
-    alignxcorrutc(x1, start1, delta1, x2, start2, delta2, plt)
+    alignxcorrutc(x1, start1, delta1, x2, start2, delta2, plt, scaleopt)
 % [delay, mc, xat1, xat2, daxt1, daxt2, dax1, dax2, xat1_pt0, xat2_pt0, F] = ...
-%        alignxcorrutc(x1, start1, delta1, x2, start2, delta2, plt)
+%        alignxcorrutc(x1, start1, delta1, x2, start2, delta2, plt, scaleopt)
 %
-% Report signal cross correlation and delay in UTC time.
+% Report signal cross correlations and delay in UTC time.
 %
-% From `alignxcorr`, to align: add delay to x1 -or- subtract delay from x2.  See
-% internal plotting subfunction for details on computing alignment shifts.
+% From `alignxcorr`, to align: add delay to x1 -or- subtract delay from x2.
+% See internal plotting subfunction for details on computing alignment shifts.
 %
 % Input:
 % x1       Time series, maybe with signal common in x2
@@ -16,11 +16,13 @@ function [delay, mc, xat1, xat2, daxt1, daxt2, dax1, dax2, xat1_pt0, xat2_pt0, F
 % start2   Starttime of x2, as `datetime`
 % delta2   Sampling interval of x2, in seconds
 % plt      true to plot (def: false)
+% scaleopt  `xcorr` scaling ('biased' [def], 'unbiased', 'coeff', or 'none')
 %
 % Output:
 % delay    How delayed the signal in x2 is, compared to x1, in seconds
 %              (x2 is delayed, "late", w.r.t. x1 if delay is positive)
-% mc       Maximum absolute value normalized [0:1] cross correlation of xat1,2
+% mc       Maximum (in the sense of absolute value, but this may be negative)
+%              of cross-correlation sequence
 % xat1     Aligned and truncated x1 (the correlated signal portion common to x2)
 % xat2     Aligned and truncated x2 (the correlated signal portion common to x1)
 % daxt1    UTC datetime axis corresponding to xat1
@@ -41,15 +43,16 @@ function [delay, mc, xat1, xat2, daxt1, daxt2, dax1, dax2, xat1_pt0, xat2_pt0, F
 %    start1 = seistime(h1); start1 = start1.B;
 %    start2 = seistime(h2); start2 = start2.B;
 %    delta1 = h1.DELTA; delta2 = h2.DELTA;
-%    delay = ALIGNXCORRUTC(x1, start1, delta1, x2, start2, delta2, true)
+%    delay = ALIGNXCORRUTC(x1, start1, delta1, x2, start2, delta2, true, 'coeff')
 %
 % See also: alignxcorr.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 08-Feb-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 09-Feb-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('F', [])
+defval('scaleopt', 'unbiased')
 
 % Sanity.
 if ~strcmp(start1.TimeZone, 'UTC')
@@ -82,7 +85,7 @@ elseif fs2 > fs1
 end
 
 % Determine delay of x2 in arbitrary sample space (x1, x2 start at sample 1).
-[corr_delay_samp, mc, xat1, xat2, xat1_pt0, xat2_pt0] = alignxcorr(x1, x2);
+[corr_delay_samp, mc, xat1, xat2, xat1_pt0, xat2_pt0] = alignxcorr(x1, x2, scaleopt);
 
 % Convert correlation delays from sampling intervals to seconds
 % Do not remove 1 sample; delays of 0 samples = 0 seconds.
@@ -154,7 +157,7 @@ if plt
     title('Correlated signal, truncated time series xat1 and xat2 ')
     legend('xat1', 'xat2')
     xlabel('UTC time')
-    textpatch(F(1).ax1, 'NorthWest', sprintf('Delay: %.2f\nXCorr: %.1f%s', delay, mc*100, '%'));
+    textpatch(F(1).ax1, 'NorthWest', sprintf('Delay: %.2f\nXCorr: %.1e', delay, mc));;
     symaxes(F(2).ax1, 'y');
 
     % Plot xat1 in UTC time, shift xat2 to align/overlay
