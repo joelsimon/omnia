@@ -179,7 +179,6 @@ longticks(ax, 1.5);
 
 %% Annotations (clockwise from top left).
 % Magnitude.
-evttime = EQ(1).PreferredTime;
 magtype = EQ(1).PreferredMagnitudeType;
 if ~strcmpi(magtype(1:2), 'mb')
     magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', upper(magtype(1)), ...
