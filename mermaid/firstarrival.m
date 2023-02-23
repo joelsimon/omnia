@@ -120,7 +120,7 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', []) % defaults to `getrevevt(s, evtdir)`, later
 defval('bathy', true)
 defval('wlen2', 1.75)
-defval('fs', []) % defaults to not bandpass filter
+defval('fs', []) % defaults to not decimate
 defval('popas', [4 1])
 defval('pt0', 0)
 
