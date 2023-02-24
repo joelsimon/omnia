@@ -23,9 +23,7 @@ function write_simon2021gji_unidentified_residuals
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 23-Feb-2023, Version 9.3.0.948333 (R201b7) Update 9 on MACI64
-
-llnl_exists = false;
+% Last modified: 24-Feb-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% Preliminaries
 clc
@@ -54,94 +52,43 @@ s = revsac(-1, procdir, [], 'DET');
 glitch_sac = bumps;
 s = setdiff(s, glitch_sac);
 
-%%              Compute 1D ADJUSTED travel times and remove adjustment                  %%
-%%______________________________________________________________________________________%%
-%%______________________________________________________________________________________%%
-%%______________________________________________________________________________________%%
-
-% Specify formats.
+% Specify formats                       Column
 sac_fmt = '%44s        ';                 %  1
-
-evtime_fmt = '%22s        ';
-evlo_fmt = '%9.4f        ';
-evla_fmt = '%8.4f        ';
-magval_fmt = '%3.1f          ';           %  5
-magtype_fmt = '%3s        ';
-evdp_fmt = '%6i        ';
-
-sttime_fmt = '%22s        ';
-stlo_fmt = evlo_fmt;
-stla_fmt = evla_fmt;                      % 10
-stdp_fmt = '%5i        ';
+sttime_fmt ='%22s        ';
+stlo_fmt = '%9.4f        ';
+stla_fmt = '%8.4f        ';
+stdp_fmt = '%5i        ';                 %  5
 ocdp_fmt = stdp_fmt;
-
-gcarc_1D_fmt = '%7.4f        ';
-gcarc_1Dadj_diff_fmt = '%6i        ';
-gcarc_1Dadj_fmt = gcarc_1D_fmt;           % 15
-gcarc_3D_diff_fmt = '%7.4f        ';
-gcarc_3D_fmt = gcarc_1D_fmt;
-
-obs_travtime_fmt = '%6.2f        ';
-obs_arvltime_fmt = obs_travtime_fmt;
+obs_arvltime_fmt = '%6.2f        ';
 obs_arvltime_utc_fmt = sttime_fmt;
-
-exp_travtime_1D_fmt = '%7.2f        ';    % 20
-exp_arvltime_1D_fmt = '%6.2f        ';
-tres_1D_fmt = exp_arvltime_1D_fmt;
-
 tadj_1D_fmt = '%5.2f        ';
-exp_travtime_1Dadj_fmt = '%7.2f        ';
-exp_arvltime_1Dadj_fmt = '%6.2f        '; % 25
-tres_1Dadj_fmt = '%6.2f        ';
-
-tadj_3D_fmt = '%5.2f        ';
-exp_travtime_3D_fmt = '%7.2f        ';
-exp_arvltime_3D_fmt = '%6.2f        ';
-tres_3D_fmt = '%6.2f        ';            % 30
-
-twosd_fmt = '%6.2f        ';
-SNR_fmt= '%6u        ';
-max_counts_fmt = '%9i        ';
-max_delay_fmt = '%4.2f        ';
-
-contrib_eventid_fmt = '%10s        ';     % 35
-iris_eventid_fmt = '%8s';                 % 36
+twosd_fmt = '%6.2f        ';              % 10
 
 fmt = [sac_fmt ...                        %  1
-       ... %
        sttime_fmt ...
        stlo_fmt ...
-       stla_fmt ...                       % 10
-       stdp_fmt ...
+       stla_fmt ...
+       stdp_fmt ...                       %  5
        ocdp_fmt ...
-       ... %
        obs_arvltime_fmt ...
        obs_arvltime_utc_fmt ...
-       ... %
        tadj_1D_fmt ....
-       ... %
-       twosd_fmt ...
-       SNR_fmt ...
-       max_counts_fmt ...
-       max_delay_fmt ...
+       twosd_fmt ...                      % 10
        '\n'];
 
-
-%%______________________________________________________________________________________%%
-
-
+% Define filename and header lines
 filename = fullfile(datadir, 'simon2021gji_unidentified_residuals.txt');
 
-hdrline1 = '#COLUMN:                                   1                             2                3               4            5            6             7                             8            9            10            11               12          13';
-hdrline2 = '#DESCRIPTION:                       FILENAME               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP  OBS_ARVLTIME              OBS_ARVLTIME_UTC 1D*_TIME_adj      2STD_ERR           SNR       MAX_COUNTS    MAX_TIME';
+hdrline1 = '#COLUMN:                                   1                             2                3               4            5            6             7                             8            9            10';
+hdrline2 = '#DESCRIPTION:                       FILENAME               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP  OBS_ARVLTIME              OBS_ARVLTIME_UTC 1D*_TIME_adj      2STD_ERR';
 
 writeaccess('unlock', filename, false);
 fid = fopen(filename, 'w');
 fprintf(fid, '%s\n', hdrline1);
 fprintf(fid, '%s\n', hdrline2);
 
-max_tdiff_check = 0; % for testing
-                     %for i = 1:length(s);
+% Loop over every unidentified SAC and write a line for each.
+%for i = 1:length(s);
 for i =1:5
     i
     % Retrieve the SAC header.
@@ -166,12 +113,10 @@ for i =1:5
     ocdp = gebco(stlo, stla, '2014');
     ocdp = -ocdp;
 
-    %%______________________________________________________________________________________%%
-
     % These values (travel time residual and expected arrival time) are adjusted for
     % bathymetry and cruising depth because that is how I did it in the GJI paper.
-    [~, obs_arvltime, ~, tadj_1D, ~, max_delay, twosd, ~, ~, ~, max_counts, SNR] = ...
-        firstarrival_unidentified(sac, ci, wlen, lohi, procdir, bathy, wlen2, fs, popas, pt0);
+    [~, obs_arvltime, ~, tadj_1D, ~, ~, twosd] ...
+        = firstarrival_unidentified(sac, ci, wlen, lohi, procdir, bathy, wlen2, fs, popas, pt0);
 
     % UTC Datetime of actual observed arrival in seismogram (so, observed at depth).
     obs_arvltime_utc = seisdate.B + seconds(obs_arvltime) - pt0;;
@@ -181,32 +126,17 @@ for i =1:5
 
     end
 
-    % Round the SNR; when its down in single digits is so low who cares if
-    % its rounded.
-    SNR = round(SNR);
-
-    % The max. counts are non-integer due to filtering; round them because it's
-    % meaningless to have a fractional count.
-    max_counts = round(max_counts);
-
-    %%______________________________________________________________________________________%%
-    data = {strippath(sac) ...
-            ... %
+    % Organize and write output line by line
+    data = {strippath(sac) ...            %  1
             sttime ...
             stlo ...
             stla ...
-            stdp ...
+            stdp ...                      %  5
             ocdp ...
-            ... %
             obs_arvltime ...
             obs_arvltime_utc ...
-            ... %
             tadj_1D ...
-            ... %
-            twosd ...
-            SNR ...
-            max_counts ...
-            max_delay};
+            twosd};                       % 10
 
     fprintf(fid, fmt, data{:});
 
@@ -227,18 +157,3 @@ function t = round2decimal(t)
 rounded_t_decimal = num2str(round(str2double(t(end-3:end)), 2));
 t(end) = []; % chop of 1/1000 s decimal place
 t(end) = rounded_t_decimal(end); % replace 1/100 s decimal place with rounded value
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
