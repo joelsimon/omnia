@@ -83,6 +83,7 @@ gcarc_3D_fmt = gcarc_1D_fmt;
 
 obs_travtime_fmt = '%6.2f        ';
 obs_arvltime_fmt = obs_travtime_fmt;
+obs_arvltime_utc_fmt = sttime_fmt;
 
 exp_travtime_1D_fmt = '%7.2f        ';    % 20
 exp_arvltime_1D_fmt = '%6.2f        ';
@@ -115,6 +116,7 @@ fmt = [sac_fmt ...                        %  1
        ocdp_fmt ...
        ... %
        obs_arvltime_fmt ...
+       obs_arvltime_utc_fmt ...
        ... %
        tadj_1D_fmt ....
        ... %
@@ -130,8 +132,8 @@ fmt = [sac_fmt ...                        %  1
 
 filename = fullfile(datadir, 'simon2021gji_unidentified_residuals.txt');
 
-hdrline1 = '#COLUMN:                                   1                             2                3               4           5            6             7             8             9            10               11          12';
-hdrline2 = '#DESCRIPTION:                       FILENAME               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP  OBS_ARVLTIME 1D*_TIME_adj      2STD_ERR           SNR       MAX_COUNTS    MAX_TIME';
+hdrline1 = '#COLUMN:                                   1                             2                3               4            5            6             7                             8            9            10            11               12          13';
+hdrline2 = '#DESCRIPTION:                       FILENAME               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP  OBS_ARVLTIME              OBS_ARVLTIME_UTC 1D*_TIME_adj      2STD_ERR           SNR       MAX_COUNTS    MAX_TIME';
 
 writeaccess('unlock', filename, false);
 fid = fopen(filename, 'w');
@@ -140,7 +142,7 @@ fprintf(fid, '%s\n', hdrline2);
 
 max_tdiff_check = 0; % for testing
                      %for i = 1:length(s);
-for i =1:10
+for i =1:5
     i
     % Retrieve the SAC header.
     sac = s{i};
@@ -180,6 +182,17 @@ for i =1:10
     [~, obs_arvltime, ~, tadj_1D, ~, max_delay, twosd, ~, ~, ~, max_counts, SNR] = ...
         firstarrival_unidentified(sac, ci, wlen, lohi, procdir, bathy, wlen2, fs, popas, pt0);
 
+    obs_arvltime_utc = seisdate.B + seconds(obs_arvltime) - pt0;;
+    if ~isnat(obs_arvltime_utc)
+        obs_arvltime_utc = fdsndate2str(obs_arvltime_utc);
+
+        % (see `rounded_sttime_decimal`, above)
+        rounded_obs_arvltime_utc_decimal = num2str(round(str2double(obs_arvltime_utc(end-3:end)), 2));
+        obs_arvltime_utc(end) = []; % chop of 1/1000 s decimal place
+        obs_arvltime_utc(end) = rounded_obs_arvltime_utc_decimal(end); % replace 1/100 s decimal place with rounded value
+
+    end
+
     % Round the SNR; when its down in single digits is so low who cares if
     % its rounded.
     SNR = round(SNR);
@@ -198,6 +211,7 @@ for i =1:10
             ocdp ...
             ... %
             obs_arvltime ...
+            obs_arvltime_utc ...
             ... %
             tadj_1D ...
             ... %
@@ -210,4 +224,4 @@ for i =1:10
 
 end
 fclose(fid);
-writeaccess('lock', filename);
+%writeaccess('lock', filename);
