@@ -1,6 +1,6 @@
-function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag, xax0] = firstarrival_unidentified(s, ci, wlen, lohi, sacdir, bathy, wlen2, fs, popas)
+function [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag, xax0] = firstarrival_unidentified(s, ci, wlen, lohi, sacdir, bathy, wlen2, fs, popas, pt0)
 % [tres, dat, syn, tadj, ph, delay, twosd, xw1, xaxw1, maxc_x, maxc_y, SNR, EQ, W1, xw2, W2, winflag, tapflag, zerflag, xax0] ...
-%     = firstarrival_unidentified(s, ci, wlen, lohi, sacdir, bathy, wlen2, fs, popas)
+%     = firstarrival_unidentified(s, ci, wlen, lohi, sacdir, bathy, wlen2, fs, popas, pt0)
 %
 % Compute first-arrivals like in `firstarrival.m` but for unidentified SAC
 % files.  Assumes P wave incident at 0 degrees on seafloor arrives at 100 s into
@@ -23,10 +23,7 @@ defval('bathy', true)
 defval('wlen2', 1.75)
 defval('fs', []) % defaults to not bandpass filter
 defval('popas', [4 1])
-
-% Make all times in reference to start of seismogram, ("start counting from 0"),
-% not offsets from the SAC reference time (h.B).
-pt0 = 0;
+defval('pt0', 0);
 evtdir = 'foo';
 
 % Nab fullpath SAC file name, if not supplied.
