@@ -149,15 +149,7 @@ for i =1:5
     [~, h] = readsac(fullsac(s{i}, procdir));
     seisdate = seistime(h);
     sttime = fdsndate2str(seisdate.B);
-
-    % Round seismogram time to 1/100 of s precision from millisecond-precision.
-    % Don't just cut off the last sig fig because all other numbers are rounded,
-    % and I specifically say all times are ROUNDED (not truncated) in the
-    % supplement (not just 'floor'ed in the output text file; e.g., the travel
-    % time residuals and their estimated uncertainties are rounded to 1/100 s).
-    rounded_sttime_decimal = num2str(round(str2double(sttime(end-3:end)), 2));
-    sttime(end) = []; % chop of 1/1000 s decimal place
-    sttime(end) = rounded_sttime_decimal(end); % replace 1/100 s decimal place with rounded value
+    sttime = round2decimal(sttime);
 
     % Parse station parameters.
     % Station depth is in meters, down is positive.
@@ -174,7 +166,6 @@ for i =1:5
     ocdp = gebco(stlo, stla, '2014');
     ocdp = -ocdp;
 
-    %%         Times: adjusted for bathymetry and cruising depth; pt0 = 0 s
     %%______________________________________________________________________________________%%
 
     % These values (travel time residual and expected arrival time) are adjusted for
@@ -182,14 +173,11 @@ for i =1:5
     [~, obs_arvltime, ~, tadj_1D, ~, max_delay, twosd, ~, ~, ~, max_counts, SNR] = ...
         firstarrival_unidentified(sac, ci, wlen, lohi, procdir, bathy, wlen2, fs, popas, pt0);
 
+    % UTC Datetime of actual observed arrival in seismogram (so, observed at depth).
     obs_arvltime_utc = seisdate.B + seconds(obs_arvltime) - pt0;;
     if ~isnat(obs_arvltime_utc)
         obs_arvltime_utc = fdsndate2str(obs_arvltime_utc);
-
-        % (see `rounded_sttime_decimal`, above)
-        rounded_obs_arvltime_utc_decimal = num2str(round(str2double(obs_arvltime_utc(end-3:end)), 2));
-        obs_arvltime_utc(end) = []; % chop of 1/1000 s decimal place
-        obs_arvltime_utc(end) = rounded_obs_arvltime_utc_decimal(end); % replace 1/100 s decimal place with rounded value
+        obs_arvltime_utc = round2decimal(obs_arvltime_utc)
 
     end
 
@@ -225,3 +213,32 @@ for i =1:5
 end
 fclose(fid);
 %writeaccess('lock', filename);
+
+%% ___________________________________________________________________________ %%
+
+function t = round2decimal(t)
+
+% Round times time to 1/100 of s precision from millisecond-precision.  Don't
+% just cut off the last sig fig because all other numbers are rounded, and I
+% specifically say all times are ROUNDED (not truncated) in the supplement (not
+% just 'floor'ed in the output text file; e.g., the travel time residuals and
+% their estimated uncertainties are rounded to 1/100 s).
+
+rounded_t_decimal = num2str(round(str2double(t(end-3:end)), 2));
+t(end) = []; % chop of 1/1000 s decimal place
+t(end) = rounded_t_decimal(end); % replace 1/100 s decimal place with rounded value
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
