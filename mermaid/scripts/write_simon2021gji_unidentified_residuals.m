@@ -35,8 +35,7 @@ procdir = fullfile(merdir, 'processed');
 datadir = fullfile(merdir, 'events', 'reviewed', 'unidentified', 'txt');
 
 % Parameters for firstarrival text file.
-%ci = false; % Load pre-computed confidence intervals from firstarrival txt file.
-ci = true; % Remake confidence intervals using a new call to `firstarrivals`
+ci = true;
 wlen = 30;
 lohi = [1 5];
 bathy = true;
@@ -52,17 +51,22 @@ s = revsac(-1, procdir, [], 'DET');
 glitch_sac = bumps;
 s = setdiff(s, glitch_sac);
 
-% Specify formats                       Column
-sac_fmt = '%44s        ';                 %  1
-sttime_fmt ='%22s        ';
+% Sort based on starttime
+[~, sidx] = sort(mersac2date(s));
+s = s(sidx);
+
+% Specify formats                             Column
+sac_fmt = '%44s        ';                       %  1
+sttime_fmt = '%22s        ';
 stlo_fmt = '%9.4f        ';
 stla_fmt = '%8.4f        ';
-stdp_fmt = '%5i        ';                 %  5
+stdp_fmt = '%5i        ';                       %  5
 ocdp_fmt = stdp_fmt;
 obs_arvltime_fmt = '%6.2f        ';
 obs_arvltime_utc_fmt = sttime_fmt;
 tadj_1D_fmt = '%5.2f        ';
-twosd_fmt = '%6.2f        ';              % 10
+obs_arvltime_utc_z0_fmt = obs_arvltime_utc_fmt; % 10
+twosd_fmt = '%6.2f';                            % 11
 
 fmt = [sac_fmt ...                        %  1
        sttime_fmt ...
@@ -73,14 +77,15 @@ fmt = [sac_fmt ...                        %  1
        obs_arvltime_fmt ...
        obs_arvltime_utc_fmt ...
        tadj_1D_fmt ....
-       twosd_fmt ...                      % 10
+       obs_arvltime_utc_z0_fmt ...        % 10
+       twosd_fmt ...                      % 11
        '\n'];
 
 % Define filename and header lines
 filename = fullfile(datadir, 'simon2021gji_unidentified_residuals.txt');
 
-hdrline1 = '#COLUMN:                                   1                             2                3               4            5            6             7                             8            9            10';
-hdrline2 = '#DESCRIPTION:                       FILENAME               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP  OBS_ARVLTIME              OBS_ARVLTIME_UTC 1D*_TIME_adj      2STD_ERR';
+hdrline1 = '#COLUMN:                                   1                             2                3               4            5            6             7                             8            9                            10            11';
+hdrline2 = '#DESCRIPTION:                       FILENAME               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP  OBS_ARVLTIME      OBS_ARVLTIME_UTC(Z=STDP) 1D*_TIME_adj         OBS_ARVLTIME_UTC(Z=0)      2STD_ERR';
 
 writeaccess('unlock', filename, false);
 fid = fopen(filename, 'w');
@@ -88,15 +93,13 @@ fprintf(fid, '%s\n', hdrline1);
 fprintf(fid, '%s\n', hdrline2);
 
 % Loop over every unidentified SAC and write a line for each.
-%for i = 1:length(s);
-for i =1:5
+for i = 1:length(s);
     i
     % Retrieve the SAC header.
     sac = s{i};
     [~, h] = readsac(fullsac(s{i}, procdir));
     seisdate = seistime(h);
-    sttime = fdsndate2str(seisdate.B);
-    sttime = round2decimal(sttime);
+    sttime = round2decimal(fdsndate2str(seisdate.B));
 
     % Parse station parameters.
     % Station depth is in meters, down is positive.
@@ -118,11 +121,26 @@ for i =1:5
     [~, obs_arvltime, ~, tadj_1D, ~, ~, twosd] ...
         = firstarrival_unidentified(sac, ci, wlen, lohi, procdir, bathy, wlen2, fs, popas, pt0);
 
-    % UTC Datetime of actual observed arrival in seismogram (so, observed at depth).
-    obs_arvltime_utc = seisdate.B + seconds(obs_arvltime) - pt0;;
+    % UTC Datetime of observed arrival in seismogram
+    % So this is the ACTUAL in REAL UTC time that MERMAID records the signal while at depth
+    obs_arvltime_utc = seisdate.B + seconds(obs_arvltime) - pt0;
     if ~isnat(obs_arvltime_utc)
-        obs_arvltime_utc = fdsndate2str(obs_arvltime_utc);
-        obs_arvltime_utc = round2decimal(obs_arvltime_utc)
+        obs_arvltime_utc_str = round2decimal(fdsndate2str(obs_arvltime_utc));
+
+    else
+        obs_arvltime_utc_str = NaN;
+
+    end
+
+    % UTC Datetime of arrival in seismogram as if it were observed at the surface
+    % So this is a PROJECTED time in UTC by pretending MERMAID were on hard rock at Z=0
+    % The bathymetric time correction must be REMOVED from the observed arrival time (see bathime.pdf)
+    obs_arvltime_z0_utc = obs_arvltime_utc - seconds(tadj_1D);
+    if ~isnat(obs_arvltime_z0_utc)
+        obs_arvltime_utc_z0_str = round2decimal(fdsndate2str(obs_arvltime_z0_utc));
+
+    else
+        obs_arvltime_utc_z0_str = NaN;
 
     end
 
@@ -134,15 +152,16 @@ for i =1:5
             stdp ...                      %  5
             ocdp ...
             obs_arvltime ...
-            obs_arvltime_utc ...
+            obs_arvltime_utc_str ...
             tadj_1D ...
-            twosd};                       % 10
+            obs_arvltime_utc_z0_str ...   % 10
+            twosd};                       % 11
 
     fprintf(fid, fmt, data{:});
 
 end
 fclose(fid);
-%writeaccess('lock', filename);
+writeaccess('lock', filename);
 
 %% ___________________________________________________________________________ %%
 
