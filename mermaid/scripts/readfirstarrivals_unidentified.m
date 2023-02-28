@@ -10,17 +10,15 @@ function MERMAID = readfirstarrivals_unidentified(filename)
 % Output:
 % MERMAID   Struct with columns as fieldnames
 %
-%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 24-Feb-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 27-Feb-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 merdir = getenv('MERMAID');
 procdir = fullfile(merdir, 'processed');
 datadir = fullfile(merdir, 'events', 'reviewed', 'unidentified', 'txt');
 defval('filename', fullfile(datadir, 'firstarrivals_unidentified.txt'));
 
-% Specify formats                             Column
 sac_fmt = '%44s        ';                       %  1
 sttime_fmt = '%22s        ';
 stlo_fmt = '%9.4f        ';
@@ -50,7 +48,7 @@ fid = fopen(filename, 'r');
 C = textscan(fid, fmt,  'HeaderLines', 2);
 
 MERMAID.filename  = C{1};
-MERMAID.seismogram_time = C{2};
+MERMAID.seismogram_time = fdsnstr2date(C{2});
 MERMAID.stlo = C{3}; % -180:180 longitude
 MERMAID.stlo_360 = MERMAID.stlo;
 MERMAID.stlo_360(MERMAID.stlo_360<0) = MERMAID.stlo(MERMAID.stlo_360<0) + 360; % 0:360 longitude
