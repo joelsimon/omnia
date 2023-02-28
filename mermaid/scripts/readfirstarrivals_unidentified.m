@@ -1,11 +1,11 @@
-function MERMAID = read_simon2021gji_unidentified_residuals(filename)
-% MERMAID = READ_SIMON2021GJI_UNIDENTIFIED_RESIDUALS(filename)
+function MERMAID = readfirstarrivals_unidentified(filename)
+% MERMAID = READFIRSTARRIVALS_UNIDENTIFIED(filename)
 %
-% Read output of `write_simon2021gji_unidentified_residuals`
+% Read output of `readfirstarrivals_unidentified`
 %
 % Input:
 % filename  Filename
-%           (default: $MERMAID/events/reviewed/unidentified/txt/simon2021gji_unidentified_residuals.txt)
+%           (default: $MERMAID/events/reviewed/unidentified/txt/firstarrivals_unidentified.txt)
 %
 % Output:
 % MERMAID   Struct with columns as fieldnames
@@ -18,7 +18,7 @@ function MERMAID = read_simon2021gji_unidentified_residuals(filename)
 merdir = getenv('MERMAID');
 procdir = fullfile(merdir, 'processed');
 datadir = fullfile(merdir, 'events', 'reviewed', 'unidentified', 'txt');
-defval('filename', fullfile(datadir, 'simon2021gji_unidentified_residuals.txt'));
+defval('filename', fullfile(datadir, 'firstarrivals_unidentified.txt'));
 
 % Specify formats                             Column
 sac_fmt = '%44s        ';                       %  1

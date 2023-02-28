@@ -1,5 +1,5 @@
-function write_simon2021gji_unidentified_residuals
-% WRITE_SIMON2021GJI_UNIDENTIFIED_RESIDUALS
+function writefirstarrivals_unidentified
+% WRITEFIRSTARRIVALS_UNIDENTIFIED
 %
 % Writes "arrival times" of the observed "P" wave in unidentified events in the
 % same general format (similar column names are defined identically) as the real
@@ -16,14 +16,14 @@ function write_simon2021gji_unidentified_residuals
 %      pages =	 {147--170, 10.1093/gji/ggab271}
 %    }
 %
-% So this script name is a bit of misnomer because I don't actually print
-% residuals because there is no theoretical time against which to compute them
-% (I just set my 30 second window at 100 seconds as a starting point to refine
-% my pick)...
+% Uses a 30 window centered at 100 s into seismogram (the assume theoretical
+% arrival time of the P wave as identified by MERMAID's onboard detection
+% algorithm) to generate the arrival time pick using the same filtering and AIC
+% picking scheme as my GJI paper.
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 24-Feb-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 27-Feb-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% Preliminaries
 clc
@@ -49,11 +49,12 @@ s = revsac(-1, procdir, [], 'DET');
 
 % Remove glitchy .sac files
 glitch_sac = bumps;
-s = setdiff(s, glitch_sac);
+[~, idx] = setdiff(strippath(s), glitch_sac);
+s = s(idx);
 
 % Sort based on starttime
-[~, sidx] = sort(mersac2date(s));
-s = s(sidx);
+[~, idx] = sort(mersac2date(s));
+s = s(idx);
 
 % Specify formats                             Column
 sac_fmt = '%44s        ';                       %  1
@@ -82,7 +83,7 @@ fmt = [sac_fmt ...                        %  1
        '\n'];
 
 % Define filename and header lines
-filename = fullfile(datadir, 'simon2021gji_unidentified_residuals.txt');
+filename = fullfile(datadir, 'firstarrivals_unidentified.txt')
 
 hdrline1 = '#COLUMN:                                   1                             2                3               4            5            6             7                             8            9                            10            11';
 hdrline2 = '#DESCRIPTION:                       FILENAME               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP  OBS_ARVLTIME      OBS_ARVLTIME_UTC(Z=STDP) 1D*_TIME_adj         OBS_ARVLTIME_UTC(Z=0)      2STD_ERR';
@@ -94,7 +95,6 @@ fprintf(fid, '%s\n', hdrline2);
 
 % Loop over every unidentified SAC and write a line for each.
 for i = 1:length(s);
-    i
     % Retrieve the SAC header.
     sac = s{i};
     [~, h] = readsac(fullsac(s{i}, procdir));
