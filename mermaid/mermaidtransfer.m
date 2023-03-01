@@ -13,7 +13,7 @@ function [x, h, xraw] = mermaidtransfer(s, fl, sacpz, rflexa, taper)
 % sacpz     SACPZ filename (def: $MERMAID/response/MH.pz)
 % rflexa    Local path to Alex Burky's cloned rflexa repository
 %               (def: $RFLEXA; from https://github.com/alexburky/rflexa/)
-% taper     true to Tukey taper before removing the response (def: true)
+% taper     true to Tukey taper (R=0.1) before removing the response (def: true)
 %
 % Output:
 % x         SAC trace data with instrument response removed
