@@ -17,13 +17,15 @@ function [r2,p,r2_adj] = linreg(x,y,n)
 %                      (penalizes higher order fits)
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 23-Jan-2016, Version 2017b
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 08-Mar-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default.
 defval('n',1)
 
 % Fit data, calculate residuals, return (adjusted, maybe) R-squared.
+x = x(:);
+y = y(:);
 p = polyfit(x,y,n);
 
 yfit = polyval(p,x);
