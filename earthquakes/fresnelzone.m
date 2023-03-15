@@ -1,9 +1,8 @@
 function [fzlat, fzlon, gclat, gclon, fr] = fresnelzone(lat1, lon1, lat2, lon2, v, f, npts_gc, npts_fr, plt)
-% [fzlat, fzlon, gclat, gclon, fr] ...
-%     = FRESNELZONE(lat1, lon1, lat2, lon2, v, f, npts_gc, npts_fr, plt)
+% [fzlat, fzlon, gclat, gclon, fr] = FRESNELZONE(lat1, lon1, lat2, lon2, v, f, npts_gc, npts_fr, plt)
 %
-% Compute Fresnel-zone tracks (like great-circle tracks) for constant-velocity
-% waves.
+% Compute 2-D (lat/lon only; map view, no depth) Fresnel-zone tracks (like
+% great-circle tracks) for constant-velocity waves (e.g., surface or T waves).
 %
 % Input:
 % lat1/lon1        Latitude and longitude of source [deg]
