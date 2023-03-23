@@ -1,5 +1,5 @@
-function [perc, ncross] = occlusion(elev, test_elev)
-% [perc, ncross] = OCCLUSION(elev, test_elev)
+function [perc, ncross] = occlusion(elev, test_elev, zero_min)
+% [perc, ncross] = OCCLUSION(elev, test_elev, zero_min)
 %
 % Compute elevation profile occlusion statistics.
 %
@@ -18,6 +18,7 @@ function [perc, ncross] = occlusion(elev, test_elev)
 %               (up is positive, so elevations within the ocean are negative)
 % test_elev SINGLE test elevation of interest, e.g., a MERMAID parking elevation
 %               (up is positive, so elevations within the ocean are negative)
+% zero_min  Set elevations BEFORE minimum to 0 m (e.g., the slope before the trench)
 %
 % Output:
 % perc      Percentage of path that is occluded
@@ -39,7 +40,7 @@ function [perc, ncross] = occlusion(elev, test_elev)
 %            -2250 -1750 -1250
 %            -2000 -1500 -1000]
 %    test_elev = -1550
-%    [perc, ncross] = OCCLUSION(elev, test_elev)
+%    [perc, ncross] = OCCLUSION(elev, test_elev, false)
 %
 % Ex2: Path w/in water by third point; 2 of next 5 occluded (40%), numbering one "hit"
 %    elev = [ -100
@@ -50,15 +51,24 @@ function [perc, ncross] = occlusion(elev, test_elev)
 %            -1000
 %            -2000]
 %    test_elev = -1550
+%    [perc, ncross] = OCCLUSION(elev, test_elev, false)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 15-Mar-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 27-Oct-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 23-Mar-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Elevation profiles (e.g. along Fresnel or great-circle tracks), as columns.
 npts_elev = size(elev, 1);
+
+% Zero out elevevations before minimum elevation (e.g. the slope bottoming in
+% the Kermadec Trench).
+if zero_min
+    for j = 1:size(elev, 2)
+        [~, mini] = min(elev(:, j));
+        elev(1:mini, j) = 0;
+
+    end
+end
 
 % Occlusion matrix: 1 where elevation shallower than test elevation.
 % I.e., direct path through water from source to receiver is occluded.
