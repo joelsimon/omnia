@@ -9,7 +9,7 @@ function distmagsnr
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Dec-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 24-Mar-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -76,15 +76,15 @@ xticks([0:60:180])
 %yticks([0:40:160])
 h.BinWidth = 60/8;
 ha = gca;
-xlabel('Epicentral distance (degrees)')
+xlabel('Epicentral distance')
 ylabel('Count')
 
 longticks(ha, 2)
-axesfs(gcf, fs, fs)
+axesfs(gcf, fs/2,  fs/2)
 latimes
 
 
-[lg, tx] = textpatch(ha, 'NorthEast', sprintf('[N: %i]', sum(h.Values)), fs)
+[lg, tx] = textpatch(ha, 'NorthEast', sprintf('[N: %i]', sum(h.Values)), fs/2)
 lg.Box = 'off';
 ha.XTickLabel = cellfun(@(xx) [xx '$^{\circ}$'], ha.XTickLabels, 'UniformOutput', false)
 
@@ -107,10 +107,10 @@ xlabel('Magnitude');
 yl = ylabel('Count');
 
 longticks(ha, 2)
-axesfs(gcf, fs, fs)
+axesfs(gcf, fs/2, fs/2)
 latimes
 
-[lg, tx] = textpatch(ha, 'NorthEast', sprintf('[N: %i]', sum(h.Values)), fs)
+[lg, tx] = textpatch(ha, 'NorthEast', sprintf('[N: %i]', sum(h.Values)), fs/2)
 lg.Box = 'off';
 
 savepdf('maghist')
@@ -135,6 +135,7 @@ normsnr = norm2max(MER.SNR);
 % Plot: https://www.mathworks.com/help/matlab/ref/plot.html#btzitot_sep_shared-MarkerSize
 
 ax = gca;
+
 sc = scatter(ax, MER.dist, MER.preferred_magval, normsnr*size_multiplier^2);
 sc.MarkerEdgeColor = edgecolor;
 sc.MarkerFaceColor = facecolor;
@@ -170,7 +171,7 @@ ax.Box = 'on';
 longticks([], 2)
 axesfs(gcf, fs/2,  fs/2)
 
-xlabel('Epicentral distance (degrees)')
+xlabel('Epicentral distance')
 xticks([0:20:180])
 ax.XTickLabels = cellfun(@(xx) [xx '$^{\circ}$'], ax.XTickLabels, 'UniformOutput', false)
 
