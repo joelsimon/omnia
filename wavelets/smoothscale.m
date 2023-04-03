@@ -19,8 +19,8 @@ function dabe = smoothscale(dabe, fml)
 % See also: wtspy.m, plotchangepoint.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 01-Jan-2019, Version 2017b
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 03-Apr-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 for i = 1:length(dabe)
     if ~isnan(dabe{i})
@@ -33,13 +33,13 @@ for i = 1:length(dabe)
 
           case 'middle'
             dabe{i} = round(mean(dabe{i}, 2));
-            
+
           otherwise
-            error(['Specify either ''first'', ''middle'', ''last'', or ' ...
-                   '[] for input: fml'])
+            error('Specify either ''first'', ''middle'', or ''last'' for input `fml`')
+
         end
     else
         dabe{i} = NaN;
-        
+
     end
 end
