@@ -41,6 +41,7 @@ set(0, 'DefaultFigurePosition', [1100   450   560   420])
 
 % For my code, and code my code requires.
 addpath(genpath(getenv('OMNIA')))
+addpath(genpath(getenv('GEOCSV')))
 
 % Remove the paper-specific paths, with generic "fig*.m" names.
 rmpath(genpath(fullfile(getenv('OMNIA'), 'BSSA2020')))
