@@ -9,7 +9,7 @@ function distmagsnr
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 24-Mar-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 18-Apr-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -58,6 +58,11 @@ MER = rmstructindex(MER, non_det);
 nan_tres = find(isnan(MER.tres));
 MER = rmstructindex(MER, nan_tres);
 
+% Collec some stats.
+num_paths = length(MER.s);
+num_eqs = length(unique(MER.ID));
+num_mer = length(unique(getmerser(MER.s)));
+%beg_date = min(mersac2date(MER.s));
 
 %%______________________________________________________________________________________%%
 
@@ -177,19 +182,21 @@ ax.XTickLabels = cellfun(@(xx) [xx '$^{\circ}$'], ax.XTickLabels, 'UniformOutput
 
 ylabel('Magnitude')
 
+tit_str = sprintf('%i Travel Times, %i Earthquakes, %i MERMAIDs', ...
+                  num_paths, num_eqs, num_mer)
+title(ax, tit_str)
+
 latimes
 
 %lg.FontSize = (fs - 4) / 2;
 grid(ax, 'on')
-tack2corner(ax, lg, 'lr')
 
-warning('requires adjustment of SNR box, likely')
-
-[lg2, tx] = textpatch(ax, 'NorthEast', sprintf('[N: %i]', length(sc.SizeData)), fs/2);
-lg2.Box = 'off'
+% [lg2, tx] = textpatch(ax, 'NorthEast', sprintf('[N: %i]', length(sc.SizeData)), fs/2);
+% lg2.Box = 'off'
 
 lg.FontSize = 14;
 tack2corner(ax, lg, 'lr')
+warning('requires adjustment of SNR box, likely')
 savepdf('distmagsnr')
 
 close
@@ -242,13 +249,13 @@ for i = length(MER.s):-1:1
 
 end
 
-makemap([realmin 70], MER.depth, trla, trlo, MER.merlat, MER.merlon, MER.evtlat, MER.evtlon, 'shallow')
-makemap([70 300],  MER.depth, trla, trlo, MER.merlat, MER.merlon, MER.evtlat, MER.evtlon, 'intermediate')
-makemap([300 realmax], MER.depth, trla, trlo, MER.merlat, MER.merlon, MER.evtlat, MER.evtlon, 'deep')
+makemap([realmin 70], MER.depth, trla, trlo, MER.merlat, MER.merlon, MER.evtlat, MER.evtlon, 'shallow', MER.ID, num_mer)
+makemap([70 300],  MER.depth, trla, trlo, MER.merlat, MER.merlon, MER.evtlat, MER.evtlon, 'intermediate', MER.ID, num_mer)
+makemap([300 realmax], MER.depth, trla, trlo, MER.merlat, MER.merlon, MER.evtlat, MER.evtlon, 'deep', MER.ID, num_mer)
 
 %%______________________________________________________________________________________%%
 function makemap(minmaxdepth, eqdepth, trla, trlo, merlat, merlon, evtlat, ...
-                 evtlon, dtype)
+                 evtlon, dtype, id, num_mer)
 
 mindepth = minmaxdepth(1);
 maxdepth = minmaxdepth(2);
@@ -277,6 +284,7 @@ hold(gca, 'on')
 plp = plotm(plat, plon, 'k', 'LineWidth', lw);
 
 % Plot great-circle ray paths.
+eqid = {};
 count = 0;
 for i = 1:length(eqdepth)
     if  eqdepth(i) <= maxdepth && eqdepth(i) > mindepth
@@ -285,23 +293,27 @@ for i = 1:length(eqdepth)
         plmer = plotm(merlat(i), merlon(i), 'v', 'MarkerFaceColor', porange, ...
                       'MarkerEdgeColor', porange, 'MarkerSize', 10);
         count = count + 1;
+        eqid = [eqid ; id(i)];
 
     end
 end
 hold(gca, 'off')
 shg
 
+num_eq = length(unique(eqid));
+tit_str = sprintf('%i Paths, %i Earthquakes, %i MERMAIDs', ...
+                  count, num_eq, num_mer);
 switch lower(dtype)
   case 'shallow'
-    tl = title(gca, sprintf('event depth $\\leq$ 70 km [N: %i]', count), 'FontSize', fs)
+    tl = title(gca, sprintf('Event Depth $\\leq$ 70 km\n%s', tit_str), 'FontSize', fs)
     labstr = 'a';
 
   case 'intermediate'
-    tl = title(gca, sprintf('70 km $<$ event depth $\\leq$ 300 km [N: %i]', count), 'FontSize', fs)
+    tl = title(gca, sprintf('70 km $<$ Event Depth $\\leq$ 300 km\n%s', tit_str), 'FontSize', fs)
     labstr = 'b';
 
   case 'deep'
-    tl = title(gca, sprintf('event depth $>$ 300 km [N: %i]', count), 'FontSize', fs)
+    tl = title(gca, sprintf('Event Depth $>$ 300 km\n%s', tit_str), 'FontSize', fs)
     labstr = 'c';
 
 end
