@@ -6,10 +6,10 @@ function [perc, ncross] = occlusion(elev, test_elev, zero_min)
 % Envisioned to be used with GEBCO elevation(bathymetric) profiles and a test
 % elevation to answer the questions:
 % Along a constant-elevation path from source to receiver,
-% * what percentage is occluded by seamounts, and
-% * how many times is the path occluded (number of seamount "hits")?
+% (1) what percentage is occluded by seamounts, and
+% (2) how many times is the path occluded (number of seamount "hits")?
 % where occlusion is defined as a point where the elevation is
-% greater(shallower) than the test elevation.*
+% greater(shallower) than the test elevation.**
 %
 % In reality this is an `isshallower` function abstracted for use with T waves.
 %
@@ -25,15 +25,15 @@ function [perc, ncross] = occlusion(elev, test_elev, zero_min)
 % ncross    Number occlusions (seamount "hits") along path
 %               (i.e., skinny/narrow and fat/wide seamount each count for 1 hit)
 %
-% * If elevation profile starts shallower than the test elevation, e.g., a
-%  seismic source within rock, that is not counted in statistics; only
-%  subsequent transitions from unoccluded to occluded (water to rock) are. This
-%  is meaningful for hydroacoustic T waves that start life as seismic waves
-%  within rock and convert to T waves in the water column.  I.e., it is
-%  meaningless to discuss "occlusion" along the initial path from source to
-%  water, before the T wave is generated. Statistics only computed for in-water
-%  portion of path, so a path completely within rock (shallower than test depth,
-%  see path 3 of example 1) is returned as NaN.
+% ** If elevation profile starts shallower than the test elevation, e.g., a
+%    seismic source within rock, that is not counted in statistics; only
+%    subsequent transitions from unoccluded to occluded (water to rock) are. This
+%    is meaningful for hydroacoustic T waves that start life as seismic waves
+%    within rock and convert to T waves in the water column.  I.e., it is
+%    meaningless to discuss "occlusion" along the initial path from source to
+%    water, before the T wave is generated. Statistics only computed for in-water
+%    portion of path, so a path completely within rock (shallower than test depth,
+%    see path 3 of example 1) is returned as NaN.
 %
 % Ex1: 1st path unoccluded; 2nd partially occluded; 3rd path completely w/in rock
 %    elev = [-2500 -2000 -1500
