@@ -1,13 +1,26 @@
-function plotmerlocbathyall(skip_french)
-% PLOTMERLOCBATHYALL(skip_french)
+function plotmerlocbathyall(skip_french, skip_nearby)
+% PLOTMERLOCBATHYALL(skip_french, skip_nearby)
+%
+% Plot MERMAID drift trajectories, color coded based on deployment duration, for
+% entire array on GEBCO basemap.
+%
+% Input:
+% skip_french     true to not plot P0006/7 GeoAzur float (def: true)
+% skip_nearby     true to not plot nearby stations (def false)
+%
+% NB: PLOTMERLOCBATHYALL loads bathymetric .mat basemap in
+% `plotsouthpacificbathy` and thus the bounding box is relatively inflexible. If
+% you want to enlarge plot you must remake basemap .mat file.
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 24-Oct-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 08-May-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
+
 defval('skip_french', true)
+defval('skip_nearby', false)
 
 % Paths.
 merpath = getenv('MERMAID');
@@ -17,14 +30,28 @@ nearbytbl = fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystati
 
 % Common parameters.
 fs = 13;
-latlim = [-33 4];
-lonlim = [176 251];
+if ~skip_nearby
+    latlim = [-33 4];
+    lonlim = [176 251];
+
+else
+    % Must regenerate basemap `plotsouthpacificbathy` uses to adjust
+    % lat/lonlim outside original box listed above
+    latlim = [-33 -7];
+    lonlim = [176 240];
+
+end
 deplim = [-7000 1500];
 
 %%______________________________________________________________________________________%%
 %% (1) Plot bathymetric base map
 %%______________________________________________________________________________________%%
 [ax_bathy, cb_bathy] = plotsouthpacificbathy(lonlim, flip(latlim), deplim);
+if isempty(ax_bathy.Children.CData)
+    error('Likely issue -- must recompute/enlarge basemap; lat/lon limits outside of [-33 -4]/[176 251]')
+
+end
+cb_bathy.Label.String = strrep(cb_bathy.Label.String , 'elevation', 'Elevation');
 fig2print(gcf, 'flandscape')
 
 %% Cosmetics to bathymetric base map.
@@ -41,22 +68,24 @@ movev(gca, 0.1)
 movev(cb_bathy, 0.1)
 cb_bathy.Ticks = [-7000:1000:0 1500];
 
-ax_bathy.XTick = [180:10:250];
-ax_bathy.XTickLabel = {'-180$^{\circ}$'  ...
-                 '-170$^{\circ}$' ...
-                 '-160$^{\circ}$' ...
-                 '-150$^{\circ}$' ...
-                 '-140$^{\circ}$' ...
-                 '-130$^{\circ}$' ...
-                 '-120$^{\circ}$' ...
-                 '-110$^{\circ}$'};
+if ~skip_nearby
+    ax_bathy.XTick = [180:10:250];
+    ax_bathy.XTickLabel = {'-180$^{\circ}$'  ...
+                        '-170$^{\circ}$' ...
+                        '-160$^{\circ}$' ...
+                        '-150$^{\circ}$' ...
+                        '-140$^{\circ}$' ...
+                        '-130$^{\circ}$' ...
+                        '-120$^{\circ}$' ...
+                        '-110$^{\circ}$'};
 
 
-ax_bathy.YTick = [-30:10:0];
-ax_bathy.YTickLabel = flip({'0$^{\circ}$' ...
-                    '-10$^{\circ}$' ...
-                    '-20$^{\circ}$' ...
-                    '-30$^{\circ}$'});
+    ax_bathy.YTick = [-30:10:0];
+    ax_bathy.YTickLabel = flip({'0$^{\circ}$' ...
+                        '-10$^{\circ}$' ...
+                        '-20$^{\circ}$' ...
+                        '-30$^{\circ}$'});
+end
 
 longticks(ax_bathy, 3)
 cb_bathy.TickLength = 0.015;
@@ -83,9 +112,15 @@ tsize = fs - 2;
 % Plot MERMAID tracks.
 mer = readgps(procdir, false);
 
+% Apr/May 2023 "T0100" came online into my server, ignore for now.
+if isfield(mer, 'T0100')
+    mer = rmfield(mer, 'T0100');
+
+end
+
 % Remove French floats, P0006 and P0007
 if skip_french
-    mer = rmfield(mer, {'P0006', 'P0007'})
+    mer = rmfield(mer, {'P0006', 'P0007'});
 
 end
 
@@ -116,7 +151,7 @@ for i = 1:length(name)
     cum_days = [0 ; cumsum(days(diff(mer.(name{i}).date)))];
 
     % Remove indices when MERMAID P023 was out of the water (on the ship).
-    if strcmp(name{i}, 'P023')
+    if strcmp(name{i}, 'P0023')
         bad_dates = iso8601str2date({'2019-08-17T03:18:29Z' '2019-08-17T03:22:02Z'});
         [~, rm_idx] = intersect(sta.date, bad_dates);
         lon(rm_idx) = [];
@@ -145,14 +180,16 @@ end
 %%______________________________________________________________________________________%%
 %% (3) Overlay "nearby" and CPPT stations in same axis as MERMAID tracks
 %%______________________________________________________________________________________%%
-[~, nb_sta, nb_lat, nb_lon] = parsenearbystationstbl(nearbytbl);
+if ~skip_nearby
+    [~, nb_sta, nb_lat, nb_lon] = parsenearbystationstbl(nearbytbl);
 
-nb_lon(find(nb_lon<0)) = nb_lon(find(nb_lon<0)) + 360;
-for i = 1:length(nb_sta)
-    nb_pl(i) = plot(ax_mer, nb_lon(i), nb_lat(i), 'kv', 'MarkerFaceColor', 'none');
-    nb_tx(i) = text(ax_mer, nb_lon(i), nb_lat(i)+1, nb_sta{i}, 'FontSize', ...
-                    tsize, 'HorizontalAlignment', 'Center');
+    nb_lon(find(nb_lon<0)) = nb_lon(find(nb_lon<0)) + 360;
+    for i = 1:length(nb_sta)
+        nb_pl(i) = plot(ax_mer, nb_lon(i), nb_lat(i), 'kv', 'MarkerFaceColor', 'none');
+        nb_tx(i) = text(ax_mer, nb_lon(i), nb_lat(i)+1, nb_sta{i}, 'FontSize', ...
+                        tsize, 'HorizontalAlignment', 'Center');
 
+    end
 end
 
 %______________________________________________________________________________%
@@ -165,12 +202,13 @@ box on
 
 cb_mer.Label.Interpreter = 'latex';
 
-% This will identify the indices of th colorbar tick labels.
-max_tick2keep = round2fac(cbticklabels{end}, 100, 'down');
-ticks2keep = nearestidx([cbticklabels{:}], [0:100:max_tick2keep]);
+% This identifies the indices of the colorbar tick labels.
+tick_int = 365/2; % ticks every 6 months
+max_tick2keep = round2fac(cbticklabels{end}, tick_int, 'down');
+ticks2keep = nearestidx([cbticklabels{:}], [0:tick_int:max_tick2keep]);
 cb_mer.Ticks = cbticks(ticks2keep);
-cb_mer.TickLabels = round2fac(ticks2keep, 100, 'down');
-cb_mer.Label.String = 'Days since deployment';
+cb_mer.TickLabels = round2fac(ticks2keep/365, tick_int/365, 'down');
+cb_mer.Label.String = 'Years Deployed';
 cb_mer.FontSize = fs;
 cb_mer.Label.FontSize = fs;
 
@@ -178,56 +216,58 @@ longticks(ax_mer, 3)
 cb_mer.TickDirection = 'out';
 cb_mer.TickLength = 0.015;
 
-
 %% MERMAID
-mer_tx(1).Position = [186 -11.75];  % P008
-mer_tx(2).Position(2) = -10;        % P009
-mer_tx(3).Position(2) = -15.5;      % P009
-mer_tx(5).Position(2) = -13.25;     % P012
-mer_tx(7).Position = [220.5 -10.2]; % P016
-mer_tx(10).Position = [227.5 -15];  % P019
-mer_tx(12).Position = [226 -25];    % P021
-mer_tx(13).Position(1) = 222;       % P022
-mer_tx(15).Position = [214  -23.5]; % P024
-mer_tx(16).Position = [211  -20.5]; % P025
-
-%% Nearby stations.
-nb_tx(1).Position = [183 -15.75];  % FUTU
-nb_tx(5).Position(1) = 249;        % VA02
-nb_tx(7).Position = [248.5 -27.5]; % RPN
-delete(nb_pl(7))
-nb_tx(8).Position = [189 -15.25];  % AFI
-nb_tx(24).Position = [212 -12.7];  % VAH
-delete(nb_pl(24));
-nb_tx(25).Position = [208.5 -23.6]; % TBI
-
-
-% Delete station names around Fiji; put them in legend
-kpr = [2 15 16 17 18 20 21 22];
-for i = kpr
-    if i == 2
-        % Don't move this out as initial value -- I want complete list in 'kpr'.
-        patch_str =  nb_tx(i).String;
-
-    else
-        patch_str = [patch_str newline nb_tx(i).String];
-
-    end
+if skip_french
+    mer_tx(1).Position = [186 -11.75];  % P0008
+    mer_tx(2).Position(2) = -10;        % P0009
+    mer_tx(3).Position(2) = -15.5;      % P0009
+    mer_tx(5).Position(2) = -13.25;     % P0012
+    mer_tx(7).Position = [220.5 -10.2]; % P0016
+    mer_tx(10).Position = [227.5 -15];  % P0019
+    mer_tx(12).Position = [226 -25];    % P0021
+    mer_tx(13).Position(1) = 222;       % P0022
+    mer_tx(15).Position = [214  -23.5]; % P0024
+    mer_tx(16).Position = [211  -20.5]; % P0025
 
 end
-delete(nb_tx(kpr))
 
-% Flip the triangle on Fiji and make bigger to mark this cluster of stations. Use the first as the
-% marker and delete the rest.
-nb_pl(kpr(1)).MarkerSize = 12;
-nb_pl(kpr(1)).Marker = '^';
-delete(nb_pl(kpr(2:end)))
+%% Nearby stations.
+if ~skip_nearby
+    nb_tx(1).Position = [183 -15.75];  % FUTU
+    nb_tx(5).Position(1) = 249;        % VA02
+    nb_tx(7).Position = [248.5 -27.5]; % RPN
+    delete(nb_pl(7))
+    nb_tx(8).Position = [189 -15.25];  % AFI
+    nb_tx(24).Position = [212 -12.7];  % VAH
+    delete(nb_pl(24));
+    nb_tx(25).Position = [208.5 -23.6]; % TBI
 
-% Add a long list of names attached to the single triangle on Fiji.
-lg = legend(nb_pl(kpr((1))), patch_str, 'Interpreter', 'LaTeX');
-lg.Color = 'None';
+    % Delete station names around Fiji; put them in legend
+    kpr = [2 15 16 17 18 20 21 22];
+    for i = kpr
+        if i == 2
+            % Don't move this out as initial value -- I want complete list in 'kpr'.
+            patch_str =  nb_tx(i).String;
 
+        else
+            patch_str = [patch_str newline nb_tx(i).String];
 
+        end
+
+    end
+    delete(nb_tx(kpr))
+
+    % Flip the triangle on Fiji and make bigger to mark this cluster of stations. Use the first as the
+    % marker and delete the rest.
+    nb_pl(kpr(1)).MarkerSize = 12;
+    nb_pl(kpr(1)).Marker = '^';
+    delete(nb_pl(kpr(2:end)))
+
+    % Add a long list of names attached to the single triangle on Fiji.
+    lg = legend(nb_pl(kpr((1))), patch_str, 'Interpreter', 'LaTeX');
+    lg.Color = 'None';
+
+end
 
 ax_mer.XTick = [];
 ax_mer.YTick = [];
@@ -237,3 +277,4 @@ moveh([ax_bathy cb_mer], -0.05)
 movev(cb_mer, -0.1)
 
 set(ax_mer, 'Color', 'None', 'Position', ax_bathy.Position)
+uistack(mer_tx, 'top')
