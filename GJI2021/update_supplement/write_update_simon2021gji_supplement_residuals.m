@@ -1,5 +1,5 @@
-function write_update_simon2021gji_supplement_residuals
-% WRITE_UPDATE_SIMON2021GJI_SUPPLEMENT_RESIDUALS
+function write_update_simon2021gji_supplement_residuals(redo)
+% WRITE_UPDATE_SIMON2021GJI_SUPPLEMENT_RESIDUALS(redo)
 %
 % !! Must first run writefirstarrival.m !!
 %
@@ -16,8 +16,9 @@ function write_update_simon2021gji_supplement_residuals
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 30-Jan-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-May-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
+defval('redo', true)
 llnl_exists = false;
 
 %% Preliminaries
@@ -93,7 +94,6 @@ s = FA.s;
 % Let's just delete this old (who knows what parameters) `firstarrivals`
 % output; use it only to determine which SAC files we need to inspect.
 clearvars FA
-
 
 %%              Compute 1D ADJUSTED travel times and remove adjustment                  %%
 %%______________________________________________________________________________________%%
@@ -200,20 +200,34 @@ fmt = [sac_fmt ...                        %  1
 
 filename = fullfile(datadir, 'update_simon2021gji_supplement_residuals.txt');
 
-hdrline1 =  '#COLUMN:                                   1                             2                3               4          5            6             7                             8                9              10           11           12             13            14             15             16             17            18            19             20            21            22           23             24            25            26           27             28            29            30            31            32               33          34                35              36';
-hdrline2 = ['#DESCRIPTION:                       FILENAME                    ' ...
-            'EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP       1D_GCARC 1D*_GCARC_adj      1D*_GCARC   3D_GCARC_adj       3D_GCARC  OBS_TRAVTIME  OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES 1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES  3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR           SNR       MAX_COUNTS    MAX_TIME           NEIC_ID         IRIS_ID'];
-
 writeaccess('unlock', filename, false);
-fid = fopen(filename, 'w');
-fprintf(fid, '%s\n', hdrline1);
-fprintf(fid, '%s\n', hdrline2);
+prev_file = exist(filename, 'file') == 2
+
+if ~prev_file || redo
+    fid = fopen(filename, 'w+');
+    hdrline1 =  '#COLUMN:                                   1                             2                3               4          5            6             7                             8                9              10           11           12             13            14             15             16             17            18            19             20            21            22           23             24            25            26           27             28            29            30            31            32               33          34                35              36';
+    hdrline2 = ['#DESCRIPTION:                       FILENAME                    ' ...
+                'EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP       1D_GCARC 1D*_GCARC_adj      1D*_GCARC   3D_GCARC_adj       3D_GCARC  OBS_TRAVTIME  OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES 1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES  3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR           SNR       MAX_COUNTS    MAX_TIME           NEIC_ID         IRIS_ID'];
+
+    fprintf(fid, '%s\n', hdrline1);
+    fprintf(fid, '%s\n', hdrline2);
+
+else
+    fid = fopen(filename, 'a');
+    prev_mer = read_update_simon2021gji_supplement_residuals(filename);
+
+end
 
 max_tdiff_check = 0; % for testing
 for i = 1:length(s);
     i
-    % Retrieve the SAC header.
     sac = s{i};
+    if ~redo && any(contains(prev_mer.filename, sac));
+        continue
+
+    end
+
+    % Retrieve the SAC header.
     [~, h] = readsac(fullsac(s{i}, procdir));
     seisdate = seistime(h);
     sttime = fdsndate2str(seisdate.B);
@@ -444,4 +458,11 @@ for i = 1:length(s);
 
 end
 fclose(fid);
+
+% Use a system call to sort the new entries.
+status = system(sprintf('sort -k1 -n -o %s %s', filename, filename));
+if status ~= 0
+    warning('unable to sort %s\nflags may differ on non-Linux machines', filename)
+
+end
 writeaccess('lock', filename);
