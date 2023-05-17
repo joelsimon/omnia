@@ -41,7 +41,7 @@ function varargout = readidentified(filename, starttime, endtime, reftime, retur
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 12-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 16-May-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
@@ -82,8 +82,8 @@ eqregion = strtrim(cellfun(@(xx) xx(95+7:128+7), lynes, 'UniformOutput', false))
 eqdepth  = cellfun(@(xx) str2double(xx(133+7:138+7)), lynes, 'UniformOutput', true);
 eqdist = cellfun(@(xx) str2double(xx(143+7:149+7)), lynes, 'UniformOutput', true);
 eqmag = cellfun(@(xx) str2double(xx(154+7:157+7)), lynes, 'UniformOutput', true);
-eqphase1 = strtrim(cellfun(@(xx) xx(162+7:167+7), lynes, 'UniformOutput', false));
-eqid = strtrim(cellfun(@(xx) xx(172+7:184+7), lynes, 'UniformOutput', false));
+eqphase1 = strtrim(cellfun(@(xx) xx(162+7:168+7), lynes, 'UniformOutput', false));
+eqid = strtrim(cellfun(@(xx) xx(173+7:185+7), lynes, 'UniformOutput', false));
 eqdate = NaT(length(eqtime), 1, 'TimeZone', 'UTC');
 
 % Get SAC (time at first sample) and EQ (hypocenter time) datetimes.
