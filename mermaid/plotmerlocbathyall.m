@@ -1,5 +1,5 @@
-function plotmerlocbathyall(skip_french, skip_nearby)
-% PLOTMERLOCBATHYALL(skip_french, skip_nearby)
+function plotmerlocbathyall(skip_french, skip_nearby, just_xenet)
+% PLOTMERLOCBATHYALL(skip_french, skip_nearby, just_xenet)
 %
 % Plot MERMAID drift trajectories, color coded based on deployment duration, for
 % entire array on GEBCO basemap.
@@ -7,10 +7,13 @@ function plotmerlocbathyall(skip_french, skip_nearby)
 % Input:
 % skip_french     true to not plot P0006/7 GeoAzur float (def: true)
 % skip_nearby     true to not plot nearby stations (def false)
+% just_xenet*     true to only plot XE OBS network (def: false)
 %
 % NB: PLOTMERLOCBATHYALL loads bathymetric .mat basemap in
 % `plotsouthpacificbathy` and thus the bounding box is relatively inflexible. If
 % you want to enlarge plot you must remake basemap .mat file.
+%
+% * Sets `skip_french = true' and uses nearbystations list updated 2023-05-08.
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
@@ -21,19 +24,31 @@ close all
 
 defval('skip_french', true)
 defval('skip_nearby', false)
+defval('just_xenet', false)
+
+if just_xenet
+    skip_french = true;
+    skip_nearby = true;
+
+end
 
 % Paths.
 merpath = getenv('MERMAID');
 procdir = fullfile(merpath, 'processed');
 evtdir = fullfile(merpath, 'events');
-nearbytbl = fullfile(getenv('MERMAID'), 'events', 'nearbystations', 'nearbystations.tbl');
+nearbytbl = fullfile(evtdir, 'nearbystations', 'nearbystations.tbl');
 
 % Common parameters.
 fs = 13;
-if ~skip_nearby
+if ~skip_nearby  || just_xenet
     latlim = [-33 4];
     lonlim = [176 251];
 
+    if just_xenet
+        latlim = [-33 -2];
+        lonlim = [176 240];
+
+    end
 else
     % Must regenerate basemap `plotsouthpacificbathy` uses to adjust
     % lat/lonlim outside original box listed above
@@ -192,9 +207,29 @@ if ~skip_nearby
     end
 end
 
-%______________________________________________________________________________%
-%% (4) Final cosmetics
 %%______________________________________________________________________________________%%
+%% (3.1) Overlay "nearby" EX-network stations ONLY, in same axis as MERMAID tracks
+%%______________________________________________________________________________________%%
+if just_xenet
+    updated_txtfile = fullfile(evtdir, 'nearbystations', 'nearbystations_2023-05-08.txt');
+    [xe_net, xe_sta, ~, ~, xe_lat, xe_lon] = parsenearbystations(updated_txtfile, false);
+    xe_idx = cellstrfind(xe_net, 'XE');
+    xe_net = xe_net(xe_idx);
+    xe_sta = xe_sta(xe_idx);
+    xe_lat = xe_lat(xe_idx);
+    xe_lon = xe_lon(xe_idx);
+    xe_lon = longitude360(xe_lon);
+    for i = 1:length(xe_sta)
+        xe_pl(i) = plot(ax_mer, xe_lon(i), xe_lat(i), 'kv', 'MarkerFaceColor', 'none');
+        % xe_tx(i) = text(ax_mer, xe_lon(i), xe_lat(i)+1, xe_sta{i}, 'FontSize', ...
+        %                 tsize, 'HorizontalAlignment', 'Center');
+
+    end
+end
+
+%% ___________________________________________________________________________ %%
+%% (4) Final cosmetics
+%% ___________________________________________________________________________ %%
 
 ax_mer.XLim = lonlim;
 ax_mer.YLim = latlim;
@@ -278,3 +313,9 @@ movev(cb_mer, -0.1)
 
 set(ax_mer, 'Color', 'None', 'Position', ax_bathy.Position)
 uistack(mer_tx, 'top')
+
+if skip_nearby
+    set(ax_bathy, 'YTickLabels', degrees(ax_bathy.YTick))
+    set(ax_bathy, 'XTickLabels', degrees(ax_bathy.XTick))
+
+end
