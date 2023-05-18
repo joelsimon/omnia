@@ -73,7 +73,7 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ph, conf, ..
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 28-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 18-May-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -95,6 +95,12 @@ rawdiro = fullfile(diro, 'raw');
 rawevt  = fullfile(rawdiro, 'evt', [sans_sac '.raw.evt']);
 rawpdfc = fullfile(rawdiro, 'pdf', [sans_sac '.complete.raw.pdf']);
 rawpdfw = fullfile(rawdiro, 'pdf', [sans_sac '.windowed.raw.pdf']);
+
+% Generate raw directories if required
+% (silence "Warning: Directory already exists.")
+[~, ~] = mkdir(rawdiro);
+[~, ~] = mkdir(fullfile(rawdiro, 'evt'));
+[~, ~] = mkdir(fullfile(rawdiro, 'pdf'));
 
 % Check if this SAC file has already been processed by cpsac2evt.m,
 % and return outputs if so.
@@ -153,8 +159,14 @@ for i = 1:length(CP)
 
     % Save em.
     pdfname = sprintf([strrep(strippath(sac), 'sac', '') '%s'], ...
-                      [corw{i} '.raw']);
+                      [corw{i} '.raw.pdf']);
     rawpdf{i} = savepdf(pdfname, F(i).fig, fullfile(diro, 'raw', 'pdf'));
+
+    %% HINT: if `savepdf` errors for you, e.g., you don't have "epostopdf" in
+    %% terminal, comment the `rawpdf{i} = savepdf(...)"` line above, and
+    %% uncomment the two lines below.
+    % rawpdf{i} = fullfile(diro, 'raw', 'pdf', pdfname);
+    % print(rawpdf{i}, '-dpdf');
 
 end
 
