@@ -26,13 +26,13 @@ function [coi, coibe, precede] = wtcoi(dabe, samp, lx)
 %
 % Input:
 % dabe         abe (input as cell, {abe}) or dbe from wtspy.m
-% samp         Time-domain sample index of interest 
+% samp         Time-domain sample index of interest
 % lx           Length of original time series (def: max(dabe))
 %
 % Output:
 % coi          Cell of ALL time-scale indices that see the input sample,
 %                  at each scale (returns [] if samp out of range)
-% coibe        Cell of first and last time-scale indices that see the input 
+% coibe        Cell of first and last time-scale indices that see the input
 %                  sample, at each scale (returns [] if samp out of range)
 % precede      Array of the last time-scale index that does NOT see the sample
 %                 of interest, i.e., the last time-scale index which is
@@ -40,26 +40,26 @@ function [coi, coibe, precede] = wtcoi(dabe, samp, lx)
 %                 (returns NaN if none exist, i.e., samp = 1)
 %
 % For examples 1--3 below first run:
-%    x = cpgen(1000, 500);
+%    lx = 1000 ; x = cpgen(lx, 500);
 %    [a, d] = wt(x, 'CDF', [2 4], 5, 4, 0);
 %    [abe, dbe] = wtspy(length(x), 'CDF', [2 4], 5, 4, 0);
 %
 % Ex1: Approximation indices that see sample 500 (note the braces {})
-%    [acoi, acoibe] = WTCOI({abe}, 500)
+%    [acoi, acoibe] = WTCOI({abe}, 500, lx)
 %
 % Ex2: Detail indices that see sample 500
-%    [dcoi, dcoibe] = WTCOI(dbe, 500)
+%    [dcoi, dcoibe] = WTCOI(dbe, 500, lx)
 %
 % Ex:3 Detail indices that precede sample 4: none found for scales 2:5
 % because sample 4 is seen by the first detail index at those scales
-%    [~, ~, precede] = wtcoi(dbe, 4)
+%    [~, ~, precede] = WTCOI(dbe, 4, lx)
 %
 % Ex4: Start of "signal" at sample 736 -- find last detail which is solely
 %       in the "noise" segment at each scale.
 %    x = normcpgen(1000, 736, 10);
 %    [~, d]  = wt(x, 'CDF', [1 1], 2, 4, 0);
 %    [~, dbe]  = wtspy(length(x), 'CDF', [1 1], 5, 4, 0);
-%    [~, ~, precede] = WTCOI(dbe, 736);
+%    [~, ~, precede] = WTCOI(dbe, 736, lx);
 %    % Check the samples precede now record.
 %    for i = 1:length(precede)
 %         endofnoise{i} = dbe{i}(precede(i),:);
@@ -75,8 +75,8 @@ function [coi, coibe, precede] = wtcoi(dabe, samp, lx)
 % See also: wtxaxis.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 26-Nov-2018, Version 2017b
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 18-May-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Changelog -
 %
@@ -87,7 +87,7 @@ function [coi, coibe, precede] = wtcoi(dabe, samp, lx)
 % 26-Nov-2018: Added lx input to ensure 'out of range' outputs handled
 % correctly (I can't think of a case when the max of dabe wouldn't be
 % lx, but I added it here just in case).  Left option to default to
-% use max. 
+% use max.
 %
 % 27-Jul-2018: Removed sanity check that threw error if sample out of
 % dabe range and instead return [].  Added second output of first and
@@ -124,6 +124,17 @@ for i = 1:length(dabe)
 
     % Nab the first and last time-scale indices found above.
     coibe{i} = minmax(coi{i}');
+
+    % 18-May-2023: `minmax` errored for Dalija because she did not have the required
+    % toolbox; Joel made the below edit and is now tracking it to ensure it
+    % performs equally.
+    mn = min(coi{i});
+    mx = max(coi{i});
+    coibe2{i} = [mn mx];
+    if ~isequal(coibe, coibe2)
+        error('`minmax` fix not working as expected')
+
+    end
 
     % Return the last time-scale index that precedes the those found
     % above; i.e., the last time-scale index which is completely
