@@ -242,7 +242,7 @@ tadj = t2 - t1;
 
 %%______________________________________________________________________________________%%
 
-% NB, in the notation of equation 6 of paper??
+% NB, in the notation of equation A5 of Simon et al., 2022 (GJI), 10.1093/gji/ggab271.
 % * Z_w is z_ocean
 % * Z_MER is z_mermaid
 %
@@ -257,5 +257,5 @@ tadj = t2 - t1;
 %
 % Therefore, as described here:
 % tadj = t2 - t1
-%      = (z_ocean-z_mermaid)/[v2*cosd(theta2)] - z_ocean/[v1*cosd(theta1)]  % this file
-%      = (Z_w-Z_MER)/[v_w*cos(\theta_w)] - z_w/[v_r*cos(\theta_r)]          % Eq. 6
+%      = (z_ocean-z_mermaid)/[v2*cosd(theta2)] - z_ocean/[v1*cosd(theta1)]  % This file
+%      = (Z_w-Z_MER)/[v_w*cos(\theta_w)] - z_w/[v_r*cos(\theta_r)]          % Eq. A5
