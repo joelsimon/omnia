@@ -76,9 +76,9 @@ function [coi, coibe, precede] = wtcoi(dabe, samp, lx)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 18-May-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 30-May-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-% Changelog -
+% Changelog - this is way out of date; left for reference but use .git log instead
 %
 % UPDATE to 26-Nov-2018: Found a case where dabe doesn't reach lx:
 % [abe, dbe] = wtspy(length(x), 'CDF', [1 1], 5, 4, 0)
@@ -117,6 +117,7 @@ for i = 1:length(dabe)
     coi{i} = find(dabe{i}(:,1) <= samp & dabe{i}(:,2) >= samp);
     if isempty(coi{i})
         coibe{i} = {};
+        coibe2{i} = {}; % `minmax` fix test var to check edit; see below
         precede(i) = NaN;
         continue
 
@@ -131,6 +132,7 @@ for i = 1:length(dabe)
     mn = min(coi{i});
     mx = max(coi{i});
     coibe2{i} = [mn mx];
+
     if ~isequal(coibe, coibe2)
         error('`minmax` fix not working as expected')
 
