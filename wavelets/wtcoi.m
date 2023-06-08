@@ -133,7 +133,7 @@ for i = 1:length(dabe)
     mx = max(coi{i});
     coibe2{i} = [mn mx];
 
-    if ~isequal(coibe, coibe2)
+    if ~isequaln(coibe, coibe2)
         error('`minmax` fix not working as expected')
 
     end
