@@ -17,10 +17,10 @@ function [iabe, idbe] = iwtspy(lx, tipe, nvm, n, pph, intel)
 % lx,...,intel   Inputs to wtpsy.m, see there
 %
 % Output:
-% iabe          Time domain sample span associated with each time-scale 
-%                   approximation coefficient index 
-% idbe          Time domain sample span associated with each time-scale 
-%                   detail coefficient index 
+% iabe          Time domain sample span associated with each time-scale
+%                   approximation coefficient index
+% idbe          Time domain sample span associated with each time-scale
+%                   detail coefficient index
 %
 % This function is slower than wtspy.m, but for a good reason, which
 % is explained at the end of the file.
@@ -28,8 +28,8 @@ function [iabe, idbe] = iwtspy(lx, tipe, nvm, n, pph, intel)
 % See also: wtspy.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 16-Aug-2019, Version 2017b
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 08-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults and sanity.
 defval('tipe', 'CDF')
@@ -85,13 +85,27 @@ clearvars data
 
 % Do once for the approximations.
 iabe = NaN(length(a), 2);
+iabe2 = NaN(length(a), 2);
 for i = 1:length(a)
     a(i) = 1;
     [~, x] = iwt(a, d, an, dn, tipe, nvm, pph); % *See note at bottom.
     iabe(i, :) =  minmax(find(x)');
     a(i) = 0;
 
+    % 08-Jun-2023: `minmax` errored for Dalija because she did not have the required
+    % toolbox; Joel made the below edit and is now tracking it to ensure it
+    % performs equally.
+    fx = find(x)';
+    mn = min(fx);
+    mx = max(fx);
+    iabe2(i, :) = [mn mx];
+    if ~isequaln(iabe, iabe2)
+        keyboard
+        error('`minmax` fix not working as expected')
+
+    end
 end
+
 % minmax(NaN) returns [-Inf +Inf].  Set those indices back to NaN.
 % What is physically means: energy at that scale at that coefficient
 % is not seen in the original time series.
@@ -100,14 +114,29 @@ fprintf('...completed approximations...\n')
 
 % Do n times for details.
 idbe = celldeal(d, NaN);
+idbe2 = celldeal(d, NaN);
 for j = 1:length(d)
     idbe{j} = NaN(length(d{j}), 2);
+    idbe2{j} = NaN(length(d{j}), 2);
 
     for i = 1:length(d{j})
         d{j}(i) = 1;
         [~, x] = iwt(a, d, an, dn, tipe, nvm, pph);
         idbe{j}(i, :) =  minmax(find(x)');
         d{j}(i) = 0;
+
+        % 08-Jun-2023: `minmax` errored for Dalija because she did not have the required
+        % toolbox; Joel made the below edit and is now tracking it to ensure it
+        % performs equally.
+        fx = find(x)';
+        mn = min(fx);
+        mx = max(fx);
+        idbe2{j}(i, :) = [mn mx];
+        if ~isequaln(idbe, idbe2)
+            error('`minmax` fix not working as expected')
+
+        end
+
 
     end
     idbe{j}(~isfinite(idbe{j})) = NaN;
@@ -136,7 +165,7 @@ fprintf('\nSaved new iwtspy experiment to %s.\n', spyfile)
 
 %_________________________________________________________________%
 
-% A note about the speed of this function -- 
+% A note about the speed of this function --
 
 % This function is slower than wtspy.m because it is more general than
 % wtspy.m (and also requires 'n' times more computations; one for each
