@@ -41,22 +41,7 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ph, conf, ..
 % F             Structure containing both figure handles and other bits
 %                  (def: [], if event already matched)
 %
-% CPSAC2EVT requires the following folders exist with write permission:
-%    (1) [diro]/raw/evt/
-%    (2) [diro]/raw/pdf/
-%
-% Wherein, for every SAC file, three associated event files are written:
-%    (1) [diro]/raw/evt/*.raw.evt
-%    (2) [diro]/raw/pdf/*.complete.raw.pdf
-%    (3) [diro]/raw/pdf/*.windowed.raw.pdf
-%
-% For the following example first make the required directories:
-%
-%    mkdir ~/cpsac2evt_example/raw/pdf
-%    mkdir ~/cpsac2evt_example/raw/evt
-%
-% And for both examples, use these inputs:
-%
+% For both examples below, use these inputs:
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
 %    diro = '~/cpsac2evt_example';
 %
@@ -73,7 +58,7 @@ function varargout = cpsac2evt(sac, redo, domain, n, inputs, model, ph, conf, ..
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 18-May-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 09-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -96,11 +81,19 @@ rawevt  = fullfile(rawdiro, 'evt', [sans_sac '.raw.evt']);
 rawpdfc = fullfile(rawdiro, 'pdf', [sans_sac '.complete.raw.pdf']);
 rawpdfw = fullfile(rawdiro, 'pdf', [sans_sac '.windowed.raw.pdf']);
 
-% Generate raw directories if required
-% (silence "Warning: Directory already exists.")
-[~, ~] = mkdir(rawdiro);
-[~, ~] = mkdir(fullfile(rawdiro, 'evt'));
-[~, ~] = mkdir(fullfile(rawdiro, 'pdf'));
+% Generate raw directories if required.
+%    (1) [diro]/raw/evt/
+%    (2) [diro]/raw/pdf/
+rawdir = {'evt', ...
+          'pdf'};
+for i = 1:length(rawdir)
+    newdir = fullfile(rawdiro, rawdir{i});
+    [succ, mess] = mkdir(newdir);
+    if ~succ
+        error('Cannot create: %s\n`mkdir` message: %s\n', newdir, mess)
+
+    end
+end
 
 % Check if this SAC file has already been processed by cpsac2evt.m,
 % and return outputs if so.

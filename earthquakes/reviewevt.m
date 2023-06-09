@@ -80,12 +80,7 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 % After prompt 2 the user may type 'restart' to relaunch a fresh
 % instance of REVIEWEVT, useful if input error was made.
 %
-% For the following example run the first Ex1 in cpsac2evt.m,
-% then make these required directories:
-%
-%    mkdir ~/cpsac2evt_example/reviewed/identified/evt/
-%    mkdir ~/cpsac2evt_example/reviewed/unidentified/evt/
-%
+% For the following example run the first Ex1 in cpsac2evt.m.
 % Ex: (winnow EQ structure by selecting first-arriving P wave assoc. w/ first event)
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
 %    diro = '~/cpsac2evt_example';
@@ -104,6 +99,22 @@ defval('sac', 'centcal.1.BHZ.SAC')
 defval('redo', false)
 defval('diro', fullfile(getenv('MERMAID'), 'events'))
 defval('viewr', 2)
+
+% Generate reviewed directories if required.
+%    (1) [diro]/reviewed/identified/evt/
+%    (2) [diro]/reviewed/unidentified/evt/
+%    (3) [diro]/reviewed/purgatory/evt/
+revdir = {'identified', ...
+          'unidentified', ...
+          'purgatory'};
+for i = 1:length(revdir)
+    newdir = fullfile(diro, 'reviewed', revdir{i}, 'evt');
+    [succ, mess] = mkdir(newdir);
+    if ~succ
+        error('Cannot create: %s\n`mkdir` message: %s\n', newdir, mess)
+
+    end
+end
 
 %% Check if SAC already reviewed.
 
