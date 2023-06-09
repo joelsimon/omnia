@@ -1,0 +1,180 @@
+"How to convert .LOG, .MER and .BIN MERMAID files to .mseed and .sac, and
+match those traces to global earthquakes in the form of .evt files."
+
+Everything below is as-of-writing...this document (version numbers/branch names
+etc.) may quickly become outdated.
+
+Special thanks to Yong Yu and Dalija Namjesnik for being my beta testers.
+
+Author: Joel D. Simon
+Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+Last modified: 09-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+%% ___________________________________________________________________________%%
+%% THE BIG PICTURE                                                            %%
+%% ___________________________________________________________________________%%
+
+This document describes how to take MERMAID data from the server and convert it
+to .sac and .mseed, and then how to match those .sac traces with earthquakes in
+the global catalog, and save those earthquake metadata as so-called .evt files
+(which are really MATLAB structures saved as .mat files).  Those .evt files
+contain important travel-time information that can be used to compute, e.g.,
+travel-time residuals, which is beyond the scope of this document. This document
+is only concerned with generating the earthquake matches for future tomography.
+
+In short:
+
+* Codes in  "automaid" read ~/mermaid/server/ and write .sac and .mseed in ~/mermaid/processed/
+* Codes in "omnia" read .sac in ~/mermaid/processed/ and write .evt in ~/mermaid/events/
+
+It is suggested all codes/outputs be saved in a main ~/mermaid/ directory
+(though this is not required), which is used for all example paths below.
+
+%% ___________________________________________________________________________%%
+%% GENERAL WORKFLOW (check specific READMEs                                   %%
+%% ___________________________________________________________________________%%
+
+Note: "$" means run command in terminal; ">>" means run command in MATLAB.  This
+is a pseudo-workflow of command calls. Check automaid and omnia READMEs for
+specific run-time instructions; e.g., automaid requires the "pymaid" conda env be
+active.
+
+(1) Make .sac and .mseed from ~/mermaid/server (can be run on cron)
+
+    `$ python $AUTOMAID/scripts/main.py`
+
+Generates, e.g.:
+~mermaid/processed/452.020-P-08/20180806-13h48m01s/20180808T014200.08_5B736FA6.MER.DET.WLT5.sac
+~mermaid/processed/452.020-P-08/20180806-13h48m01s/20180808T014200.08_5B736FA6.MER.DET.WLT5.sac
+
+(2) Generate preliminary (raw/unreviewed) event matches (can be run on cron)
+
+    `>> matchall.m`
+
+Generates, e.g.:
+~/mermaid/events/raw/evt/20180808T014200.08_5B736FA6.MER.DET.WLT5.raw.evt
+~/mermaid/events/raw/evt/20180808T014200.08_5B736FA6.MER.DET.WLT5.complete.raw.pdf
+~/mermaid/events/raw/evt/20180808T014200.08_5B736FA6.MER.DET.WLT5.windowed.raw.pdf
+
+(3) Review preliminary match and determine identified/unidentified event
+    (requires user intervention; cannot be run on cron)
+
+    `>> reviewall.m`
+
+~/mermaid/events/reviewed/identified/evt/20180808T014200.08_5B736FA6.MER.DET.WLT5.evt
+
+%% ___________________________________________________________________________%%
+%% CODE YOU WILL NEED                                                         %%
+%% ___________________________________________________________________________%%
+
+I suggest you clone these in $HOME/mermaid ($ mkdir $HOME/mermaid; cd $HOME/mermaid)
+
+(1) automaid
+    `$ git clone https://github.com/earthscopeoceans/automaid`
+
+Unfortunately we have to be on a development branch at the moment. I have made
+some very important changes to the code that have not yet been merged into the
+master branch, so after cloning,
+
+    `$ git checkout v3.6.0`
+    `$ git pull --set-upstream origin v3.6.0`
+
+Requires "pymaid" conda env to run; use the README.md to install.  If your data
+set in ~/mermaid/server includes .BIN data you will also need to follow the
+instructions in README_ALSO.md to decrypt those files.
+
+(2) omnia
+    `$ git clone https://github.com/joelsimon/omnia`
+
+Will need to add environmental variables (below) and irisFetch-matlab .jar paths
+(see irisFetch README) to startup.m  Use my README for guidance.
+
+(3) irisFetch
+    `$ git clone https://github.com/iris-edu/irisFetch-matlab`
+
+Currently, Joel is using v2.0.10, but there is an updated 2.0.12.  If the later
+does not work for some reason you may always fall back on the older version,
+which can be cloned at https://github.com/joelsimon/irisFetch-matlab.  Again,
+check README.md in OMNIA, which includes descriptions of a jar file that must be
+downloaded and its path added to MATLAB startup.m
+
+%% ___________________________________________________________________________%%
+%% ENVIRONMENTAL VARIABLES YOU WILL NEED                                      %%
+%% ___________________________________________________________________________%%
+
+$OMNIA (where you cloned omnia; e.g., ~/mermaid/omnia/)
+$AUTOMAID (where you cloned automaid; e.g., ~/mermaid/automaid/)
+$IRISFETCH (where you cloned irisFetch-matlab; e.g., ~/mermaid/irisFetch-matlab)
+
+$MERMAID, with these required subdirs:
+$MERMAID/server/ (MERMAID sends  raw .vit, .LOG, .MER raw data here)
+$MERMAID/processed/ (automaid outputs .mseed and .sac etc. here)
+$MERMAID/events/ (omnia writes .evt files for earthquake matches here)
+
+%% ___________________________________________________________________________ %%
+%% ANSWERING THE MATLAB `REVIEWEVT.M` AND `REVEIWALL.M` PROMPTS                %%
+%% ___________________________________________________________________________ %%
+
+After running automaid to generate .sac, and `reviewall.m` in MATLAB to write
+their corresponding *raw.evt files, you must manually review them and determine
+if the MERMAID trace is "identified" or "unidentified".  You do this by running:
+
+   `>> reviewevt.m`  (or `reviewall.m`)
+
+99% of the time that you see a match you will answer the three prompts: "y",
+"1", ":", for "yes event identified", "match is EQ(1) from EQ list", "save all
+phases in output .evt structure."  Note that I prefer to save all phases in case
+I ever want to go back and check for e.g., S waves or something. Also, for core
+phases in particular sometimes PKiKP will arrive before PKP, but we know from
+amplitudes that PKP is the actual match.  Even in that case I still save
+all phases just for completeness. So I would suggest you always use a colon ":"
+for saving phases.
+
+So in the command line that would look like this --
+
+K>> dbcont
+
+     Is this event identified? [Y/N/M/back/skip]: y
+     Matched EQ(#) [or back/restart]: 1
+     Matched TaupTimes(#) for EQ(1) [or restart]: :
+
+The EQ list is organized by magnitude. 99% of the time the largest magnitude
+event is the match. Rarely the second (or third), etc., earthquake in the list
+is the actual match, e.g., if there is a Mw 5 180 degrees away, and a Mw 4.8 4
+degrees away, and the timing of "P_2" phase aligns with the AIC picks, then you
+would want to pick the second event in the EQ list.
+
+K>> dbcont
+
+     Is this event identified? [Y/N/M/back/skip]: y
+     Matched EQ(#) [or back/restart]: 2
+     Matched TaupTimes(#) for EQ(2) [or restart]: :
+
+
+%% ___________________________________________________________________________ %%
+%% SOME COMMON PITFALLS & GENERAL SUGGESTIONS
+%% ___________________________________________________________________________ %%
+
+* If working remotely via ssh, both automaid and omnia require login with X11
+  forwarding via "ssh -Y" or "ssh -X"
+
+* Most generally EQ(1).TaupTimes(1) is the first-arriving phase of the matched
+  event.
+
+* `matchevt.m` PRELIMINARILY matches a single .sac with all possible earthquakes
+  in the PDE; `matchall.m` just loops over all .sac for you and preliminarily
+  matches all unmatched SAC.  These codes save raw (unreviewed) .evt and .pdf
+  files in ~/mermaid/events/raw/.  These codes can be run automatically, e.g.,
+  on a cron job, without user intervention.
+
+* `reviewevt.m` requires user intervention to determine if a .sac file is
+  IDENTIFIED or UNIDENTIFIED (e.g., the signal is truly, not just preliminarily,
+  matched to a known earthquake(s)) via inspection of all preliminary events
+  saved in the *.raw.evt file; `reviewall.m` just loops over all .sac files and
+  asks you to review each sequentially.  These codes save reviewed .evt files in
+  ~/mermaid/events/reviewd/[identified,unidentified]/.
+
+* During review, if a purportedly distant signal only exhibits high-SNR at high
+  scales 1 and 2 (~5-10 Hz) and not at mid-scales (~1-5 Hz), it's probably not a
+  match, and rather an unidentified local event; teleseisms do not have high-SNR
+  at high-scales (high frequencies, 5 Hz+).
