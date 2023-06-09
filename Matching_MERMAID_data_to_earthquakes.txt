@@ -35,7 +35,7 @@ Please read section "S3 MATCHING MERMAID SEISMOGRAMS TO EARTHQUAKES" of
 earthquake-matching procedure developed here.
 
 %% ___________________________________________________________________________%%
-%% GENERAL WORKFLOW (check specific READMEs                                   %%
+%% GENERAL WORKFLOW (check specific READMEs)                                  %%
 %% ___________________________________________________________________________%%
 
 Note: "$" means run command in terminal; ">>" means run command in MATLAB.  This
