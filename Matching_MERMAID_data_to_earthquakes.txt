@@ -30,6 +30,10 @@ In short:
 It is suggested all codes/outputs be saved in a main ~/mermaid/ directory
 (though this is not required), which is used for all example paths below.
 
+Please read section "S3 MATCHING MERMAID SEISMOGRAMS TO EARTHQUAKES" of
+"Matching_MERMAID_data_to_earthquakes.pdf" for a description of the
+earthquake-matching procedure developed here.
+
 %% ___________________________________________________________________________%%
 %% GENERAL WORKFLOW (check specific READMEs                                   %%
 %% ___________________________________________________________________________%%
