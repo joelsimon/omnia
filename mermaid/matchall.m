@@ -1,11 +1,14 @@
-function matchall(writecp)
-% MATCHALL(writecp)
+function matchall(writecp, procdir, evtdir)
+% MATCHALL(writecp, procdir, evtdir)
 %
 % Matches all unmatched $MERMAID SAC files to the IRIS database using
 % cpsac2evt.m and its defaults, assuming same system configuration as JDS.
 %
 % Input:
-% writecp        true to write changepoint (.cp) files (def: false)
+% writecp    true to write changepoint (.cp) files (def: false)
+% procdir    Path to processed directory (def: $MERMAID/processed/)
+% evtdir     Path to events directory (def: $MERMAID/events/)
+%
 %
 % A list of any files which are unsuccessfully matched using
 % cpsac2evt.m are saved as 'matchall_fail.txt' $MERMAID/events (or
@@ -13,18 +16,25 @@ function matchall(writecp)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 30-May-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-% Default.
+clc
+
+% Defauls.
 defval('writecp', false)
+defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
+defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 
 % Find only those SAC files which have not been preliminary matched.
-allsac = fullsac;
-rawevt = skipdotdir(dir(fullfile(getenv('MERMAID'), 'events', 'raw', 'evt')));
+allsac = fullsac([], procdir);
+if isempty(allsac)
+    error('No .sac files recursively found in %s\n', procdir)
+
+end
+rawevt = skipdotdir(dir(fullfile(evtdir, 'raw', 'evt')));
 already_matched = strrep({rawevt.name}, '.raw.evt', '.sac'); % Not necessarily reviewed!
 allsac_nopath = cellfun(@(xx) strippath(xx), allsac, 'UniformOutput', false);
 [~, idx] = setdiff(allsac_nopath, already_matched);
-%pool = gcp;
 
 % Loop over the unmatched SAC files.
 fail = [];
@@ -65,7 +75,7 @@ for i = 1:length(s)
 
     % Write raw event (.raw.evt) files.
     try
-        cpsac2evt(s{i}, false, 'time', n);
+        cpsac2evt(s{i}, false, 'time', n, [], [], [], [], [], evtdir);
 
     catch ME
         fail = [fail i];
@@ -94,7 +104,7 @@ else
     failsac = {};
 
 end
-fid = fopen(fullfile(getenv('MERMAID'), 'events', 'raw', 'matchall_fail.txt'), 'w');
+fid = fopen(fullfile(evtdir, 'raw', 'matchall_fail.txt'), 'w');
 fprintf(fid, '%s\n', failsac{:});
 fclose(fid);
 fprintf('\nAll done.\n')

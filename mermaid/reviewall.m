@@ -1,5 +1,5 @@
-function reviewall(writecp, floatnum)
-% REVIEWALL(writecp, floatnum)
+function reviewall(writecp, floatnum, procdir, evtdir)
+% REVIEWALL(writecp, floatnum, procdir, evtdir)
 %
 % Review all unreviewed $MERMAID events using reviewevt.m, assuming
 % same system configuration as JDS.
@@ -9,6 +9,8 @@ function reviewall(writecp, floatnum)
 %           false to skip running writechangepointall.m (def: false)
 % floatnum  Character array of MERMAID float number, to only review
 %               those .evt files associated with it (e.g., '12')
+% procdir   Path to processed directory (def: $MERMAID/processed/)
+% evtdir    Path to events directory (def: $MERMAID/events/)
 %
 % Output:
 % N/A       Writes reviewed .evt files, updates .txt files,
@@ -16,11 +18,13 @@ function reviewall(writecp, floatnum)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 18-May-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('writecp', false)
 defval('floatnum', [])
+defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
+defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 
 skip_french = true;
 
@@ -39,7 +43,7 @@ clc
 fprintf('Searching for unreviewed SAC files...\n')
 
 % Compile list of reviewed SAC files by inspecting the list of reviewed .evt files.
-revevt_dir = fullfile(getenv('MERMAID'), 'events', 'reviewed');
+revevt_dir = fullfile(evtdir, 'reviewed');
 d = recursivedir(dir(fullfile(revevt_dir, '**/*.evt')));
 if ~isempty(d)
     evt = strrep(strippath(d), 'evt', 'sac');
@@ -50,11 +54,9 @@ else
 end
 
 % Compile list of all SAC files and compare their differences.
-proc_dir = fullfile(getenv('MERMAID'), 'processed');
-sac = fullsac([], proc_dir);
+sac = fullsac([], procdir);
 if isempty(sac)
-    fprintf('%s contains, recursively, no .*sac files...exiting\n', proc_dir)
-    return
+    error('No .sac files recursively found in %s\n', procdir)
 
 end
 [~, idx] = setdiff(strippath(sac), evt);
@@ -76,7 +78,7 @@ num_rev = num_sac;
 for i = 1:num_sac
     fprintf('Remaining SAC to be reviewed: %3i\n', num_rev)
     try
-        reviewevt(sac{i}, [], [], viewr);
+        reviewevt(sac{i}, false, evtdir, viewr);
 
     catch
         fail = [fail; i];
@@ -121,7 +123,7 @@ else
     failsac = {};
 
 end
-fid = fopen(fullfile(getenv('MERMAID'), 'events', 'reviewed', 'reviewall_fail.txt'), 'w');
+fid = fopen(fullfile(revevt_dir, 'reviewed', 'reviewall_fail.txt'), 'w');
 fprintf(fid, '%s\n', failsac{:});
 fclose(fid);
 fprintf('\nAll done.\n')
