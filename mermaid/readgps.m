@@ -17,7 +17,7 @@ function gps = readgps(processed, rm23)
 % rm23          Replace GPS data associated with dates:
 %                   '2019-08-17T03:18:29Z' and '2019-08-17T03:22:02Z'
 %                   (when P0023 was out of the water) with '', NaN, NaT
-%                   (def: True)
+%                   (def: true)
 %
 % Output:
 % gps           GPS structure that parses gps.csv, organized by float name
