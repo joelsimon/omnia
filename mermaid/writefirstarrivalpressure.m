@@ -12,9 +12,10 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 % redundant compared with that of writefirstarrival.m, but it is not.
 %
 % Input:
-% s        Cell array of identified SAC filenames (def: revsac(1))
+% s        Cell array of identified SAC filenames
+%              (def: `revsac(1, sacdir, evtdir, 'ALL')`; or the defaults therein)
 % redo     true: delete and remake the text file
-%          false: append new lines to the existing tex file unless
+%          false: add new lines to the existing tex file unless
 %              that SAC file name already exists in the text file (def)
 % filename Output text file name (def: $MERMAID/.../firstarrivalpressure.txt)
 % wlen     Window length [s] (def: 30)
@@ -59,7 +60,7 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 10-Dec-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 13-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% !!
 %%
@@ -68,14 +69,14 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 %% !!
 
 % Defaults.
-defval('s', revsac(1))
+defval('sacdir', [])
+defval('evtdir', [])
+defval('s', revsac(1, sacdir, evtdir, 'ALL'))
 defval('redo', false)
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'firstarrivalpressure.txt'))
 defval('wlen', 30)
 defval('lohi', [1 5])
-defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
-defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('EQ', [])
 defval('bathy', true)
 defval('wlen2', 1)
@@ -101,7 +102,7 @@ fmt = ['%44s    ' , ...
        '%3i    ', ...
        '%i\n'];
 
-% Sort out if deleting, appending to, or creating output file.
+% Sort out if deleting, adding to, or creating output file.
 if exist(filename,'file') == 2
     % Grant write access to file.
     writeaccess('unlock', filename, false)
@@ -113,9 +114,9 @@ if exist(filename,'file') == 2
         verb = 'Wrote';
 
     else
-        % Append to existing contents.
+        % Add to existing contents.
         fid = fopen(filename, 'a');
-        verb = 'Appended';
+        verb = 'Added';
 
     end
 else
@@ -163,7 +164,7 @@ if isempty(wlines)
     fprintf('No new lines written to:\n%s\n', filename)
 
 else
-    % Append new lines to the text file.
+    % Add new lines to the text file.
     fprintf(fid, wlines);
     fclose(fid);
 

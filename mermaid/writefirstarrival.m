@@ -10,16 +10,17 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 % time of the first-arriving phase is labeled "syn".
 %
 % Input: (see `firstarrival.m` for defaults)
-% s        Cell array of identified SAC filenames (def: revsac(1))
+% s        Cell array of identified SAC filenames
+%              (def: `revsac(1, sacdir, evtdir, 'ALL')`; or the defaults therein)
 % redo     true: delete and remake the text file
-%          false: append new lines to the existing text file unless
+%          false: add new lines to the existing text file unless
 %              that SAC file name already exists in the text file (def)
 % filename Output text file name (def: $MERMAID/.../firstarrival.txt)
 % wlen     Window length [s]
 % lohi     1x2 array of corner frequencies, or NaN to skip bandpass
 % sacdir   Directory containing (possibly subdirectories) of .sac files
 % evtdir   Directory containing (possibly subdirectories) of .evt files
-% EQ      Cell array (same size as 's') of corresponding EQ structs
+% EQ       Cell array (same size as 's') of corresponding EQ structs
 % bathy    logical true apply bathymetric travel time correction,
 %              computed with bathtime.m
 % wlen2    Length of second window, starting at the 'dat', the time of
@@ -56,25 +57,31 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 31-Jan-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 13-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
-defval('s', revsac(1))
+defval('sacdir', [])
+defval('evtdir', [])
+defval('s', revsac(1, sacdir, evtdir, 'ALL'))
 defval('redo', false)
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'firstarrival.txt'))
-
 % Default the rest as empties to be filled in firstarrival.m
 defval('wlen', [])
 defval('lohi', [])
-defval('sacdir', [])
-defval('evtdir', [])
 defval('EQ', [])
 defval('bathy', [])
 defval('wlen2', [])
 defval('fs', [])
 defval('popas', [])
 defval('pt0', 0)
+
+% Make textfile directory, if required.
+fdir = fileparts(filename);
+if exist(fdir, 'dir') ~= 7
+    mkdir(fdir)
+
+end
 
 % Textfile format.
 fmt = ['%44s    ' , ...
@@ -92,7 +99,7 @@ fmt = ['%44s    ' , ...
        '%3i    ', ...
        '%3i\n'];
 
-% Sort out if deleting, appending to, or creating output file.
+% Sort out if deleting, adding to, or creating output file.
 if exist(filename, 'file') == 2
     % Grant write access to file.
     writeaccess('unlock', filename, false)
@@ -104,9 +111,9 @@ if exist(filename, 'file') == 2
         verb = 'Wrote';
 
     else
-        % Append to existing contents.
+        % Add to existing contents.
         fid = fopen(filename, 'a');
-        verb = 'Appended';
+        verb = 'Added';
 
     end
 else
@@ -154,7 +161,7 @@ if isempty(wlines)
     fprintf('No new lines written to:\n%s\n', filename)
 
 else
-    % Append new lines to the text file.
+    % Add new lines to the text file.
     fprintf(fid, wlines);
     fclose(fid);
 
