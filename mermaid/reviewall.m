@@ -18,7 +18,7 @@ function reviewall(writecp, floatnum, procdir, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 12-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 14-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('writecp', false)
@@ -123,7 +123,7 @@ else
     failsac = {};
 
 end
-fid = fopen(fullfile(revevt_dir, 'reviewed', 'reviewall_fail.txt'), 'w');
+fid = fopen(fullfile(revevt_dir, 'reviewall_fail.txt'), 'w');
 fprintf(fid, '%s\n', failsac{:});
 fclose(fid);
 fprintf('\nAll done.\n')
