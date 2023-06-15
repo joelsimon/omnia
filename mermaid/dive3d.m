@@ -1,10 +1,16 @@
-function dive3d
+function dive3d(geocsv)
+% DIVE3D(geocsv)
+%
 % WIP: Generate movie of 3-D dive trajectory from GeoCSV file.
+%
+% Author: Joel D. Simon
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 15-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
 
-load '~/Desktop/P0006_GeoCSV.mat';
+G = readGeoCSV(geocsv);
 
 lon = longitude360(G.Longitude);
 lat = G.Latitude;
@@ -46,7 +52,7 @@ box on
 grid on
 
 fr = 10;
-vid = VideoWriter('vidFile', 'MPEG-4');
+vid = VideoWriter(strippath(geocsv), 'MPEG-4');
 vid.FrameRate = 10;
 open(vid)
 
