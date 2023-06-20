@@ -5,7 +5,7 @@ function [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = getevt(sac, evtdir, o
 % (reviewed) with reviewevt.m.
 %
 % Input:
-% sac       SAC filename
+% sac       SAC filename (.evt also allowed)
 %               (def: '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 % evtdir    Path to directory containing 'raw/' and 'reviewed'
 %               subdirectories (def: $MERMAID/events/)
@@ -39,13 +39,19 @@ function [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = getevt(sac, evtdir, o
 % See also: getrevevt.m, reviewevt.m, revsac.m, cpsac2evt.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 21-Mar-2019, Version 2017b
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 20-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('openpdf', false);
+
+% Also allow .evt as input.
+if strcmp(sac(end-3:end), '.evt')
+    sac(end-3:end) = '.sac';
+
+end
 
 %% N.B.________________________________________________________________%
 % Do not wrap finding rev_evt and raw_evt into loop with a dynamically
