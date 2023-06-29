@@ -12,7 +12,7 @@ function [T,S,DT,DS]=gdemv(lat1,lon1,dep1,Mmm,xver,T,S,DT,DS)
 % xver         0 Proceed along with the extraction
 %              1 Excessive verification
 %              2 Database load only, no values extracted
-%              3 Input coordinates are a line, not a grid  
+%              3 Input coordinates are a line, not a grid
 % T,S,DT,DS    Database input
 %
 % OUTPUT:
@@ -67,7 +67,7 @@ function [T,S,DT,DS]=gdemv(lat1,lon1,dep1,Mmm,xver,T,S,DT,DS)
 % lat1=lat1*pi/180; lat2=lat2*pi/180;
 % [lolag,delta]=grcircle([lon1 lat1],[lon2 lat2],round(gdeg/0.25));
 % figure(1); hold on
-% pc=twoplot(lolag*180/pi); set(pc,'LineWidth',2,'Color','k'); hold off 
+% pc=twoplot(lolag*180/pi); set(pc,'LineWidth',2,'Color','k'); hold off
 % lons=lolag(:,1)*180/pi;
 % lats=lolag(:,2)*180/pi;
 % dels=delta*180/pi*fralmanac('DegDis','Earth')/1000;
@@ -94,9 +94,11 @@ function [T,S,DT,DS]=gdemv(lat1,lon1,dep1,Mmm,xver,T,S,DT,DS)
 % OAML for the preprocessing, GEBCO for a better bathymetry grid
 %
 % Last modified by fjsimons-at-alum.mit.edu, 06/08/2023
+% Last modified by jdsimon-at-alumni.princeton.edu, 06/29/2023
 
 % Where are the data being kept?
-defval('ddir','/data1/fjsimons/IFILES/GDEM-V/MONTHLY')
+defval('ddir', fullfile(getenv('IFILES'), 'GDEM-V', 'MONTHLY'))
+
 % Defaults
 defval('lat1',15)
 defval('lon1',-25)
@@ -116,7 +118,7 @@ if nargin<=5
     DT=water_temp_stdev;
     DS=salinity_stdev;
 end
-    
+
 if xver==2
     % Be done already, now you can pass the database around
     % exactly in the form that it came.
@@ -161,7 +163,7 @@ else
         %A=repmat(sub2ind([length(lat) length(lon)],lati(:)',loni(:)'),...
         %       length(depi),1)+repmat((depi(:)-1)*length(lat)*length(lon),...
         %                              1,length(lati));
-        % Easier these days with an outer sum... 
+        % Easier these days with an outer sum...
         B=sub2ind([length(lat) length(lon)],lati(:)',loni(:)')...
           +(depi(:)-1)*length(lat)*length(lon);
         % Pick up the right stuff
