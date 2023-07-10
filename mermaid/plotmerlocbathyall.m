@@ -15,6 +15,9 @@ function plotmerlocbathyall(skip_french, skip_nearby, just_xenet)
 %
 % * Sets `skip_french = true' and uses nearbystations list updated 2023-05-08.
 %
+% See also: plotmerlocbathysppim
+%           (to plot entire SPPIM array, not just Princeton/GeoAzur 16/18)
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 08-May-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
