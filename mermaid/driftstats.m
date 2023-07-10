@@ -162,4 +162,5 @@ ave_dist = nanmean(dist);
 tot_time = nansum(time);
 ave_time = nanmean(time);
 
-ave_vel = nanmean(vel);
+%ave_vel = nanmean(vel);
+ave_vel = tot_dist / tot_time;
