@@ -1,9 +1,12 @@
-function plotmerlocbathy(mername, legendloc)
+function F = plotmerlocbathy(mername, legendloc)
 % PLOTMERLOCBATHY(mername, legendloc)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 21-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 10-Jul-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+clc
+close all
 
 % Defaults
 merpath = getenv('MERMAID');
@@ -42,7 +45,7 @@ end
 %%______________________________________________________________________________________%%
 %% (1) Plot bathymetric base map one separate axis
 %%______________________________________________________________________________________%%
- 
+
 % Let MATLAB determine the x/ylims of the ultimate base map: scatter the data then delete the plot.
 scatter(lon, lat, [], 'w');
 xl = xlim;
@@ -53,8 +56,14 @@ close
 ax_bathy = axes;
 
 % Flip the YLimits because they must go from high to low numbers (southing).
-cax = [-7000 1500];
-[ax_bathy, cb_bathy] = plotsouthpacificbathy(xl, flip(yl), cax);
+%cax = [-7000 1500];
+%[ax_bathy, cb_bathy] = plotsouthpacificbathy(xl, flip(yl), cax);
+F = plotgebcopacific();
+ax_bathy = F.ha;
+ax_bathy.XLim = [xl(1)-3 xl(2)+3];
+ax_bathy.YLim = [yl(1)-3 yl(2)+3];
+
+cb_bathy = F.cb;
 cb_bathy.Ticks = [-7000:1000:0 1500];
 
 % Base map cosmetics.
@@ -65,15 +74,15 @@ cb_bathy.Label.Interpreter = 'LaTeX';
 cb_bathy.TickDirection = 'Out';
 
 % Turn off base map axis labels.
-set(ax_bathy, 'Visible', 'off');
+%set(ax_bathy, 'Visible', 'off');
 
-if diff(xl) > diff(yl)
-    fig2print(gcf, 'flandscape')
+% if diff(xl) > diff(yl)
+%     fig2print(gcf, 'flandscape')
 
-else
-    fig2print(gcf, 'fportrait')
+% else
+%     fig2print(gcf, 'fportrait')
 
-end
+% end
 %%______________________________________________________________________________________%%
 %% (2) Overlay MERMAID drift tracks in separate transparent axis
 %%______________________________________________________________________________________%%
@@ -178,15 +187,15 @@ tl_str = sprintf('%s total drift=%i km,', tl_str, round(drift_tot.tot_dist/1000)
 tl_str = sprintf('%s surface velocity=%.1f km/hr,', tl_str, drift_surf.ave_vel*3.6);
 tl_str = sprintf('%s deep velocity=%.1f km/day', tl_str, drift_deep.ave_vel*3.6*24);
 
-tl = title(ax_mer, tl_str);
+tl = title(ax_bathy, tl_str);
 
 %%______________________________________________________________________________________%%
 %% (5) Final cosmetics and axes adjustment to ensure they lie on top of one another
 %%______________________________________________________________________________________%%
 
 lg = legend(ax_mer, [sc sc_id], ...
-            {'GPS location', sprintf('signal recorded\n(location interpolated)')}, ...
-            'Interpreter', 'LaTeX', 'Color', [0.8 0.8 0.8])
+            {'GPS Location', sprintf('Identified Signal Recorded\n(Location Interpolated)')}, ...
+            'Interpreter', 'LaTeX', 'Color', [0.8 0.8 0.8]);
 lg.LineWidth = 1;
 lg.Location = legendloc;
 uistack(lg, 'top')
@@ -201,4 +210,5 @@ set(ax_mer, 'Position', ax_bathy.Position,  ...
             'XLim', ax_bathy.XLim, ...
             'YLim', ax_bathy.YLim, ...
             'DataAspectRatio', ax_bathy.DataAspectRatio, ...
-            'TickDir', 'Out', 'Box', 'on', 'Color', 'None')
+            'Visible', 'off')
+
