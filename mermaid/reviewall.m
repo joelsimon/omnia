@@ -26,7 +26,7 @@ defval('floatnum', [])
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 
-skip_french = true;
+skip_french = false;
 
 % Switch the .pdf viewer depending on the platform.
 switch computer
