@@ -1,5 +1,5 @@
-function [r2,p,r2_adj] = linreg(x,y,n)
-% [r2,p,r2_adj] = LINREG(x,y,n)
+function [r2, p, r2_adj, yfit] = linreg(x, y, n)
+% [r2, p, r2_adj, yfit] = LINREG(x, y, n)
 %
 % Performs linear regression and computes R-squared value in a
 % least-squares sense. Code follows MATLAB's help doc, 'Linear
@@ -15,20 +15,21 @@ function [r2,p,r2_adj] = linreg(x,y,n)
 % p                Best fit polynomial from polyfit
 % r2_adjust        Adjusted R-squared value
 %                      (penalizes higher order fits)
+% yfit             Fitted curve, evaluated at points in `x`
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 08-Mar-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 13-Jul-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default.
-defval('n',1)
+defval('n', 1)
 
 % Fit data, calculate residuals, return (adjusted, maybe) R-squared.
 x = x(:);
 y = y(:);
-p = polyfit(x,y,n);
+p = polyfit(x, y, n);
 
-yfit = polyval(p,x);
+yfit = polyval(p, x);
 yresid = y - yfit;
 
 SSres = sum(yresid.^2);
