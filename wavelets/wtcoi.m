@@ -1,5 +1,5 @@
 function [coi, coibe, precede] = wtcoi(dabe, samp, lx)
-% [coi, coibe, precede] = WTCOI(dabe, samp)
+% [coi, coibe, precede] = WTCOI(dabe, samp, lx)
 %
 % WTCOI returns the cone of influence of a single sample in the time
 % domain, i.e. the time-scale indices that contain ('see'; are
@@ -76,7 +76,7 @@ function [coi, coibe, precede] = wtcoi(dabe, samp, lx)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 30-May-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 20-Jul-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Changelog - this is way out of date; left for reference but use .git log instead
 %
@@ -96,7 +96,7 @@ function [coi, coibe, precede] = wtcoi(dabe, samp, lx)
 % Sanity.
 validateattributes(dabe, {'cell'}, {}, 1)
 validateattributes(samp, {'numeric'}, {'integer'}, 2)
-validateattributes(lx, {'numeric'}, {'integer'}, 3)
+%validateattributes(lx, {'numeric'}, {'integer'}, 3)
 
 % Default length: presumes maximum of dabe represents the total length of the original signal.
 defval('lx', max(cellfun(@(xx) max(xx(:)), dabe)))
@@ -117,25 +117,24 @@ for i = 1:length(dabe)
     coi{i} = find(dabe{i}(:,1) <= samp & dabe{i}(:,2) >= samp);
     if isempty(coi{i})
         coibe{i} = {};
-        coibe2{i} = {}; % `minmax` fix test var to check edit; see below
+        orig_coibe{i} = {};
         precede(i) = NaN;
         continue
 
     end
 
+    %% SEE 08-Jun-2023 `minmax` comment in `iwtspy`
     % Nab the first and last time-scale indices found above.
-    coibe{i} = minmax(coi{i}');
-
-    % 18-May-2023: `minmax` errored for Dalija because she did not have the required
-    % toolbox; Joel made the below edit and is now tracking it to ensure it
-    % performs equally.
     mn = min(coi{i});
     mx = max(coi{i});
-    coibe2{i} = [mn mx];
+    coibe{i} = [mn mx];
 
-    if ~isequaln(coibe, coibe2)
-        error('`minmax` fix not working as expected')
+    if exist('minmax')
+        orig_coibe{i} = minmax(coi{i}');
+        if ~isequaln(coibe, orig_coibe)
+            error('`minmax` fix not working as expected')
 
+        end
     end
 
     % Return the last time-scale index that precedes the those found

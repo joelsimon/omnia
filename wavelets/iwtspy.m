@@ -29,7 +29,7 @@ function [iabe, idbe] = iwtspy(lx, tipe, nvm, n, pph, intel)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 08-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 20-Jul-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults and sanity.
 defval('tipe', 'CDF')
@@ -85,25 +85,35 @@ clearvars data
 
 % Do once for the approximations.
 iabe = NaN(length(a), 2);
-iabe2 = NaN(length(a), 2);
+orig_iabe = NaN(length(a), 2);
 for i = 1:length(a)
     a(i) = 1;
     [~, x] = iwt(a, d, an, dn, tipe, nvm, pph); % *See note at bottom.
-    iabe(i, :) =  minmax(find(x)');
-    a(i) = 0;
 
     % 08-Jun-2023: `minmax` errored for Dalija because she did not have the required
     % toolbox; Joel made the below edit and is now tracking it to ensure it
-    % performs equally.
+    % performs equally (the original method was `iabe(i, :) =  minmax(find(x)')`).
     fx = find(x)';
     mn = min(fx);
     mx = max(fx);
-    iabe2(i, :) = [mn mx];
-    if ~isequaln(iabe, iabe2)
-        keyboard
-        error('`minmax` fix not working as expected')
+    iabe(i, :) = [mn mx];
 
+    % Test `minmax` fix (replacing with `min`, `max`), if function exists.
+    %
+    % Unexpected behavior: exist('min') == 5, for "built-in MATLAB function"
+    %                      exist('minmax') == 2, for "file with extension .m"
+    % I don't see the difference; maybe because the latter is in toolbox?
+    if exist('minmax')
+        orig_iabe(i, :) =  minmax(find(x)');
+        if ~isequaln(iabe, orig_iabe)
+            error('`minmax` fix not working as expected')
+
+        end
     end
+
+
+    a(i) = 0;
+
 end
 
 % minmax(NaN) returns [-Inf +Inf].  Set those indices back to NaN.
@@ -114,29 +124,29 @@ fprintf('...completed approximations...\n')
 
 % Do n times for details.
 idbe = celldeal(d, NaN);
-idbe2 = celldeal(d, NaN);
+orig_idbe = celldeal(d, NaN);
 for j = 1:length(d)
     idbe{j} = NaN(length(d{j}), 2);
-    idbe2{j} = NaN(length(d{j}), 2);
+    orig_idbe{j} = NaN(length(d{j}), 2);
 
     for i = 1:length(d{j})
         d{j}(i) = 1;
         [~, x] = iwt(a, d, an, dn, tipe, nvm, pph);
-        idbe{j}(i, :) =  minmax(find(x)');
-        d{j}(i) = 0;
 
-        % 08-Jun-2023: `minmax` errored for Dalija because she did not have the required
-        % toolbox; Joel made the below edit and is now tracking it to ensure it
-        % performs equally.
+        % See above, 08-Jun-2023 edit.
         fx = find(x)';
         mn = min(fx);
         mx = max(fx);
-        idbe2{j}(i, :) = [mn mx];
-        if ~isequaln(idbe, idbe2)
-            error('`minmax` fix not working as expected')
+        idbe{j}(i, :) = [mn mx];
 
+        if exist('minmax')
+            orig_idbe{j}(i, :) =  minmax(find(x)');
+            if ~isequaln(idbe, orig_idbe)
+                error('`minmax` fix not working as expected')
+
+            end
         end
-
+        d{j}(i) = 0;
 
     end
     idbe{j}(~isfinite(idbe{j})) = NaN;
