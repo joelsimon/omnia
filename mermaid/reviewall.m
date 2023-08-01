@@ -18,7 +18,7 @@ function reviewall(writecp, floatnum, procdir, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 14-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 01-Aug-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('writecp', false)
@@ -81,11 +81,11 @@ for i = 1:num_sac
         reviewevt(sac{i}, false, evtdir, viewr);
 
     catch
+        fprintf('Skipping...%s\n', strippath(sac{i}))
         fail = [fail; i];
 
     end
     num_rev = num_rev - 1;
-    clc
 
 end
 clc
