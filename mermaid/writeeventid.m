@@ -3,6 +3,12 @@ function writeeventid(sacdir, evtdir)
 %
 % Write event text file with lines: <sac_filename>  | <contrib_id>  | <iris_id>
 %
+% Input:
+% sacdir       Directory containg .sac files (def: $MERMAID/processed/)
+% evtdir       Directory containg .evt files (def: $MERMAID/events/
+%
+% Output: eventid.txt
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 11-Aug-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
@@ -29,6 +35,6 @@ for i = 1:length(evt)
     fprintf(fid, fmt, sname, contrib_eventid, iris_eventid);
 
 end
-fclose(fid)
+fclose(fid);
 writeaccess('lock', fname);
-sprintf('Wrote: %s\n', fname);
+fprintf('Wrote: %s\n', fname)
