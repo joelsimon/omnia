@@ -80,7 +80,7 @@ if ~isempty(VE2)
     %% RECURSION
     % Bizare...have to run Ex2 twice to land on proper adjustment...
     while round(vertexag(ax)) ~= round(VE2)
-        vertexag(ax, VE2, HorW)
+        vertexag(ax, VE2, HorW);
 
     end
 end
@@ -108,6 +108,6 @@ for i = 1:length(ax.Parent)
 
         end
         break
-        
+
     end
 end
