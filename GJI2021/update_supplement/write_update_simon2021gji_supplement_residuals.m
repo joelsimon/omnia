@@ -42,7 +42,7 @@ fs = 20; % Decimation is a pass-through function when R = 1 (which it does at fs
 popas = [4 1];
 pt0 = 0;
 
-%%            Identify the list of SAC files whose first phase is p or P                 %%
+%%            Identify the list of SAC files whose first phase is p or P                %%
 %%______________________________________________________________________________________%%
 
 % Read the relevant SAC files from mer.firstarr.all.txt.
@@ -201,7 +201,7 @@ fmt = [sac_fmt ...                        %  1
 filename = fullfile(datadir, 'update_simon2021gji_supplement_residuals.txt');
 
 writeaccess('unlock', filename, false);
-prev_file = exist(filename, 'file') == 2
+prev_file = exist(filename, 'file') == 2;
 
 if ~prev_file || redo
     fid = fopen(filename, 'w+');
@@ -304,31 +304,6 @@ for i = 1:length(s);
                                                       lohi, procdir, ...
                                                       evtdir, EQ, bathy, ...
                                                       wlen2, fs, popas, pt0);
-
-
-    %% 26-Jan-2023: we can't run some of these validations because, unlike
-    %% the "locked" firstarrival textfile used in the paper, the current
-    %% firstarrival textfile that lives in $MERMAID/events/ might have had different
-    %% parameters in use and thus things like `max_delay` and `max_counts`
-    %% may differ. These validations really were just to test to make sure
-    %% the old and current runs all used the same parameters, which we don't
-    %% care about now because we are re-running firstarrival.m for ever .sac.
-
-    % % Run some validations with FA (times written to text file with 2 decimal places
-    % % of precision)
-    % if abs(FA.tres(i)-tres_1Dadj) >= 1e-2 || ...
-    %         abs(FA.dat(i)-obs_arvltime) >= 1e-2 || ...
-    %         abs(FA.tadj(i)-exp_arvltime_1Dadj_diff) >= 1e-2 || ...
-    %         abs(FA.delay(i)-max_delay) >= 1e-2 || ...
-    %         abs(FA.maxc_y(i)-max_counts) >= 1e-2 || ...
-    %         abs(FA.SNR(i)-SNR) >= 1e-2
-    %     %abs(FA.syn(i)-exp_arvltime_1Dadj) >= 1e-2 || ... (no 'syn', but if 'obs_arvltime' and 'tres' match, so must 'exp_arvltime'
-
-    %     keyboard
-    %     error(sprintf('%s numbers don''t match: %s', strippath(mer_det_txt1), sac))
-
-    % end
-
     % The travel time and arrival time time-adjustments (tadj) are equal because the
     % time elapsed between the event and the start of the seismogram is the same
     % in both cases and cancels.
@@ -341,16 +316,6 @@ for i = 1:length(s);
     % The max. counts are non-integer due to filtering; round them because it's
     % meaningless to have a fractional count.
     max_counts = round(max_counts);
-
-    %% 30-Jan-2023 (after already sending first round of updates to Dalija)
-    %% Use recomputed `twosd` from firstarrival above, not from firstarrival
-    %% text file (that uncertainty estimate could have been generated using
-    %% different parameters or window lengths etc.
-    % Use the saved uncertainty estimation (computed using the same firstarrival.m
-    % and loaded with `winnowfirstarrival` above) so that the text file matches
-    % example seismograms in the paper.
-    %twosd = twosd_vector(i);
-
 
     %%______________________________________________________________________________________%%
 
