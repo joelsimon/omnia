@@ -131,8 +131,7 @@ end
 % in one fell-swoop later.
 wline = [];
 wlines = [];
-%parfor i = 1:length(s)
-for i = 1:3
+parfor i = 1:length(s)
     sac = s{i};
     if contains(sac, 'prelim')
         continue
