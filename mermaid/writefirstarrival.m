@@ -194,9 +194,6 @@ function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, single_EQ, ba
 publicid = fx(strsplit(EQ(1).PublicId, '='),  2);
 tptime = EQ(1).TaupTimes(1).time;
 
-tapflag = NaN;
-zerflag = NaN;
-
 % Parse.
 data = {strippath(sac), ...
         ph,             ...
