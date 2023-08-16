@@ -52,12 +52,13 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 %    (12) Incomplete window flag (sentinel value: 'winflag')
 %    (13) Taper flag (sentinel value: 'tapflag')
 %    (14) Potential null-value flag, x = 0 (sentinel value: 'zerflag')
+%    (15) Time in seconds assigned to first sample of X-xaxis ('pt0')
 %
 % See also: firstarrival.m, readfirstarrival.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 24-Jul-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 16-Aug-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('sacdir', [])
@@ -84,7 +85,7 @@ if exist(fdir, 'dir') ~= 7
 end
 
 % Textfile format.
-fmt = ['%45s    ' , ...
+fmt = ['%-45s    ' , ...
        '%11s    ' ,  ...
        '%7.2f   ' , ...
        '%6.2f   ' , ...
@@ -95,9 +96,10 @@ fmt = ['%45s    ' , ...
        '%+19.12E    ' , ...
        '%18.12E    '  , ...
        '%8s    ' , ...
-       '%i    ', ...
-       '%3i    ', ...
-       '%3i\n'];
+       '%1i    ', ... % winflag: can only be int
+       '%3i    ', ... % tapflag: can be NaN
+       '%3i    ', ... % zerflag: can be NaN
+       '%+6.3f\n'];
 
 % Sort out if deleting, adding to, or creating output file.
 if exist(filename, 'file') == 2
@@ -129,7 +131,8 @@ end
 % in one fell-swoop later.
 wline = [];
 wlines = [];
-parfor i = 1:length(s)
+%parfor i = 1:length(s)
+for i = 1:3
     sac = s{i};
     if contains(sac, 'prelim')
         continue
@@ -191,6 +194,9 @@ function wline = single_wline(sac, ci, wlen, lohi, sacdir, evtdir, single_EQ, ba
 publicid = fx(strsplit(EQ(1).PublicId, '='),  2);
 tptime = EQ(1).TaupTimes(1).time;
 
+tapflag = NaN;
+zerflag = NaN;
+
 % Parse.
 data = {strippath(sac), ...
         ph,             ...
@@ -205,7 +211,8 @@ data = {strippath(sac), ...
         publicid,       ...
         winflag,        ...
         tapflag,        ...
-        zerflag};
+        zerflag,        ...
+        pt0};
 
 % Format.
 wline = sprintf(fmt, data{:});
