@@ -53,20 +53,15 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 %    (12) Event longitude in decimal degrees
 %    (13) IRIS event ID
 %    (14) winflag (see firstarrival.m)
-%    (14) tapflag (see firstarrival.m)
-%    (14) zerflag (see firstarrival.m)
+%    (15) tapflag (see firstarrival.m)
+%    (16) zerflag (see firstarrival.m)
+%    (17) pt0 (see firstarrival.m)
 %
 % See also: firstarrivalpressure.m, readfirstarrivalpressure.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 24-Jul-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
-
-%% !!
-%%
-%% To add: pt0 column
-%%
-%% !!
+% Last modified: 16-Aug-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('sacdir', [])
@@ -85,7 +80,7 @@ defval('popas', [4 1])
 defval('pt0', 0)
 
 % Textfile format.
-fmt = ['%45s    ' , ...
+fmt = ['%-45s    ' , ...
        '%11s    ' ,  ...
        '%18.12E    ' , ...
        '%6.2f   ' ,  ...
@@ -100,7 +95,8 @@ fmt = ['%45s    ' , ...
        '%8s   ',     ...
        '%i    ', ...
        '%3i    ', ...
-       '%i\n'];
+       '%3i    ', ...
+       '%+6.3f\n'];
 
 % Sort out if deleting, adding to, or creating output file.
 if exist(filename,'file') == 2
@@ -241,7 +237,8 @@ data = {strippath(sac), ...
         publicid,       ...
         winflag,        ...
         tapflag,        ...
-        zerflag};
+        zerflag,        ...
+        pt0};
 
 % Format.
 wline = sprintf(fmt, data{:});

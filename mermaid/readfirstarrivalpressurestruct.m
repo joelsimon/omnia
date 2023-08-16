@@ -3,14 +3,14 @@ function FAP = readfirstarrivalpressurestruct(filename)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 10-Dec-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 16-Aug-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default.
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
                             'identified', 'txt', 'firstarrivalpressure.txt'))
 
-[s, ph, RMS, P, magval, magtype, depth, dist, merlat, merlon, evtlat, evtlon, ...
- ID, winflag, tapflag, zerflag] = readfirstarrivalpressure(filename);
+[s, ph, RMS, P, magval, magtype, depth, dist, merlat, merlon, evtlat, evtlon, ID, winflag, tapflag, zerflag, pt0] = ...
+    readfirstarrivalpressure(filename);
 
 FAP.s = s;
 FAP.ph = ph;
@@ -27,4 +27,5 @@ FAP.evtlon = evtlon;
 FAP.ID = ID;
 FAP.winflag = winflag;
 FAP.tapflag = tapflag;
-FAP.zerflag = zerflag; 
+FAP.zerflag = zerflag;
+FAP.pt0 = pt0;
