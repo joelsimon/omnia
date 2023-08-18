@@ -130,11 +130,11 @@ exp_arvltime_3D_fmt = '%6.2f        ';
 tres_3D_fmt = '%6.2f        ';            % 30
 
 twosd_fmt = '%6.2f        ';
-SNR_fmt= '%6u        ';
-max_counts_fmt = '%9i        ';
+SNR_fmt= '%8u        ';
+max_counts_fmt = '%12i        ';
 max_delay_fmt = '%4.2f        ';
 
-contrib_eventid_fmt = '%10s        ';     % 35
+contrib_eventid_fmt = '%14s        ';     % 35
 iris_eventid_fmt = '%8s       ';          % 36
 
 kstnm_fmt = '%5s        ';                % 37
@@ -200,8 +200,8 @@ prev_file = exist(filename, 'file') == 2;
 
 if ~prev_file || redo
     fid = fopen(filename, 'w+');
-    hdrline1 = '#COLUMN:                                   1                             2                3               4          5            6             7                             8                9              10           11           12             13            14             15             16             17            18            19             20            21            22           23             24            25            26           27             28            29            30            31            32               33          34                35              36          37        38';
-    hdrline2 = '#DESCRIPTION:                       FILENAME                    EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP       1D_GCARC 1D*_GCARC_adj      1D*_GCARC   3D_GCARC_adj       3D_GCARC  OBS_TRAVTIME  OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES 1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES  3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR           SNR       MAX_COUNTS    MAX_TIME           NEIC_ID         IRIS_ID       KSTNM  REVIEWER';
+    hdrline1 = '#COLUMN:                                   1                             2                3               4          5            6             7                             8                9              10           11           12             13            14             15             16             17            18            19             20            21            22           23             24            25            26           27             28            29            30            31              32                  33          34                    35              36          37        38';
+    hdrline2 = '#DESCRIPTION:                       FILENAME                    EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP       1D_GCARC 1D*_GCARC_adj      1D*_GCARC   3D_GCARC_adj       3D_GCARC  OBS_TRAVTIME  OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES 1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES  3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR             SNR          MAX_COUNTS    MAX_TIME               NEIC_ID         IRIS_ID       KSTNM  REVIEWER';
     fprintf(fid, '%s\n', hdrline1);
     fprintf(fid, '%s\n', hdrline2);
 
@@ -214,7 +214,7 @@ end
 max_tdiff = 0;
 max_tdiff_sac = '';
 for i = 1:length(s);
-    i
+   i
     sac = s{i};
     if ~redo && any(contains(prev_mer.filename, sac));
         continue
