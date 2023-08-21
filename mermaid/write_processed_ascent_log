@@ -1,0 +1,33 @@
+#! /bin/zsh
+#
+# Generate "ascent request accepted" logs in $MERMAID/processed.
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 17-Aug-2023, Darwin Kernel Version 18.7.0
+
+# Loop over all MERMAID subdirectories
+# NB, the final forward slash ("/") is required here
+proc_dir=$MERMAID/processed/
+for mer_dir in $( ls -1d $proc_dir/*/ ); do
+    kstnm=$( osean2kstnm $(basename $mer_dir) )
+
+    # Define and unlock log file
+    ascent_log=$mer_dir/ascent_log.txt
+    if [[ -f $ascent_log ]]; then
+	chmod +w $ascent_log
+
+    fi
+
+    # Grep all "ascent request accepted" lines from the LOG files
+    grep --no-filename "ascent request accepted" $mer_dir/**/*.LOG.h >! $ascent_log
+
+    # Replace ":[MERMAID... request accepted" with KSTNM
+    sed -i'.tmp' -e "s/\:\[.*accepted/ | $kstnm/g" $ascent_log
+    rm ${ascent_log}.tmp
+
+    # Lock and print log filename
+    chmod -w $ascent_log
+    printf "Wrote %s\n" $ascent_log
+
+done
