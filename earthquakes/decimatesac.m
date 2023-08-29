@@ -25,8 +25,8 @@ function [x, h] = decimatesac(x, h, fs, shift)
 %
 % Ex1: Output time series not shifted; start times match
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
-%    [x1, h1] = readsac(sac);  % Originally sampled at 20 Hz
-%    fs1 = efes(h1)  % Originally sampled at 40 Hz
+%    [x1, h1] = readsac(sac);
+%    fs1 = efes(h1)  % Originally sampled at 20 Hz
 %    fs2 = 5 % Decimate to 5 Hz
 %    xax1 = xaxis(h1.NPTS, h1.DELTA, h1.B);
 %    [x2, h2] = DECIMATESAC(x1, h1, fs2, false); % Decimate to 5 Hz; do not shift
@@ -37,8 +37,8 @@ function [x, h] = decimatesac(x, h, fs, shift)
 %
 % Ex1: Output time series shifted; end times match
 %    sac = '20180629T170731.06_5B3F1904.MER.DET.WLT5.sac';
-%    [x1, h1] = readsac(sac);  % Originally sampled at 20 Hz
-%    fs1 = efes(h1)  % Originally sampled at 40 Hz
+%    [x1, h1] = readsac(sac);
+%    fs1 = efes(h1)  % Originally sampled at 20 Hz
 %    fs2 = 5 % Decimate to 5 Hz
 %    xax1 = xaxis(h1.NPTS, h1.DELTA, h1.B);
 %    [x2, h2] = DECIMATESAC(x1, h1, fs2, true); % Decimate to 5 Hz; shift
