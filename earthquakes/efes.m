@@ -1,12 +1,11 @@
 function fs = efes(h, rd)
 % fs = EFES(h, rd)
 %
-% Returns the nominal sampling frequency of a SAC waveform in Hz,
-% rounded to the nearest integer.
+% Returns the nominal sampling frequency of a SAC waveform in Hz.
 %
 % Input:
 % h           Header structure returned by readsac.m
-% rd          true to round `fs` to nearest integer (Def: true)
+% rd          true to round `fs` to nearest integer (def: true)
 %
 % Output:
 % fs          ROUNDED sampling frequency of the SAC waveform [Hz]
