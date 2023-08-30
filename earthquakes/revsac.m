@@ -53,6 +53,7 @@ defval('returntype', 'ALL')
 
 sac = [];
 evt = [];
+xtra_evt = [];
 
 % Switch the reviewed directory of interest.
 switch iup
