@@ -16,8 +16,8 @@ function fname = updatetauptimesall(sacdir, evtdir)
 %  $MERMAID/events/, not $MERMAID/events/reviewed/identified/evt/, for `evtdir`
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-May-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 30-Aug-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
 
 % Default paths.
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'));
@@ -27,23 +27,36 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'));
 [sac, evt] = revsac(1, sacdir, evtdir, 'ALL');
 
 % Open text file that tallies which .evt required EQ.TaupTimes update.
-fname = sprintf('%s_%s.txt', mfilename, datetime('now', 'Format', 'uuuu-MM-dd'));
-fname = fullfile(evtdir, fname);
-writeaccess('unlock', fname, false)
-fid = fopen(fname, 'w+');
+fname1 = fullfile(evtdir, sprintf('%s_%s.txt', mfilename, datetime('now', 'Format', 'uuuu-MM-dd')));
+writeaccess('unlock', fname1, false)
+fid1 = fopen(fname1, 'w+');
+
+fname2 = fullfile(evtdir, sprintf('%s_%s_phaseName1_mismatch.txt', mfilename, datetime('now', 'Format', 'uuuu-MM-dd')));
+writeaccess('unlock', fname2, false)
+fid2 = fopen(fname2, 'w+');
 
 % Loop over all .evt and determine which need to be updated.
 lensac = length(sac);
 for i = 1:length(sac)
     fprintf('Checking...%s (%i of %i)\n', strippath(sac{i}), i, lensac)
-    updated = updatetauptimes(sac{i}, evt{i});
+    [isupdated, new_EQ, old_EQ] = updatetauptimes(sac{i}, evt{i});
 
-    if updated
-        fprintf(fid, '%s\n', strippath(evt{i}));
+    if isupdated
+        fprintf(fid1, '%s\n', strippath(evt{i}));
 
+        for j = 1:length(old_EQ)
+            if ~strcmp(new_EQ(j).TaupTimes(1).phaseName, old_EQ(j).TaupTimes(1).phaseName)
+                keyboard
+                fprintf(fid2, '%s\n', strippath(evt{i}));
+
+            end
+        end
     end
 end
 
 % Write-restrict output file.
-writeaccess('lock', fname)
-fprintf('\nWrote: %s\n', fname)
+writeaccess('lock', fname1)
+fprintf('\nWrote: %s\n', fname1)
+
+writeaccess('lock', fname2)
+fprintf('\nWrote: %s\n', fname2)
