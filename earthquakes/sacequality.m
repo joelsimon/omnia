@@ -1,12 +1,13 @@
-function [iseq, cf, h1, h2] = sacequality(sac1, sac2, names, mess)
-% [iseq, cf, h1, h2] = SACEQUALITY(sac1, sac2, names)
+function [iseq, cf, h1, h2] = sacequality(sac1, sac2, names, mess, excl)
+% [iseq, cf, h1, h2] = SACEQUALITY(sac1, sac2, names, mess, excl)
 %
 % Compare two SAC files.
 %
 % Input:
 % sac1,2      Full path SAC files to compare
-% names       Cell array of field names to compare (def: all)
+% names       Cell array of field names to compare (def: sacfieldnames)
 % mess        true for "Comparing..." message printout (def: true)
+% excl        Cell array of field names to not compare (def: [])
 %
 % Output:
 % iseq        true: SAC files are equal
@@ -24,8 +25,8 @@ function [iseq, cf, h1, h2] = sacequality(sac1, sac2, names, mess)
 %    [iseq_diff, cf_diff] = SACEQUALITY(sac1, sac2)
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-May-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 28-Aug-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
 
 % Defaults.
 defval('names', sacfieldnames)
@@ -59,6 +60,10 @@ end
 % Loop over requested SAC header variables.
 for i = 1:length(names)
     name = names{i};
+    if ~isempty(excl) && contains(name, excl)
+        continue
+
+    end
     if ~isequal(h1.(name), h2.(name))
         if ~ischar(h1.(name))
             d = h1.(name) - h2.(name);
