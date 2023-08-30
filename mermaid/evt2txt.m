@@ -58,8 +58,8 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 % See also: cpsac2evt.m, reviewevt.m, revsac.m, getevt.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 06-Jul-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 30-Aug-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
 
 % Defaults.
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
@@ -109,7 +109,11 @@ for i = 1:2
         iup = -1;
 
     end
-    [sac, evt] = revsac(iup, sacdir, revdir);
+    [sac, evt, xtra_evt] = revsac(iup, sacdir, revdir);
+    if ~isempty(xtra_evt)
+        warning(sprintf('%i additional %s .evt files than .sac files', length(xtra_evt), status))
+
+    end
 
     if isempty(sac)
         % Possible to have the correct path but no .evt files (see the example
