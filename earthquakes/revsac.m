@@ -1,5 +1,5 @@
-function [sac, evt] = revsac(iup, sacdir, evtdir, returntype)
-% [sac, evt] = REVSAC(iup, sacdir, evtdir, returntype)
+function [sac, evt, xtra_evt] = revsac(iup, sacdir, evtdir, returntype)
+% [sac, evt, xtra_evt] = REVSAC(iup, sacdir, evtdir, returntype)
 %
 % REVSAC returns a list of fullpath .sac and .evt filenames
 % whose event information has been reviewed and sorted with
@@ -27,6 +27,8 @@ function [sac, evt] = revsac(iup, sacdir, evtdir, returntype)
 %                  .evt file is in the reviewed subdirectory of interest
 % evt          Cell array of .evt filenames whose corresponding
 %                  in the reviewed subdirectory of interest
+% xtra_evt     Cell array of .evt filenames in the corresponding reviewed
+%                  subdirectory with no complementary SAC file in sacdir
 %
 % Before running the example below run the example in reviewevt.m
 %
@@ -40,8 +42,8 @@ function [sac, evt] = revsac(iup, sacdir, evtdir, returntype)
 % See also: getevt.m, reviewevt.m, fullsac.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu
-% Last modified: 25-Sep-2019, Version 2017b on GLNXA64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 30-Aug-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
 
 % Defaults.
 defval('iup', 1)
@@ -77,57 +79,58 @@ if isempty(evtdir)
 
 end
 
-% Concatenate the .evt paths.
+% Compile list of all .evt files in evtdir.
 for i = 1:length(evtdir)
-    evt{i} = fullfile(evtdir(i).folder, evtdir(i).name);
+    allevt{i} = fullfile(evtdir(i).folder, evtdir(i).name);
 
 end
 
 % Keep just those events in of the requested return type.
 switch upper(returntype)
   case 'DET'
-    idx = cellstrfind(evt, 'MER.DET.*.evt');
+    idx = cellstrfind(allevt, 'MER.DET.*.evt');
     if isempty(idx)
         warning('No triggered (''DET'') .evt files found')
-        evt = [];
         return
 
     end
 
   case 'REQ'
-    idx = cellstrfind(evt, 'MER.REQ.*.evt');
+    idx = cellstrfind(allevt, 'MER.REQ.*.evt');
     if isempty(idx)
         warning('No requested (''REQ'') .evt files found')
-        evt = [];
         return
 
     end
 
   case 'ALL'
-    idx = [1:length(evt)];
+    idx = [1:length(allevt)];
 
   otherwise
     error('Specify one of ''ALL'', ''DET'', or ''REQ'' for input: returntype')
 
 end
-evt = evt(idx);
+allevt = allevt(idx);
 
-% Replace the filename extension.
-sac = strrep({evtdir.name}, '.evt', '.sac');
-
-% To find the fullpath SAC filenames: start with all SAC fullpath
-% filenames.
+% Compile list of all .sac files in sacdir.
 allsac = fullsac([], sacdir, returntype);
 if isempty(allsac)
-    sac = []; % No warning necessary here as it will be thrown in fullsac.m
+    % No warning necessary here as it will be thrown in fullsac.m
     return
 
 end
 
-% Find the intersection between all SAC filenames and those in the
-% specified review class.
-allsac_nopath = cellfun(@(xx) strippath(xx), allsac, 'UniformOutput', false);
-[~, ~, idx] = intersect(sac, allsac_nopath);
-sac = allsac(idx);
+% Find the intersection between all SAC filenames and those in the specified review class.
+allevt_nopath = cellfun(@(xx) strippath(xx), strrep(allevt(:), '.evt', ''), 'UniformOutput', false);
+allsac_nopath = cellfun(@(xx) strippath(xx), strrep(allsac(:), '.sac', ''), 'UniformOutput', false);
+
+[~, evt_idx, sac_idx] = intersect(allevt_nopath, allsac_nopath);
+evt = allevt(evt_idx);
+sac = allsac(sac_idx);
+
+[~, xtra_evt_idx] = setdiff(allevt_nopath, allsac_nopath);
+xtra_evt = allevt(xtra_evt_idx);
+
 sac = sac(:);
 evt = evt(:);
+xtra_evt = xtra_evt(:);
