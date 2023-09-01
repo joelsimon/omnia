@@ -25,12 +25,13 @@ function [iseq, cf, h1, h2] = sacequality(sac1, sac2, names, mess, excl)
 %    [iseq_diff, cf_diff] = SACEQUALITY(sac1, sac2)
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 28-Aug-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 01-Sep-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('names', sacfieldnames)
 defval('mess', true)
+defval('excl', [])
 
 % Sanity.
 if ~iscell(names)
