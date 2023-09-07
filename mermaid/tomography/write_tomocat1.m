@@ -1,5 +1,5 @@
-function tomocat1(redo)
-% TOMOCAT1(redo)
+function write_tomocat1(redo)
+% WRITE_TOMOCAT1(redo)
 %
 % Tomography Catalog Iteration #1: GJI22 supplement + KSTNM, REVIEWER
 %
@@ -193,7 +193,7 @@ fmt = [sac_fmt ...                        %  1
 
 %%______________________________________________________________________________________%%
 
-filename = fullfile(datadir, sprintf('%s.txt', mfilename));
+filename = fullfile(datadir, 'tomocat1.txt');
 
 writeaccess('unlock', filename, false);
 prev_file = exist(filename, 'file') == 2;
