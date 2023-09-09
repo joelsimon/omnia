@@ -22,7 +22,7 @@ function [revEQ, rev_evt] = getrevevt(sac, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 09-Sep-2022, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Last modified: 08-Sep-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
 
 %% Recursive.
 
@@ -49,7 +49,7 @@ evt_name = [sac_name(1:end-4) '.evt'];
 
 rev_dir = dir(fullfile(evtdir, 'reviewed', '**/*', evt_name));
 if isempty(rev_dir)
-    warning('%s not found in %s', evt_name, rev_dir.folder)
+    warning('%s not found in %s', evt_name, evtdir)
     revEQ = NaN;
     rev_evt = [];
 
