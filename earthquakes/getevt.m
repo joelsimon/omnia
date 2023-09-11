@@ -40,7 +40,7 @@ function [revEQ, rawEQ, rawCP, rawPDF, rev_evt, raw_evt] = getevt(sac, evtdir, o
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 20-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 11-Sep-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('sac', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -48,6 +48,7 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('openpdf', false);
 
 % Also allow .evt as input.
+sac = strtrim(sac);
 if strcmp(sac(end-3:end), '.evt')
     sac(end-3:end) = '.sac';
 
