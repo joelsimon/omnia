@@ -213,8 +213,7 @@ end
 
 max_tdiff = 0;
 max_tdiff_sac = '';
-%for i = 1:length(s);
-for i = 1:2;
+for i = 1:length(s);
     i
     sac = s{i};
     if ~redo && any(contains(prev_mer.filename, sac));
