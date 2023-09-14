@@ -57,16 +57,8 @@ for i = 1:length(fn)
 
     end
 
-    % Skip the "params" substruct -- there is more than one way to query IRIS to
-    % arrive at the same event.
-    if strcmp(field, 'Params')
-        continue
-
-    end
-
-    % Let's also disregard "Origins" substruct -- we really only care about the
-    % "Preferred" origin.
-    if strcmp(field, 'Origins')
+    % Skip irrelevant substructs; we really only care about the "Preferred" values.
+    if contains(field, {'Magnitudes' 'Origins' 'Params'})
         continue
 
     end
