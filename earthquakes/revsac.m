@@ -51,6 +51,9 @@ defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 defval('returntype', 'ALL')
 
+sacdir = strtrim(sacdir);
+evtdir = strtrim(evtdir);
+
 sac = [];
 evt = [];
 xtra_evt = [];

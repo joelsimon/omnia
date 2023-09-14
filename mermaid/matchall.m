@@ -42,10 +42,10 @@ s = allsac(idx);
 fprintf('Searching for unmatched SAC files...\n')
 for i = 1:length(s)
     % Skip the French floats.
-    if contains(s{i}, '452.020-P-06') || contains(s{i}, '452.020-P-07')
-        continue
+    % if contains(s{i}, '452.020-P-06') || contains(s{i}, '452.020-P-07')
+    %     continue
 
-    end
+    % end
 
     % Get wavelet scale
     scale_idx = strfind(s{i}, 'WLT');
