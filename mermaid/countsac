@@ -14,7 +14,7 @@ find $MERMAID/processed/ -maxdepth 3 -type f -name '*sac' > $MERMAID/all_sac
 # Count only Princeton SAC files
 set floatnum = (P-06 P-07 P-08 P-09 P-10 P-11 P-12 P-13 P-16 P-17 P-18 P-19 P-20 P-21 P-22 P-23 P-24 P-25 T-0100)
 set sac_count = 0
-#printf "\n                ...Tallying the SAC files...                \n"
+printf "\n                    ...Tallying the .sac files...                \n"
 printf "\n                 All      DET       LAST DET      REQ       LAST REQ\n"
 
 # OSX does not have the standard date formatting commands.  Must use a
