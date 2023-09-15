@@ -12,10 +12,10 @@ set MERMAID = $MERMAID
 find $MERMAID/processed/ -maxdepth 3 -type f -name '*sac' > $MERMAID/all_sac
 
 # Count only Princeton SAC files
-set floatnum = (06 07 08 09 10 11 12 13 16 17 18 19 20 21 22 23 24 25)
+set floatnum = (P-06 P-07 P-08 P-09 P-10 P-11 P-12 P-13 P-16 P-17 P-18 P-19 P-20 P-21 P-22 P-23 P-24 P-25 T-0100)
 set sac_count = 0
-printf "\n                ...Tallying the SAC files...                \n"
-printf "\n             All      DET       LAST DET      REQ       LAST REQ\n"
+#printf "\n                ...Tallying the SAC files...                \n"
+printf "\n                 All      DET       LAST DET      REQ       LAST REQ\n"
 
 # OSX does not have the standard date formatting commands.  Must use a
 # pseudo-switch statement.  Redirect any error to the /dev/null/ to
@@ -30,7 +30,7 @@ endif
 
 foreach float ($floatnum[*])
     # This tallies the SAC files.
-    grep -v "prelim" $MERMAID/all_sac | grep "P-$float" > $MERMAID/temp
+    grep -v "prelim" $MERMAID/all_sac | grep "$float" > $MERMAID/temp
     set total = `cat $MERMAID/temp | wc -l`
     set det =  `grep .DET. $MERMAID/temp  | wc -l`
     set req =  `grep .REQ. $MERMAID/temp  | wc -l`
@@ -41,12 +41,12 @@ foreach float ($floatnum[*])
     @ req_count += $req
 
     # This finds the date of the last SAC file.
-    set perfloat_det = `ls -1 $MERMAID/processed/*P-$float*/*/*.DET.*sac | tail -1`
+    set perfloat_det = `ls -1 $MERMAID/processed/*$float*/*/*.DET.*sac | tail -1`
     set lasttime_det = `basename $perfloat_det | awk '{print substr($0,1,8)}'`
 
-    ls -1 $MERMAID/processed/*P-$float*/*/*.REQ.*sac >& /dev/null
+    ls -1 $MERMAID/processed/*$float*/*/*.REQ.*sac >& /dev/null
     if ( $? == 0 ) then
-	set perfloat_req = `ls -1 $MERMAID/processed/*P-$float*/*/*.REQ.*sac | tail -1`
+	set perfloat_req = `ls -1 $MERMAID/processed/*$float*/*/*.REQ.*sac | tail -1`
 	set lasttime_req = `basename $perfloat_req | awk '{print substr($0,1,8)}'`
     else
 
@@ -63,13 +63,15 @@ foreach float ($floatnum[*])
 	set lastdate_req = `date -jf "%Y%m%d" $lasttime_req +"%d-%b-%Y"`
 
     endif
-    printf "Float %s : %5i    %5i    %s    %5i    %s\n" $float $total $det $lastdate_det $req $lastdate_req
+    printf "Float %6s : %5i    %5i    %s    %5i    %s\n" $float $total $det $lastdate_det $req $lastdate_req
 
 end
 rm $MERMAID/all_sac
 
 printf -- "----------------------------------------------------------------\n"
-printf "   Total : %5i    %5i                   %5i\n\n" $total_count $det_count $req_count
+printf "       Total : %5i    %5i                   %5i\n\n" $total_count $det_count $req_count
+
+exit 0
 
 # Count .evt files.
 set rawevt_count = 0
