@@ -68,7 +68,7 @@ foreach float ($floatnum[*])
 end
 rm $MERMAID/all_sac
 
-printf -- "----------------------------------------------------------------\n"
+printf -- "--------------------------------------------------------------------\n"
 printf "       Total : %5i    %5i                   %5i\n\n" $total_count $det_count $req_count
 
 exit 0
