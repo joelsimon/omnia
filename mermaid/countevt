@@ -9,15 +9,15 @@
 set MERMAID = $MERMAID
 
 # Count only Princeton SAC files
-set floatnum = (08 09 10 11 12 13 16 17 18 19 20 21 22 23 24 25)
+set floatnum = (06 07 08 09 10 11 12 13 16 17 18 19 20 21 22 23 24 25 0100)
 set evt_count = 0
 
 find $MERMAID/events/reviewed -not -iname '*prelim*' -iname '*.evt' > $MERMAID/all_evt
 find $MERMAID/events/reviewed/identified -not -iname '*prelim*' -iname '*.evt' > $MERMAID/id_evt
 find $MERMAID/events/reviewed/unidentified -not -iname '*prelim*' -iname '*.evt' > $MERMAID/null_evt
 
-printf "\n                     ...Tallying the event (.evt) files...                    \n"
-printf "\n             All          ID    DET_ID    REQ_ID      NULL  DET_NULL  REQ_NULL\n"
+printf "\n                         ...Tallying the .evt files...                          \n"
+printf "\n               All          ID    DET_ID    REQ_ID      NULL  DET_NULL  REQ_NULL\n"
 foreach float ($floatnum[*])
     # This tallies all the .evt files.
     grep .${float}_ $MERMAID/all_evt > $MERMAID/temp
@@ -53,12 +53,12 @@ foreach float ($floatnum[*])
     @ total_det_null += $det_null
     @ total_req_null += $req_null
 
-    printf "Float %s : %5i   |   %5i     %5i     %5i  |  %5i     %5i     %5i\n" $float $total $id $det_id $req_id $null $det_null $req_null
+    printf "Float %4s : %5i   |   %5i     %5i     %5i  |  %5i     %5i     %5i\n" $float $total $id $det_id $req_id $null $det_null $req_null
 
 end
 rm $MERMAID/all_evt
 rm $MERMAID/id_evt
 rm $MERMAID/null_evt
 
-printf -- "------------------------------------------------------------------------------\n"
-printf "Total :    %5i   |   %5i     %5i     %5i  |  %5i     %5i     %5i\n\n" $total_count $total_id $total_det_id $total_req_id $total_null $total_det_null $total_req_null
+printf -- "--------------------------------------------------------------------------------\n"
+printf "     Total :  %5i  |   %5i     %5i     %5i  |  %5i     %5i     %5i\n\n" $total_count $total_id $total_det_id $total_req_id $total_null $total_det_null $total_req_null
