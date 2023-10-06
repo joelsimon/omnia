@@ -58,8 +58,8 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 % See also: cpsac2evt.m, reviewevt.m, revsac.m, getevt.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 30-Aug-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 05-Oct-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
@@ -188,6 +188,14 @@ for i = 1:2
         wstatus = fileattrib(fout, '+w', 'a');
         if wstatus == 0
             error('Unable to allow write access to %s.', fout)
+
+        end
+    end
+
+    if exist(fileparts(fout), 'dir') ~= 7
+        [succ, mess] = mkdir(fileparts(fout));
+        if ~succ
+            error('Cannot create: %s\n`mkdir` message: %s\n', fileparts(fout), mess)
 
         end
     end
