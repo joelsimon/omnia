@@ -11,7 +11,7 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 28-Apr-2022, Darwin Kernel Version 18.7.0
+# Last modified: 23-Oct-2023, Darwin Kernel Version 18.7.0
 
 # Print help with '-h' or '--help'.
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -58,10 +58,14 @@ print '\n...completed server copy\n'
 #     exit;
 # fi
 
+# Decrypt .BIN --> .LOG
+conda activate pymaid
+cd $AUTOMAID/decrypt/
+python -c "import decrypt; decrypt.decrypt_all('/Users/joelsimon/mermaid/server/')"
+
 # Generate SAC files.
 print 'Writing SAC files...\n'
-conda activate pymaid
-python $AUTOMAID/scripts/main.py
+python $AUTOMAID/scripts/main.py -s $MERMAID/server -p $MERMAID/processed
 conda deactivate
 print '\n...completed writing SAC files\n'
 
