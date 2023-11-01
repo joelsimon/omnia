@@ -11,7 +11,7 @@ function print_last_identified_event(filename)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 27-Jan-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 01-Nov-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified', ...
@@ -39,10 +39,10 @@ for i = length(sac):-1:1
 
     % Remove serial number from "yet-to-be-found" list
     % after first occurrence.
-    str_idx = find(strcmp(ser{i}, ser_list));
-    if ~isempty(str_idx);
+    ser_idx = find(strcmp(ser{i}, ser_list));
+    if ~isempty(ser_idx);
         last_idx = [last_idx i];
-        ser_list(str_idx) = [];
+        ser_list(ser_idx) = [];
 
     end
 
@@ -63,6 +63,6 @@ last_date = mersac2date(last_sac);
 
 % Print ouput to command window.
 for i = 1:length(last_date)
-    fprintf('Float %s: %s\n', last_ser{i}, datestr(last_date(i), 1))
+    fprintf('Float %4s: %s\n', last_ser{i}, datestr(last_date(i), 1))
 
 end
