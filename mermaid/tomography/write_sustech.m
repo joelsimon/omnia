@@ -9,7 +9,7 @@ merdir = getenv('MERMAID');
 sacdir = fullfile(merdir, 'processed_sustech');
 evtdir = fullfile(merdir, 'events_sustech');
 
-f1 = fullfile(evtdir, 'reviewed', 'identified', 'txt', 'firstarrivals.txt');
+f1 = fullfile(evtdir, 'reviewed', 'identified', 'txt', 'firstarrival.txt');
 f2 = fullfile(evtdir, 'reviewed', 'identified', 'txt', 'firstarrivalpressure.txt');
 
 evt2txt(sacdir, evtdir, false);
