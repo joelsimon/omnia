@@ -1,26 +1,28 @@
-function write_tomocat1(redo)
-% WRITE_TOMOCAT1(redo)
+function write_tomocat1(redo, procdir, evtdir, txtdir)
+% WRITE_TOMOCAT1(redo, procdir, evtdir, txtdir)
 %
 % Tomography Catalog Iteration #1: GJI22 supplement + KSTNM, REVIEWER
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Sep-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 06-Nov-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
 
-reviewer = 1;
-
-defval('redo', true)
+%clc
+close all
 llnl_exists = false;
 
-%% Preliminaries
-clc
-close all
+% Joel D. Simon (Princeton)  : 1
+% Yong Yu (SUSTech)          : 2
+% Dalija Namjesnik (GeoAzur) : 3
+% Yuko Kondo (Kobe)          : 4
+reviewer = 0;
 
-% Define paths.
-merdir = getenv('MERMAID');
-procdir = fullfile(merdir, 'processed');
-evtdir = fullfile(merdir, 'events');
-datadir = fullfile(evtdir, 'reviewed', 'identified', 'txt');
+defval('redo', true)
+defval('procdir', fullfile(getenv('MERMAID'), 'processed'));
+defval('evtdir',  fullfile(getenv('MERMAID'), 'events'));
+defval('txtdir', fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified', 'txt'));
+
+%% Preliminaries
 
 % Parameters for firstarrival text file.
 ci = true; % Remake confidence intervals using a new call to `firstarrivals`
@@ -36,7 +38,7 @@ pt0 = 0;
 %%______________________________________________________________________________________%%
 
 % Read the relevant SAC files from mer.firstarr.all.txt.
-mer_det_txt1 = fullfile(datadir, 'firstarrival.txt');
+mer_det_txt1 = fullfile(txtdir, 'firstarrival.txt');
 
 % Use winnowfirstarrival.m because we only want p or P waves AND we don't want
 % any with true win/zerflags.
@@ -91,7 +93,7 @@ clearvars FA
 %%______________________________________________________________________________________%%
 
 % Specify formats.
-sac_fmt = '%44s        ';                 %  1
+sac_fmt = '%46s        ';                 %  1
 
 evtime_fmt = '%22s        ';
 evlo_fmt = '%9.4f        ';
@@ -193,35 +195,36 @@ fmt = [sac_fmt ...                        %  1
 
 %%______________________________________________________________________________________%%
 
-filename = fullfile(datadir, 'tomocat1.txt');
+filename = fullfile(txtdir, 'tomocat1.txt');
 
 writeaccess('unlock', filename, false);
 prev_file = exist(filename, 'file') == 2;
 
 if ~prev_file || redo
     fid = fopen(filename, 'w+');
-    hdrline1 = '#COLUMN:                                   1                             2                3               4          5            6             7                             8                9              10           11           12             13            14             15             16             17            18            19             20            21            22           23             24            25            26           27             28            29            30            31              32                     33          34                    35              36          37        38';
-    hdrline2 = '#DESCRIPTION:                       FILENAME                    EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP       1D_GCARC 1D*_GCARC_adj      1D*_GCARC   3D_GCARC_adj       3D_GCARC  OBS_TRAVTIME  OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES 1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES  3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR             SNR             MAX_COUNTS    MAX_TIME               NEIC_ID         IRIS_ID       KSTNM  REVIEWER';
+    hdrline1 = '#COLUMN:                                     1                             2                3               4          5            6             7                             8                9              10           11           12             13            14             15             16             17            18            19             20            21            22           23             24            25            26           27             28            29            30            31              32                     33          34                    35              36          37        38';
+    hdrline2 = '#DESCRIPTION:                         FILENAME                    EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP       1D_GCARC 1D*_GCARC_adj      1D*_GCARC   3D_GCARC_adj       3D_GCARC  OBS_TRAVTIME  OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES 1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES  3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR             SNR             MAX_COUNTS    MAX_TIME               NEIC_ID         IRIS_ID       KSTNM  REVIEWER';
     fprintf(fid, '%s\n', hdrline1);
     fprintf(fid, '%s\n', hdrline2);
+    prev_mer = '';
 
 else
     fid = fopen(filename, 'a');
-    prev_mer = read_update_simon2021gji_supplement_residuals(filename);
+    prev_mer = read_tomocat1(filename);
 
 end
 
 max_tdiff = 0;
 max_tdiff_sac = '';
 for i = 1:length(s);
-    i
+    fprintf('Working on # %i of %i\n', i, length(s))
     sac = s{i};
     if ~redo && any(contains(prev_mer.filename, sac));
         continue
 
     end
 
-    % Retrieve the SAC header.
+    % Retrieve the SAC info.
     [~, h] = readsac(fullsac(s{i}, procdir));
     seisdate = seistime(h);
     sttime = fdsndate2str(seisdate.B);
