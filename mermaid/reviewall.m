@@ -26,7 +26,7 @@ defval('floatnum', [])
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 
-skip_french = false;
+skip_french = true
 
 % Switch the .pdf viewer depending on the platform.
 switch computer
@@ -64,7 +64,7 @@ sac = sac(idx);
 
 % Skip French floats, maybe.
 if skip_french
-    rm_idx = find(contains(sac, {'452.020-P-06' '452.020-P-07'}));
+    rm_idx = find(contains(sac, {'452.020-P-06' '452.020-P-07' '467.174-T-0100'}));
     sac(rm_idx) = [];
 
 end
