@@ -12,13 +12,17 @@ function [tadj, theta2] = bathtime(mod, ph, theta1, z_ocean, z_mermaid)
 % positive tadj: adjusted theoretical arrival at MERMAID late compared to model
 % negative tadj: adjusted theoretical arrival at MERMAID early compared to model
 %
-% Therefore, the corrected travel time at MERMAID is the theoretical
-% travel time plus the time difference (adjustment) computed here.
-%
-%   <Station in water at depth>   <Station on rock at surface>
-%   ----------------------------------------------------------
 %     1D adjusted travel time   =    1D travel time + tadj
 %      1D adjusted residual     =     1D residual - tadj
+%
+% Therefore, the corrected travel time at MERMAID is the theoretical travel time
+% plus the time difference (adjustment) computed here. "Travel time" is defined
+% at the surface (z=0 m, r=6371 km), for a wave having passed through hard
+% rock. "Adjusted travel time" is defined at depth (z~=1500 m, r~=6369.5 km) for
+% a wave having transited a final-leg water layer from the seafloor to MERMAID.
+% Ergo, to project an actually observed arrival time in UTC from MERMAID at
+% z=1500 m to z=0 m (as if recorded on hard rock, not z=0 bobbing at the surface
+% of the ocean), one simply removes tadj from the observation.
 %
 % Input:
 % mod        Either 'ak135', 'iasp91', or 'prem' (def: 'ak135')
