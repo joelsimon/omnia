@@ -130,7 +130,7 @@ gcarc_1Dadj_fmt = gcarc_1D_fmt;           % 15
 gcarc_3D_diff_fmt = '%7.4f        ';
 gcarc_3D_fmt = gcarc_1D_fmt;
 
-obs_travtime_fmt = '%6.2f        ';
+obs_travtime_fmt = '%7.2f        ';
 obs_arvltime_fmt = obs_travtime_fmt;
 
 exp_travtime_1D_fmt = '%7.2f        ';    % 20
