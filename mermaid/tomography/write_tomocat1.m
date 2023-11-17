@@ -4,17 +4,20 @@ function write_tomocat1(redo, procdir, evtdir, txtdir)
 % Tomography Catalog Iteration #1: GJI22 supplement + KSTNM, REVIEWER
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 06-Nov-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 16-Nov-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-%clc
+clc
 close all
 llnl_exists = false;
 
-% Joel D. Simon (Princeton)  : 1
-% Yong Yu (SUSTech)          : 2
-% Dalija Namjesnik (GeoAzur) : 3
-% Yuko Kondo (Kobe)          : 4
+% Joel D. Simon (JDS; Princeton) : 1
+% Yong Yu (YY; SUSTech)          : 2
+% Dalija Namjesnik (DN; GeoAzur) : 3
+% Yuko Kondo (YK; Kobe)          : 4
+% JDS and YY                     : 5
+% JDS and DN                     : 6
+%$ JDS and YK                    : 7
 reviewer = 0;
 
 defval('redo', true)
@@ -34,6 +37,12 @@ fs = 20; % Decimation is a pass-through function when R = 1 (which it does at fs
 popas = [4 1];
 pt0 = 0;
 
+% P phases we are interested in (keep PKiKP as option because that may have been
+% the first-arriving phase savd in the time of the seismogram, despite the
+% later-arriving PKP being the actual pick; we will adjust window to prioritize
+% the PKP pick).
+p_phases = {'p' 'P' 'PKIKP' 'PKP' 'PKiKP'};
+
 %%            Identify the list of SAC files whose first phase is p or P                %%
 %%______________________________________________________________________________________%%
 
@@ -42,7 +51,7 @@ mer_det_txt1 = fullfile(txtdir, 'firstarrival.txt');
 
 % Use winnowfirstarrival.m because we only want p or P waves AND we don't want
 % any with true win/zerflags.
-FA = winnowfirstarrival(mer_det_txt1, [], [], [], {'p' 'P'});
+FA = winnowfirstarrival(mer_det_txt1, [], [], [], p_phases);
 
 % Remove REQ files.
 req_idx = cellstrfind(FA.s, 'REQ');
@@ -58,7 +67,7 @@ FA = rmstructindex(FA, req_idx, {'filename'});
 % Read Jessica's LLNL text file.
 if llnl_exists
     llnl_txt = fullfile(evtdir, 'reviewed', 'identified', 'txt', 'llnl.txt');
-    LL = winnowllnl(llnl_txt, mer_det_txt1, [], [], [], {'p' 'P'});
+    LL = winnowllnl(llnl_txt, mer_det_txt1, [], [], [], p_phases);
 
     % Now the lists are the same
     if ~isequal(FA.s, LL.s)
@@ -108,7 +117,7 @@ stla_fmt = evla_fmt;                      % 10
 stdp_fmt = '%5i        ';
 ocdp_fmt = stdp_fmt;
 
-gcarc_1D_fmt = '%7.4f        ';
+gcarc_1D_fmt = '%8.4f        ';
 gcarc_1Dadj_diff_fmt = '%6i        ';
 gcarc_1Dadj_fmt = gcarc_1D_fmt;           % 15
 gcarc_3D_diff_fmt = '%7.4f        ';
@@ -121,12 +130,12 @@ exp_travtime_1D_fmt = '%7.2f        ';    % 20
 exp_arvltime_1D_fmt = '%6.2f        ';
 tres_1D_fmt = exp_arvltime_1D_fmt;
 
-tadj_1D_fmt = '%5.2f        ';
+tadj_1D_fmt = '%6.2f        ';
 exp_travtime_1Dadj_fmt = '%7.2f        ';
 exp_arvltime_1Dadj_fmt = '%6.2f        '; % 25
 tres_1Dadj_fmt = '%6.2f        ';
 
-tadj_3D_fmt = '%5.2f        ';
+tadj_3D_fmt = '%6.2f        ';
 exp_travtime_3D_fmt = '%7.2f        ';
 exp_arvltime_3D_fmt = '%6.2f        ';
 tres_3D_fmt = '%6.2f        ';            % 30
@@ -202,8 +211,8 @@ prev_file = exist(filename, 'file') == 2;
 
 if ~prev_file || redo
     fid = fopen(filename, 'w+');
-    hdrline1 = '#COLUMN:                                     1                             2                3               4          5            6             7                             8                9              10           11           12             13            14             15             16             17            18            19             20            21            22           23             24            25            26           27             28            29            30            31              32                     33          34                    35              36          37        38';
-    hdrline2 = '#DESCRIPTION:                         FILENAME                    EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP       1D_GCARC 1D*_GCARC_adj      1D*_GCARC   3D_GCARC_adj       3D_GCARC  OBS_TRAVTIME  OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES 1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES  3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR             SNR             MAX_COUNTS    MAX_TIME               NEIC_ID         IRIS_ID       KSTNM  REVIEWER';
+    hdrline1 = '#COLUMN:                                     1                             2                3               4          5            6             7                             8                9              10           11           12              13            14              15             16              17             18            19             20            21            22            23             24            25            26            27             28            29            30            31              32                     33          34                    35              36          37        38';
+    hdrline2 = '#DESCRIPTION:                         FILENAME                    EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP        1D_GCARC 1D*_GCARC_adj       1D*_GCARC   3D_GCARC_adj        3D_GCARC   OBS_TRAVTIME  OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES  1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES   3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR             SNR             MAX_COUNTS    MAX_TIME               NEIC_ID         IRIS_ID       KSTNM  REVIEWER';
     fprintf(fid, '%s\n', hdrline1);
     fprintf(fid, '%s\n', hdrline2);
     prev_mer = '';
@@ -257,6 +266,9 @@ for i = 1:length(s);
     % Retrieve event structure.
     EQ = getrevevt(sac, evtdir);
     EQ = EQ(1);
+
+    % In cases where inner and outer core phases (possibly) coexist we want to prioritize outer core phases.
+    EQ = onlyPKP(EQ);
 
     % Parse event parameters.
     evtime_date = irisstr2date(EQ.PreferredTime);
@@ -435,6 +447,7 @@ end
 writeaccess('lock', filename);
 fprintf('Wrote: %s\n', filename)
 
+%% This is outdated.
 % Here is a current list of column-end indicies, starting from 0:
 %
 %  43
@@ -475,3 +488,15 @@ fprintf('Wrote: %s\n', filename)
 % 593
 % 605
 % 615
+
+%% ___________________________________________________________________________ %%
+
+% Return (really, only keep) the first PKP phase in cases were PKP exists in phase list.
+function EQ = onlyPKP(EQ)
+
+phases = {EQ.TaupTimes.phaseName};
+PKP_phases = cellstrfind(phases, 'PKP');
+if ~isempty(PKP_phases)
+    EQ.TaupTimes = EQ.TaupTimes(PKP_phases(1));
+
+end
