@@ -1,5 +1,5 @@
-function write_tomocat1(redo, procdir, evtdir, txtdir)
-% WRITE_TOMOCAT1(redo, procdir, evtdir, txtdir)
+function write_tomocat1(redo, procdir, evtdir, txtdir, revtxt)
+% WRITE_TOMOCAT1(redo, procdir, evtdir, txtdir, revtxt)
 %
 % Tomography Catalog Iteration #1: GJI22 supplement + KSTNM, REVIEWER
 %
@@ -18,7 +18,7 @@ llnl_exists = false;
 % JDS and YY                     : 5
 % JDS and DN                     : 6
 %$ JDS and YK                    : 7
-reviewer = 0;
+defval('revtxt', [])
 
 defval('redo', true)
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'));
@@ -38,7 +38,7 @@ popas = [4 1];
 pt0 = 0;
 
 % P phases we are interested in (keep PKiKP as option because that may have been
-% the first-arriving phase savd in the time of the seismogram, despite the
+% the first-arriving phase saved in the time of the seismogram, despite the
 % later-arriving PKP being the actual pick; we will adjust window to prioritize
 % the PKP pick).
 p_phases = {'p' 'P' 'PKIKP' 'PKP' 'PKiKP'};
@@ -95,6 +95,13 @@ s = FA.s;
 % Let's just delete this old (who knows what parameters) `firstarrivals`
 % output; use it only to determine which SAC files we need to inspect.
 clearvars FA
+
+% Load list of who reviewed what.
+reviewer = [];
+if ~isempty(revtxt)
+    reviewer = readtext(revtxt);
+    reviewer = strrep(reviewer, 'evt', 'sac');
+end
 
 %%              Compute 1D ADJUSTED travel times and remove adjustment                  %%
 %%______________________________________________________________________________________%%
@@ -211,8 +218,8 @@ prev_file = exist(filename, 'file') == 2;
 
 if ~prev_file || redo
     fid = fopen(filename, 'w+');
-    hdrline1 = '#COLUMN:                                     1                             2                3               4          5            6             7                             8                9              10           11           12              13            14              15             16              17             18            19             20            21            22            23             24            25            26            27             28            29            30            31              32                     33          34                    35              36          37        38';
-    hdrline2 = '#DESCRIPTION:                         FILENAME                    EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP        1D_GCARC 1D*_GCARC_adj       1D*_GCARC   3D_GCARC_adj        3D_GCARC   OBS_TRAVTIME  OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES  1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES   3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR             SNR             MAX_COUNTS    MAX_TIME               NEIC_ID         IRIS_ID       KSTNM  REVIEWER';
+    hdrline1 = '#COLUMN:                                     1                             2                3               4          5            6             7                             8                9              10           11           12              13            14              15             16              17            18            19             20            21            22            23             24            25            26            27             28            29            30            31              32                     33          34                    35              36          37        38';
+    hdrline2 = '#DESCRIPTION:                         FILENAME                    EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP        1D_GCARC 1D*_GCARC_adj       1D*_GCARC   3D_GCARC_adj        3D_GCARC  OBS_TRAVTIME  OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES  1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES   3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR             SNR             MAX_COUNTS    MAX_TIME               NEIC_ID         IRIS_ID       KSTNM  REVIEWER';
     fprintf(fid, '%s\n', hdrline1);
     fprintf(fid, '%s\n', hdrline2);
     prev_mer = '';
@@ -381,6 +388,18 @@ for i = 1:length(s);
 
     end
 
+    % Label the reviewer
+    if ~isempty(reviewer)
+        rviewr_idx = cellstrfind(reviewer, sac);
+        rviewr = str2num(strtrim(fx(strsplit(reviewer{rviewr_idx}, ','), 2)))
+
+    else
+        % Undetermined/unlabeled reviewer.
+        rviewr = 0;
+        keyboard
+
+    end
+
     %%______________________________________________________________________________________%%
     data = {strippath(sac) ...
             ... %
@@ -429,7 +448,7 @@ for i = 1:length(s);
             iris_eventid ...
             ... %
             kstnm ...
-            reviewer ...
+            rviewr ...
            };
 
     fprintf(fid, fmt, data{:});
@@ -448,7 +467,7 @@ writeaccess('lock', filename);
 fprintf('Wrote: %s\n', filename)
 
 %% This is outdated.
-% Here is a current list of column-end indicies, starting from 0:
+% Here is a current list of column-end indices, starting from 0:
 %
 %  43
 %  73
