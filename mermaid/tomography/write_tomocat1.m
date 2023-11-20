@@ -4,8 +4,8 @@ function write_tomocat1(redo, procdir, evtdir, txtdir, revtxt)
 % Tomography Catalog Iteration #1: GJI22 supplement + KSTNM, REVIEWER
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 16-Nov-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
+% Last modified: 17-Nov-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
 
 clc
 close all
@@ -156,7 +156,8 @@ contrib_eventid_fmt = '%14s        ';     % 35
 iris_eventid_fmt = '%8s       ';          % 36
 
 kstnm_fmt = '%5s        ';                % 37
-reviewer_fmt = '%2i';                     % 38
+phase_fmt = '%5s        ';
+reviewer_fmt = '%2i';                     % 39
 
 fmt = [sac_fmt ...                        %  1
        ... %
@@ -205,7 +206,8 @@ fmt = [sac_fmt ...                        %  1
        iris_eventid_fmt ...                % 36
        ...
        kstnm_fmt, ...                      % 37
-       reviewer_fmt, ...                   % 38
+       phase_fmt, ...
+       reviewer_fmt, ...                   % 39
        '\n'];
 
 
@@ -218,8 +220,8 @@ prev_file = exist(filename, 'file') == 2;
 
 if ~prev_file || redo
     fid = fopen(filename, 'w+');
-    hdrline1 = '#COLUMN:                                     1                             2                3               4          5            6             7                             8                9              10           11           12              13            14              15             16              17            18            19             20            21            22            23             24            25            26            27             28            29            30            31              32                     33          34                    35              36          37        38';
-    hdrline2 = '#DESCRIPTION:                         FILENAME                    EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP        1D_GCARC 1D*_GCARC_adj       1D*_GCARC   3D_GCARC_adj        3D_GCARC  OBS_TRAVTIME  OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES  1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES   3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR             SNR             MAX_COUNTS    MAX_TIME               NEIC_ID         IRIS_ID       KSTNM  REVIEWER';
+    hdrline1 = '#COLUMN:                                     1                             2                3               4          5            6             7                             8                9              10           11           12              13            14              15             16              17             18             19             20            21            22            23             24            25            26            27             28            29            30            31              32                     33          34                    35              36          37           38        39';
+    hdrline2 = '#DESCRIPTION:                         FILENAME                    EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP        1D_GCARC 1D*_GCARC_adj       1D*_GCARC   3D_GCARC_adj        3D_GCARC   OBS_TRAVTIME   OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES  1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES   3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR             SNR             MAX_COUNTS    MAX_TIME               NEIC_ID         IRIS_ID       KSTNM        PHASE  REVIEWER';
     fprintf(fid, '%s\n', hdrline1);
     fprintf(fid, '%s\n', hdrline2);
     prev_mer = '';
@@ -276,6 +278,7 @@ for i = 1:length(s);
 
     % In cases where inner and outer core phases (possibly) coexist we want to prioritize outer core phases.
     EQ = onlyPKP(EQ);
+    phase_name = EQ.TaupTimes(1).phaseName;
 
     % Parse event parameters.
     evtime_date = irisstr2date(EQ.PreferredTime);
@@ -321,6 +324,12 @@ for i = 1:length(s);
                                                       lohi, procdir, ...
                                                       evtdir, EQ, bathy, ...
                                                       wlen2, fs, popas, pt0);
+
+    if isnan(tres_1Dadj)
+        continue
+
+    end
+
     % The travel time and arrival time time-adjustments (tadj) are equal because the
     % time elapsed between the event and the start of the seismogram is the same
     % in both cases and cancels.
@@ -448,6 +457,7 @@ for i = 1:length(s);
             iris_eventid ...
             ... %
             kstnm ...
+            phase_name ...
             rviewr ...
            };
 
