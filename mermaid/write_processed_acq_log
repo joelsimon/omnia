@@ -1,14 +1,15 @@
 #! /bin/zsh
 #
-# Generate acquisition "started" and "stopped" logs in $MERMAID/processed.
+# Generate acquisition "started" and "stopped" logs in $MERMAID/processed*/.
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 16-Aug-2022, Darwin Kernel Version 18.7.0
+# Last modified: 21-Nov-2023, Darwin Kernel Version 18.7.0
 
 # Loop over all MERMAID subdirectories
 # NB, the final forward slash ("/") is required here
 proc_dir=$MERMAID/processed/
+#proc_dir=$MERMAID/processed_jamstec/
 for mer_dir in $( ls -1d $proc_dir/*/ ); do
 
     # Define and unlock log file
