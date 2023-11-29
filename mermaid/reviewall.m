@@ -18,7 +18,7 @@ function reviewall(writecp, floatnum, procdir, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 01-Aug-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 29-Nov-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('writecp', false)
@@ -26,7 +26,8 @@ defval('floatnum', [])
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 
-skip_french = true
+skip_french = false;
+skip_0100 = true;
 
 % Switch the .pdf viewer depending on the platform.
 switch computer
@@ -64,7 +65,13 @@ sac = sac(idx);
 
 % Skip French floats, maybe.
 if skip_french
-    rm_idx = find(contains(sac, {'452.020-P-06' '452.020-P-07' '467.174-T-0100'}));
+    rm_idx = find(contains(sac, {'452.020-P-06' '452.020-P-07'}));
+    sac(rm_idx) = [];
+
+end
+
+if skip_0100
+    rm_idx = find(contains(sac, '467.174-T-0100'));
     sac(rm_idx) = [];
 
 end
