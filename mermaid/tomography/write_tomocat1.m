@@ -17,7 +17,7 @@ llnl_exists = false;
 % Yuko Kondo (YK; Kobe)          : 4
 % JDS and YY                     : 5
 % JDS and DN                     : 6
-% JDS and YK                    : 7
+% JDS and YK                     : 7
 defval('revtxt', [])
 
 defval('redo', true)
