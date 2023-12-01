@@ -16,8 +16,8 @@ function fname = updatetauptimesall(sacdir, evtdir)
 %  $MERMAID/events/, not $MERMAID/events/reviewed/identified/evt/, for `evtdir`
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 30-Aug-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 01-Dec-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default paths.
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'));
@@ -35,6 +35,10 @@ fname2 = fullfile(evtdir, sprintf('%s_%s_phaseName1_mismatch.txt', mfilename, da
 writeaccess('unlock', fname2, false)
 fid2 = fopen(fname2, 'w+');
 
+fname3 = fullfile(evtdir, sprintf('%s_%s_tdiff_exceeds_1s.txt', mfilename, datetime('now', 'Format', 'uuuu-MM-dd')));
+writeaccess('unlock', fname3, false)
+fid3 = fopen(fname3, 'w+');
+
 % Loop over all .evt and determine which need to be updated.
 lensac = length(sac);
 for i = 1:length(sac)
@@ -46,12 +50,18 @@ for i = 1:length(sac)
 
         for j = 1:length(old_EQ)
             if ~strcmp(new_EQ(j).TaupTimes(1).phaseName, old_EQ(j).TaupTimes(1).phaseName)
-                keyboard
                 fprintf(fid2, '%s\n', strippath(evt{i}));
 
             end
         end
     end
+
+    tdiff(i) = new_EQ(1).TaupTimes(1).truearsecs - old_EQ(1).TaupTimes(1).truearsecs;
+    if abs(tdiff(i)) > 1
+        fprintf(fid3, '%s\n', strippath(evt{i}))
+
+    end
+
 end
 
 % Write-restrict output file.
@@ -60,3 +70,4 @@ fprintf('\nWrote: %s\n', fname1)
 
 writeaccess('lock', fname2)
 fprintf('\nWrote: %s\n', fname2)
+keyboard
