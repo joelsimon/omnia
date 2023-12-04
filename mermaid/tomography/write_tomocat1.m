@@ -5,7 +5,7 @@ function write_tomocat1(redo, procdir, evtdir, txtdir, revtxt)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Nov-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Last modified: 04-Dec-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
 
 clc
 close all
@@ -397,15 +397,18 @@ for i = 1:length(s);
 
     end
 
-    % Label the reviewer
+    % Label the reviewer, if external 'reviewer.txt' file supplied.
     if ~isempty(reviewer)
         rviewr_idx = cellstrfind(reviewer, sac);
-        rviewr = str2num(strtrim(fx(strsplit(reviewer{rviewr_idx}, ','), 2)))
+        if isempty(rviewr_idx)
+            error('%s not found in %s (reviewer file)', strippath(sac), revtxt)
+
+        end
+        rviewr = str2num(strtrim(fx(strsplit(reviewer{rviewr_idx}, ','), 2)));
 
     else
         % Undetermined/unlabeled reviewer.
         rviewr = 0;
-        keyboard
 
     end
 
