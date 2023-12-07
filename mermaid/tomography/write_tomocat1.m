@@ -18,12 +18,12 @@ llnl_exists = false;
 % JDS and YY                     : 5
 % JDS and DN                     : 6
 % JDS and YK                     : 7
-defval('revtxt', [])
 
 defval('redo', true)
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'));
 defval('evtdir',  fullfile(getenv('MERMAID'), 'events'));
 defval('txtdir', fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified', 'txt'));
+defval('revtxt', [])
 
 %% Preliminaries
 
