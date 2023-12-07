@@ -10,6 +10,7 @@
 # NB, the final forward slash ("/") is required here
 proc_dir=$MERMAID/processed/
 #proc_dir=$MERMAID/processed_jamstec/
+#proc_dir=$MERMAID/processed_sustech/
 for mer_dir in $( ls -1d $proc_dir/*/ ); do
 
     # Define and unlock log file
