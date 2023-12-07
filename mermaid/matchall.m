@@ -16,10 +16,11 @@ function matchall(writecp, procdir, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 29-Nov-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 07-Dec-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 
+skip_french = true;
 skip_0100 = true;
 
 % Defauls.
@@ -43,11 +44,12 @@ fail = [];
 s = allsac(idx);
 fprintf('Searching for unmatched SAC files...\n')
 for i = 1:length(s)
-    % Skip the French floats.
-    % if contains(s{i}, '452.020-P-06') || contains(s{i}, '452.020-P-07')
-    %     continue
+    if skip_french
+        if contains(s{i}, '452.020-P-06') || contains(s{i}, '452.020-P-07')
+            continue
 
-    % end
+        end
+    end
 
     if skip_0100 && contains(s{i}, '467.174-T-0100')
             continue
