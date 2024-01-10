@@ -33,9 +33,9 @@ warn_str = '';
 
 % Sanity checks.
 if ~issorted(mer_struct.date)
-    % This probably happened because you set 'rm23=True' in readgps.m
-    % (set it to false).
-    error('mer_struct.date is not sorted')
+    % This probably happened because you set 'rm23=True' in readgps.m, which set some
+    % datetimes to NaT (fix: set `rm23=false`),
+    error('mer_struct.date is not sorted (check note above this warning in source code)')
 
 end
 if ~isbetween(ilocdate, mer_struct.date(1), mer_struct.date(end))
