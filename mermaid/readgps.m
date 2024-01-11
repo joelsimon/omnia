@@ -26,7 +26,7 @@ function gps = readgps(processed, rm23)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 11-Jan-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default path.
 merpath = getenv('MERMAID');
@@ -79,7 +79,7 @@ for i = 1:length(d)
     end
 end
 
-if rm23
+if rm23 && isfield(gps, 'P0023')
     % Replace bad data values with empty strings, NaNs, or NaTs, as opposed to
     % removing the indices entirely, so as to maintain the same indexing (e.g.,
     % for driftstats.m), and so `diff`s  may be taken.  If we just removed
