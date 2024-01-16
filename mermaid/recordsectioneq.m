@@ -3,7 +3,9 @@ function [F, EQ, sac] = recordsectioneq(sac, EQ, lohi, alignon, ampfac, normlize
 % [F, EQ, sac] = RECORDSECTIONEQ(sac, EQ, lohi, alignon, ampfac, normlize, ...
 %                               ph, popas, taper)
 %
-% Plot record section given lists of SAC and their assocaited identified EQ structs
+% Plot record section given lists of SAC and their assocaited identified EQ
+% `structs.  If earthquake struct lists multiple matched events, only plots
+% first.
 %
 % Input:
 % sac       Cell array of SAC filenames
@@ -44,7 +46,7 @@ function [F, EQ, sac] = recordsectioneq(sac, EQ, lohi, alignon, ampfac, normlize
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 28-Feb-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 16-Jan-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Wish list:
 %
@@ -79,7 +81,7 @@ phase_cell = {};
 for i = 1:length(sac)
     % Retrieve the event data associated with that SAC file, as
     % found through sac2evt.m
-    if ~strcmp(EQ{i}.Filename, strippath(sac{i}))
+    if ~strcmp(EQ{i}(1).Filename, strippath(sac{i}))
         error('EQ and SAC lists differ')
 
     end
