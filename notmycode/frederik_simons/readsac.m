@@ -1,5 +1,5 @@
-function [SeisData, HdrData] = readsac(filename, endianness)
-% [SeisData, HdrData] = READSAC(filename, endianness)
+function [SeisData, HdrData] = readsac(filename, endianness, HdrOnly)
+% [SeisData, HdrData] = READSAC(filename, endianness, HdrOnly)
 %
 % Reads binary (alphanumeric not allowed) SAC-formatted data.
 %
@@ -11,6 +11,8 @@ function [SeisData, HdrData] = readsac(filename, endianness)
 % filename        SAC file name
 % endianness      'l': little-endian (default)
 %                 'b': big-endian
+% HdrOnly          true to only read header data
+%                      (`SeisData` set to []; def: false)
 %
 % Output:
 % SeisData        The number vector
@@ -19,12 +21,13 @@ function [SeisData, HdrData] = readsac(filename, endianness)
 % See also: writesac.m
 %
 % Originally written and last modified by fjsimons-at-alum.mit.edu, 10/16/2011
-% Last modified in Ver. 2017b by jdsimon@princeton.edu, 21-Oct-2020
+% Modified using v9.3.0.948333 (R2017b) Update 9 by jdsimon@princeton.edu, 17-Jan-202a4
 
 %%  Edits made here must be mirrored in writesac.m and makehdr.m
 
 % Default endianness for Linux.
 defval('endianness', 'l')
+defval('HdrOnly', false)
 
 % Read the binary file.
 fid = fopen(filename, 'r', lower(endianness));
@@ -38,7 +41,12 @@ HdrI = fread(fid, 20, 'int32');
 HdrL = fread(fid, 5, 'int32');
 HdrK = fread(fid, [8 24], 'char');
 HdrK = char(HdrK');
-SeisData = fread(fid, HdrN(10), 'float32');
+if HdrOnly
+    SeisData = [];
+
+else
+    SeisData = fread(fid, HdrN(10), 'float32');
+end
 fclose(fid);
 
 %% NB; SAC word indexing starts at 0; these assignments shifted w.r.t to
