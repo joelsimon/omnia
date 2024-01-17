@@ -8,6 +8,7 @@ function tdate = iso8601str2date(tstr, precision, noz)
 % precision    1: seconds, e.g., '2007-04-05T14:30Z' (def)
 %              2: milliseconds, e.g., '2007-04-05T01:14:30.123Z'
 %              3: microseconds, e.g., '2007-04-05T01:14:30.123456Z'
+%              4: centisecond, e.g., '2007-04-05T01:14:30.12Z'
 % noz          true if no "Z", e.g., '2007-04-05T14:30' (def: false)
 %
 % Output:
@@ -15,7 +16,7 @@ function tdate = iso8601str2date(tstr, precision, noz)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 10-Jan-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 17-Jan-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('precision', 1)
@@ -32,8 +33,11 @@ switch precision
   case 3
     Format = 'uuuu-MM-dd''T''HH:mm:ss.SSSSSS''Z''';
 
+  case 4
+    Format = 'uuuu-MM-dd''T''HH:mm:ss.SS''Z''';
+
   otherwise
-    error('Specify one of 1, 2, or 3 for input ''precision''')
+    error('Specify one of [1:4] (inclusive) for input ''precision''')
 
 end
 
