@@ -56,7 +56,7 @@ fclose(fid);
 %%______________________________________________________________________________________%%
 % Words 0-69, in SAC parlance --> "F type" (floating)
 % According to iris.edu link above, as of Jan-2024 (and possibly earlier) SAC
-% word 3 (HdrF index 4) is "UNUSED."  Previously it was "SCALE" (which no longer
+% word 3 (HdrF index 4) is "UNUSED."  Previously it was "SCALE," which no longer
 % exists anywhere in header.  Leaving for legacy codes...
 %%______________________________________________________________________________________%%
 HdrData.DELTA = HdrF(1);
