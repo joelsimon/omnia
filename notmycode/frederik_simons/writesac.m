@@ -17,7 +17,7 @@ function writesac(SeisData, HdrData, filename, endianness)
 % See also: readsac.m
 %
 % Originally written and last modified by fjsimons-at-alum.mit.edu, 10/16/2011
-% Last modified in Ver. 2017b by jdsimon@princeton.edu, 20-Oct-2020
+% Modified using v9.3.0.948333 (R2017b) Update 9 by jdsimon@princeton.edu, 23-Jan-2024
 
 %%  Edits made here must be mirrored in readsac.m and makehdr.m
 
@@ -54,12 +54,15 @@ HdrK{2} = pad(HdrK{2}, 16);
 
 %%______________________________________________________________________________________%%
 % Words 0-69, in SAC parlance --> "F type" (floating)
+% According to iris.edu link above, as of Jan-2024 (and possibly earlier) SAC
+% word 3 (HdrF index 4) is "UNUSED."  Previously it was "SCALE," which no longer
+% exists anywhere in header.  Leaving for legacy codes...
 %%______________________________________________________________________________________%%
 HdrF(1) = HdrData.DELTA;
 HdrF(2) = HdrData.DEPMIN;
 HdrF(3) = HdrData.DEPMAX;
-HdrF(4) = HdrData.SCALE;
-HdrF(5) = HdrData.ODELTA;;
+HdrF(4) = HdrData.SCALE; % "UNUSED" as of Jan-2024 (see note above)
+HdrF(5) = HdrData.ODELTA;
 
 HdrF(6) = HdrData.B;
 HdrF(7) = HdrData.E;
@@ -130,7 +133,7 @@ HdrF(60) = HdrData.XMINIMUM;
 HdrF(61) = HdrData.XMAXIMUM;
 HdrF(62) = HdrData.YMINIMUM;
 HdrF(63) = HdrData.YMAXIMUM;
-% Skip: HdrF(64:69) (unused)
+% Skip: HdrF(64:70) (unused)
 
 %%______________________________________________________________________________________%%
 % Words 70-84, in SAC parlance --> "I type" (int32(-12345))
@@ -172,7 +175,8 @@ HdrI(10) = HdrData.ISYNTH;
 
 HdrI(11) = HdrData.IMAGTYP;
 HdrI(12) = HdrData.IMAGSRC;
-% Skip HdrI(13:20) (unused)
+HdrI(13) = HdrData.IBODY;
+% Skip HdrI(14:20) (unused)
 
 %%______________________________________________________________________________________%%
 % Words 105-109, in SAC parlance --> "L type" (logical)
