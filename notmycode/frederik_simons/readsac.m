@@ -21,7 +21,7 @@ function [SeisData, HdrData] = readsac(filename, endianness, HdrOnly)
 % See also: writesac.m
 %
 % Originally written and last modified by fjsimons-at-alum.mit.edu, 10/16/2011
-% Modified using v9.3.0.948333 (R2017b) Update 9 by jdsimon@princeton.edu, 17-Jan-202a4
+% Modified using v9.3.0.948333 (R2017b) Update 9 by jdsimon@princeton.edu, 17-Jan-2024
 
 %%  Edits made here must be mirrored in writesac.m and makehdr.m
 
