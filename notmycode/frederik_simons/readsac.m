@@ -21,7 +21,7 @@ function [SeisData, HdrData] = readsac(filename, endianness, HdrOnly)
 % See also: writesac.m
 %
 % Originally written and last modified by fjsimons-at-alum.mit.edu, 10/16/2011
-% Modified using v9.3.0.948333 (R2017b) Update 9 by jdsimon@princeton.edu, 17-Jan-2024
+% Modified using v9.3.0.948333 (R2017b) Update 9 by jdsimon@princeton.edu, 23-Jan-2024
 
 %%  Edits made here must be mirrored in writesac.m and makehdr.m
 
@@ -46,6 +46,7 @@ if HdrOnly
 
 else
     SeisData = fread(fid, HdrN(10), 'float32');
+
 end
 fclose(fid);
 
@@ -54,11 +55,14 @@ fclose(fid);
 
 %%______________________________________________________________________________________%%
 % Words 0-69, in SAC parlance --> "F type" (floating)
+% According to iris.edu link above, as of Jan-2024 (and possibly earlier) SAC
+% word 3 (HdrF index 4) is "UNUSED."  Previously it was "SCALE" (which no longer
+% exists anywhere in header.  Leaving for legacy codes...
 %%______________________________________________________________________________________%%
 HdrData.DELTA = HdrF(1);
 HdrData.DEPMIN = HdrF(2);
 HdrData.DEPMAX = HdrF(3);
-HdrData.SCALE = HdrF(4);
+HdrData.SCALE = HdrF(4); % "UNUSED" as of Jan-2024 (see note above)
 HdrData.ODELTA = HdrF(5);
 
 HdrData.B = HdrF(6);
@@ -121,7 +125,7 @@ HdrData.BAZ = HdrF(53);
 HdrData.GCARC = HdrF(54);
 % Skip: HdrF(55) (internal)
 
-% Skip: HdrF(56) (internal)
+% Skip: HdrF(56) (interal)
 HdrData.DEPMEN = HdrF(57);
 HdrData.CMPAZ = HdrF(58);
 HdrData.CMPINC = HdrF(59);
@@ -130,7 +134,7 @@ HdrData.XMINIMUM = HdrF(60);
 HdrData.XMAXIMUM = HdrF(61);
 HdrData.YMINIMUM = HdrF(62);
 HdrData.YMAXIMUM = HdrF(63);
-% Skip: HdrF(64:69) (unused)
+% Skip: HdrF(64:70) (unused)
 
 %%______________________________________________________________________________________%%
 % Words 70-84, in SAC parlance --> "I type" (int32(-12345))
@@ -153,7 +157,7 @@ HdrData.NPTS = HdrN(10);
 HdrData.NWFID = HdrN(12);
 HdrData.NXSIZE = HdrN(13);
 HdrData.NYSIZE = HdrN(14);
-% Skip HdrN(15) (internal)
+% Skip HdrN(15) (unused)
 
 %%______________________________________________________________________________________%%
 % Words 85-104, in SAC parlance --> "I type" (int32(-12345))
@@ -172,7 +176,8 @@ HdrData.ISYNTH = HdrI(10);
 
 HdrData.IMAGTYP = HdrI(11);
 HdrData.IMAGSRC = HdrI(12);
-% Skip HdrI(13:20) (unused)
+HdrData.IBODY = HdrI(13);
+% Skip HdrI(14:20) (unused)
 
 %%______________________________________________________________________________________%%
 % Words 105-109, in SAC parlance --> "L type" (logical)
