@@ -3,6 +3,10 @@ function [SeisData, HdrData] = readsac(filename, endianness, HdrOnly)
 %
 % Reads binary (alphanumeric not allowed) SAC-formatted data.
 %
+% Only "old" SAC version (NVHDR=6) with single-precision headers allowed; does
+% not read "new" SAC version (NVHDR=7) with additional double-precision footer.
+% See https://ds.iris.edu/files/sac-manual/manual/file_format.html.
+%
 % Does not perform conversion of "enumerated" types from int to char,
 % e.g., READSAC does not convert IZTYPE=9 to "BEGIN TIME",
 % or IFTYPE=1 to "TIME SERIES FILE", etc.
@@ -223,3 +227,28 @@ HdrData.KCMPNM =  HdrK{20};
 HdrData.KNETWK =  HdrK{21};
 HdrData.KDATRD =  HdrK{22};
 HdrData.KINST =  HdrK{23};
+
+%%______________________________________________________________________________________%%
+% TODO: Accomodate double-precision "footer" (header), NVHDR = 7.
+% FOR NOW: Throw error.
+%
+% Jan-2024: from https://ds.iris.edu/files/sac-manual/manual/file_format.html
+%
+% All reals in the SAC header and data sections are single-precision (32 bits, 4
+% bytes). As discussed in the section on precision in TUTORIAL, although having
+% single-precision for the data is sufficient, having only single-precision for
+% time and distance variables in the header is no longer good enough to handle
+% many modern data sets. SAC version 102.0 solves this problem. The header is
+% unchanged, but a "footer" is added with 22 header variables in
+% double-precision. Version 102.0 can handle "old" SAC data files with no footer
+% or files with a footer, so there is complete compatibility. SAC v102.0
+% distinguishes between "old" and "new" files by the header variable NVHDR: if
+% NVHDR = 6, the SAC file is in "old" format, if NVHDR = 7, it is in "new" format
+% with a footer. See see the section on Floating-Point Precision in SAC in
+% TUTORIAL for a more detailed discussion.
+%%______________________________________________________________________________________%%
+
+if HdrData.NVHDR ~= 6
+    error(sprintf('%s cannot yet accommodate SAC files with double-precision ''footer'' (NVHDR=7)\n', mfilename))
+
+end
