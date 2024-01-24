@@ -5,7 +5,7 @@ function HdrData = makehdr
 % with default values.
 %
 % Originally written and last modified by fjsimons-at-alum.mit.edu, 09/12/2007
-% Last modified in Ver. 2017b by jdsimon@princeton.edu, 20-Oct-2020
+% Modified using v9.3.0.948333 (R2017b) Update 9 by jdsimon@princeton.edu, 23-Jan-2024
 
 % SAC default values.
 sacdef_F = single(-12345.0);
@@ -127,6 +127,7 @@ HdrData.ISYNTH = sacdef_I;
 
 HdrData.IMAGTYP = sacdef_I;
 HdrData.IMAGSRC = sacdef_I;
+HdrData.IBODY = sacdef_I;
 
 %%______________________________________________________________________________________%%
 % Words 105-109, in SAC parlance --> "L type" (logical)
