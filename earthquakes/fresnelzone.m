@@ -36,7 +36,7 @@ function [fzlat, fzlon, gclat, gclon, fr] = fresnelzone(lat1, lon1, lat2, lon2, 
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 06-Oct-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 24-Jan-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('npts_gc', 100);
@@ -94,11 +94,14 @@ fzlon = [fzlon_neg'  fzlon_pos'];
 
 if plt
     figure
-    plotcont
-    box on
+    %plotcont
+    %box on
+    %xlim([0 360])
+    %ylim([-90 90])
+    plotgebcopacific
+    xlim([120 300])
+    ylim([-60 80])
     hold on
-    xlim([0 360])
-    ylim([-90 90])
 
     % Plot Fresnel-zone tracks; COLUMNS of output.
     for i = 1:size(fzlon, 2);
@@ -111,12 +114,12 @@ if plt
 
     % Plot Fresnel radii; ROWS of output
     for i = 1:size(fzlon, 1);
-        fz_radius = plot(longitude360(fzlon(i, :)), fzlat(i, :), 'r');
+        fz_radius = plot(longitude360(fzlon(i, :)), fzlat(i, :), 'k');
 
     end
 
-    legend([gc_track fz_track fz_radius], 'Great-Circle Track', ...
-           'Fresnel Tracks', 'Fresnel Radii');
+    % legend([gc_track fz_track fz_radius], 'Great-Circle Track', ...
+    %        'Fresnel Tracks', 'Fresnel Radii');
     axesfs([], 10, 10)
     latimes
 
