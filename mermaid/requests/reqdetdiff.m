@@ -1,17 +1,19 @@
-function reqdetdiff(s_req, s_det, diro)
-% REQDETDIFF(s_req, s_det, diro)
+function reqdetdiff(s_req, s_det)
+% REQDETDIFF(s_req, s_det)
 %
 % Compares requested and detected MERMAID files.
 %
-% Author: Dr. Joel D. Simon
+% Input:
+% s_req    REQ SAC file (def: 20200805T121328.22_5F62A85C.MER.REQ.WLT5.sac)
+% s_det    DET SAC file (def: 20200805T121329.22_5F2AF4E8.MER.DET.WLT5.sac)
+%
+% Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 19-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 24-Jan-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
-defval('diro', fullfile(getenv('MERMAID'), 'processed'))
-defval('test_diro', fullfile(getenv('MERMAID'), 'test_processed'))
-defval('s_req', fullsac('20200805T121328.22_5F62A85C.MER.REQ.WLT5.sac', diro))
-defval('s_det', fullsac('20200805T121329.22_5F2AF4E8.MER.DET.WLT5.sac', diro))
+defval('s_req', '20200805T121328.22_5F62A85C.MER.REQ.WLT5.sac')
+defval('s_det', '20200805T121329.22_5F2AF4E8.MER.DET.WLT5.sac')
 
 %%______________________________________________________________________________________%%
 % Detected: returned.
@@ -78,8 +80,9 @@ lg1 = legend(ha1(1), [pl_det pl_req], 'DET', 'REQ');
 %% PLOT ALIGNED AND TRUNCATED
 
 % Compute their cross correlation.
+%% JDS note -- should maybe use `xdist` instead
 [xcorr_norm, max_xcorr, xat_det, xat_req, dx_det, dx_req, px_det, px_req] = ...
-    alignxcorr(x_det, x_req);
+    alignxcorr(x_det, x_req, 'coeff');
 
 
 %% PLOT
@@ -114,9 +117,9 @@ lg2 = legend(ha1(2), [pl2_det pl2_req], 'DET', 'REQ');
 xax_xat_det = xaxis(length(xat_det), h_det.DELTA, 0);
 xax_xat_req = xaxis(length(xat_req), h_req.DELTA, 0);
 
-pl3_det = plot(ha1(3), xax_xat_det, xat_det, 'k');
+pl3_det = plot(ha1(3), xax_xat_det, xat_det, 'k-o');
 hold(ha1(3), 'on')
-pl3_req = plot(ha1(3), xax_xat_req, xat_req, 'r');
+pl3_req = plot(ha1(3), xax_xat_req, xat_req, 'r-o');
 xlim(ha1(3), minmax([0 xax_xat_det' xax_xat_req']))
 lg1 = legend(ha1(3), [pl3_det pl3_req], 'DET', 'REQ');
 xlabel(ha1(3), 'Aligned and truncated')
