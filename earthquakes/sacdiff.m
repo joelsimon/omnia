@@ -35,7 +35,7 @@ function [h1, h2] = sacdiff(s1, s2, dmate, lohi, flipstack)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 08-Feb-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 24-Jan-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 %% Wishlist:
 %%
@@ -143,7 +143,7 @@ lg1 = legend(ha1(1), [pl11 pl12], 's1', 's2');
 %% PLOT ALIGNED AND TRUNCATED
 
 % Compute their cross correlation and signal delay.
-[delay, mc, xat1, xat2, ~, ~, sx1, sx2, px1, px2, c] = alignxcorr(x1, x2);
+[delay, mc, xat1, xat2, ~, ~, sx1, sx2, px1, px2, c] = alignxcorr(x1, x2, 'coeff');
 delay_time = delay * h2.DELTA;
 
 % Generate x-axis for aligned and truncated S1 and S2 signals where they
