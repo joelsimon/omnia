@@ -15,7 +15,7 @@ function write_data_log(procdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Jan-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 24-Jan-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 fmt = '%23sZ    %23sZ\n';
@@ -27,7 +27,8 @@ for i = 1:length(floatdir)
         continue
 
     end
-    kstnm = osean2fdsn(strippath(floatdir{i}));
+    h = sachdr(sac{i});
+    kstnm = h.KSTNM;
     fname = sprintf('%s_data_log.txt', kstnm);
     fid = fopen(fullfile(floatdir{i}, fname), 'w+');
     fprintf(fid, sprintf('%s:        start_time                    end_time\n', kstnm));
