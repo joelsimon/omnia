@@ -8,7 +8,7 @@ function depth = pressure2depth(value, unit)
 %
 % as is done in the MERMAID manual.
 %
-% NB: as of writing, automaid assumes 1 m = 1 dbar, no 1.01 dbar.
+% NB: as of writing, automaid assumes 1 m = 1 dbar, not 1.01 dbar.
 %
 % Input:
 % value       Pressure in dbar or Pa
