@@ -8,9 +8,8 @@ function countsac(procdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 15-Nov-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Last modified: 05-Feb-2024, Version 9.3.0.713579 (R2017b) on GLNXA64
 
-clc
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 
 % Find all folders matching, e.g., "452.020-P-06" or "452.120-S-0094"
