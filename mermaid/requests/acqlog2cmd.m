@@ -1,5 +1,5 @@
-function acqlog2cmd(csv_file, req_file, nscal)
-% ACQLOG2CMD(csv_file, req_file, nscal)
+function acqlog2cmd(csv_file, req_file, nscal, delim)
+% ACQLOG2CMD(csv_file, req_file, nscal, delim)
 %
 % Convert *_Available_in_AcqLogs.csv files as written by Dalija Namjesnik to
 % "mermaid REQUEST:XXXX-XX-XXTXX_XX-XX,X,X" formatted-strings for .cmd files.
@@ -12,11 +12,11 @@ function acqlog2cmd(csv_file, req_file, nscal)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 02-Feb-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 09-Feb-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-% Default number of scales to request: 5 scales = 20 Hz
-% Output files defaulted later, based on station name
+% Defaults
 defval('nscal', 5)
+defval('delim', ',')
 
 % Find station name
 basename = strippath(csv_file);
@@ -25,7 +25,7 @@ kstnm = basename(1:5);
 % Read Dalija's .csv file
 csv_fmt = [repmat('%s ', [1,31]) '\n'];
 csv_fid = fopen(csv_file, 'r');
-ts = textscan(csv_fid, csv_fmt, 'HeaderLines', 1, 'Delimiter', ',');
+ts = textscan(csv_fid, csv_fmt, 'HeaderLines', 1, 'Delimiter', delim);
 fclose(csv_fid);
 
 % Parse relevent startTime, endTime, flag columns for .csv
