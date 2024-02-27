@@ -15,7 +15,7 @@ function lon = longitude360(lon)
 % Output:
 % lon      Longitude in [0:360] degree system
 %
-% Example: (heading east from Prime Meridian)
+% Ex: (heading east from Prime Meridian)
 %    LONGITUDE360(+0)
 %    LONGITUDE360(+1)
 %    LONGITUDE360(+45)
@@ -29,6 +29,8 @@ function lon = longitude360(lon)
 %    LONGITUDE360(-1)
 %    LONGITUDE360(-0)
 %
+% See also: longitude180
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 20-Oct-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
@@ -37,7 +39,7 @@ function lon = longitude360(lon)
 if ~isvector(lon)
     % Work down each column in the case of an input matrix.
 
-    %% RECURSION.
+    %% (lazy) RECURSION.
     for i = 1:size(lon, 2)
         lon(:, i) = longitude360(lon(:, i));
 
