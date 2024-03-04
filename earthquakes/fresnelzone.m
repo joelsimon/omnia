@@ -1,5 +1,7 @@
-function [fzlat, fzlon, gclat, gclon, fr] = fresnelzone(lat1, lon1, lat2, lon2, v, f, num_fr, npts_fr, plt)
-% [fzlat, fzlon, gclat, gclon, fr] = FRESNELZONE(lat1, lon1, lat2, lon2, v, f, num_fr, npts_fr, plt)
+function [fzlat, fzlon, gclat, gclon, fr, gcidx] = ...
+    fresnelzone(lat1, lon1, lat2, lon2, v, f, num_fr, npts_fr, plt)
+% [fzlat, fzlon, gclat, gclon, fr, gcidx] = ...
+%     FRESNELZONE(lat1, lon1, lat2, lon2, v, f, num_fr, npts_fr, plt)
 %
 % Compute 2-D (lat/lon only; map view, no depth) Fresnel-zone tracks (like
 % great-circle tracks) for constant-velocity waves (e.g., surface or T waves).
@@ -13,6 +15,7 @@ function [fzlat, fzlon, gclat, gclon, fr] = fresnelzone(lat1, lon1, lat2, lon2, 
 %                      path (def: 100)
 % npts_fr*         Number of points along each Fresnel radii, each of which
 %                      are perpendicular to great-circle path (def: `num_fr`)
+% plt              true to plot output (def: false)
 %
 % Output:
 % fzlat**          Latitude of Fresnel-zone tracks [deg]
@@ -20,25 +23,27 @@ function [fzlat, fzlon, gclat, gclon, fr] = fresnelzone(lat1, lon1, lat2, lon2, 
 % gclat            Latitude of great-circle tracks [deg]
 % gclon            Longitude of great-circle tracks [deg]
 % fr               Fresnel radius at every point along great circle [deg]
-% plt              true to plot output (def: false)
+% gcidx           Column index of great-circle track (in middle all all tracks)
+%                  e.g., gclat = fzlat(:, gcidx);
+%                        gclon = fzlat(:, gclon)
 %
-% *Total number of Fresnel tracks returned is 2*npts_fr, where half are
+% *Total number of Fresnel tracks returned is 2*npts_fr+1, where half are
 %  relatively "negative" south/west and half are relatively "positive"
-%  north/east of great-circle track.
+%  north/east of great-circle track in the middle.
 %
 % **Columns define Fresnel-zone tracks, adjacent to great-circle track.
 %   Rows define Fresnel zone radii, normal to great-circle track.
 %
-% Ex: 20 s surface wave enimating from Hung-Tonga recorded at MH.N0005
+% Ex: 20 s surface wave emanating from Hung-Tonga recorded at MH.N0005
 %    lat1=-20.546; lon1=-175.390; lat2=-11.809; lon2=-144.310;
-%    v=3500; f=1/20; num_fr = 2; npts_fr=5; plt=true;
-%    FRESNELZONE(lat1, lon1, lat2, lon2, v, f, num_fr, npts_fr, plt)
+%    v=3500; f=1/20; num_fr=100; npts_fr=5; plt=true;
+%    FRESNELZONE(lat1, lon1, lat2, lon2, v, f, num_fr, npts_fr, plt);
 %
-% See also: fresnelradius, track1, track2
+% See also: fresnelradius
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 29-Feb-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 04-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Defaults.
 defval('num_fr', 100);
@@ -81,16 +86,21 @@ npts_fr = npts_fr + 1;
 % cut it.  E.g., the positive track starts on great circle and tracks north/east
 % the specific Fresnel radius.
 fzlat_neg(1, :) = [];
-fzlon_neg(1, :) = [];
 fzlat_pos(1, :) = [];
+fzlon_neg(1, :) = [];
 fzlon_pos(1, :) = [];
 
 % At this point the columns define the Fresnel radius tracks (normal to great
 % circle) and the rows define the Fresnel-zone tracks (adjacent to great
 % circle). Transpose and concatenate pos/neg radius tracks so that columns of
-% the output define Fresnel-zone tracks.
-fzlat = [fzlat_neg'  fzlat_pos'];
-fzlon = [fzlon_neg'  fzlon_pos'];
+% the output define Fresnel-zone tracks.  Slot great-circle latitudes and
+% longitudes (multiply repeated and cut above) in middle of positive and
+% negative tracks.
+fzlat = [fzlat_neg' gclat fzlat_pos'];
+fzlon = [fzlon_neg' gclon fzlon_pos'];
+
+% Return index (middle of tracks) of column representing great-circle track.
+gcidx = size(fzlat_neg',2) + 1;
 
 %% ___________________________________________________________________________ %%
 
@@ -98,9 +108,10 @@ if plt
     % Toggle big on or off to swap basemap
     big = false;
 
-    figure 
+    figure
     if big
         plotgebcopacific
+
     else
         plotcont
         box on
@@ -117,12 +128,12 @@ if plt
 
     end
 
-    % Plot great-circle track, which should fall in middle.
-    gc_track = plot(longitude360(gclon), gclat, 'r');
+    % Plot (again, redundantly for color) great-circle track, which should fall in middle.
+    gc_track = plot(longitude360(fzlon(:, gcidx)), fzlat(:, gcidx), 'r');
 
     % Plot Fresnel radii; ROWS of output
     for i = 1:size(fzlon, 1);
-        fz_radius = plot(longitude360(fzlon(i, :)), fzlat(i, :), 'k');
+        fz_radius = plot(longitude360(fzlon(i, :)), fzlat(i, :), 'k-o');
 
     end
 
@@ -130,6 +141,6 @@ if plt
            'Fresnel Tracks', 'Fresnel Radii');
     hold off
     axesfs([], 10, 10)
-    latimes
+    latimes2
 
 end
