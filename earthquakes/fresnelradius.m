@@ -28,7 +28,13 @@ function fr = fresnelradius(r, R, v, f);
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 03-Oct-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 04-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+% Sanity.
+if any(r > R)
+    error('Requested distance greater than total distance')
+
+end
 
 % Equation (22) from Skarsoulis & Cornuelle (2004).
 fr = sqrt([r.*(R-r)*v]/(f*R))';
