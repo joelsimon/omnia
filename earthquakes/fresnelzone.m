@@ -23,7 +23,7 @@ function [fzlat, fzlon, gclat, gclon, fr, gcidx] = ...
 % gclat            Latitude of great-circle tracks [deg]
 % gclon            Longitude of great-circle tracks [deg]
 % fr               Fresnel radius at every point along great circle [deg]
-% gcidx           Column index of great-circle track (in middle all all tracks)
+% gcidx            Column index of great-circle track (in middle all all tracks)
 %                  e.g., gclat = fzlat(:, gcidx);
 %                        gclon = fzlat(:, gclon)
 %
@@ -74,10 +74,12 @@ cum_distdeg = linspace(0, tot_distdeg, num_fr);
 fr_m = fresnelradius(cum_distm, tot_distm, v, f);
 fr = km2deg(fr_m/1000);
 
-% Compute Fresnel radius tracks that run normal to great-circle track.
-% Positive radii track north(east) of east-west(north-south) great circles.
-% Negative radii track south(west) of north-south(east_west) great circles.
-% Add one point to each to accommodate latter chop of great-circle track itself.
+% Compute Fresnel radius tracks that run normal to great-circle track.  Positive
+% radii track north(east) of east-west(north-south) great circles.  Negative
+% radii track south(west) of north-south(east_west) great circles.  Add one
+% point to each to accommodate latter chop of great-circle track itself (the
+% input here is number of Fresnel radii, so we do want to add one to equal
+% number requested, which differs from how it is done with `fresnelgrid`).
 npts_fr = npts_fr + 1;
 [fzlat_neg, fzlon_neg] = track1(gclat, gclon, az-90, fr, [], [], npts_fr);
 [fzlat_pos, fzlon_pos] = track1(gclat, gclon, az+90, fr, [], [], npts_fr);
@@ -96,8 +98,8 @@ fzlon_pos(1, :) = [];
 % the output define Fresnel-zone tracks.  Slot great-circle latitudes and
 % longitudes (multiply repeated and cut above) in middle of positive and
 % negative tracks.
-fzlat = [fzlat_neg' gclat fzlat_pos'];
-fzlon = [fzlon_neg' gclon fzlon_pos'];
+fzlat = [fliplr(fzlat_neg') gclat fzlat_pos'];
+fzlon = [fliplr(fzlon_neg') gclon fzlon_pos'];
 
 % Return index (middle of tracks) of column representing great-circle track.
 gcidx = size(fzlat_neg',2) + 1;
