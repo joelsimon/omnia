@@ -4,8 +4,8 @@ function write_tomocat1(redo, procdir, evtdir, txtdir, revtxt)
 % Tomography Catalog Iteration #1: GJI22 supplement + KSTNM, REVIEWER
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 04-Dec-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 13-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 clc
 close all
@@ -254,8 +254,19 @@ for i = 1:length(s);
     % supplement (not just 'floor'ed in the output text file; e.g., the travel
     % time residuals and their estimated uncertainties are rounded to 1/100 s).
     rounded_sttime_decimal = num2str(round(str2double(sttime(end-3:end)), 2));
+
+    %% ___________________________________________________________________________ %%
+    %%
+    error('next two lines are the poblem (same with evt timing below)')
+    %% I compute the rounded string for complete decimal, but instead of
+    %% replacing complete decimal (and adding a zero if I need to, I guess) I
+    %% replace the decimal hundreds with the whole decimal. Try
+    %% sttime = '2018-07-06T01:49:30.603' as an example
+
     sttime(end) = []; % chop of 1/1000 s decimal place
     sttime(end) = rounded_sttime_decimal(end); % replace 1/100 s decimal place with rounded value
+    %%
+    %% ___________________________________________________________________________ %%
 
     % Parse station parameters.
     % Station depth is in meters, down is positive.
