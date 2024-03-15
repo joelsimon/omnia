@@ -1,11 +1,14 @@
 function km = londeg2km(lat, deg)
-% LONDEG2KM(lat, deg)
+% km = LONDEG2KM(lat, deg)
 %
 % Convert distance from longitude degrees to kilometers at a constant latitude.
 %
 % Input:
 % lat     Degree of constant latitude [deg]
 % deg     Degrees of longitude (east-west distance) [deg]
+%
+% Output:
+% km      Distance spanned by degrees of longitude [km]
 %
 % Ex: (Distance of 1 degree of longitude from North Pole to equator)
 %    LONDEG2KM([90 60 45 15 0]', 1)
