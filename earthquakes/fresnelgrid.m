@@ -32,13 +32,13 @@ function [fzlat, fzlon, gcidx, fr, deg] = ...
 %
 % Ex: (Fresnel zone for 20 s surface wave from Sydney to Portland using 0.25 deg grid)
 %    lat1=-33; lon1=151; lat2=45; lon2=-122; vel=3500; freq=1/20; deg=0.25; plt=true;
-%    FRESNELGRID3(lat1,lon1,lat2,lon2,vel,freq,deg,plt);
+%    FRESNELGRID(lat1,lon1,lat2,lon2,vel,freq,deg,plt);
 %
 % See also: fresnelzone.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 14-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 15-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % NTS: There are various ways to speed this up (e.g., `cumdist` outside loop and
 % computing all `fresnelradius` in one go; merging azimuth computation into main
