@@ -70,20 +70,21 @@ python $AUTOMAID/scripts/main.py -s $MERMAID/server -p $MERMAID/processed
 conda deactivate
 print '\n...completed writing SAC files\n'
 
-# Generate raw matches to the IRIS catalog.  Note that upon exiting MATLAB you
-# may get the following message.
-#
-#    Identifier: 'MATLAB:connector:connector:ConnectorNotRunning'
-#     Arguments: {}
-#
-# I have only noticed this since adding the parallel writechangepointall.m to
-# matchall.m.  I assume it has something to do with MATLAB closing before the
-# parallel pool is completely shut down.  Doesn't seem to affect the output of
-# this code, however.
-print '\nGenerating preliminary match to global seismic catalogs...\n'
-/Applications/MATLAB_R2017b.app/bin/matlab -r \
-   "run matchall.m; run lastdive.m; run exit" >& /dev/null
-print '\n..done with preliminary match to the seismic catalogs\n'
+# # Generate raw matches to the IRIS catalog.  Note that upon exiting MATLAB you
+# # may get the following message.
+# #
+# #    Identifier: 'MATLAB:connector:connector:ConnectorNotRunning'
+# #     Arguments: {}
+# #
+# # I have only noticed this since adding the parallel writechangepointall.m to
+# # matchall.m.  I assume it has something to do with MATLAB closing before the
+# # parallel pool is completely shut down.  Doesn't seem to affect the output of
+# # this code, however.
+# print '\nGenerating preliminary match to global seismic catalogs...\n'
+# /Applications/MATLAB_R2017b.app/bin/matlab -r \
+#    "run matchall.m; run lastdive.m; run exit" >& /dev/null
+# print '\n..done with preliminary match to the seismic catalogs\n'
+/Applications/MATLAB_R2017b.app/bin/matlab -r "run lastdive.m; run exit" >& /dev/null
 
 # Write "acq started", "acq stopped" logs
 $OMNIA/mermaid/write_processed_acq_log
