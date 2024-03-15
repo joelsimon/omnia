@@ -34,21 +34,22 @@
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 14-Aug-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 14-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Open figs in right side of right monitor
 set(0, 'DefaultFigurePosition', [1100   450   560   420])
 
 % For my code, and code my code requires.
-addpath(genpath(getenv('OMNIA')))
 addpath(genpath(getenv('GEOCSV')))
+addpath(genpath(getenv('OMNIA')))
 
 % Remove the paper-specific paths, with generic "fig*.m" names.
+rmpath(genpath(fullfile(getenv('OMNIA'), '.git')))
+rmpath(genpath(fullfile(getenv('GEOCSV'), '.git')))
+rmpath(genpath(fullfile(getenv('OMNIA'), 'atm')))
 rmpath(genpath(fullfile(getenv('OMNIA'), 'BSSA2020')))
 rmpath(genpath(fullfile(getenv('OMNIA'), 'SRL2021')))
 rmpath(genpath(fullfile(getenv('OMNIA'), 'GJI2021')))
-rmpath(genpath(fullfile(getenv('OMNIA'), '.git')))
-rmpath(genpath(fullfile(getenv('GEOCSV'), '.git')))
 
 % For MatTaup.
 javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', ...
