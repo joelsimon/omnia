@@ -42,6 +42,10 @@ if ~ismember(sac_scales, [-1:5])
     error('''sac_scales'' must be an integer between -1 and 5')
 
 end
+if sacduration > 1800
+    error('''sac_duration'' cannot be greater than 1800 (must split to multline request')
+
+end
 
 % Convert datetime to datestr with proper format.
 sac_datestr = reqdate(sac_date);
