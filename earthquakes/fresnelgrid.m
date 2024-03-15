@@ -1,7 +1,7 @@
 function [fzlat, fzlon, gcidx, fr, deg] = ...
-            fresnelgrid3(lat1, lon1, lat2, lon2, vel, freq, deg, plt)
+            fresnelgrid(lat1, lon1, lat2, lon2, vel, freq, deg, plt)
 % [fzlat, fzlon, gcidx, fr, deg] = ...
-%     FRESNELGRID3(lat1, lon1, lat2, lon2, vel, freq, deg, plt)
+%     FRESNELGRID(lat1, lon1, lat2, lon2, vel, freq, deg, plt)
 %
 % Compute 2-D (map view; no depth) Fresnel zone for constant-velocity waves
 % (e.g., surface or T waves) on equal-area grid.
@@ -38,7 +38,7 @@ function [fzlat, fzlon, gcidx, fr, deg] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 14-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % NTS: There are various ways to speed this up (e.g., `cumdist` outside loop and
 % computing all `fresnelradius` in one go; merging azimuth computation into main
@@ -57,20 +57,21 @@ gc_tot_dist_m = deg2km(gc_tot_dist_deg) * 1e3;
 % Determine number of points along great-circle path to compute Fresnel radii
 % based on requested resolution in degrees. Add one for end point (resolution is
 % an interval).
-num_fr = ceil(gc_tot_dist_deg / deg) + 1;
+req_deg = deg;
+num_fr = ceil(gc_tot_dist_deg / req_deg) + 1;
 
 % Compute lat/lon of great circle path between source and receiver.
 [gclat, gclon] = track2(lat1, lon1, lat2, lon2, [], [], num_fr);
 
 % Determine actual degree resolution (at most equal to, likely less than
 % requested).
-delta_deg = distance(gclat(1), gclon(1), gclat(2), gclon(2), 'degrees');
+act_deg = distance(gclat(1), gclon(1), gclat(2), gclon(2), 'degrees');
 
 % Note request vs. reality.
-fprintf('Requested grid spacing: %.4f degrees (~%.1f km sides; %.1f sq. km)\n', ...
-        deg, deg2km(deg), deg2km(deg)^2);
-fprintf('   Actual grid spacing: %.4f degrees (~%.1f km sides; %.1f sq. km)\n', ...
-        delta_deg, deg2km(delta_deg), deg2km(delta_deg)^2);
+fprintf('Requested grid spacing: %.5f degrees (~%.3f km sides; %.2f sq. km)\n', ...
+        req_deg, deg2km(req_deg), deg2km(req_deg)^2);
+fprintf('   Actual grid spacing: %.5f degrees (~%.3f km sides; %.2f sq. km)\n', ...
+        act_deg, deg2km(act_deg), deg2km(act_deg)^2);
 
 
 % Compute azimuth (degrees) at every point along great circle path.  Each
@@ -104,8 +105,8 @@ end
 fr_max_m = fresnelmax(vel, freq, gc_tot_dist_m);
 fr_max_km = fr_max_m / 1e3;
 fr_max_deg = km2deg(fr_max_km);
-max_arclen_delta_deg = [0:delta_deg:fr_max_deg];
-npts_max_fr = length(max_arclen_delta_deg);
+max_arclen_act_deg = [0:act_deg:fr_max_deg];
+npts_max_fr = length(max_arclen_act_deg);
 
 % Initiate matrices to hold positive, negative Fresnel radii in latitude and
 % longitude (think of a fish spine as viewed above).
@@ -120,7 +121,17 @@ for i = 1:num_fr
     % Determine Fresnel radii length in degrees at this point.
     gc_fr_dist_deg = distance(lat1, lon1, gclat(i), gclon(i));
     gc_fr_dist_m = deg2km(gc_fr_dist_deg) * 1e3;
-    fr_m = fresnelradius(gc_fr_dist_m, gc_tot_dist_m, vel, freq);
+
+    % Skip calculation at end points (far end can have distance rounding errors that
+    % throw errors in `fresnelradius`).
+    if i > 1 && i < num_fr
+        fr_m = fresnelradius(gc_fr_dist_m, gc_tot_dist_m, vel, freq);
+
+    else
+        fr_m = 0;
+
+    end
+
     fr_km = fr_m / 1e3;
     fr_deg(i) = km2deg(fr_km);
 
@@ -128,16 +139,16 @@ for i = 1:num_fr
     % and use final value (distance in degrees) to specify full length of arc
     % (equal to or less than actual Fresnel length), and array length to
     % specify how many points along that arch to be computed.
-    arclen_delta_deg = [0:delta_deg:fr_deg(i)];
+    arclen_act_deg = [0:act_deg:fr_deg(i)];
 
     % Project Fresnel radii at +/-90 degrees (normal) to great-circle path at arc
     % lengths defined by max discretized radii, splitting into
     % equal-degree-length chunks just found.
     [lat_neg, lon_neg] = ...
-        track1(gclat(i), gclon(i), az(i)-90, arclen_delta_deg(end), [], 'degrees', length(arclen_delta_deg));
+        track1(gclat(i), gclon(i), az(i)-90, arclen_act_deg(end), [], 'degrees', length(arclen_act_deg));
 
     [lat_pos, lon_pos] = ...
-        track1(gclat(i), gclon(i), az(i)+90, arclen_delta_deg(end), [], 'degrees', length(arclen_delta_deg));
+        track1(gclat(i), gclon(i), az(i)+90, arclen_act_deg(end), [], 'degrees', length(arclen_act_deg));
 
     % Only the maximum radii (midpoint of path) can ever have all indices of output
     % matrices filled (although it think depending on discretization, even that
@@ -191,14 +202,14 @@ for i = 1:size(fzlat,1);
 
     end
 end
-difer(min(mind)-delta_deg, 10, 1, NaN)
-difer(max(maxd)-delta_deg, 10, 1, NaN)
+difer(min(mind)-act_deg, 10, 1, NaN)
+difer(max(maxd)-act_deg, 10, 1, NaN)
 
 % Return index (middle of tracks) of column representing great-circle track.
 gcidx = size(frlat_neg', 2) + 1;
 
 % Collect outputs.
-deg = delta_deg;
+deg = act_deg;
 fr = fr_deg;
 
 %% ___________________________________________________________________________ %%
