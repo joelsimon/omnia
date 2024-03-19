@@ -1,13 +1,14 @@
-function varargout=gebco(lon,lat,vers,npc,method,xver,jig)
-% [z,lon,lat,A,R,jig]=gebco(lon,lat,vers,npc,method,xver,jig)
+function varargout=gebco(lon,lat,vers,npc,method,xver,jig,gt)
+% [z,lon,lat,A,R,jig]=gebco(lon,lat,vers,npc,method,xver,jig,gt)
 %
 % Returns the GEBCO bathymetry interpolated to the requested location
 %
 % INPUT:
 %
-% lon      Requested longitude, in decimal degrees, ideally -180<=lon<180
+% lon      Requested longitudes, in decimal degrees, ideally -180<=lon<180
 % lat      Requested latitudes, in decimal degrees, ideally -90<=lat<=90
-% vers     2014  version (30 arc seconds) [default]
+% vers     2019  version (15 arc seconds)
+%          2014  version (30 arc seconds) [default]
 %          2008  version (30 arc seconds, deprecated)
 %          '1MIN' version (1 arc minute, deprecated)
 %          'WMS' uses the GEBCO Web Map Service request server
@@ -15,6 +16,9 @@ function varargout=gebco(lon,lat,vers,npc,method,xver,jig)
 % method   'nearest' (default), 'linear', etc, for the interpolation
 % xver     Extra verification [1] or not [0]
 % jig      A rejigging factor to cover up for a bad request [default: none]
+% gt       0 the actual data [default] 
+%          1 the source identifier grid (SID), if applicable
+%          2 the data type identifier grid (TID), if applicable
 %
 % OUTPUT:
 %
@@ -32,25 +36,27 @@ function varargout=gebco(lon,lat,vers,npc,method,xver,jig)
 %% A whole grid that should BE like the original data set around somewhere
 % gebco('demo3')
 %% A log of a MERMAID float
-% gebco('demo4','P006'))
+% gebco('demo4','P006')
+%% A grid of data and a grid of data provenance
+% gebco('demo5')
 %
 % SEE ALSO:
 %
-% https://www.gebco.net/
+% https://www.gebco.net/, POLYNESIA
 %
 % TESTED ON:
 %
 % 9.0.0.341360 (R2016a)
 %
-% Last modified by fjsimons-at-alum.mit.edu, 07/18/2019
-% Last modified by jdsimon-at-alumni.princeton.edu, 12/10/2021
+% Last modified by fjsimons-at-alum.mit.edu, 03/12/2020
 
 if ~isstr(lon)
-    % Default lon and lat, for good measure, take those from the examples of 
-    % https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/
-    % for comparison with WMS GetFeatureInfo requests
+  % Default lon and lat, for good measure, take those from the examples of 
+  % https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/
+  % for comparison with WMS GetFeatureInfo requests
   defval('lon',-19.979167)
   defval('lat', 50.9625)
+  defval('gt',0)
   
   % Check size
   if any(size(lon)~=size(lat)); error('Inconsistent input data size'); end
@@ -73,53 +79,53 @@ if ~isstr(lon)
   
   % If it is a WMS request, skip ahead
   if strcmp(vers,'WMS')
-      % Fudge factor for difficult cases
+    % Fudge factor for difficult cases
     defval('jig',0)
 
-    % Executive this sequentially if the inputs are manifold
+    % Execute this sequentially if the inputs are manifold
     if length(lon)~=1 || length(lat)~=1
       [zz,lonz,latz]=deal(nan(size(lon)));
       % Should probably take advantage of the parallellization here
- for index=1:prod(size(lon))
-          if xver==1; disp(sprintf('Making WMS request %3.3i/%3.3i',index,prod(size(lon)))); end
-          [zz(index),lonz(index),latz(index)]=gebco(lon(index),lat(index),vers,[],[],xver);
+      parfor index=1:prod(size(lon))
+	if xver==1; disp(sprintf('Making WMS request %3.3i/%3.3i',index,prod(size(lon)))); end
+	[zz(index),lonz(index),latz(index)]=gebco(lon(index),lat(index),vers,[],[],xver);
       end
       % And then leave, because you are finished, output
-      varns={zz,lonz,latz,A,R,jig};
+      varns={zz,lonz,latz,A,R,jig};  
       varargout=varns(1:nargout);
       return
     else
-        % Make a little bounding box around the request, inspired by the known 2014 resolution
-        % latlim and lonlim must be ascending and between what the WMS layer can support
+      % Make a little bounding box around the request, inspired by the known 2014 resolution
+      % latlim and lonlim must be ascending and between what the WMS layer can support
       latlim=lat+[-1 +1]/60/2+(-1)^randi(2)*jig*1e-3;
       lonlim=lon+[-1 +1]/60/2+(-1)^randi(2)*jig*1e-3;
       
       if xver==1
-          % Access the data base of all WMS servers, return a WMSLayer object
-          wmsl=wmsfind('GEBCO_2014_Grid','SearchField','LayerTitle');
-          
-          if min(latlim)<min(wmsl.Latlim) ||  max(latlim)>max(wmsl.Latlim) ...
-                        || min(lonlim)<min(wmsl.Lonlim) ||  max(lonlim)>max(wmsl.Lonlim)
-                error(sprintf('Latitude and longitude request out of bounds [%g %g] and [%g %g]',...
-                              wmsl.Latlim,wmsl.Lonlim))
+	% Access the data base of all WMS servers, return a WMSLayer object
+	wmsl=wmsfind('GEBCO_2014_Grid','SearchField','LayerTitle');
+	
+	if min(latlim)<min(wmsl.Latlim) ||  max(latlim)>max(wmsl.Latlim) ...
+	      || min(lonlim)<min(wmsl.Lonlim) ||  max(lonlim)>max(wmsl.Lonlim)
+	  error(sprintf('Latitude and longitude request out of bounds [%g %g] and [%g %g]',...
+			wmsl.Latlim,wmsl.Lonlim))
         end
  
-        % Supplant the server if you came this far
-        wms.srv=wmsl.ServerURL;
-        
-        % Stuff that could have, but didn't work:
+	% Supplant the server if you came this far
+	wms.srv=wmsl.ServerURL;
+	
+	% Stuff that could have, but didn't work:
 
-        % [Not needed] Gets more info! And collects a whole bunch of other stuff. See "refine".
-        % [wms.inf,wms.inq]=wmsinfo(wmsl.ServerURL);
-        % [Not needed] Gets the webmap server capabilities, or do XMLREAD
-        % wms.cap=urlread(wms.inq); 
-        % [Not needed] Gets the webmap server proxy
-        % wms.spr=WebMapServer(wmsl.ServerURL);
-        
-        % [Not working] Gets a webmap request (template?)
-        % wms.mpr=WMSMapRequest(wmsl,wms.spr);
-        % [Not working] Direct read, or getting a template request
-        % [A,R,wms.mpr]=wmsread(wmsl,'Latlim',latlim,'Lonlim',lonlim,'ImageHeight',2,'ImageWidth',2);
+	% [Not needed] Gets more info! And collects a whole bunch of other stuff. See "refine".
+	% [wms.inf,wms.inq]=wmsinfo(wmsl.ServerURL);
+	% [Not needed] Gets the webmap server capabilities, or do XMLREAD
+	% wms.cap=urlread(wms.inq); 
+	% [Not needed] Gets the webmap server proxy
+	% wms.spr=WebMapServer(wmsl.ServerURL);
+	
+	% [Not working] Gets a webmap request (template?)
+	% wms.mpr=WMSMapRequest(wmsl,wms.spr);
+	% [Not working] Direct read, or getting a template request
+	% [A,R,wms.mpr]=wmsread(wmsl,'Latlim',latlim,'Lonlim',lonlim,'ImageHeight',2,'ImageWidth',2);
       end
       % Just to make sure for later
       latlim=sort(latlim); lonlim=sort(lonlim);
@@ -155,19 +161,19 @@ if ~isstr(lon)
       
       % Make a map request, to take a look...
       if xver==1
-          wms.rqt='GetMap';
-          wms.fmt='image/png';
-          
-          % Construct the direct request myself from the gebco.net website example
-          wms.mpr=sprintf(...
-                  '%srequest=%s&service=%s&crs=%s&version=%s&format=%s&layers=%s&query_layers=%s&BBOX=%s,%s,%s,%s&width=%i&height=%i',...
-                  wms.srv,...
-                  wms.rqt,wms.ser,wms.crs,wms.ver,wms.fmt,wms.lyr,wms.lyr,...
-                  num2str(latlim(1)),num2str(lonlim(1)),num2str(latlim(2)),num2str(lonlim(2)),...
-                  wms.pxw,wms.pxh);
-          % Get the output, use wmsread only for GetMap request... 
-          % first output is image, second output is the raster used
-          [A,R,r]=wmsread(wms.mpr);
+	wms.rqt='GetMap';
+	wms.fmt='image/png';
+	
+	% Construct the direct request myself from the gebco.net website example
+	wms.mpr=sprintf(...
+	    '%srequest=%s&service=%s&crs=%s&version=%s&format=%s&layers=%s&query_layers=%s&BBOX=%s,%s,%s,%s&width=%i&height=%i',...
+	    wms.srv,...
+	    wms.rqt,wms.ser,wms.crs,wms.ver,wms.fmt,wms.lyr,wms.lyr,...
+	    num2str(latlim(1)),num2str(lonlim(1)),num2str(latlim(2)),num2str(lonlim(2)),...
+	    wms.pxw,wms.pxh);
+	% Get the output, use wmsread only for GetMap request... 
+	% first output is image, second output is the raster used
+	[A,R,r]=wmsread(wms.mpr);
       end
       
       % For a point, need 'GetFeatureinfo', not 'GetCapabilities' or 'GetMap'
@@ -175,14 +181,12 @@ if ~isstr(lon)
       
       % Construct the direct request myself from the gebco.net website example
       wms.req=sprintf(...
-            '%srequest=%s&service=%s&crs=%s&version=%s&info_format=%s&layers=%s&query_layers=%s&BBOX=%s,%s,%s,%s&x=%i&y=%i&width=%i&height=%i',...
-            wms.srv,...
-            wms.rqt,wms.ser,wms.crs,wms.ver,wms.iff,wms.lyr,wms.lyr,...
-            num2str(latlim(1)),num2str(lonlim(1)),num2str(latlim(2)),num2str(lonlim(2)),...
-            wms.pxx,wms.pxy,wms.pxw,wms.pxh);
+	  '%srequest=%s&service=%s&crs=%s&version=%s&info_format=%s&layers=%s&query_layers=%s&BBOX=%s,%s,%s,%s&x=%i&y=%i&width=%i&height=%i',...
+	  wms.srv,...
+	  wms.rqt,wms.ser,wms.crs,wms.ver,wms.iff,wms.lyr,wms.lyr,...
+	  num2str(latlim(1)),num2str(lonlim(1)),num2str(latlim(2)),num2str(lonlim(2)),...
+	  wms.pxx,wms.pxy,wms.pxw,wms.pxh);
       
-      keyboard
-
       % Get the output, cannot use WMSREAD if it isn't a GetMap request...
       % [wmsu,R,U]=wmsread(wmsr);
       % So, need to parse the output
@@ -190,16 +194,16 @@ if ~isstr(lon)
       % Get the lon and lat out that you have actually received and
       % the bathymetry at that point, which is what you really wanted
       try 
-          lon=sscanf(strtrim(wms.out(4,:)),'x = ''%f''');
-          lat=sscanf(strtrim(wms.out(5,:)),'y = ''%f''');
-          z=  sscanf(strtrim(wms.out(6,:)),'value_list = ''%i''');
+	lon=sscanf(strtrim(wms.out(4,:)),'x = ''%f''');
+	lat=sscanf(strtrim(wms.out(5,:)),'y = ''%f''');
+	z=  sscanf(strtrim(wms.out(6,:)),'value_list = ''%i''');
       catch
-          % Sometimes there are no data being returned, still the webmap
-          % would contain colors (but not values that we can work with, so
-          % rejig the request by nudging the requested location a bit! 
-          warning(sprintf('Failed lon %f lat %f, nudging requested location along',lon,lat))
-          % In which case we force an xver
-          [z,lon,lat,~,~,jig]=gebco(lon,lat,vers,[],[],1,jig+1);
+	% Sometimes there are no data being returned, still the webmap
+	% would contain colors (but not values that we can work with, so
+	% rejig the request by nudging the requested location a bit! 
+	warning(sprintf('Failed lon %f lat %f, nudging requested location along',lon,lat))
+	% In which case we force an xver
+	[z,lon,lat,~,~,jig]=gebco(lon,lat,vers,[],[],1,jig+1);
       end
 
       % And then leave, because you are finished, output
@@ -210,11 +214,14 @@ if ~isstr(lon)
   end
   
   % Now it's NOT a WMS request but we interpolate our presaved data files
-  
+
+  % Here I will put in Pete's direct solution
+  % https://github.com/sirpipat/MERMAIDS_work/blob/master/bathymetry.m
+
   % Get information on where the data files are being kept
-  [mname,sname,up,dn,lt,rt,dxdy,NxNy]=readGEBCO(vers,npc);
-  
-  % Grid or pixel registration? See below
+  [mname,sname,up,dn,lt,rt,dxdy,NxNy]=readGEBCO(vers,npc,gt);
+
+  % Grid (0) or pixel (1) registration? See below.
   if strcmp(vers,'1MIN')
     flg=0; else ; flg=1;
   end
@@ -230,10 +237,10 @@ if ~isstr(lon)
   rindep=max(1,ceil(npc-[lat+90 ]/[180/npc]));
   cindex=unique(cindep);
   rindex=unique(rindep);
-  
+
   % If you are spread across multiple tiles you're in trouble
   if length(cindex)~=1 || length(rindex)~=1
-      % What are the running tile numbers?
+    % What are the running tile numbers?
     wtile=sub2ind([npc npc],rindep,cindep);
     % What are the unique running tile numbers?
     utile=unique(wtile);
@@ -254,9 +261,9 @@ if ~isstr(lon)
     zz=cellnan([length(utile) 1],witsz(:),ones(length(witsz)));
     
     % Loop over the unique tiles
-    for index=1:length(utile)
-        % If you are doing this right, you NOW end up in unique tiles
-      zz{index}=gebco(lon(witsj{index}),lat(witsj{index}),vers,npc,method,xver);
+    parfor index=1:length(utile)
+      % If you are doing this right, you NOW end up in unique tiles
+      zz{index}=gebco(lon(witsj{index}),lat(witsj{index}),vers,npc,method,xver,[],gt);
     end
     
     % And then stick in the output at the right place
@@ -302,8 +309,8 @@ if ~isstr(lon)
   
   % Note that "any" needs a vector input to do this job
   if any(isnan(z(:)))
-      % Need a different interpolation, it's an extrapolation in a sense
-      % If it's only one number, give a simple reason
+    % Need a different interpolation, it's an extrapolation in a sense
+    % If it's only one number, give a simple reason
     if length(lon)*length(lat)==1
       disp(sprintf('Longitude given %g to %g wanted %g',min(lonpc),max(lonpc),lon))
       disp(sprintf('Latitude given %g to %g wanted %g',min(latpc), max(latpc),lat))
@@ -317,7 +324,7 @@ if ~isstr(lon)
       diferm(zi(~isnan(z))-z(~isnan(z)))
       z=zi;
     else
-        % Just use the new interpolant
+      % Just use the new interpolant
       z=F(lat,lon);
     end
   end
@@ -329,7 +336,7 @@ if ~isstr(lon)
   varns={z,lon,lat,A,R,jig};
   varargout=varns(1:nargout);
   
-  % Grid documentation for 2008 and 2014 it's pixel-registered.
+  % Grid documentation for 2008 and 2014 (and 2019) it's pixel-registered.
   % https://www.bodc.ac.uk/data/documents/nodb/301801/#6_format
   %
   % The grid is stored as a two-dimensional array of 2-byte signed integer ...
@@ -398,10 +405,12 @@ elseif strcmp(lon,'demo2')
   [z,lon,lat]=gebco(LO,LA); imagefnan([-180 90],[180 -90],z)
 elseif strcmp(lon,'demo3')
   c11=[100 -10]; cmn=[140 -40]; spc=1/10;
-  [LO,LA]=meshgrid(c11(1):spc:cmn(1),c11(2):-spc*2:cmn(2));
-  [z,lon,lat]=gebco(LO,LA); imagefnan(c11,cmn,z,'demmap',[-7473 5731])
+  [LO,LA]=meshgrid(c11(1):spc:cmn(1),c11(2):-spc:cmn(2));
+  ver=2019;
+  [z,lon,lat]=gebco(LO,LA,ver); imagefnan(c11,cmn,z,'demmap',[-7473 5731])
+  title(sprintf('%i',ver))
 elseif strcmp(lon,'demo4')
-    % Go grab a float's log from this directory
+  % Go grab a float's log from this directory
   dname='/u/fjsimons/MERMAID/serverdata/locdata';
   % Construct te filename from the number given after the 'demo4' input
   defval('lat','P006')
@@ -409,7 +418,7 @@ elseif strcmp(lon,'demo4')
   % Extracts the longitudes and latitudes out of a particular float's log
   % Look up the format codes in VIT2TBL, do not confuse latitude and longitude
   cname=sprintf('awk ''{printf "%%12.6f %%11.6f\\n",$5,$4}'' %s',...
-                fullfile(dname,fname));
+		fullfile(dname,fname));
   % Read, then parse
   [~,lolas]=system(cname); C=textscan(lolas,'%12.6f %11.6f');
   lola=[C{1} C{2}]; clear lolas C
@@ -420,6 +429,25 @@ elseif strcmp(lon,'demo4')
   fid=fopen(fullfile(dname,sprintf('%s.bat',pref(fname))),'w+');
   % Look up the format for the bathymetry itself rigt here in GEBCO
   fprintf(fid,'%12.6f %11.6f %12.6f %11.6f %12.6f %11.6f %i %i\n',...
-           [lola' ; lon2014' ; lat2014' ; lonWMS' ; latWMS' ; z2014' ; zWMS'])
+	 [lola' ; lon2014' ; lat2014' ; lonWMS' ; latWMS' ; z2014' ; zWMS'])
   fclose(fid)
+elseif strcmp(lon,'demo5')
+  % Modification of demo3 to give us provenance also
+  % Global view
+  %c11=[-180 90]; cmn=[180 -90];
+  %[LO,LA]=meshgrid(-180:1/10:180,90:-1/10:-90);
+  % c11=[-150 15]; cmn=[-130 -5]; spc=1/20;
+  % c11=[-107 15]; cmn=[-97 5]; spc=1/60/2;
+  c11=[-100 12]; cmn=[-91 3]; spc=1/60/2;
+  [LO,LA]=meshgrid(c11(1):spc:cmn(1),c11(2):-spc:cmn(2));
+  % plotcont; hold on; 
+  % plot([c11(1) cmn(1) cmn(1) c11(1) c11(1)]+360,[c11(2) c11(2) cmn(2) cmn(2) c11(2)])
+  % The actual data
+  [z,lon,lat]=gebco(LO,LA,[],[],[],[],[],0); 
+  % The provenance data
+  [zp,lon,lat]=gebco(LO,LA,[],[],[],[],[],1); 
+  subplot(121)
+  imagefnan(c11,cmn,z,'demmap',[-7473 5731])
+  subplot(122)
+  imagefnan(c11,cmn,zp,'demmap',[-7473 5731])
 end
