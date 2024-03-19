@@ -68,11 +68,13 @@ num_fr = ceil(gc_tot_dist_deg / req_deg) + 1;
 act_deg = distance(gclat(1), gclon(1), gclat(2), gclon(2), 'degrees');
 
 % Note request vs. reality.
-fprintf('Requested grid spacing: %.5f degrees (~%.3f km sides; %.2f sq. km)\n', ...
+lambda_km = (vel / freq) / 1e3;
+fprintf('Requested grid spacing: %.5f degrees (%.3f km sides; %.2f sq. km)\n', ...
         req_deg, deg2km(req_deg), deg2km(req_deg)^2);
-fprintf('   Actual grid spacing: %.5f degrees (~%.3f km sides; %.2f sq. km)\n', ...
+fprintf('   Actual grid spacing: %.5f degrees (%.3f km sides; %.2f sq. km)\n', ...
         act_deg, deg2km(act_deg), deg2km(act_deg)^2);
-
+fprintf('            Wavelength: %.3f km (%.1f wavelengths per grid interval)\n', ...
+        lambda_km, deg2km(act_deg)/lambda_km)
 
 % Compute azimuth (degrees) at every point along great circle path.  Each
 % Fresnel radii will be oriented normal to the instantaneous azimuth at that
