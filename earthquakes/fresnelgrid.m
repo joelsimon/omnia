@@ -1,10 +1,10 @@
-function [fzlat, fzlon, gcidx, fr, deg] = ...
+function [fzlat, fzlon, gcidx, gcdist, fr, deg] = ...
             fresnelgrid(lat1, lon1, lat2, lon2, vel, freq, deg, plt)
-% [fzlat, fzlon, gcidx, fr, deg] = ...
+% [fzlat, fzlon, gcidx, gcdist, fr, deg] = ...
 %     FRESNELGRID(lat1, lon1, lat2, lon2, vel, freq, deg, plt)
 %
 % Compute 2-D (map view; no depth) Fresnel zone for constant-velocity waves
-% (e.g., surface or T waves) on equal-area grid.
+% (e.g., surface or T waves) on an equal-area grid.
 %
 % Output fzlat/lon matrices arranged with rows of Fresnel radii and columns of
 % Fresnel "tracks," of which the latter run (sub)parallel to great-circle path,
@@ -24,6 +24,7 @@ function [fzlat, fzlon, gcidx, fr, deg] = ...
 % gcidx            Column index of great-circle path (middle of output matrix)
 %                  e.g., gclat = fzlat(:, gcidx);
 %                        gclon = fzlat(:, gclon)
+% gcdist           Cumulative distance along great-circle path [deg]
 % fr               Fresnel radii length at every point along great circle [deg]
 % deg*             Actual grid resolution [deg]*
 %
@@ -38,13 +39,13 @@ function [fzlat, fzlon, gcidx, fr, deg] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 15-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 20-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % NTS: There are various ways to speed this up (e.g., `cumdist` outside loop and
 % computing all `fresnelradius` in one go; merging azimuth computation into main
 % loop; computing max radius at every point, filling "rectangle" with lat/lon
-% and then latter set to NaN those outside radius (allows you to make one run of
-% `track1` for all points), etc.  I did all that and didn't find the speedup
+% and then latter set to NaN those outside radius [allows you to make one run of
+% `track1` for all points]), etc.  I did all that and didn't find the speedup
 % worth the loss of readability. This is a slow code in general, so be it.
 
 % Default.
@@ -121,13 +122,13 @@ frlon_pos = NaN(npts_max_fr, num_fr);
 % computed.
 for i = 1:num_fr
     % Determine Fresnel radii length in degrees at this point.
-    gc_fr_dist_deg = distance(lat1, lon1, gclat(i), gclon(i));
-    gc_fr_dist_m = deg2km(gc_fr_dist_deg) * 1e3;
+    gc_dist_deg(i) = distance(lat1, lon1, gclat(i), gclon(i));
+    gc_dist_m = deg2km(gc_dist_deg(i)) * 1e3;
 
     % Skip calculation at end points (far end can have distance rounding errors that
     % throw errors in `fresnelradius`).
     if i > 1 && i < num_fr
-        fr_m = fresnelradius(gc_fr_dist_m, gc_tot_dist_m, vel, freq);
+        fr_m = fresnelradius(gc_dist_m, gc_tot_dist_m, vel, freq);
 
     else
         fr_m = 0;
@@ -212,7 +213,8 @@ gcidx = size(frlat_neg', 2) + 1;
 
 % Collect outputs.
 deg = act_deg;
-fr = fr_deg;
+fr = fr_deg';
+gcdist = gc_dist_deg';
 
 %% ___________________________________________________________________________ %%
 
