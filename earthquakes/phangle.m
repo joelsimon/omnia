@@ -1,26 +1,28 @@
 function [tdeg, trad, ideg, irad] = phangle(rayParam, phaseName, mod, depth)
 % [tdeg, trad, ideg, irad] = PHANGLE(rayParam, phaseName, mod)
 %
-% PHANGLE computes the incidence angle, relative to the normal, of an
-% incoming seismic phase at the surface of the Earth (r = 6371 km),
-% given a spherical Earth ray parameter in units of [deg/s], i.e.,
+% PHANGLE computes the incidence angle, relative to the normal, of an incoming
+% seismic phase at the surface of the Earth (r = 6371 km), given a spherical
+% Earth ray parameter in units of s (or s/km, if we ignore radius dimension),
+% i.e.,
 %
 %           rayParam = 6371 * sind(theta) / v,
 %
-% as is returned from taupTime.  
+% as is returned from taupTime.  See taup_rayParam2slowness for more discussion
+% of dimensions.
 %
 % PHANGLE expects phase names allowable in TauP, and does not accept
 % all IASPEI-approved phase names.
 %
 % Input:
-% rayParam    Spherical ray parameter in [deg/s] 
-%                 (e.g, from taupTime.m) 
-% phaseName   Phase names allowed in TauP 
+% rayParam    Spherical ray parameter in [s]
+%                 (e.g, from taupTime.m)
+% phaseName   Phase names allowed in TauP
 %                 (e.g., 'P' or 'SKIKS'; not 'P''' nor 'PcP2')
 % mod         Either 'ak135', 'iasp91', or 'prem'
 % depth*      Event depth [km]
 %
-% Output: 
+% Output:
 % tdeg**      Takeoff angle of outgoing phase [deg]
 % trad**      Takeoff angle of outgoing phase [rad]
 % ideg        Incidence angle of incoming phase [deg]
@@ -30,9 +32,9 @@ function [tdeg, trad, ideg, irad] = phangle(rayParam, phaseName, mod, depth)
 % **currently not supported (both output NaN)
 %
 % Ex: (taupTime calls PHANGLE internally)
-%--> MATLAB:         
+%--> MATLAB:
 %    tt = taupTime('ak135', 664, 'P,PP,PKiKP,SKKKKS,SKiKKiKP,PKiKKiKS', 'deg', 57.889);
-%    [{tt.phaseName}' {tt.incidentDeg}'] = 
+%    [{tt.phaseName}' {tt.incidentDeg}'] =
 %
 %        {'P'       }    {[20.4531]}
 %        {'PP'      }    {[27.1780]}
@@ -42,19 +44,19 @@ function [tdeg, trad, ideg, irad] = phangle(rayParam, phaseName, mod, depth)
 %        {'SKKKKS'  }    {[ 8.8721]}
 %        {'SKKKKS'  }    {[ 6.1915]}
 %
-%--> Command line: 
+%--> Command line:
 %    $ taup_time -h 664  -ph P,PP,PKiKP,SKKKKS,SKiKKiKP,PKiKKiKS -deg 57.889 -mod ak135
 %    Model: ak135
 %    Distance   Depth   Phase      Travel    Ray Param  Takeoff  Incident  Purist    Purist
-%      (deg)     (km)   Name       Time (s)  p (s/deg)   (deg)    (deg)   Distance   Name 
+%      (deg)     (km)   Name       Time (s)  p (s/deg)   (deg)    (deg)   Distance   Name
 %    --------------------------------------------------------------------------------------
-%       57.89   664.0   P           531.17     6.699     46.59    20.45    57.89   = P       
-%       57.89   664.0   PP          670.91     8.757     71.72    27.18    57.89   = PP      
-%       57.89   664.0   PKiKP       954.89     1.211      7.55     3.62    57.89   = PKiKP   
+%       57.89   664.0   P           531.17     6.699     46.59    20.45    57.89   = P
+%       57.89   664.0   PP          670.91     8.757     71.72    27.18    57.89   = PP
+%       57.89   664.0   PKiKP       954.89     1.211      7.55     3.62    57.89   = PKiKP
 %       57.89   664.0   SKiKKiKP   1572.94     0.737      2.53     2.20    57.89   = SKiKKiKP
 %       57.89   664.0   PKiKKiKS   1635.29     0.739      4.60     1.32    57.89   = PKiKKiKS
-%       57.89   664.0   SKKKKS     2660.58     4.957     17.28     8.87   302.11   = SKKKKS  
-%       57.89   664.0   SKKKKS     3146.89     3.466     11.99     6.19   417.89   = SKKKKS  
+%       57.89   664.0   SKKKKS     2660.58     4.957     17.28     8.87   302.11   = SKKKKS
+%       57.89   664.0   SKKKKS     3146.89     3.466     11.99     6.19   417.89   = SKKKKS
 %
 % See also: MatTaup
 %
@@ -106,23 +108,23 @@ if endsWith(ph, 'kmps', 'IgnoreCase', true)
 
 end
 
-% All vp, vs given below are in [km/s]. 
+% All vp, vs given below are in [km/s].
 switch lower(mod)
   case 'ak135'
     % $OMNIA/notmycode/MatTaup/lib/matTaup.jar --> edu/sc/seis/TauP/StdModels/ak135.tvel
-    vp = 5.80;  
-    vs = 3.46; 
-    
+    vp = 5.80;
+    vs = 3.46;
+
   case 'iasp91'
     % $OMNIA/notmycode/MatTaup/lib/matTaup.jar --> edu/sc/seis/TauP/StdModels/iasp91.taup
-    vp = 5.80;  
-    vs = 3.36; 
+    vp = 5.80;
+    vs = 3.36;
 
   case 'prem'
     % $OMNIA/notmycode/MatTaup/lib/matTaup.jar --> edu/sc/seis/TauP/StdModels/prem.nd
     % (TauP extends the "crust" layer to the surface, there is no "ocean").
-    vp = 5.80;  
-    vs = 3.20; 
+    vp = 5.80;
+    vs = 3.20;
 
   otherwise
     error(['Invalid model name: ''%s''\nMust be one of: ''ak135'', ' ...
@@ -131,10 +133,10 @@ switch lower(mod)
 end
 
 % Incidence velocity: last leg of the phase.
-switch ph(end) 
+switch ph(end)
   case 'p'
     iv = vp;
-    
+
   case 's'
     iv = vs;
 
@@ -145,6 +147,14 @@ switch ph(end)
 end
 ideg = asind(rayParam * iv / r); % degrees
 irad = ideg * pi / 180;         % radians
+
+% Could just as well compute using slowness in s/deg.
+slowness_s_deg = taup_rayParam2slowness(rayParam);
+slowness_s_km = slowness_s_deg / deg2km(1,r);
+ideg2 = asind(slowness_s_km * iv);
+
+% (check my work)
+difer(ideg2-ideg, 10, 1, NaN);
 
 % Placeholders, for now.
 tdeg = NaN;
