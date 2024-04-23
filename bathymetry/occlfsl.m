@@ -28,9 +28,9 @@ function ct = occlfsl(z, tz, mess)
 %          NaN   -150  -125  -150   NaN
 %          NaN    NaN  -150   NaN   NaN];
 %    tz = -120;
-%    surf(z); set(gca, 'YDir', 'reverse'); xlabel('Radii width');
-%    ylabel('Radii number'); zlabel('Elevation [m]'); hold on;
-%    surf(repmat(tz, size(z))); colormap(winter); colorbar; hold off
+%    surf(z); set(gca, 'YDir', 'reverse'); xlabel('Radii width'); xticks([1:5])
+%    ylabel('Radii number'); zlabel('Elevation [m]'); yticks([1:6]); hold on
+%    surf(repmat(tz, size(z))); colormap(winter); hold off
 %    ct = OCCLFSL(z, tz, true)
 %
 % Ex2: (shows how contiguity matters; test depth is plane at -120 m)
@@ -41,9 +41,9 @@ function ct = occlfsl(z, tz, mess)
 %         -125   -125  -150  -150  -125  -100  -100
 %         -150   -150  -150  -150  -125  -125  -125];
 %    tz = -120;
-%    surf(z); set(gca, 'YDir', 'reverse'); xlabel('Radii width');
-%    ylabel('Radii number'); zlabel('Elevation [m]'); hold on;
-%    surf(repmat(tz, size(z))); colormap(winter); colorbar; hold off
+%    surf(z); set(gca, 'YDir', 'reverse'); xlabel('Radii width'); xticks([1:7])
+%    ylabel('Radii number'); zlabel('Elevation [m]'); yticks([1:6]); hold on
+%    surf(repmat(tz, size(z))); colormap(winter); hold off
 %    ct = OCCLFSL(z, tz, true)
 %
 % Explanation1: The first row is clear because it only has a single point within
