@@ -1,0 +1,130 @@
+function ct = occlfsl(z, tz, mess)
+% ct = OCCLFSL(z, tz, mess)
+%
+% Tally occlusion based on the concept of free-space loss by incrementing the
+% output count at each Fresnel radii along the path (from source to receiver)
+% where the the contiguous clearance is less than 0.6 the width of the first
+% Fresnel zone. NaNs in elevation matrix are ignored (clearance computed
+% considering only finite elements in each row).
+%
+%
+% Input:
+% z        Elevation (depth is negative) matrix with Fresnel "tracks"
+%              as columns and Fresnel radii as rows [m]
+% tz       Test elevation array [m]
+% mess     Print occlusion message at each radii, useful for understanding
+%              and debugging (def: false)
+%
+% Output:
+% ct        Tally (raw count) of number of Fresnel radii occluded
+%
+% Ex:
+%    z = [ NaN    NaN  -150   NaN   NaN
+%          NaN   -150  -125  -150   NaN
+%         -150   -125  -100  -125  -150
+%          NaN   -150  -125  -150   NaN
+%          NaN    NaN  -150   NaN   NaN];
+%    tz = -120;
+%    surf(z); ylabel('radii number'); zlabel('elevation'); hold on; surf(repmat(tz, size(z)))
+%    ct = OCCLFSL(z, tz, true)
+%
+% Explanation: The first row is clear because it only has a single point within
+% the Fresnel radius (NaNs are ignored), and it is below (deeper than) the test
+% depth.  Only the third row is occluded because it has the peak of the seamount
+% at -100 m in the middle of the radius, meaning that the contiguous clearance
+% gap of that row is of width two on either side of the seamount. So while in
+% total four of five points along the radius are clear, they are not
+% contiguously clear, and thus that slice is defined as occluded.
+%
+% Author: Joel D. Simon
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 23-Apr-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+%% ___________________________________________________________________________ %%
+%% RECURSIVE.
+% Loop over function for multiple test depths.
+if length(tz) > 1
+    for i = 1:length(tz)
+        ct(i) = occlfsl(z, tz(i));
+
+    end
+
+    % Reshape output to same size as input and exit.
+    ct = reshape(ct, size(tz));
+    return
+
+end
+%% RECURSIVE.
+%% ___________________________________________________________________________ %%
+
+defval('mess', false)
+
+% Number of Fresnel radii same as number of points along great-circle path
+% (running from source to receiver).
+num_fr_rad = size(z, 1);
+
+% Initialize output Clarence counter.
+ct = 0;
+
+% Define free-space loss threshold -- if the contiguous clearance at any slice
+% along path is less than 0.6 the width of the first Fresnel zone the path is
+% occluded.
+clearance_ratio = 0.6;
+
+% Loop over the rows (going down matrix, along Fresnel "tracks," inspecting each
+% Fresnel radii).
+for i = 1:size(z, 1)
+    if mess; fprintf('Fresnel radii: %i\n', i); end
+
+    % The Fresnel radii are the rows of the elevation matrix.
+    fr_rad = z(i, :);
+
+    % Skip calculation if all NaNs; e.g., a radii before the slope, removed as in
+    % `zero_min=true`.
+    if all(isnan(fr_rad))
+        continue
+
+    end
+
+    % Chop off any NaNs in this row (e.g., at source/receiver there may only be a
+    % single finite elevation; all points are finite only near midpoint of
+    % great-circle path, where Fresnel radius is maximized).
+    fr_rad = fr_rad(~isnan(fr_rad));
+
+    % Width of the first Fresnel zone at this point along the path.
+    fz_width = length(fr_rad);
+
+    % Yes/no (1/0) vector of occluded or not.
+    occluded = fr_rad > tz;
+
+    % This loops over each Fresnel radii -- so running along the diameter of
+    % the Fresnel zone -- and counts contiguous clearance.  If the width of
+    % some chunk of contiguous clearance exceeds 0.6 this radii (slice of the
+    % path) is deemed unoccluded and the next radii is inspected.
+    clearance_width = 0;
+    for j = 1:fz_width
+        % Increment or reset clearance-contiguity counter.
+        if occluded(j)
+            clearance_width = 0;
+
+        else
+            clearance_width = clearance_width + 1;
+
+        end
+
+        % Exit loop early if radii is clear (move to next Fresnel radius).
+        if clearance_width / fz_width > clearance_ratio
+            if mess; fprintf(' unoccluded\n\n', i); end
+            break
+
+        end
+
+        % This radius is occluded if after sweeping entire width (diameter) of Fresnel
+        % zone no contiguous gap of at least 60% of full diameter was found.
+        if j == fz_width
+            if mess; fprintf(' occluded\n\n', i); end
+            ct = ct + 1;
+
+        end
+    end
+end
