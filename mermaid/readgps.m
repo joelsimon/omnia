@@ -1,5 +1,5 @@
-function gps = readgps(processed, rm23)
-% gps = READGPS(processed, rm23)
+function gps = readgps(processed, rm23, skippy)
+% gps = READGPS(processed, rm23, skip)
 %
 % Read MERMAID GPS locations from 'gps.csv' file output by automaid v3.4.0-K+
 % (when "clockfreq" column was added). Note that gps.(mermaid).date may
@@ -18,6 +18,8 @@ function gps = readgps(processed, rm23)
 %                   '2019-08-17T03:18:29Z' and '2019-08-17T03:22:02Z'
 %                   (when P0023 was out of the water) with '', NaN, NaT
 %                   (def: true)
+% skippy        Cell array of KSTNM to skip (in case of error; hacky)
+%                   (def: {}; ex: {'P0012'})
 %
 % Output:
 % gps           GPS structure that parses gps.csv, organized by float name
@@ -26,12 +28,13 @@ function gps = readgps(processed, rm23)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 11-Jan-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 01-Jul-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
 % Default path.
 merpath = getenv('MERMAID');
 defval('processed', fullfile(merpath, 'processed'))
 defval('rm23', true)
+defval('skippy', true)
 
 % gps.csv format.
 fmt = ['%s' ...
@@ -51,11 +54,20 @@ for i = 1:length(d)
     if d(i).isdir
         % Dynamically name gps.(field) for individual MERMAIDs
         mermaid = osean2fdsn(d(i).name);
+        if any(contains(skippy, mermaid))
+            continue
+
+        end
 
         % Read gps.csv file within individual float directory
         file = fullfile(d(i).folder, d(i).name, 'gps.csv');
         fid = fopen(file, 'r');
+        try
         C = textscan(fid, fmt, 'HeaderLines', 3, 'Delimiter', ',');
+        catch
+            keyboard
+        end
+        
         fclose(fid);
 
         % Parse.
