@@ -4,7 +4,7 @@ function p = taup_rayParam2slowness(rayParam)
 % Convert spherical-Earth "rayParam" output by MatTauP package written by Qin Li
 % to flat-Earth ray parameter (horizontal slowness?) as returned by
 % terminal-based `taup`, written by H. Philip Crotwell, Thomas J. Owens, and
-% Jeroen Ritsema
+% Jeroen Ritsema.
 %
 % Input:
 % rayParam       .rayParam output by MatTap, e.g., taupTime [s]
