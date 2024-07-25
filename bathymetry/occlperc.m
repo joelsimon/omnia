@@ -7,8 +7,8 @@ function perc = occlperc(z, tz)
 % Think
 %
 % Input:
-% tz       Test elevation array [m]
 % z        Elevation array or matrix, e.g., from gebco.m [m]
+% tz       Test elevation array [m]
 %
 % Output:
 % perc     Occlusion percentage at every test depth [m]
@@ -24,7 +24,7 @@ function perc = occlperc(z, tz)
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 20-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-% Must convert test depths to rows so that ">" comparison works as expect for matrix.
+% Must convert test depths to rows so that ">" comparison works as expected for matrix.
 trow = true;
 if ~isrow(tz)
     trow = false;
