@@ -7,6 +7,8 @@ function ct = occlfsl(z, tz, mess)
 % Fresnel zone. NaNs in elevation matrix are ignored (clearance computed
 % considering only finite elements in each row).
 %
+% Occlusion is defined as elevation being greater than test elevation (i.e.,
+% path blocked by seamount).
 %
 % Input:
 % z        Elevation (depth is negative) matrix with Fresnel "tracks"
@@ -121,7 +123,9 @@ for i = 1:size(z, 1)
     % Width of the first Fresnel zone at this point along the path.
     fz_width = length(fr_rad);
 
-    % Yes/no (1/0) vector of occluded or not.
+    % Yes/no vector of "occluded or not" where occlusion is defined as
+    % elevation being greater than test depth (i.e., you ran into a seamount
+    % as opposed to transiting free-space [clear-path through water]).
     occluded = fr_rad > tz;
 
     % This loops over each Fresnel radii -- so running along the diameter of
