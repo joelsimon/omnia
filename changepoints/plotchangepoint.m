@@ -41,7 +41,8 @@ function F = plotchangepoint(CP, scales, cpar, normaleyes, symmetric)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 28-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 02-Aug-2024, 9.13.0.2553342 (R2022b) Update 9 on MACI64
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Defaults.
 defval('scales', 'all')
@@ -77,7 +78,8 @@ if symmetric
 
 end
 numticks(ha(1), 'y', 3);
-ylabel(ha(1), '$x$')
+% ylabel(ha(1), '$x$') % latimes
+ylabel(ha(1), 'x') % latimes2
 
 % Generate empty axes so indexing is the same -- there will be two
 % axes overlain on each other in each subplot; the second holds the
@@ -262,10 +264,12 @@ for i = scales
 
         % Label the y-axis.
         if i == length(CP.outputs.da)
-            lbl_str = sprintf('$a_{%i}$', i - 1);
+            % lbl_str = sprintf('$a_{%i}$', i - 1); % latimes
+            lbl_str = sprintf('a_%i', i - 1); % latimes2
 
         else
-            lbl_str = sprintf('$d_{%i}$', i);
+            % lbl_str = sprintf('$d_{%i}$', i); % latimes
+            lbl_str = sprintf('d_%i', i); % latimes2
 
         end
         ylabel(ax, sprintf('%s', lbl_str))
@@ -300,10 +304,12 @@ for i = scales
 
         % Label the y-axis.
         if i == length(CP.outputs.da)
-            lbl_str = sprintf('$\\overline{x}_{%i}$', i - 1);
+            % lbl_str = sprintf('$\\overline{x}_{%i}$', i - 1); % latimes
+            lbl_str = sprintf('x_%i^{(approx.)}', i - 1); %latimes2
 
         else
-            lbl_str = sprintf('$x_{%i}$', i);
+            % lbl_str = sprintf('$x_{%i}$', i); % latimes
+            lbl_str = sprintf('x_%i', i); % latimes2
 
         end
         ylabel(ax, sprintf('%s', lbl_str))
@@ -319,7 +325,8 @@ for i = scales
     set(ax, 'YColor', [0.5 0.5 0.5]);
     set(ax2, 'Position', ax.Position, 'Visible', 'off', 'YAxisLocation', 'right', ...
              'TickDir', 'out');
-    ylabel(ax2, '$\mathcal{A}$');
+    % ylabel(ax2, '$\mathcal{A}$'); % latimes
+    ylabel(ax2, '\itA'); % latimes
     ax2.YAxis.Visible = 'on';
 
 end
@@ -327,7 +334,8 @@ set(ha, 'XLim', [CP.outputs.xax(1) CP.outputs.xax(end)])
 set(ha, 'Box', 'on')
 set(ha, 'TickDir', 'out')
 
-latimes
+% latimes
+latimes2
 
 % Realign axes after adjusting fonts, set YTick positions equal to
 % each other using numticks, and ensure proper YLim of vertical lines,
@@ -343,7 +351,8 @@ for i = scales
     numticks(ha2(ax_idx), 'y', 3);
 
     % Add SNR annotation in bottom left corner
-    [lgSNR(sc_idx), txSNR(sc_idx)] = textpatch(ax2, [], sprintf('$\\mathrm{SNR}~=~%.1f$', CP.SNRj(i)));
+    % [lgSNR(sc_idx), txSNR(sc_idx)] = textpatch(ax2, [], sprintf('$\\mathrm{SNR}~=~%.1f$', CP.SNRj(i))); % latimes
+    [lgSNR(sc_idx), txSNR(sc_idx)] = textpatch(ax2, [], sprintf('SNR=%.1f', CP.SNRj(i)), [], [], false); % latimes2
     tack2corner(ha2(ax_idx), lgSNR(sc_idx), 'SouthWest');
 
     for j = 1:length(pl.vl{sc_idx})

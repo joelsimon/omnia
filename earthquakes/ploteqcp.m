@@ -24,7 +24,8 @@ function  F = ploteqcp(EQ, CP, sac, scales)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 28-Jan-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 02-Aug-2024, 9.13.0.2553342 (R2022b) Update 9 on MACI64
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Defaults:
 defval('scales', 'all')
@@ -88,7 +89,8 @@ if ~isempty(EQ)
                         tparr <= CP.outputs.xax(end)
                 F.tp{j}{k} = plot(ax, repmat(tparr, [1, 2]), ...
                                      ax.YLim, 'k--', 'LineWidth', LineWidth);
-                phstr = sprintf('\\textit{%s}$_{%i}$', tp.phaseName, j);
+                %phstr = sprintf('\\textit{%s}$_{%i}$', tp.phaseName, j); % latimes
+                phstr = sprintf('%s_%i', tp.phaseName, j); % latimes2
                 F.tx{j}{k} = text(ax, tparr, 0, phstr, ...
                                      'HorizontalAlignment', 'Center');
                 F.tx{j}{k}.Position(2) = ax.YLim(2) + 0.2*range(ax.YLim);
@@ -116,19 +118,31 @@ if ~isempty(EQ)
     % Make the magnitude string.
     magtype = lower(EQ(1).PreferredMagnitudeType);
     if ~strcmpi(magtype(1:2), 'mb')
-        magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', upper(magtype(1)), ...
-                         lower(magtype(2)), EQ(1).PreferredMagnitudeValue);
+        % magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', upper(magtype(1)), ...
+        %                  lower(magtype(2)), EQ(1).PreferredMagnitudeValue); % latimes
+        magstr = sprintf('%s_%s %2.1f', upper(magtype(1)), lower(magtype(2)), ...
+                         EQ(1).PreferredMagnitudeValue);
 
     else
-        magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', lower(magtype(1)), ...
-                         lower(magtype(2:end)), EQ(1).PreferredMagnitudeValue);
+        % magstr = sprintf('\\textit{%s}$_{\\mathrm{%s}}$ %2.1f', lower(magtype(1)), ...
+        %                  lower(magtype(2:end)), EQ(1).PreferredMagnitudeValue); % latimes
+        magstr = sprintf('%s_%s %2.1f', lower(magtype(1)), lower(magtype(2:end)), ...
+                         EQ(1).PreferredMagnitudeValue); % latimes2
 
     end
-    depthstr = sprintf('%.2f~km', EQ(1).PreferredDepth);
-    diststr = sprintf('%.2f$^{\\circ}$', EQ(1).TaupTimes(1).distance);
+    %% latimes
+    % depthstr = sprintf('%.2f~km', EQ(1).PreferredDepth);
+    % diststr = sprintf('%.2f$^{\\circ}$', EQ(1).TaupTimes(1).distance);
+    % [F.f.lgmag, F.f.lgmagtx] = textpatch(ax, 'NorthWest', magstr);
+    % [F.f.lgdist, F.lgdisttx] = textpatch(ax, 'SouthWest', [diststr ', ' depthstr]);
+    %% latimes
 
-    [F.f.lgmag, F.f.lgmagtx] = textpatch(ax, 'NorthWest', magstr);
-    [F.f.lgdist, F.lgdisttx] = textpatch(ax, 'SouthWest', [diststr ', ' depthstr]);
+    %% latimes2
+    depthstr = sprintf('%.2f km', EQ(1).PreferredDepth);
+    diststr = sprintf('%.2f^\\circ', EQ(1).TaupTimes(1).distance);
+    [F.f.lgmag, F.f.lgmagtx] = textpatch(ax, 'NorthWest', magstr, [], [], false);
+    [F.f.lgdist, F.lgdisttx] = textpatch(ax, 'SouthWest', [diststr ', ' depthstr], [], [], false);
+    %% latimes2
 
 end
 
@@ -145,7 +159,8 @@ F.f.ha(end).XLabel.String = sprintf('Time relative to %s UTC (s)\n[%s]', ...
                                        datestr(refdate), ...
                                        strrep(strippath(sac), '_', '\_'));
 longticks(F.f.ha, 3);
-latimes(F.fig);
+%latimes(F.fig);
+latimes2(F.fig);
 
 %  The axes have been shifted due to adjusting the font, interpreter, tick
 % lengths etc. -- need to adjust the second (AIC) adjust and re-tack2corner the
