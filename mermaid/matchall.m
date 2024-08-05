@@ -54,7 +54,9 @@ for i = 1:length(s)
     if skip_0100 && contains(s{i}, '467.174-T-0100')
             continue
 
-        end
+    end
+
+    fprintf('\nMatching .sac %i of %i\n', i, length(s))
 
     % Get wavelet scale
     scale_idx = strfind(s{i}, 'WLT');
