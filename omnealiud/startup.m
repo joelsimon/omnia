@@ -24,8 +24,8 @@
 % with "setenv" in csh-like (csh, tsch).
 %
 % For me:
-% export OMNIA=$HOME/github/omnia
-% export IRISFETCH=$HOME/github/irisFetch-matlab
+% export OMNIA=$PROGRAMS/omnia
+% export IRISFETCH=$PROGRAMS/irisFetch-matlab
 %
 % Assumes MATLAB is subsequently launched in said shell, such that
 % these environmental variables are then known to MATLAB.
@@ -34,7 +34,8 @@
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 14-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 01-Aug-2024, 9.13.0.2553342 (R2022b) Update 9 on MACI64
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Open figs in right side of right monitor
 set(0, 'DefaultFigurePosition', [1100   450   560   420])
@@ -52,8 +53,7 @@ rmpath(genpath(fullfile(getenv('OMNIA'), 'SRL2021')))
 rmpath(genpath(fullfile(getenv('OMNIA'), 'GJI2021')))
 
 % For MatTaup.
-javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', ...
-                     'matTaup.jar'))
+javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', 'matTaup.jar'))
 
 % For irisFetch-Matlab.
 addpath(genpath(getenv('IRISFETCH')))
