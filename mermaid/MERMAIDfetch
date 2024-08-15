@@ -13,6 +13,9 @@
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 # Last modified: 07-Dec-2023, Darwin Kernel Version 18.7.0
 
+echo 'exiting...must edit for geo_mac'
+exit 1
+
 # Print help with '-h' or '--help'.
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     sed -ne '/^#/!q;s/^#$/# /;/^# /s/^# //p' < "$0" |
