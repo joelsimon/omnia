@@ -1,0 +1,192 @@
+function  [ct, OCCL] = occlfspl(z, tz)
+% [ct, OCCL] = OCCLFSPL(z, tz)
+%
+% Occlusive Free-Space Path Loss
+%
+% Differs from `occlfsl` in that this requires clearance of 0.6 the Fresnel
+% radial length as measured right/left (up/down) from the line of sight
+% (great-circle path), as opposed to simply contiguous 0.6 Fresnel diameter
+% window arranged at place within full Fresnel diameter. `occlfsl` will
+% likely be sunsetted or renamed...
+%
+% Inspired by: Bullington 1957, Bell Syst. Tech. J.)
+%
+% Ex:
+%    H11S1 = load('HTHH_2_H11S1_elevation_matrix.mat');
+%    z = H11S1.z;
+%    tz = -2000;
+%    [ct, OCCL] = OCCLFSPL(z, tz)
+%
+% Author: Joel D. Simon
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 16-Aug-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64
+
+% Define a clearance ratio below which you have free-space path loss --
+% classically(? ; or at least implied...) this requires a clear path from
+% line-of-sight to 0.6x the length of the radius (Bullington 1957, BELL SYST
+% TECH J).  In their jargon this is H/H0.
+clearance_ratio = 0.6;
+
+% Fresnel radii (fish spines) are rows and "tracks" (parallel to great-circle
+% path) are columns of elevation matrix.
+num_fr_rad = size(z, 1);
+num_fr_tra = size(z, 2);
+
+% Expecting an odd number of Fresnel tracks, with the central track being the
+% central path.
+if iseven(num_fr_tra)
+    error(['Depth matrix must have odd number of columns, with central column ' ...
+           'representing great-circle path'])
+
+end
+
+% Get index of great-circle track (middle track).
+gc_idx = mididx(1:num_fr_tra);
+
+% Initialize outputs.
+ct = 0;
+occl_beg = [];
+occl_end = [];
+lh_occl = NaN(num_fr_rad, 1);
+lh_H = NaN(num_fr_rad, 1);
+lh_H0 = NaN(num_fr_rad, 1);
+rh_occl = NaN(num_fr_rad, 1);
+rh_H = NaN(num_fr_rad, 1);
+rh_H0 = NaN(num_fr_rad, 1);
+
+% `prev_occl` specifies whether the previous radius (row) was occluded; only
+% increment the counter if current radius occluded and previous was
+% not.
+prev_occl = false;
+
+% Loop over each Fresnel radius and look left/right (east/west or north/south
+% etc.) from line of sight (middle great-circle index) and check clearance.
+for i = 1:num_fr_rad
+    % The Fresnel diameters are the rows of the elevation matrix.
+    fr_diam = z(i, :);
+
+    % Skip calculation if all NaNs; e.g., a radii before the slope, removed as in
+    % `zero_min=true`.
+    if all(isnan(fr_diam))
+        continue
+
+    end
+
+    % Split full Fresnel diameter into two radii at great-circle path
+    % (central track). For the left radius (from index 1 at far edge to
+    % middle at great-circle track), index backwards from center so that you
+    % start along line-of-sight and look toward edge of Fresnel zone.  These
+    % "raw" radii include NaNs at the end -- if elevation matrix made with
+    % `fresnelgrid` then only the middle diameter (have way between source
+    % and receiver) can be filled with elevations; otherwise the edges of the
+    % grid beyond the true length of the Fresnel radius at intermediate
+    % distances is set to NaN.
+    lh_rad_incl_nan = fr_diam(gc_idx:-1:1);
+    rh_rad_incl_nan = fr_diam(gc_idx:end);
+
+    % Going to check both radii (despite only requiring on to be occluded to
+    % increment counter) to avoid an early exit via `continue`; also may want to
+    % individually know right/left diffs at some point. "lh" = left hand;
+    % "rh" = right hand (e.g., west/east or south/north).
+    [lh_occl(i), lh_H(i), lh_H0(i)] = ...
+        is_occluded(lh_rad_incl_nan, tz, clearance_ratio);
+    [rh_occl(i), rh_H(i), rh_H0(i)] = ...
+        is_occluded(rh_rad_incl_nan, tz, clearance_ratio);
+
+    if ~lh_occl(i) && ~rh_occl(i)
+        % Neither radius occluded.
+        if prev_occl
+            % I previously occluded, set "end" occlusion index here
+            % (transition out of seamount back into open ocean water).
+            occl_end = [occl_end ; i];
+
+        end
+        % Set "previous" flag to unoccluded, for next loop.
+        prev_occl = false;
+
+    else
+        % One/both radii occluded.
+        if ~prev_occl
+            % If previously unoccluded, increment occluder counter and set "begin" occlusion
+            % index here (transition from open ocean water to seamount).
+            ct = ct + 1;
+            occl_beg = [occl_beg ; i];
+            if i == num_fr_rad
+                % If still occluded at end of path (how? MERMAID in seamount?...) just set
+                % begin/end index equal consistency in array size.
+                occl_end = [occl_end ; i];
+
+            end
+        end
+        % Set "previous" flag to occluded, for next loop.
+        prev_occl = true;
+
+    end
+end
+
+OCCL.ct = ct;
+OCCL.beg = occl_beg;
+OCCL.end = occl_end;
+
+OCCL.lh_occl = lh_occl;
+OCCL.lh_H = lh_H;
+OCCL.lh_H0 = lh_H0;
+
+OCCL.rh_occl = rh_occl;
+OCCL.rh_H = rh_H;
+OCCL.rh_H0 = rh_H0;
+
+OCCL.gc_idx = gc_idx;
+
+% Run verification -- left/right (west/east) radii-lengths should be equal.
+if ~isequal(OCCL.lh_H0, OCCL.rh_H0)
+    error('Left/right (west/east) Fresnel radii lengths not equal')
+
+end
+
+%% ___________________________________________________________________________ %%
+
+function [occl, H, H0] = is_occluded(fr_rad, tz, clearance_ratio)
+% IS_OCCLUDED returns true if this specific Fresnel radius is occluded, as well
+% as the index of the first occlusion (a length from line-of-sight heading along
+% Fresnel radius toward edge of first Fresnel zone) and full Fresnel radial
+% length.
+
+% Chop off any NaNs in this radius (e.g., at source/receiver there may only be a
+% single finite elevation; all points are finite only near midpoint of
+% great-circle path, where Fresnel radius is maximized).
+fr_rad = fr_rad(~isnan(fr_rad));
+
+% Radial length of the first Fresnel zone at this point along the path --
+% only compute this after chopping off NaNs. Using Bullington 1975 jargon for
+% distances here.
+H0 = length(fr_rad);
+
+% Yes/no vector of "occluded or not" where occlusion is defined as
+% elevation being greater than test depth (i.e., you ran into a seamount
+% as opposed to transiting free-space [clear-path through water]).
+occl_idx = fr_rad > tz;
+
+% The clearance is defined as the distance from line-of-sight to first
+% occluder (how far off great-circle path can you look east/west before
+% bumping into an occluder).
+H = find(occl_idx, 1);
+
+% Default output occlusion is false.
+occl = false;
+
+% Exit with NaN (for indexing) if radius completely unoccluded.
+if isempty(H)
+    H = NaN;
+    return
+
+end
+
+% If first occluder too close to line-of-sight (great-circle path), represented
+% as a ratio of total length of Fresnel radius at this point along the great
+% circle path, then this radius is considered occluded (suffering free-space
+% path loss).
+if H / H0 < clearance_ratio
+    occl = true;
+
+end
