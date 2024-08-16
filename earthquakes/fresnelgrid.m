@@ -10,6 +10,19 @@ function [fzlat, fzlon, gcidx, gcdist, fr, deg] = ...
 % Fresnel "tracks," of which the latter run (sub)parallel to great-circle path,
 % itself at center: gclat=fzlat(:,<middle_index); gclon=fzlon(:,<middle_index>).
 %
+% Note the construction of the final lat/lon output matrices: the middle column
+% is the great-circle path (line of sight in a free-space path loss sense). All
+% columns to the left are Fresnel radii projected at -90-degree azimuths from
+% the instantaneous azimuth of the great-circle path at that point.  Negative
+% azimuth does NOT mean lower lat/lon; it means rotating 90 degrees counter
+% clockwise, so a great-circle path heading directly east (HTHH to H03S1) will
+% actually have relatively larger latitudes in the left side of the output
+% matrix, since -90 rotation (counterclockwise) from east is heading north.
+% Further, column 1 is the edge (furthest from great-circle path) in the
+% counter-clockwise azimuthal sense.  Conversely, the right-half columns in the
+% output matrix at +90 azimuth (clockwise) from from great-circle path, so an
+% easting path (HTHH to H03S1) actually has lower latitudes in the +90 sense.
+%
 % Input:
 % lat1/lon1        Latitude and longitude of source [deg]
 % lat2/lon2        Latitude and longitude of receiver [deg]
@@ -41,12 +54,12 @@ function [fzlat, fzlon, gcidx, gcdist, fr, deg] = ...
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 20-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
 
-% NTS: There are various ways to speed this up (e.g., `cumdist` outside loop and
+% NB: There are various ways to speedup this up (e.g., `cumdist` outside loop and
 % computing all `fresnelradius` in one go; merging azimuth computation into main
 % loop; computing max radius at every point, filling "rectangle" with lat/lon
 % and then latter set to NaN those outside radius [allows you to make one run of
 % `track1` for all points]), etc.  I did all that and didn't find the speedup
-% worth the loss of readability. This is a slow code in general, so be it.
+% worth the loss of readability.
 
 % Default.
 defval('plt', false)
@@ -135,6 +148,7 @@ for i = 1:num_fr
 
     end
 
+    % Convert Fresnel radii from m to km, deg.
     fr_km = fr_m / 1e3;
     fr_deg(i) = km2deg(fr_km);
 
@@ -144,9 +158,13 @@ for i = 1:num_fr
     % specify how many points along that arch to be computed.
     arclen_act_deg = [0:act_deg:fr_deg(i)];
 
-    % Project Fresnel radii at +/-90 degrees (normal) to great-circle path at arc
-    % lengths defined by max discretized radii, splitting into
-    % equal-degree-length chunks just found.
+    % Project Fresnel radii at azimuth -/+90 degrees (normal) to great-circle path
+    % at arc lengths defined by max discretized radii, splitting into
+    % equal-degree-length chunks just found.  NB: negative azimuth does NOT mean
+    % lower lat/lon; it means rotating 90 degrees counter clockwise, so a
+    % great-circle path heading directly east (HTHH to H03S1) will actually have
+    % relatively larger latitudes in the left side of the output matrix, since
+    % -90 rotation (counterclockwise) from east is heading north.
     [lat_neg, lon_neg] = ...
         track1(gclat(i), gclon(i), az(i)-90, arclen_act_deg(end), [], 'degrees', length(arclen_act_deg));
 
@@ -175,21 +193,25 @@ frlon_neg(1, :) = [];
 frlat_pos(1, :) = [];
 frlon_pos(1, :) = [];
 
-% At this point the columns define the Fresnel radii (normal to great circle)
-% and the rows define the Fresnel-zone "tracks" ((sub)parallel to great
-% circle). Flip left-right the negative lat/lon so that shape of matrix mirrors
-% shape of Fresnel zone (with NaNs). Transpose and concatenate pos/neg radius
-% tracks so that columns of the output define Fresnel-zone tracks.  Slot
-% great-circle latitudes and longitudes (multiply repeated and cut above) in
-% middle of positive and negative tracks.
+% At this point the columns define the Fresnel radii (normal to great
+% circle/line-of-sight in free-space path loss sense) and the rows define the
+% Fresnel-zone "tracks" ((sub)parallel to great circle). Flip left-right the
+% negative-azimuth lat/lon so that shape of matrix mirrors shape of Fresnel zone
+% (with NaNs). Transpose and concatenate pos/neg radius tracks so that columns
+% of the output define Fresnel-zone tracks.  Slot great-circle latitudes and
+% longitudes (multiply repeated and cut above) in middle of positive and
+% negative tracks.
 fzlat = [fliplr(frlat_neg') gclat frlat_pos'];
 fzlon = [fliplr(frlon_neg') gclon frlon_pos'];
 
-% Now rows are now Fresnel "tracks" that run (sub)parallel to great circle.
-% This is a check to verify equal area (we know Fresnel radii perpendicular to
-% great-circle have constant delta deg spacing; this verifies spacing between
-% neighboring Fresnel radii are similarly spaced spacing set to delta deg).
+% Now the rows are Fresnel radii and the columns are Fresnel "tracks" that run
+% (sub)parallel to great circle.  This is a check to verify equal area (we know
+% Fresnel radii perpendicular to great-circle have constant delta deg spacing;
+% this verifies spacing between neighboring Fresnel radii are similarly spaced
+% spacing set to delta deg).
 ct = 0;
+mind = [];
+maxd = [];
 for i = 1:size(fzlat,1);
     lat = fzlat(i,:);
     lon = fzlon(i,:);
