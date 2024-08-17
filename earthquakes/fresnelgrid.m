@@ -1,6 +1,6 @@
-function [fzlat, fzlon, gcidx, gcdist, fr, deg] = ...
+function [fzlat, fzlon, gcidx, gcdist, fr, deg, c11, cmn] = ...
             fresnelgrid(lat1, lon1, lat2, lon2, vel, freq, deg, plt)
-% [fzlat, fzlon, gcidx, gcdist, fr, deg] = ...
+% [fzlat, fzlon, gcidx, gcdist, fr, deg, c11, cmn] = ...
 %     FRESNELGRID(lat1, lon1, lat2, lon2, vel, freq, deg, plt)
 %
 % Compute 2-D (map view; no depth) Fresnel zone for constant-velocity waves
@@ -30,6 +30,8 @@ function [fzlat, fzlon, gcidx, gcdist, fr, deg] = ...
 % freq             Wave frequency [Hz]
 % deg*             Grid resolution (lengths of sides of lat/lon square) [deg]*
 % plt              true to plot output (def: false)
+% c11              [lon,lat] at position C(1,1) of output matrices**
+% cmn              [lon,lat] at position C(M,N) of output matrices**
 %
 % Output:
 % fzlat            Latitudes of Fresnel zone [deg]
@@ -43,6 +45,13 @@ function [fzlat, fzlon, gcidx, gcdist, fr, deg] = ...
 %
 % *Actual grid resolution is dictated by discretization of great circle path and
 %  will be less than requested.
+%
+% ** NB: C(1,1) (top left) and C(M,N) (bottom right) are in reference to output
+%    matrices and will (probably) not necessarily correspond to geographically
+%    meaningful bounding box locations as drawn on the Earth; may require
+%    fliplr/flipud/rot90 etc. in `imagesc` to approximate geographic map view
+%    with north being up and east being right (which may be meaningless...how
+%    does one properly orient the example below in imagesc?)/
 %
 % Ex: (Fresnel zone for 20 s surface wave from Sydney to Portland using 0.25 deg grid)
 %    lat1=-33; lon1=151; lat2=45; lon2=-122; vel=3500; freq=1/20; deg=0.25; plt=true;
@@ -131,6 +140,9 @@ frlon_neg = NaN(npts_max_fr, num_fr);
 frlat_pos = NaN(npts_max_fr, num_fr);
 frlon_pos = NaN(npts_max_fr, num_fr);
 
+% Log index of middle of great-circle path, where Fresnel radius is maximized.
+mid_fr = fx(mididx(1:num_fr), 1);
+
 % Loop over every point along great-circle where Fresnel radii must be
 % computed.
 for i = 1:num_fr
@@ -183,7 +195,17 @@ for i = 1:num_fr
     frlat_pos(:,i) = [lat_pos ;  nan_fill];
     frlon_pos(:,i) = [lon_pos ;  nan_fill];
 
+    % At midpoint the Fresnel radius is at a maximum. Use that distance to compute
+    % lon/lat at C(1,1) and C(M,N) (if they existed; will be NaN in output),
+    % which may be potentially useful for e.g., imagesc.
+    if i == mid_fr;
+        [c11_lat, c11_lon] = track1(gclat(1), gclon(1), az(1)-90, arclen_act_deg(end), [], 'degrees', 1);
+        [cmn_lat, cmn_lon] = track1(gclat(end), gclon(end), az(1)+90, arclen_act_deg(end), [], 'degrees', 1);
+
+    end
 end
+c11 = [longitude360(c11_lon), c11_lat];
+cmn = [longitude360(cmn_lon), cmn_lat];
 
 % The first point along each pos/neg Fresnel radius is on great circle itself;
 % cut it.  E.g., the positive track starts on great circle and tracks north/east
