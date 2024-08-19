@@ -21,6 +21,11 @@ if strcmp(z, 'demo');
 
 end
 
+if length(tz) > 1
+    error('Only 1 test depth allowed.')
+
+end
+
 % Defaults
 defval('crat', 0.6)
 
@@ -38,8 +43,7 @@ num_fr_tra = size(z, 2);
 % Expecting an odd number of Fresnel tracks, with the central track being the
 % central path.
 if iseven(num_fr_tra)
-    error(['Depth matrix must have odd number of columns, with central column ' ...
-           'representing great-circle path'])
+    error('Depth matrix must have odd number of columns, with central column representing great-circle path.')
 
 end
 
