@@ -1,5 +1,5 @@
-function  [ct, OCCL] = occlfspl(z, tz)
-% [ct, OCCL] = OCCLFSPL(z, tz)
+function  [ct, OCCL] = occlfspl(z, tz, crat)
+% [ct, OCCL] = OCCLFSPL(z, tz, crat)
 %
 % Occlusive Free-Space Path Loss
 %
@@ -11,21 +11,24 @@ function  [ct, OCCL] = occlfspl(z, tz)
 %
 % Inspired by: Bullington 1957, Bell Syst. Tech. J.)
 %
-% Ex:
-%    H11S1 = load('HTHH_2_H11S1_elevation_matrix.mat');
-%    z = H11S1.z;
-%    tz = -2000;
-%    [ct, OCCL] = OCCLFSPL(z, tz)
-%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 16-Aug-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64
+% Last modified: 19-Aug-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64
+
+if strcmp(z, 'demo');
+    run_demo
+    return
+
+end
+
+% Defaults
+defval('crat', 0.6)
 
 % Define a clearance ratio below which you have free-space path loss --
 % classically(? ; or at least implied...) this requires a clear path from
 % line-of-sight to 0.6x the length of the radius (Bullington 1957, BELL SYST
 % TECH J).  In their jargon this is H/H0.
-clearance_ratio = 0.6;
+clearance_ratio = crat;
 
 % Fresnel radii (fish spines) are rows and "tracks" (parallel to great-circle
 % path) are columns of elevation matrix.
@@ -190,3 +193,43 @@ if H / H0 < clearance_ratio
     occl = true;
 
 end
+
+%% ___________________________________________________________________________ %%
+
+function [ct, OCCL] = run_demo
+clc
+close all
+
+crat = 0.6;
+H11S1 = load('HTHH_2_H11S1_elevation_matrix.mat');
+z = H11S1.z;
+tz = -1000;
+[ct, OCCL] = occlfspl(z, tz, crat);
+
+num_fr_rad = size(z, 1);
+num_fr_tra = size(z, 2);
+gc_idx = mididx(1:num_fr_tra);
+x = [1 num_fr_rad];
+y = [+gc_idx -gc_idx];
+
+figure
+im = imagesc(x, y, z', 'AlphaData', ~isnan(z'));
+ax = gca;
+set(ax, 'YDir', 'normal')
+
+caxis([tz-1 tz+1])
+colormap(bluewhiteredcmap(3))
+cb = colorbar;
+cb.Ticks = [tz-1 tz tz+1];
+cb.Label.String = 'Depth [m]';
+
+hold(ax, 'on')
+plot(ax.XLim, [0 0], 'k', 'LineWidth', 0.5);
+for i = 1:ct
+    plot(ax, [OCCL.beg(i) OCCL.beg(i)], ax.YLim, 'w-', 'LineWidth', 1);
+    plot(ax, [OCCL.end(i) OCCL.end(i)], ax.YLim, 'w--', 'LineWidth', 1);
+
+end
+min_free_radius = crat * OCCL.lh_H0;
+plot(ax, +min_free_radius, 'k', 'LineWidth', 0.5);
+plot(ax, -min_free_radius, 'k', 'LineWidth', 0.5);
