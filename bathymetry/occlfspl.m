@@ -146,7 +146,7 @@ OCCL.rh_H0 = rh_H0;
 OCCL.gc_idx = gc_idx;
 
 % Run verification -- left/right (west/east) radii-lengths should be equal.
-if ~isequal(OCCL.lh_H0, OCCL.rh_H0)
+if ~isequaln(OCCL.lh_H0, OCCL.rh_H0)
     error('Left/right (west/east) Fresnel radii lengths not equal')
 
 end
@@ -204,10 +204,10 @@ function [ct, OCCL] = run_demo
 clc
 close all
 
-crat = 0.6;
 H11S1 = load('HTHH_2_H11S1_elevation_matrix.mat');
 z = H11S1.z;
 tz = -1000;
+crat = 0.6;
 [ct, OCCL] = occlfspl(z, tz, crat);
 
 num_fr_rad = size(z, 1);
