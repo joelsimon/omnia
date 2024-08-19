@@ -48,12 +48,9 @@ function [fzlat, fzlon, gcidx, gcdist, fr, deg, c11, cmn] = ...
 %
 % ** NB: C(1,1) (top left) and C(M,N) (bottom right) are in reference to output
 %    matrices and will (probably) not necessarily correspond to geographically
-%    meaningful bounding box locations as drawn on the Earth; may require
-%    fliplr/flipud/rot90 etc. in `imagesc` to approximate geographic map view
-%    with north being up and east being right (which may be meaningless...how
-%    does one properly orient the example below in imagesc?)/
+%    meaningful bounding box locations as drawn on the Earth.
 %
-% Ex: (Fresnel zone for 20 s surface wave from Sydney to Portland using 0.25 deg grid)
+% Ex1: (Fresnel zone for 20 s surface wave from Sydney to Portland using 0.25 deg grid)
 %    lat1=-33; lon1=151; lat2=45; lon2=-122; vel=3500; freq=1/20; deg=0.25; plt=true;
 %    FRESNELGRID(lat1,lon1,lat2,lon2,vel,freq,deg,plt);
 %
