@@ -3,6 +3,10 @@ function  [ct, lh_OCCL, rh_OCCL, ax] = occlfspl2(z, tz, crat, plt)
 %
 % Occlusive Free-Space Path Loss -- 2-sided.
 %
+% Need to verify works forward/backwards.
+%
+% crat     ...; set to 0.0 only consider occluders directly within line-of-sight
+%
 % Differs from `occlfsl` in that this requires clearance of 0.6 the Fresnel
 % radial length as measured right/left (up/down) from the line of sight
 % (great-circle path), as opposed to simply contiguous 0.6 Fresnel diameter
@@ -41,6 +45,10 @@ if length(tz) > 1
     error('Only 1 test depth allowed.')
 
 end
+if crat < 0 || crat > 1.0
+    error('`crat` must be within 0:1, inclusive')
+
+end
 
 % Expecting an odd number of Fresnel tracks, with the central track being the
 % central path.
@@ -62,6 +70,19 @@ rh_fr_rad = z(:, gc_idx:end);
 % max-extent of radii is last column.
 lh_fr_rad = fliplr(lh_fr_rad);
 
+% Clearance ratio of zero will mean just great-circle path, here.
+if crat == 0
+    lh_fr_rad = lh_fr_rad(:, 1);
+    rh_fr_rad = rh_fr_rad(:, 1);
+
+    % Verify expected my indexing.
+    if ~isequaln(lh_fr_rad, z(:, gc_idx)) || ~isequaln(rh_fr_rad, z(:, gc_idx))
+        error('oops')
+
+    end
+end
+
+% Count occlusion!
 lh_OCCL = main(lh_fr_rad, tz, crat);
 rh_OCCL = main(rh_fr_rad, tz, crat);
 
@@ -187,12 +208,15 @@ occl_idx = fr_rad > tz;
 % bumping into an occluder).
 H = find(occl_idx, 1);
 
-% Default output occlusion is false.
-occl = false;
+% Exit prematurely on two-edge cases: entire radius completely (un)occluded.
+if all(occl_idx)
+    occl = true;
+    return
 
-% Exit with NaN (for indexing) if radius completely unoccluded.
+end
 if isempty(H)
-    H = NaN;
+    occl = false;
+    H = NaN; % reset to NaN for output indexing purposes
     return
 
 end
@@ -203,6 +227,9 @@ end
 % path loss).
 if H / H0 < crat
     occl = true;
+
+else
+    occl = false;
 
 end
 
@@ -257,4 +284,4 @@ H11S1 = load('HTHH_2_H11S1_elevation_matrix.mat');
 z = H11S1.z;
 tz = -1000;
 crat = 0.6;
-[ct, OCCL] = occlfspl2(z, tz, crat, true);
+ct = occlfspl2(z, tz, crat, true);
