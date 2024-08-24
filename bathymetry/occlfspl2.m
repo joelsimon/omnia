@@ -105,14 +105,14 @@ if plt
 
 end
 
-% Verify swapping source/reciever produces same output.
+% Verify swapping source/receiver produces same output.
 if recursive_check
     reverse_z = flipud(z);
     plt = false;
     recursive_check = false;
     reverse_ct = occlfspl2(reverse_z, tz, crat, plt, recursive_check);
     if ct ~= reverse_ct
-        error('Swapping source-reciever produced different results')
+        error('Swapping source-receiver produced different results')
 
     end
 end
