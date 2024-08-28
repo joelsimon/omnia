@@ -5,6 +5,8 @@ Developed by Joel D. Simon, a  postdoc at Princeton University (jdsimon@princeto
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5637492.svg)](https://doi.org/10.5281/zenodo.5637492)
 
+>> NB: irisFetch requires MATLAB 2022b or earlier <<
+
 ## Installation:
 \
 [0]. OMNIA relies on various environmental variables being known to MATLAB, which requires
