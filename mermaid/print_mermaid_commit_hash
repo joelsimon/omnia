@@ -11,13 +11,13 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 15-Aug-2022, Darwin Kernel Version 18.7.0
+# Last modified: 28-Aug-2024, Darwin Kernel Version 23.6.0
 
 cd $MERMAID/server/ >& /dev/null
 hash=$( git log -1  | grep commit | cut -d " " -f2 )
 printf "  server: %s\n" $hash
 
-cd $MERMAID/automaid/ >& /dev/null
+cd $AUTOMAID >& /dev/null
 hash=$( git log -1  | grep commit | cut -d " " -f2 )
 printf "automaid: %s\n" $hash
 
