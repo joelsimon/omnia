@@ -3,8 +3,6 @@ function  [ct, lh_OCCL, rh_OCCL, ax] = occlfspl2(z, tz, crat, plt, recursive_che
 %
 % Occlusive Free-Space Path Loss -- 2-sided.
 %
-% Need to verify works forward/backwards.
-%
 % crat     ...; set to 0.0 only consider occluders directly within line-of-sight
 %
 % Differs from `occlfsl` in that this requires clearance of 0.6 the Fresnel
