@@ -1,31 +1,20 @@
 function  [ct, lh_OCCL, rh_OCCL, ax] = occlfspl2(z, tz, crat, plt, recursive_check)
 % [ct, lh_OCCL, rh_OCCL, ax] = OCCLFSPL2(z, tz, crat, plt)
 %
-% Occlusive Free-Space Path Loss -- 2-sided.
+% Occlusive Free-Space Path Loss: Two-Sided
+% (occlusion to left or right each adds 0.5 to count)
 %
-% crat     ...; set to 0.0 only consider occluders directly within line-of-sight
+% Input:
+% tbd
 %
-% Differs from `occlfsl` in that this requires clearance of 0.6 the Fresnel
-% radial length as measured right/left (up/down) from the line of sight
-% (great-circle path), as opposed to simply contiguous 0.6 Fresnel diameter
-% window arranged at place within full Fresnel diameter. `occlfsl` will
-% likely be sunsetted or renamed...
-%
-% Occlusion to left/right of great-circle path (line-of-sight) each add 0.5 to
-% total count; both halves being occluded at a given radius sum to 1.0.
-% Additionally, this mean a single occluder on great-circle path only add 1.0 to
-% total count....which is kind of(?) unphysical.
-%
-% Define a clearance ratio below which you have free-space path loss --
-% classically(? ; or at least implied...) this requires a clear path from
-% line-of-sight to 0.6x the length of the radius (Bullington 1957, BELL SYST
-% TECH J).  In their jargon this is H/H0.
+% Output:
+% tbd
 %
 % Inspired by: Bullington 1957, Bell Syst. Tech. J.)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 23-Aug-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 13-Sep-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 %% NB: Function recursively checks itself exactly once; private input
 %% `recursive check` is defaulted to true and flipped to false in singular
@@ -78,9 +67,9 @@ if crat == 0
     lh_fr_rad = lh_fr_rad(:, 1);
     rh_fr_rad = rh_fr_rad(:, 1);
 
-    % Verify expected my indexing.
+    % Verify expected indexing.
     if ~isequaln(lh_fr_rad, z(:, gc_idx)) || ~isequaln(rh_fr_rad, z(:, gc_idx))
-        error('oops')
+        error('Verify only great-circle track remains (same left/right)')
 
     end
 end
@@ -88,7 +77,6 @@ end
 % Count occlusion!
 lh_OCCL = main(lh_fr_rad, tz, crat);
 rh_OCCL = main(rh_fr_rad, tz, crat);
-
 ct = lh_OCCL.ct + rh_OCCL.ct;
 
 % Verify radii symmetry of input.
@@ -97,7 +85,6 @@ if ~isequaln(lh_OCCL.H0, rh_OCCL.H0)
 
 end
 
-ax = [];
 if plt
     ax = plotit(z, tz, crat, lh_OCCL, rh_OCCL);
 
@@ -175,6 +162,7 @@ for i = 1:num_fr_rad
             % index here (transition from open ocean water to seamount).
             ct = ct + 0.5;
             occl_beg = [occl_beg ; i];
+
         end
         % Set "previous" flag to occluded, for next loop.
         prev_occl = true;
@@ -200,7 +188,6 @@ OCCL.H0 = H0;
 %% ___________________________________________________________________________ %%
 
 function [occl, H, H0] = is_occluded(fr_rad, tz, crat)
-
 % IS_OCCLUDED returns true if this specific Fresnel radius is occluded, as well
 % as the index of the first occlusion (a length from line-of-sight heading along
 % Fresnel radius toward edge of first Fresnel zone) and full Fresnel radial
@@ -301,5 +288,5 @@ function [ct, OCCL] = run_demo
 H11S1 = load('HTHH_2_H11S1_elevation_matrix.mat');
 z = H11S1.z;
 tz = -1000;
-crat = 0.6;
+crat = 1.0;
 ct = occlfspl2(z, tz, crat, true);
