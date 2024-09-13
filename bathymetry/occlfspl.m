@@ -1,47 +1,54 @@
-function  [ct, OCCL] = occlfspl(z, tz, crat)
-% [ct, OCCL] = OCCLFSPL(z, tz, crat)
+function  [ct, OCCL] = occlfspl(z, tz, crat, plt, recursive_check)
+% [ct, OCCL] = OCCLFSPL(z, tz, crat, plt, recursive_check)
 %
 % Occlusive Free-Space Path Loss
 %
-% Differs from `occlfsl` in that this requires clearance of 0.6 the Fresnel
-% radial length as measured right/left (up/down) from the line of sight
-% (great-circle path), as opposed to simply contiguous 0.6 Fresnel diameter
-% window arranged at place within full Fresnel diameter. `occlfsl` will
-% likely be sunsetted or renamed...
+% Occlusive Free-Space Path Loss: One-Sided
+% (if either left or right is occluded, 1 is added to count; both not required)
+%
+% Input:
+% tbd
+%
+% Output:
+% tbd
 %
 % Inspired by: Bullington 1957, Bell Syst. Tech. J.)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 19-Aug-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64
+% Last modified: 13-Sep-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
+%% NB: Function recursively checks itself exactly once; private input
+%% `recursive check` is defaulted to true and flipped to false in singular
+%% recursion call.
+
+% Demo it, maybe.
 if strcmp(z, 'demo');
     run_demo
     return
 
 end
 
+% Defaults
+defval('crat', 0.6)
+defval('plt', false)
+defval('recursive_check', true)
+
+% Sanity.
 if length(tz) > 1
     error('Only 1 test depth allowed.')
 
 end
+if crat < 0 || crat > 1.0
+    error('`crat` must be within 0:1, inclusive')
 
-% Defaults
-defval('crat', 0.6)
-
-% Define a clearance ratio below which you have free-space path loss --
-% classically(? ; or at least implied...) this requires a clear path from
-% line-of-sight to 0.6x the length of the radius (Bullington 1957, BELL SYST
-% TECH J).  In their jargon this is H/H0.
-clearance_ratio = crat;
+end
 
 % Fresnel radii (fish spines) are rows and "tracks" (parallel to great-circle
-% path) are columns of elevation matrix.
+% path) are columns of elevation matrix.  Expecting an odd number of Fresnel
+% tracks, with the central track being the central path.
 num_fr_rad = size(z, 1);
 num_fr_tra = size(z, 2);
-
-% Expecting an odd number of Fresnel tracks, with the central track being the
-% central path.
 if iseven(num_fr_tra)
     error('Depth matrix must have odd number of columns, with central column representing great-circle path.')
 
@@ -95,10 +102,8 @@ for i = 1:num_fr_rad
     % increment counter) to avoid an early exit via `continue`; also may want to
     % individually know right/left diffs at some point. "lh" = left hand;
     % "rh" = right hand (e.g., west/east or south/north).
-    [lh_occl(i), lh_H(i), lh_H0(i)] = ...
-        is_occluded(lh_rad_incl_nan, tz, clearance_ratio);
-    [rh_occl(i), rh_H(i), rh_H0(i)] = ...
-        is_occluded(rh_rad_incl_nan, tz, clearance_ratio);
+    [lh_occl(i), lh_H(i), lh_H0(i)] = is_occluded(lh_rad_incl_nan, tz, crat);
+    [rh_occl(i), rh_H(i), rh_H0(i)] = is_occluded(rh_rad_incl_nan, tz, crat);
 
     if ~lh_occl(i) && ~rh_occl(i)
         % Neither radius occluded.
@@ -151,9 +156,26 @@ if ~isequaln(OCCL.lh_H0, OCCL.rh_H0)
 
 end
 
+if plt
+    ax = plotit(z, tz, crat, OCCL);
+
+end
+
+% Verify swapping source/receiver produces same output.
+if recursive_check
+    reverse_z = flipud(z);
+    plt = false;
+    recursive_check = false;
+    reverse_ct = occlfspl(reverse_z, tz, crat, plt, recursive_check);
+    if ct ~= reverse_ct
+        error('Swapping source-receiver produced different results')
+
+    end
+end
+
 %% ___________________________________________________________________________ %%
 
-function [occl, H, H0] = is_occluded(fr_rad, tz, clearance_ratio)
+function [occl, H, H0] = is_occluded(fr_rad, tz, crat)
 % IS_OCCLUDED returns true if this specific Fresnel radius is occluded, as well
 % as the index of the first occlusion (a length from line-of-sight heading along
 % Fresnel radius toward edge of first Fresnel zone) and full Fresnel radial
@@ -179,12 +201,25 @@ occl_idx = fr_rad > tz;
 % bumping into an occluder).
 H = find(occl_idx, 1);
 
-% Default output occlusion is false.
-occl = false;
+% Exit early on two-edge cases: entire radius completely (un)occluded (makes the
+% ratio H/H0 break).
+if all(occl_idx)
+    occl = true;
+    return
 
-% Exit with NaN (for indexing) if radius completely unoccluded.
+end
 if isempty(H)
-    H = NaN;
+    occl = false;
+    H = NaN; % reset to NaN for output indexing purposes
+    return
+
+end
+
+% Exit early if crat = 0 (line-of-sight only consideration), and the first
+% index in the radius (starts at great-circle and extends outward) is
+% occluded.
+if crat == 0 && H == 1
+    occl = true;
     return
 
 end
@@ -193,22 +228,17 @@ end
 % as a ratio of total length of Fresnel radius at this point along the great
 % circle path, then this radius is considered occluded (suffering free-space
 % path loss).
-if H / H0 < clearance_ratio
+if H / H0 < crat
     occl = true;
+
+else
+    occl = false;
 
 end
 
 %% ___________________________________________________________________________ %%
 
-function [ct, OCCL] = run_demo
-clc
-close all
-
-H11S1 = load('HTHH_2_H11S1_elevation_matrix.mat');
-z = H11S1.z;
-tz = -1000;
-crat = 0.6;
-[ct, OCCL] = occlfspl(z, tz, crat);
+function ax = plotit(z, tz, crat, OCCL)
 
 num_fr_rad = size(z, 1);
 num_fr_tra = size(z, 2);
@@ -229,7 +259,7 @@ cb.Label.String = 'Depth [m]';
 
 hold(ax, 'on')
 plot(ax.XLim, [0 0], 'k', 'LineWidth', 0.5);
-for i = 1:ct
+for i = 1:OCCL.ct
     plot(ax, [OCCL.beg(i) OCCL.beg(i)], ax.YLim, 'w-', 'LineWidth', 1);
     plot(ax, [OCCL.end(i) OCCL.end(i)], ax.YLim, 'w--', 'LineWidth', 1);
 
@@ -237,3 +267,13 @@ end
 min_free_radius = crat * OCCL.lh_H0;
 plot(ax, +min_free_radius, 'k', 'LineWidth', 0.5);
 plot(ax, -min_free_radius, 'k', 'LineWidth', 0.5);
+
+%% ___________________________________________________________________________ %%
+
+function [ct, OCCL] = run_demo
+
+H11S1 = load('HTHH_2_H11S1_elevation_matrix.mat');
+z = H11S1.z;
+tz = -1000;
+crat = 0.6;
+[ct, OCCL] = occlfspl(z, tz, crat, true);
