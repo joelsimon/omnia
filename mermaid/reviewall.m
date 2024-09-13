@@ -18,7 +18,8 @@ function reviewall(writecp, floatnum, procdir, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 29-Nov-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 13-Sep-2024, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Defaults.
 defval('writecp', false)
@@ -84,6 +85,14 @@ num_sac = length(sac);
 num_rev = num_sac;
 for i = 1:num_sac
     fprintf('Remaining SAC to be reviewed: %3i\n', num_rev)
+
+    % Skip review of REQ
+    if contains(strippath(sac{i}), 'REQ')
+        warning(sprintf('Skipping review (REQ): %s\n', strippath(sac{i})))
+        continue
+
+    end
+
     try
         reviewevt(sac{i}, false, evtdir, viewr);
 
