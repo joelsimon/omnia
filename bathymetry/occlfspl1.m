@@ -1,10 +1,10 @@
-function  [ct, OCCL] = occlfspl(z, tz, crat, plt, recursive_check)
-% [ct, OCCL] = OCCLFSPL(z, tz, crat, plt, recursive_check)
-%
-% Occlusive Free-Space Path Loss
+function  [ct, OCCL] = occlfspl1(z, tz, crat, plt, recursive_check)
+% [ct, OCCL] = OCCLFSPL1(z, tz, crat, plt)
 %
 % Occlusive Free-Space Path Loss: One-Sided
-% (if either left or right is occluded, 1 is added to count; both not required)
+%
+% If either Fresnel radius left/right (up/down) of LoS (great-circle path;
+% middle column of depth matrix) is occluded, 1.0 is added to occlusion count.
 %
 % Input:
 % tbd
@@ -14,9 +14,12 @@ function  [ct, OCCL] = occlfspl(z, tz, crat, plt, recursive_check)
 %
 % Inspired by: Bullington 1957, Bell Syst. Tech. J.)
 %
+% Ex:
+%    OCCLFSPL1('demo')
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Sep-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 19-Sep-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 %% NB: Function recursively checks itself exactly once; private input
 %% `recursive check` is defaulted to true and flipped to false in singular
@@ -166,7 +169,7 @@ if recursive_check
     reverse_z = flipud(z);
     plt = false;
     recursive_check = false;
-    reverse_ct = occlfspl(reverse_z, tz, crat, plt, recursive_check);
+    reverse_ct = occlfspl1(reverse_z, tz, crat, plt, recursive_check);
     if ct ~= reverse_ct
         error('Swapping source-receiver produced different results')
 
@@ -276,4 +279,4 @@ H11S1 = load('HTHH_2_H11S1_elevation_matrix.mat');
 z = H11S1.z;
 tz = -1000;
 crat = 0.6;
-[ct, OCCL] = occlfspl(z, tz, crat, true);
+[ct, OCCL] = occlfspl1(z, tz, crat, true);
