@@ -1,5 +1,5 @@
-function ct = occlfsl(z, tz, mess)
-% ct = OCCLFSL(z, tz, mess)
+function ct = occlfsl(z, tz, crat, mess)
+% ct = OCCLFSL(z, tz, crat, mess)
 %
 % Tally occlusion based on the concept of free-space loss by incrementing the
 % output count at each Fresnel radii along the path (from source to receiver)
@@ -10,10 +10,15 @@ function ct = occlfsl(z, tz, mess)
 % Occlusion is defined as elevation being greater than test elevation (i.e.,
 % path blocked by seamount).
 %
+%% ATM: does not correct/adjust for in/out of seamount; raw count. Doesn't,
+%% e.g., only increment when going from water to rock (counts each radius
+%% within rock).
+%
 % Input:
 % z        Elevation (depth is negative) matrix with Fresnel "tracks"
 %              as columns and Fresnel radii as rows [m]
 % tz       Test elevation array [m]
+% crat     Clearance ratio
 % mess     Print occlusion message at each radii, useful for understanding
 %              and debugging (def: false)
 %
@@ -30,10 +35,11 @@ function ct = occlfsl(z, tz, mess)
 %          NaN   -150  -125  -150   NaN
 %          NaN    NaN  -150   NaN   NaN];
 %    tz = -120;
+%    crat = 0.6;
 %    surf(z); set(gca, 'YDir', 'reverse'); xlabel('Radii width'); xticks([1:5])
 %    ylabel('Radii number'); zlabel('Elevation [m]'); yticks([1:6]); hold on
 %    surf(repmat(tz, size(z))); colormap(winter); hold off
-%    ct = OCCLFSL(z, tz, true)
+%    ct = OCCLFSL(z, tz, crat, true)
 %
 % Ex2: (shows how contiguity matters; test depth is plane at -120 m)
 %    z = [-150   -150  -150  -150  -150  -150  -150
@@ -43,10 +49,11 @@ function ct = occlfsl(z, tz, mess)
 %         -125   -125  -150  -150  -125  -100  -100
 %         -150   -150  -150  -150  -125  -125  -125];
 %    tz = -120;
+%    crat = 0.6;
 %    surf(z); set(gca, 'YDir', 'reverse'); xlabel('Radii width'); xticks([1:7])
 %    ylabel('Radii number'); zlabel('Elevation [m]'); yticks([1:6]); hold on
 %    surf(repmat(tz, size(z))); colormap(winter); hold off
-%    ct = OCCLFSL(z, tz, true)
+%    ct = OCCLFSL(z, tz, crat, true)
 %
 % Explanation1: The first row is clear because it only has a single point within
 % the Fresnel radius (NaNs are ignored), and it is below (deeper than) the test
@@ -85,19 +92,15 @@ end
 %% RECURSIVE.
 %% ___________________________________________________________________________ %%
 
+defval('crat', 0.6)
 defval('mess', false)
 
 % Number of Fresnel radii same as number of points along great-circle path
 % (running from source to receiver).
 num_fr_rad = size(z, 1);
 
-% Initialize output Clarence counter.
+% Initialize output count.
 ct = 0;
-
-% Define free-space loss threshold -- if the contiguous clearance at any slice
-% along path is less than 0.6 the width of the first Fresnel zone the path is
-% occluded.
-clearance_ratio = 0.6;
 
 % Loop over the rows (going down matrix, along Fresnel "tracks," inspecting each
 % Fresnel radii).
@@ -149,7 +152,7 @@ for i = 1:size(z, 1)
         % exceeds the threshold -- this loop short circuits at the first chance
         % that condition is met. That means it may not compute the full
         % contiguous-clearance factor along the full width.
-        if clearance_width / fz_width > clearance_ratio
+        if clearance_width / fz_width >= crat
             if mess; fprintf('unoccluded\n'); end
             break
 
