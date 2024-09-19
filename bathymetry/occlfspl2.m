@@ -1,8 +1,11 @@
 function  [ct, lh_OCCL, rh_OCCL, ax] = occlfspl2(z, tz, crat, plt, recursive_check)
 % [ct, lh_OCCL, rh_OCCL, ax] = OCCLFSPL2(z, tz, crat, plt)
 %
-% Occlusive Free-Space Path Loss: Two-Sided
-% (occlusion to left or right each adds 0.5 to count)
+% % Occlusive Free-Space Path Loss: Two-Sided
+%
+% Fresnel radii left/right (up/down) of LoS (great-circle path; middle column of
+% depth matrix) are independently checked and occlusion on either adds 0.5 to
+% total occlusion count.
 %
 % Input:
 % tbd
