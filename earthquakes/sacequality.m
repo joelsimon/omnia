@@ -1,5 +1,5 @@
-function [iseq, cf, h1, h2] = sacequality(sac1, sac2, names, mess, excl)
-% [iseq, cf, h1, h2] = SACEQUALITY(sac1, sac2, names, mess, excl)
+function [iseq, cf, h1, h2, x1, x2] = sacequality(sac1, sac2, names, mess, excl)
+% [iseq, cf, h1, h2, x1, x2] = SACEQUALITY(sac1, sac2, names, mess, excl)
 %
 % Compare two SAC files.
 %
@@ -17,6 +17,7 @@ function [iseq, cf, h1, h2] = sacequality(sac1, sac2, names, mess, excl)
 %             alphanumeric header fields: empty, or "[char1]|[char2]"
 %             float32 header fields: empty, or order-of-magnitude difference
 % h1,2        SAC headers corresponding to sac1,2
+% x1,2        SAC time-series data corresponding to sac1,2
 %
 % Ex1:
 %    sac1 = '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac';
@@ -26,7 +27,7 @@ function [iseq, cf, h1, h2] = sacequality(sac1, sac2, names, mess, excl)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 01-Sep-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 25-Sep-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 % Defaults.
 defval('names', sacfieldnames)
