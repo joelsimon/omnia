@@ -1,5 +1,5 @@
-function rad = occlrad(z, tz)
-% rad = OCCLRAD(z, tz)
+function rad = occlrad(z, tz, crat)
+% rad = OCCLRAD(z, tz, crat)
 %
 % <placeholder: header coming>
 %
@@ -16,6 +16,7 @@ function rad = occlrad(z, tz)
 % z        Elevation (depth is negative) matrix with Fresnel "tracks"
 %              as columns and Fresnel radii as rows [m]
 % tz       SINGLE test elevation [m]
+% crat     ...<clearance ratio> (def: 0.6)
 %
 % Output:
 % rad      Normalized occlusion (0 is free space, 1 completely occluded) at
@@ -43,6 +44,8 @@ function rad = occlrad(z, tz)
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 25-Jul-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+
+defval('crat', 0.6)
 
 if length(tz) > 1
     error('Need to loop externally or refactor to make recursive for multiple test depth')
@@ -75,4 +78,8 @@ for i = 1:size(z, 1)
     rad(i) = sum(occl) / length(occl);
 
 end
-rad = rad';
+
+% In occlfspl* `crat` is a clearance ratio. Here, `orad` is an occlusion ratio
+% (the complement; 60% clear is 40% occluded).
+orat = 1 - crat;
+rad = sum(rad > orat);
