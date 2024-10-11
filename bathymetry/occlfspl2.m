@@ -147,6 +147,12 @@ for i = 1:num_fr_rad
     % Check if this specific radius is occluded.
     [occl(i), H(i), H0(i)] = is_occluded(fr_rad, tz, crat);
 
+    if occl(i)
+        ct = ct + 1;
+
+    end
+    continue
+
     if ~occl(i)
         % Fresnel radius not occluded.
         if prev_occl

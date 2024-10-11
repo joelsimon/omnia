@@ -108,6 +108,12 @@ for i = 1:num_fr_rad
     [lh_occl(i), lh_H(i), lh_H0(i)] = is_occluded(lh_rad_incl_nan, tz, crat);
     [rh_occl(i), rh_H(i), rh_H0(i)] = is_occluded(rh_rad_incl_nan, tz, crat);
 
+    if lh_occl(i) || rh_occl(i)
+        ct = ct + 1;
+
+    end
+    continue
+
     if ~lh_occl(i) && ~rh_occl(i)
         % Neither radius occluded.
         if prev_occl
