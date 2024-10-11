@@ -243,11 +243,11 @@ end
 % as a ratio of total length of Fresnel radius at this point along the great
 % circle path, then this radius is considered occluded (suffering free-space
 % path loss).
-if H / H0 < crat
-    occl = true;
+if H / H0 > crat
+    occl = false;
 
 else
-    occl = false;
+    occl = true;
 
 end
 
