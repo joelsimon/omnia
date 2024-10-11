@@ -27,8 +27,6 @@ function perc = occlperc(z, tz, dummy) % see dummy* note below
 % dummy note*: this variable is unused; here only to match input list-length
 % of occlfspl*
 
-fprintf('%s\n', mfilename)
-
 % Must convert test depths to rows so that ">" comparison works as expected for matrix.
 trow = true;
 if ~isrow(tz)
