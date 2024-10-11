@@ -1,6 +1,10 @@
 function  [ct, OCCL] = occlfspl1(z, tz, crat, plt, recursive_check)
 % [ct, OCCL] = OCCLFSPL1(z, tz, crat, plt)
 %
+% !! WARNING: Hacky edit to check output of counting all occluding radii (and not worrying
+% !! WARNING: about if previous was occluded)...this completely changes the structure of
+% !! WARNING: this code and break, e.g., OCCL.beg/end structs')
+%
 % Occlusive Free-Space Path Loss: One-Sided
 %
 % If either Fresnel radius left/right (up/down) of LoS (great-circle path;
@@ -108,11 +112,13 @@ for i = 1:num_fr_rad
     [lh_occl(i), lh_H(i), lh_H0(i)] = is_occluded(lh_rad_incl_nan, tz, crat);
     [rh_occl(i), rh_H(i), rh_H0(i)] = is_occluded(rh_rad_incl_nan, tz, crat);
 
+    %% !! WARNING: hacky edit
     if lh_occl(i) || rh_occl(i)
         ct = ct + 1;
 
     end
     continue
+    %% !! WARNING: hacky edit
 
     if ~lh_occl(i) && ~rh_occl(i)
         % Neither radius occluded.

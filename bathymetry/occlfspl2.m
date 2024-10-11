@@ -1,7 +1,11 @@
 function  [ct, lh_OCCL, rh_OCCL, ax] = occlfspl2(z, tz, crat, plt, recursive_check)
 % [ct, lh_OCCL, rh_OCCL, ax] = OCCLFSPL2(z, tz, crat, plt)
 %
-% % Occlusive Free-Space Path Loss: Two-Sided
+% !! WARNING: Hacky edit to check output of counting all occluding radii (and not worrying
+% !! WARNING: about if previous was occluded)...this completely changes the structure of
+% !! WARNING: this code and break, e.g., OCCL.beg/end structs')
+%
+% Occlusive Free-Space Path Loss: Two-Sided
 %
 % Fresnel radii left/right (up/down) of LoS (great-circle path; middle column of
 % depth matrix) are independently checked and occlusion on either adds 0.5 to
@@ -17,7 +21,7 @@ function  [ct, lh_OCCL, rh_OCCL, ax] = occlfspl2(z, tz, crat, plt, recursive_che
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Sep-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 11-Oct-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 %% NB: Function recursively checks itself exactly once; private input
 %% `recursive check` is defaulted to true and flipped to false in singular
@@ -147,12 +151,14 @@ for i = 1:num_fr_rad
     % Check if this specific radius is occluded.
     [occl(i), H(i), H0(i)] = is_occluded(fr_rad, tz, crat);
 
+    %% !! WARNING: hacky edit
     if occl(i)
-        ct = ct + 1;
+        ct = ct + 0.5;
 
     end
     continue
-
+    %% !! WARNING: hacky edit
+    
     if ~occl(i)
         % Fresnel radius not occluded.
         if prev_occl
