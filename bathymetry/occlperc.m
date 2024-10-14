@@ -1,4 +1,4 @@
-function perc = occlperc(z, tz, dummy) % see dummy* note below
+function perc = occlperc(z, tz, dummy1, dummy2) % see dummy* note below
 % perc = OCCLPERC(z, tz)
 %
 % Compute occlusion percentage where occlusion is defined to be any elevation
@@ -22,10 +22,10 @@ function perc = occlperc(z, tz, dummy) % see dummy* note below
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 19-Sep-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 14-Oct-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
-% dummy note*: this variable is unused; here only to match input list-length
-% of occlfspl*
+% dummy note*: unused variables; defined to match input list-length of
+% occlfspl* for anon funcs
 
 % Must convert test depths to rows so that ">" comparison works as expected for matrix.
 trow = true;
