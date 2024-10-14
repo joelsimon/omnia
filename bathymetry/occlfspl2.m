@@ -1,11 +1,7 @@
-function  [ct, lh_OCCL, rh_OCCL, ax] = occlfspl2(z, tz, crat, plt, recursive_check)
-% [ct, lh_OCCL, rh_OCCL, ax] = OCCLFSPL2(z, tz, crat, plt)
+function  [ct, lh_OCCL, rh_OCCL, ax] = occlfspl2(z, tz, crat, prev, plt, recursive_check)  % private final var
+% [ct, lh_OCCL, rh_OCCL, ax] = OCCLFSPL2(z, tz, crat, prev, plt)
 %
-% !! WARNING: Hacky edit to check output of counting all occluding radii (and not worrying
-% !! WARNING: about if previous was occluded)...this completely changes the structure of
-% !! WARNING: this code and break, e.g., OCCL.beg/end structs')
-%
-% Occlusive Free-Space Path Loss: Two-Sided
+% Occlusive Free-Space Path Loss: "Two-Sided"
 %
 % Fresnel radii left/right (up/down) of LoS (great-circle path; middle column of
 % depth matrix) are independently checked and occlusion on either adds 0.5 to
@@ -13,6 +9,8 @@ function  [ct, lh_OCCL, rh_OCCL, ax] = occlfspl2(z, tz, crat, plt, recursive_che
 %
 % Input:
 % tbd
+% prev      true: require previously unoccluded to increment counter
+%           false: tally each occluding radii, regardless of previous status (def)
 %
 % Output:
 % tbd
@@ -21,11 +19,7 @@ function  [ct, lh_OCCL, rh_OCCL, ax] = occlfspl2(z, tz, crat, plt, recursive_che
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 11-Oct-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
-
-%% NB: Function recursively checks itself exactly once; private input
-%% `recursive check` is defaulted to true and flipped to false in singular
-%% recursion call.
+% Last modified: 14-Oct-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 % Demo it, maybe.
 if strcmp(z, 'demo');
@@ -36,6 +30,7 @@ end
 
 % Defaults
 defval('crat', 0.6)
+defval('prev', false)
 defval('plt', false)
 defval('recursive_check', true)
 
@@ -82,8 +77,8 @@ if crat == 0
 end
 
 % Count occlusion!
-lh_OCCL = main(lh_fr_rad, tz, crat);
-rh_OCCL = main(rh_fr_rad, tz, crat);
+lh_OCCL = main(lh_fr_rad, tz, crat, prev);
+rh_OCCL = main(rh_fr_rad, tz, crat, prev);
 ct = lh_OCCL.ct + rh_OCCL.ct;
 
 % Verify radii symmetry of input.
@@ -102,7 +97,7 @@ if recursive_check
     reverse_z = flipud(z);
     plt = false;
     recursive_check = false;
-    reverse_ct = occlfspl2(reverse_z, tz, crat, plt, recursive_check);
+    reverse_ct = occlfspl2(reverse_z, tz, crat, prev, plt, recursive_check);
     if ct ~= reverse_ct
         error('Swapping source-receiver produced different results')
 
@@ -114,7 +109,7 @@ end
 %% Subfuncs
 %% ___________________________________________________________________________ %%
 
-function OCCL = main(fr_radii, tz, crat)
+function OCCL = main(fr_radii, tz, crat, prev)
 
 % Fresnel radii (fish spines) are rows and "tracks" (parallel to great-circle
 % path) are columns of elevation matrix.
@@ -151,42 +146,43 @@ for i = 1:num_fr_rad
     % Check if this specific radius is occluded.
     [occl(i), H(i), H0(i)] = is_occluded(fr_rad, tz, crat);
 
-    %% !! WARNING: hacky edit
-    if occl(i)
-        ct = ct + 0.5;
-
-    end
-    continue
-    %% !! WARNING: hacky edit
-    
-    if ~occl(i)
-        % Fresnel radius not occluded.
-        if prev_occl
-            % I previously occluded, set "end" occlusion index here
-            % (transition out of seamount back into open ocean water).
-            occl_end = [occl_end ; i];
-
-        end
-        % Set "previous" flag to unoccluded, for next loop.
-        prev_occl = false;
-
-    else
-        % Fresnel radius occluded.
-        if ~prev_occl
-            % If previously unoccluded, increment occluder counter and set "begin" occlusion
-            % index here (transition from open ocean water to seamount).
+    if ~prev
+        if occl(i)
             ct = ct + 0.5;
             occl_beg = [occl_beg ; i];
-
-        end
-        % Set "previous" flag to occluded, for next loop.
-        prev_occl = true;
-
-        if i == num_fr_rad
-            % If still occluded at end of path (how? MERMAID in seamount?...) just set
-            % begin/end index equal consistency in array size.
             occl_end = [occl_end ; i];
 
+        end
+    else
+        if ~occl(i)
+            % Fresnel radius not occluded.
+            if prev_occl
+                % I previously occluded, set "end" occlusion index here
+                % (transition out of seamount back into open ocean water).
+                occl_end = [occl_end ; i];
+
+            end
+            % Set "previous" flag to unoccluded, for next loop.
+            prev_occl = false;
+
+        else
+            % Fresnel radius occluded.
+            if ~prev_occl
+                % If previously unoccluded, increment occluder counter and set "begin" occlusion
+                % index here (transition from open ocean water to seamount).
+                ct = ct + 0.5;
+                occl_beg = [occl_beg ; i];
+
+            end
+            % Set "previous" flag to occluded, for next loop.
+            prev_occl = true;
+
+            if i == num_fr_rad
+                % If still occluded at end of path (how? MERMAID in seamount?...) just set
+                % begin/end index equal consistency in array size.
+                occl_end = [occl_end ; i];
+
+            end
         end
     end
 end
@@ -302,6 +298,7 @@ function [ct, OCCL] = run_demo
 
 H11S1 = load('HTHH_2_H11S1_elevation_matrix.mat');
 z = H11S1.z;
-tz = -1000;
-crat = 1.0;
-ct = occlfspl2(z, tz, crat, true);
+tz = -1385;
+crat = 0.6;
+prev = false;
+ct = occlfspl2(z, tz, crat, prev, true);
