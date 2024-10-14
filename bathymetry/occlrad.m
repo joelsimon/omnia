@@ -1,5 +1,5 @@
-function rad = occlrad(z, tz, crat)
-% rad = OCCLRAD(z, tz, crat)
+function [ct, rad] = occlrad(z, tz, crat, dummy) % see dummy* note below
+% [ct, rad] = OCCLRAD(z, tz, crat)
 %
 % <placeholder: header coming>
 %
@@ -18,6 +18,15 @@ function rad = occlrad(z, tz, crat)
 % tz       SINGLE test elevation [m]
 % crat     ...<clearance ratio> (def: 0.6)
 %
+%
+% Author: Joel D. Simon
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 14-Oct-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+
+% dummy note*: unused variable; defined to match input list-length of occlfspl*
+% for anon funcs
+
+%% SPLIT THIS CHUNK OF HEADER OUT -- NO LONGER TRUE; MODIFIED WHAT OCCLRAD RETURNS
 % Output:
 % rad      Normalized occlusion (0 is free space, 1 completely occluded) at
 %              each Fresnel radius
@@ -40,10 +49,7 @@ function rad = occlrad(z, tz, crat)
 %         -150   -150  -150  -150  -125  -125  -125];
 %    tz = -120;
 %    rad = OCCLRAD(z, tz);
-%
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 25-Jul-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+%% SPLIT THIS CHUNK OF HEADER OUT -- NO LONGER TRUE; MODIFIED WHAT OCCLRAD RETURNS
 
 defval('crat', 0.6)
 
@@ -82,4 +88,4 @@ end
 % In occlfspl* `crat` is a clearance ratio. Here, `orad` is an occlusion ratio
 % (the complement; 60% clear is 40% occluded).
 orat = 1 - crat;
-rad = sum(rad > orat);
+ct = sum(rad > orat);
