@@ -6,7 +6,7 @@ function fr = fresnelradius(r, R, v, f);
 % Input:
 % r       Distance from source to compute Fresnel radius [m]
 % R       Epicentral distance [m]
-% v       Velocity  [m]
+% v       Velocity  [m/s]
 % f       Frequency [Hz]
 %
 % Output:
@@ -26,10 +26,10 @@ function fr = fresnelradius(r, R, v, f);
 %
 % Citation: Skarsoulis & Cornuelle (2004), JASA, 10.1121/1.1753292.
 %           (also see Bulltingon (1957), BELL SYST TECH J)
-
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 04-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 23-Oct-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 % Sanity.
 if any(r > R)
