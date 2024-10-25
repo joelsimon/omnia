@@ -21,7 +21,7 @@ function  [ct, OCCL] = occlfspl1(z, tz, crat, prev, plt, recursive_check) % priv
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 14-Oct-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 25-Oct-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 %% NB: Function recursively checks itself exactly once; private input
 %% `recursive check` is defaulted to true and flipped to false in singular
@@ -108,8 +108,10 @@ for i = 1:num_fr_rad
     % increment counter) to avoid an early exit via `continue`; also may want to
     % individually know right/left diffs at some point. "lh" = left hand;
     % "rh" = right hand (e.g., west/east or south/north).
-    [lh_occl(i), lh_H(i), lh_H0(i)] = is_occluded(lh_rad_incl_nan, tz, crat);
-    [rh_occl(i), rh_H(i), rh_H0(i)] = is_occluded(rh_rad_incl_nan, tz, crat);
+    [lh_occl(i), lh_H(i), lh_H0(i)] = ...
+        fresnelradius_occluded(lh_rad_incl_nan, tz, crat);
+    [rh_occl(i), rh_H(i), rh_H0(i)] = ...
+        fresnelradius_occluded(rh_rad_incl_nan, tz, crat);
 
     if ~prev
         if lh_occl(i) || rh_occl(i)
@@ -188,70 +190,6 @@ if recursive_check
 end
 
 %% ___________________________________________________________________________ %%
-
-function [occl, H, H0] = is_occluded(fr_rad, tz, crat)
-% IS_OCCLUDED returns true if this specific Fresnel radius is occluded, as well
-% as the index of the first occlusion (a length from line-of-sight heading along
-% Fresnel radius toward edge of first Fresnel zone) and full Fresnel radial
-% length.
-
-% Chop off any NaNs in this radius (e.g., at source/receiver there may only be a
-% single finite elevation; all points are finite only near midpoint of
-% great-circle path, where Fresnel radius is maximized).
-fr_rad = fr_rad(~isnan(fr_rad));
-
-% Radial length of the first Fresnel zone at this point along the path --
-% only compute this after chopping off NaNs. Using Bullington 1975 jargon for
-% distances here.
-H0 = length(fr_rad);
-
-% Yes/no vector of "occluded or not" where occlusion is defined as
-% elevation being greater than test depth (i.e., you ran into a seamount
-% as opposed to transiting free-space [clear-path through water]).
-occl_idx = fr_rad > tz;
-
-% The clearance is defined as the distance from line-of-sight to first
-% occluder (how far off great-circle path can you look east/west before
-% bumping into an occluder).
-H = find(occl_idx, 1);
-
-% Exit early on two-edge cases: entire radius completely (un)occluded (makes the
-% ratio H/H0 break).
-if all(occl_idx)
-    occl = true;
-    return
-
-end
-if isempty(H)
-    occl = false;
-    H = NaN; % reset to NaN for output indexing purposes
-    return
-
-end
-
-% Exit early if crat = 0 (line-of-sight only consideration), and the first
-% index in the radius (starts at great-circle and extends outward) is
-% occluded.
-if crat == 0 && H == 1
-    occl = true;
-    return
-
-end
-
-% If first occluder too close to line-of-sight (great-circle path), represented
-% as a ratio of total length of Fresnel radius at this point along the great
-% circle path, then this radius is considered occluded (suffering free-space
-% path loss).
-if H / H0 > crat
-    occl = false;
-
-else
-    occl = true;
-
-end
-
-%% ___________________________________________________________________________ %%
-
 function ax = plotit(z, tz, crat, OCCL)
 
 num_fr_rad = size(z, 1);
