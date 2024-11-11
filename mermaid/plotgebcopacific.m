@@ -24,7 +24,7 @@ c11 = [120 80];
 cmn = [300 -60];
 
 % Color bar first...
-[F.cb, F.cm] = cax2dem(cax, 'hor');
+[F.cb, F.cm] = cax2dem(cax);
 
 % then map
 F.bathy = imagefnan(c11, cmn, z, F.cm, cax);
@@ -32,4 +32,4 @@ F.bathy = imagefnan(c11, cmn, z, F.cm, cax);
 % then colorbar again for adequate rendering
 [F.cb, C. cm] = cax2dem(cax);
 F.cb.Location = 'EastOutside';
-F.cb.Label.String = 'GEBCO Elevation (m)';
+F.cb.Label.String = 'GEBCO Elevation [m]';
