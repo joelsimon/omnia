@@ -18,8 +18,7 @@ function reviewall(writecp, floatnum, procdir, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Sep-2024, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
-% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
+% Last modified: 13-Nov-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 % Defaults.
 defval('writecp', false)
@@ -29,6 +28,7 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 
 skip_french = true;
 skip_0100 = true;
+skip_mag3 = true;
 
 % Switch the .pdf viewer depending on the platform.
 switch computer
@@ -85,6 +85,7 @@ num_sac = length(sac);
 num_rev = num_sac;
 for i = 1:num_sac
     fprintf('Remaining SAC to be reviewed: %3i\n', num_rev)
+    num_rev = num_rev - 1;
 
     % Skip review of REQ
     if contains(strippath(sac{i}), 'REQ')
@@ -93,16 +94,19 @@ for i = 1:num_sac
 
     end
 
+    if skip_mag3 && EQ_mag3(sac{i}, evtdir)
+        warning('Skipping %s (< mag. 3, or empty)\n', strippath(sac{i}))
+        continue
+
+    end
     try
         reviewevt(sac{i}, false, evtdir, viewr);
 
     catch
         fprintf('Skipping...%s\n', strippath(sac{i}))
-        fail = [fail; i];
+            fail = [fail; i];
 
     end
-    num_rev = num_rev - 1;
-
 end
 clc
 fprintf('Manual review complete...\n')
@@ -143,3 +147,23 @@ fid = fopen(fullfile(revevt_dir, 'reviewall_fail.txt'), 'w');
 fprintf(fid, '%s\n', failsac{:});
 fclose(fid);
 fprintf('\nAll done.\n')
+
+%% ___________________________________________________________________________ %%
+
+function mag3 = EQ_mag3(sac, evtdir)
+% Returns mag3=true if EQ(1) less than mag. 3 and greater than 10 deg.
+
+mag3 = false;
+[~, EQ] = getevt(sac, evtdir);
+if isempty(EQ)
+    mag3 = true;
+    return
+
+end
+
+mag = EQ(1).PreferredMagnitude.Value;
+dist = EQ(1).TaupTimes(1).distance;
+if mag < 3 && dist > 10
+    mag3 = true;
+
+end
