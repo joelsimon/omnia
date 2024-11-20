@@ -22,9 +22,11 @@ function [Lp2, Lp1] = spldist(r2, p, p0, r1, propto)
 %      NIST Special Publication 811 2008 Edition
 %      Ambler Thompson and Barry N. Taylor
 %
-% Ex: RMS=2 Pa measured at 100 km, adjusted to 500, 1000, 1500 km
+% Ex: RMS = 2 Pa measured at 100 km, adjusted to 500, 1000, 1500 km
 %    r2 = [500:500:1500]*1e3; p = 2; p0 = 1; r1 = 100e3; propto = 2;
 %    [Lp2, Lp1] = SPLDIST(r2, p, p0, r1, propto)
+%
+% See spldist.pdf for derivation.
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
@@ -36,6 +38,6 @@ switch propto
     Lp2 = Lp1 + 20*log10(r1./r2);
 
   case 2
-    Lp2 = Lp1 + 20*log10(sqrt(r1./r2));
+    Lp2 = Lp1 + 20*log10(sqrt(r1)./sqrt(r2));
 
 end
