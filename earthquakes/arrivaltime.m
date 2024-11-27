@@ -1,5 +1,5 @@
-function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
-% tt = ARRIVALTIME(h, evtdate, [evla evlo], mod, evdp, phases, pt0)
+function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0, tadj)
+% tt = ARRIVALTIME(h, evtdate, [evla evlo], mod, evdp, phases, pt0, tadj)
 %
 % ARRIVALTIME returns the theoretical arrival time(s) of seismic phase(s) in a
 % seismogram.
@@ -13,14 +13,15 @@ function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 %             written by Qin Li, dated November 2002.
 %
 % Input:
-% h             SAC header from readsac.m (FJS function)
+% h             SAC header from readsac.m
 % evtdate       Earthquake rupture time in datetime format in UTC timezone
 % [evla evlo]*  Event location as [latitude longitude] (def: [h.EVLA h.EVLO])
 % mod           TauP velocity model (def: 'ak135')
 % evdp*         Event depth in km (def: h.EVDP)
 % phases        Comma separated phase list (def: 'P')
-% pt0           Time in seconds assigned to first sample (def: 0 s)
-%                  (another good choice: h.B, see example 2)
+% pt0           Time in seconds assigned to first sample of waveform
+%                   (def: 0 s; another good choice: h.B, see example 2)
+% tadj          Manual travel-time adjustment (def: 0 s)
 %
 % * may be left empty if SAC header is populated with event info
 %
@@ -33,7 +34,8 @@ function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 %   .arsecs: time in seconds at sample nearest to the .truearsecs
 %   .arsamp: sample index whose corresponding time is nearest .truearsecs
 %   .model: velocity model use
-%   .pt0: time in seconds assigned to first sample
+%   .pt0: time in seconds assigned to first sample of waveform x-axis
+%   .timeadj: manual time adjustment in seconds applied to travel time (Ex3)
 %
 % Ex1: (load example MERMAID12 seismogram and calculate arrival time)
 %    sacf = 'm12.20130416T105310.sac';
@@ -67,9 +69,11 @@ function tt = arrivaltime(h, evtdate, evtloc, mod, evdp, phases, pt0)
 %    plot(xaxB, x);
 %    vertline(ttB.arsecs); title('pt0 = -120.6810 s (seconds since reference time)'); shg
 %
+% Ex3: (need to supply time-adjustment example...)
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 03-Jul-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 26-Nov-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 % Defaults.
 defval('evtloc', [h.EVLA h.EVLO])
@@ -77,6 +81,7 @@ defval('evdp', h.EVDP)
 defval('mod', 'ak135')
 defval('phases', 'P')
 defval('pt0', 0)
+defval('tadj', 0)
 
 % Concatenate station location from header.
 staloc = [h.STLA h.STLO];
@@ -109,6 +114,15 @@ if isempty(tt)
 
 end
 
+% Apply any manual travel-time corrections (e.g., for path through rock before
+% water; this as opposed to separate `bathtime` later).  Time correction is
+% additive, so if you want the "true" arrival to come earlier than the
+% "theoretical" one of tt.time, the correction should be negative.
+for i = 1:length(tt)
+    tt(i).time = tt(i).time + tadj;
+
+end
+
 % Preallocate new structure fields to be filled, maybe.
 [tt(:).arrivaldatetime] = deal([]);
 [tt(:).truearsecs] = deal([]);
@@ -116,6 +130,7 @@ end
 [tt(:).arsamp] = deal([]);
 [tt(:).model] = deal(mod);
 [tt(:).pt0] = deal(pt0);
+[tt(:).timeadj] = deal(tadj);
 
 % Set up x-axis to map arrival time to nearest sample.
 xax = xaxis(h.NPTS, h.DELTA, pt0);
