@@ -63,3 +63,7 @@ rmpath(genpath(fullfile(getenv('IRISFETCH'), '.git')))
 % Any others paths, specific to JDS
 addpath('~/programs/offline/misc')
 addpath(fullfile(getenv('MERMAID'), 'iris', 'scripts'))
+
+% For Acoustics Toolbox
+%addpath(genpath(getenv('AT')))
+
