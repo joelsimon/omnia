@@ -61,7 +61,7 @@ javaaddpath(fullfile(getenv('IRISFETCH'), 'IRIS-WS-2.0.18.jar'))
 rmpath(genpath(fullfile(getenv('IRISFETCH'), '.git')))
 
 % Any others paths, specific to JDS
-addpath('~/programs/offline/misc')
+%addpath('~/programs/offline/misc')
 addpath(fullfile(getenv('MERMAID'), 'iris', 'scripts'))
 
 % For Acoustics Toolbox
