@@ -19,7 +19,7 @@ function [ilat, ilon, warn, warn_str] = interpmerloc(mer_struct, ilocdate, plt)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 29-Apr-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 20-Dec-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 % Default input.
 defval('plt', false)
@@ -45,6 +45,22 @@ if ~isbetween(ilocdate, mer_struct.date(1), mer_struct.date(end))
     return
 
 end
+
+% Remove NaNs, as can occur in /eso_locations/ (LOG error, I guess?).
+nan_idx = find(isnat(mer_struct.date));
+mer_struct.date(nan_idx) = [];
+mer_struct.lat(nan_idx) = [];
+mer_struct.lon(nan_idx) = [];
+
+nan_idx = find(isnan(mer_struct.lat));
+mer_struct.date(nan_idx) = [];
+mer_struct.lat(nan_idx) = [];
+mer_struct.lon(nan_idx) = [];
+
+nan_idx = find(isnan(mer_struct.lon));
+mer_struct.date(nan_idx) = [];
+mer_struct.lat(nan_idx) = [];
+mer_struct.lon(nan_idx) = [];
 
 % Remove redundant dates so that interp1.m does not get flustered.
 [~, uniq_idx] = unique(mer_struct.date);
