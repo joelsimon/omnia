@@ -7,13 +7,12 @@ function countsac(procdir)
 % procdir      Processed directory (def: $MERMAID/processed/)
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Feb-2024, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 31-Jan-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 
-% Find all folders matching, e.g., "452.020-P-06" or "452.120-S-0094"
-D = skipdotdir(dir(fullfile(procdir)));
+D = skipdotdir(dir(fullfile(strip(procdir))));
 proc_dirs_regexp = regexp(fullfiledir(D), '.*[0-9]-[A-Z]-[0-9].*');
 sac_dirs_idx = find(~cellfun(@isempty, proc_dirs_regexp));
 sac_dirs = fullfiledir(D(sac_dirs_idx));
