@@ -4,11 +4,12 @@
 #
 # Author: Joel D. Simon
 # Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 21-Nov-2023, Darwin Kernel Version 18.7.0
+# Last modified: 26-Feb-2025, Darwin Kernel Version 23.6.0
 
 # Loop over all MERMAID subdirectories
 # NB, the final forward slash ("/") is required here
 proc_dir=$MERMAID/processed/
+#proc_dir=$MERMAID/processed_automaid-v4/
 #proc_dir=$MERMAID/processed_jamstec/
 #proc_dir=$MERMAID/processed_sustech/
 for mer_dir in $( ls -1d $proc_dir/*/ ); do
@@ -21,8 +22,8 @@ for mer_dir in $( ls -1d $proc_dir/*/ ); do
     fi
 
     # Grep all "acq" lines from the LOG files
-    grep --no-filename "acq" $mer_dir/**/*.LOG.h >! $acq_log
-
+    grep --no-filename "acq" $mer_dir/**/*.LOG.h >! $acq_log # for processed*/
+    #grep --no-filename "acq" $mer_dir/**/*.CYCLE.h >! $acq_log # for processed*_automaid-v4/
     # Lock and print log filename
     chmod -w $acq_log
     printf "Wrote %s\n" $acq_log
