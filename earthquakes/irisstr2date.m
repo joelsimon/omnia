@@ -7,7 +7,7 @@ function tdate = irisstr2date(tstr, precision)
 % Input:
 % tstr       Datestr formatted for irisFetch
 % precision  Specify 1 or 2 for datetime format
-%            1:'uuuu-MM-dd HH:mm:ss.SSS'
+%            1:'uuuu-MM-dd HH:mm:ss.SSS' (def)
 %            2:'uuuu-MM-dd HH:mm:ss'
 %
 % Output:
