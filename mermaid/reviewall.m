@@ -77,13 +77,13 @@ if skip_0100
 
 end
 
-% Loop over in sequential (time) order.
+% Loop backwards in time (most recent first).
 fail = [];
 [~, sort_idx] = sort(strippath(sac));
 sac = sac(sort_idx);
 num_sac = length(sac);
 num_rev = num_sac;
-for i = 1:num_sac
+for i = num_sac:-1:1
     fprintf('Remaining SAC to be reviewed: %3i\n', num_rev)
     num_rev = num_rev - 1;
 
