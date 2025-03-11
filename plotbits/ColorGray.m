@@ -11,5 +11,3 @@ function col = ColorGray
 % Last modified: 10-Mar-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 col = [0.6 0.6 0.6];
-   
-    
