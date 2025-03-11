@@ -58,7 +58,7 @@ function [fzlat, fzlon, gcidx, gcdist, fr, deg, c11, cmn] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 20-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 11-Mar-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 % NB: There are various ways to speedup this up (e.g., `cumdist` outside loop and
 % computing all `fresnelradius` in one go; merging azimuth computation into main
@@ -98,29 +98,15 @@ fprintf('            Wavelength: %.3f km (%.1f wavelengths per grid interval)\n'
 
 % Compute azimuth (degrees) at every point along great circle path.  Each
 % Fresnel radii will be oriented normal to the instantaneous azimuth at that
-% point (picture a fish spine).
-for i = 1:num_fr-1
+% point (picture a fish spine). Fresnel radius goes to zero at endpoints so
+% azimuth is irrelevant.
+az(1) = NaN;
+az(num_fr) = NaN;
+for i = 2:num_fr-1
     az(i) = azimuth(gclat(i), gclon(i), gclat(i+1), gclon(i+1), 'degrees');
 
 end
 az = az';
-
-% For final azimuth (last point on great circle path), compute back azimuth and
-% then convert that to an azimuth by taking the back azimuth (back azimuth of a
-% back azimuth is an azimuth, right?)
-%
-% https://www.nwcg.gov/course/ffm/location/63-back-azimuth-and-backsighting
-% "A back azimuth is calculated by adding 180 [deg] to the azimuth when the
-%  azimuth is less than 180 [deg], or by subtracting 180 [deg] from the azimuth
-%  if it is more than 180 [deg]."
-baz = azimuth(gclat(num_fr), gclon(num_fr), gclat(num_fr-1), gclon(num_fr-1));
-if baz < 180
-    az(num_fr) = baz + 180;
-
-else
-    az(num_fr) = baz - 180;
-
-end
 
 % Determine number of points along longest Fresnel radii (at midpoint of
 % great-circle) to determine size of output matrix.
