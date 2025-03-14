@@ -1,6 +1,6 @@
-function [fzlat, fzlon, gcidx, gcdist, fr, deg, c11, cmn] = ...
-            fresnelgrid(lat1, lon1, lat2, lon2, vel, freq, deg, plt)
-% [fzlat, fzlon, gcidx, gcdist, fr, deg, c11, cmn] = ...
+function [fzlat, fzlon, gcidx, gcdist, fr, deg, c11, cmn, olat, olon] = ...
+        fresnelgrid(lat1, lon1, lat2, lon2, vel, freq, deg, plt)
+% [fzlat, fzlon, gcidx, gcdist, fr, deg, c11, cmn, olat, olon] = ...
 %     FRESNELGRID(lat1, lon1, lat2, lon2, vel, freq, deg, plt)
 %
 % Compute 2-D (map view; no depth) Fresnel zone for constant-velocity waves
@@ -28,10 +28,8 @@ function [fzlat, fzlon, gcidx, gcdist, fr, deg, c11, cmn] = ...
 % lat2/lon2        Latitude and longitude of receiver [deg]
 % vel              Wave velocity [m/s]
 % freq             Wave frequency [Hz]
-% deg*             Grid resolution (lengths of sides of lat/lon square) [deg]*
+% deg*             Grid resolution (lengths of sides of lat/lon square) [deg]
 % plt              true to plot output (def: false)
-% c11              [lon,lat] at position C(1,1) of output matrices**
-% cmn              [lon,lat] at position C(M,N) of output matrices**
 %
 % Output:
 % fzlat            Latitudes of Fresnel zone [deg]
@@ -42,6 +40,9 @@ function [fzlat, fzlon, gcidx, gcdist, fr, deg, c11, cmn] = ...
 % gcdist           Cumulative distance along great-circle path [deg]
 % fr               Fresnel radii length at every point along great circle [deg]
 % deg*             Actual grid resolution [deg]*
+% c11**            [lon,lat] at position C(1,1) of output matrices
+% cmn**            [lon,lat] at position C(M,N) of output matrices
+% olat/olon***     "Outline" latitude/longitude of full Fresnel zone
 %
 % *Actual grid resolution is dictated by discretization of great circle path and
 %  will be less than requested.
@@ -49,6 +50,8 @@ function [fzlat, fzlon, gcidx, gcdist, fr, deg, c11, cmn] = ...
 % ** NB: C(1,1) (top left) and C(M,N) (bottom right) are in reference to output
 %    matrices and will (probably) not necessarily correspond to geographically
 %    meaningful bounding box locations as drawn on the Earth.
+%
+% ***Each is an Nx2 matrix of maximum [lat_neg lat_pos] at each Fresnel radii.
 %
 % Ex1: (Fresnel zone for 20 s surface wave from Sydney to Portland using 0.25 deg grid)
 %    lat1=-33; lon1=151; lat2=45; lon2=-122; vel=3500; freq=1/20; deg=0.25; plt=true;
@@ -58,7 +61,7 @@ function [fzlat, fzlon, gcidx, gcdist, fr, deg, c11, cmn] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 11-Mar-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 14-Mar-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 % NB: There are various ways to speedup this up (e.g., `cumdist` outside loop and
 % computing all `fresnelradius` in one go; merging azimuth computation into main
@@ -122,6 +125,8 @@ frlat_neg = NaN(npts_max_fr, num_fr);
 frlon_neg = NaN(npts_max_fr, num_fr);
 frlat_pos = NaN(npts_max_fr, num_fr);
 frlon_pos = NaN(npts_max_fr, num_fr);
+olat = NaN(num_fr, 2);
+olon = NaN(num_fr, 2);
 
 % Log index of middle of great-circle path, where Fresnel radius is maximized.
 mid_fr = fx(mididx(1:num_fr), 1);
@@ -165,6 +170,10 @@ for i = 1:num_fr
 
     [lat_pos, lon_pos] = ...
         track1(gclat(i), gclon(i), az(i)+90, arclen_act_deg(end), [], 'degrees', length(arclen_act_deg));
+
+    % Fresnel-zone "outline" is the max/min latitude at each radii.
+    olat(i,:)  = [lat_neg(end) lat_pos(end)];
+    olon(i,:)  = [lon_neg(end) lon_pos(end)];
 
     % Only the maximum radii (midpoint of path) can ever have all indices of output
     % matrices filled (although it think depending on discretization, even that
