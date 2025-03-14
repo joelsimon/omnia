@@ -222,7 +222,7 @@ fzlon = [fliplr(frlon_neg') gclon frlon_pos'];
 % (sub)parallel to great circle.  This is a check to verify equal area (we know
 % Fresnel radii perpendicular to great-circle have constant delta deg spacing;
 % this verifies spacing between neighboring Fresnel radii are similarly spaced
-% spacing set to delta deg).
+% and equal to delta deg).
 ct = 0;
 mind = [];
 maxd = [];
