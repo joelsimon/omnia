@@ -1,8 +1,7 @@
 function tt=taupCurve(model,depth,phase)
-
 % TAUPCURVE calculate travel time curve using TauP toolkit
 %
-% taupTime(model,depth,phase)
+% TAUPCURVE(model,depth,phase)
 %
 % Input arguments:
 %   Model:      Global velocity model. Default is "iasp91".
@@ -35,13 +34,14 @@ function tt=taupCurve(model,depth,phase)
 %   qinli@u.washington.edu
 %   Nov, 2002
 %
-% Last modified by jdsimon@princeton.edu, 28-Feb-2022 in Ver. 2017b
+% Last modified by jdsimon@princeton.edu, 28-Mar-2025 in Ver. 2024a
 
 % JDS changelog
 % *Fix traveltime sort in empty cases
 % *Return sorted by travel time (using longest time for each phase as reference)
 % *Change tt.distance from [0 0] to [0 360] for "*kmps" phases
 % *Edit to return tt structure as opposed to empty
+% *Correc docstring: taupTime(...) -> taupCurve(...)
 
 import edu.sc.seis.TauP.*;
 import java.io.*;
