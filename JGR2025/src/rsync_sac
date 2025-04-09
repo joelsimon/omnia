@@ -1,0 +1,20 @@
+#! /bin/zsh
+#
+# `rsync` all $PROCESSED/**/*.sac from 15-Jan-2022 to $HUNGA/sac/unmerged.
+#
+# In most cases it is appropriate to sync to this unmerged folder, because most
+# floats have two or more SAC files that must be merged in the top-level
+# directory.
+#
+# If it copies a SAC file here from a new float without any existing unmerged
+# (or only a single unmerged SAC in the top-level directory) you must move the
+# new SAC file up to the top-level directory (or move the old single SAC file
+# down to this directory and merge it with the new chunk).
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 01-Feb-2023, Darwin Kernel Version 18.7.0
+
+rsync -av \
+      $MERMAID/20230120_processed/**/*20220115T*sac \
+      $HUNGA/sac/unmerged/
