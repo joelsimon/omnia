@@ -1,0 +1,52 @@
+#! /bin/zsh
+# USAGE:   sac2mergedsac [serial_number] >! $HUNGA/sac/meta/sac2mergedsac_[serial_number].out
+#
+# EXAMPLE: sac2mergedsac   23
+#          sac2mergedsac 0042
+#
+# Merge SAC files.
+#
+# 'serial_number' is the len 2 or 4 char in automaid filenames:
+# 20220115T041444.23_6204AEDB.MER.REQ.RAW.sac   -> serial number =   "23"
+# 20220115T041444.0042_620ACF30.MER.REQ.RAW.sac -> serial_number = "0042"
+#
+# After much playing I found it was best to interpolate all SAC files, regardless
+# of native sampling frequency, to delta = 0.025 (40 Hz), and then merge (and do
+# not decimate back to 20 Hz). I found that even merging all purported 20 Hz
+# (WLT5) data without any interpolation resulted in odd amplitudes of the output
+# (which I can only figure was caused by slight inconsistencies in the various
+# deltas?).  I found it best to upsample (where necessary) to 40 Hz so that there
+# was a clean Nyquist at 10 Hz (no ringing, which can occur near 10 Hz with a 20
+# Hz sampling).  This means that you must always remember to only filter and/or
+# `mermaidtransfer` with a max corner of 10 Hz.
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+# Last modified: 15-Sep-2022, Darwin Kernel Version 18.7.0
+
+# First and only input is serial number
+serial=$1
+
+# Make paths explicit
+sacdir=$HUNGA/sac/
+
+# Delete any existing *.{serial}_*merged.sac
+rm $sacdir/*.${serial}_*.merged.sac
+
+# Keep first filename from float as naming reference
+first_sac=$( ls -1 $sacdir/unmerged/*.${serial}_*.sac | head -1 )
+
+# Remove "REQ.sac" or "WLT5.sac", the final two fields when split on "." delim
+first_sac_base=$( basename $first_sac | rev | cut -f 3- -d '.' | rev )
+
+# Interpolate all SAC to 40 Hz and save merged output in parent dir
+${SACHOME}/bin/sac << !
+    echo on
+    read $sacdir/unmerged/*.${serial}_*.sac
+    lh delta
+    interpolate delta 0.025
+    lh delta
+    merge verbose gap zero overlap average
+    write $sacdir/${first_sac_base}.merged.sac
+    quit
+!
