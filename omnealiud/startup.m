@@ -51,6 +51,7 @@ rmpath(genpath(fullfile(getenv('OMNIA'), 'atm')))
 rmpath(genpath(fullfile(getenv('OMNIA'), 'BSSA2020')))
 rmpath(genpath(fullfile(getenv('OMNIA'), 'SRL2021')))
 rmpath(genpath(fullfile(getenv('OMNIA'), 'GJI2021')))
+rmpath(genpath(fullfile(getenv('OMNIA'), 'JGR2025')))
 
 % For MatTaup.
 javaaddpath(fullfile(getenv('OMNIA'), 'notmycode', 'MatTaup', 'lib', 'matTaup.jar'))
