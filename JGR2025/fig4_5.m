@@ -1,7 +1,7 @@
-function [ax, f] = fig4_5_9(sac)
-% [ax, f] = FIG4_5_9(sac)
+function [ax, f] = fig4_5(sac)
+% [ax, f] = FIG4_5(sac)
 %
-% Figures (or parts of): 4, 5, 9, SI 1-35
+% Figures (or parts of): 4, 5, SI 1-35
 %
 % Generically plots 4 panels: time domain, spectral domain, bathymetric cross
 % section, Fresnel-zone bathymetry map view.
