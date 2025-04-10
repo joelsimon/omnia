@@ -1,0 +1,8 @@
+addpath('src')
+
+NB: I was somewhat careless with "elevation" (up is positive) and "depth" (down
+    is positive) when generating a some of the source code / data files. Not
+    worth my time to go back and recompile everything; hopefully their
+    distinction will be clear enough in context. I've added some sanity checks
+    in places you could really get in trouble.
+    
