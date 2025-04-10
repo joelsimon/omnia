@@ -1,7 +1,7 @@
-function [ax, f] = fig4_5(sac)
-% [ax, f] = FIG4_5(sac)
+function [ax, f] = fig4_5_A2(sac)
+% [ax, f] = FIG4_5_A2(sac)
 %
-% Figures (or parts of): 4, 5, SI 1-35
+% Figures (or parts of): 4, 5, A2, SI 1-35
 %
 % Generically plots 4 panels: time domain, spectral domain, bathymetric cross
 % section, Fresnel-zone bathymetry map view.
@@ -15,7 +15,7 @@ function [ax, f] = fig4_5(sac)
 % Last modified: 01-Apr-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 % Figures 4 and 5: set timspec_only to true
-% Figure 4: uncomment "For small font P0045 --> ... <--- For small font P0045" block
+% Figure 4, A2: uncomment "For small font P0045 --> ... <--- For small font P0045" block
 % Figure 4: additional annotation added in post
 % For Figures SI 1--35: set timspec_only to false
 %sac = '20220115T034444.0045_62AAD314.MER.REQ.merged.sac'
@@ -482,7 +482,6 @@ if timspec_only
     % axesfs([], 15, 15)
     % shrink(ax(2), 1, 1/2)
     % savepdf('glide')
-
 
     % %% <--- For small font P0045
     % keyboard
