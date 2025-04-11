@@ -17,16 +17,16 @@ function [ax, f] = fig4_5_A2(sac)
 % Figures 4 and 5: set timspec_only to true
 % Figure 4, A2: uncomment "For small font P0045 --> ... <--- For small font P0045" block
 % Figure 4: additional annotation added in post
-% For Figures SI 1--35: set timspec_only to false
+% For Figures SI 1--35: comment all following SAC, set timspec_only to false
 %sac = '20220115T034444.0045_62AAD314.MER.REQ.merged.sac'
-sac = '20220115T040400.0053_630C0CF0.MER.REQ.merged.sac'; % color = [0 .33  1]
+%sac = '20220115T040400.0053_630C0CF0.MER.REQ.merged.sac'; % color = [0 .33  1]
 %sac = 'H03S1.EDH.202201150400_4hr.sac.pa'; % color = [0 .67  1]
 %sac = 'H11S1.EDH.202201150300_5hr.sac.pa'; % color = [0 1 1]
 %sac = '20220115T040540.0026_631CC068.MER.REQ.merged.sac';
 %sac = '20220115T034444.0049_62AD8DA4.MER.REQ.merged.sac';
 
 clc
-timspec_only = true;
+timspec_only = false;
 
 % Defaults.
 prepost = [-15 45]; % minutes
