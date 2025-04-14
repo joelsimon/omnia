@@ -1,5 +1,5 @@
 function [kstnm, val, idx] = orderkstnm_occl(kstnm, tz, algo, crat, prev, los, tzfunc)
-% [kstnm, val, idx] = ORDERKSTNM_OCCL(kstnm, tz, algo, crat, prev, los, tzfund)
+% [kstnm, val, idx] = ORDERKSTNM_OCCL(kstnm, tz, algo, crat, prev, los, tzfunc)
 %
 % Input:
 % kstnm    Cell array of five-character station names (def: all)
