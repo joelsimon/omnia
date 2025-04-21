@@ -1,5 +1,5 @@
-function matchall(writecp, procdir, evtdir)
-% MATCHALL(writecp, procdir, evtdir)
+function matchall(writecp, procdir, evtdir, evtdir2)
+% MATCHALL(writecp, procdir, evtdir, evtdir2)
 %
 % Matches all unmatched $MERMAID SAC files to the IRIS database using
 % cpsac2evt.m and its defaults, assuming same system configuration as JDS.
@@ -7,16 +7,21 @@ function matchall(writecp, procdir, evtdir)
 % Input:
 % writecp    true to write changepoint (.cp) files (def: false)
 % procdir    Path to processed directory (def: $MERMAID/processed/)
-% evtdir     Path to events directory (def: $MERMAID/events/)
-%
+% evtdir     Path to events directory to check for existing and save new
+%                if .evt is not already matched (def: $MERMAID/events/)
+% evtdir2*   (optional) Path to events secondary directory to check if
+%                .evt is already matched.
 %
 % A list of any files which are unsuccessfully matched using
 % cpsac2evt.m are saved as 'matchall_fail.txt' $MERMAID/events (or
 % empty if all successfully matched).
 %
+% *Ex:
+%    matchall(false, '~/mermaid/processed_automaid-v4/', ~/mermaid/events_automaid-v4/', '~/mermaid/events/')
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 07-Dec-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 21-Apr-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 clc
 
@@ -27,21 +32,26 @@ skip_0100 = true;
 defval('writecp', false)
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
+defval('evtdir2', [])
 
 % Find only those SAC files which have not been preliminary matched.
-allsac = fullsac([], procdir);
-if isempty(allsac)
+all_sac = fullsac([], procdir);
+if isempty(all_sac)
     error('No .sac files recursively found in %s\n', procdir)
 
 end
-rawevt = skipdotdir(dir(fullfile(evtdir, 'raw', 'evt')));
-already_matched = strrep({rawevt.name}, '.raw.evt', '.sac'); % Not necessarily reviewed!
-allsac_nopath = cellfun(@(xx) strippath(xx), allsac, 'UniformOutput', false);
-[~, idx] = setdiff(allsac_nopath, already_matched);
+rawevt = fullfiledir(skipdotdir(dir(fullfile(evtdir, 'raw', 'evt'))));
+if ~isempty(evtdir2)
+    rawevt2 = fullfiledir(skipdotdir(dir(fullfile(evtdir2, 'raw', 'evt'))));
+    rawevt = unique([rawevt ; rawevt2]);
+
+end
+matched_sac = strrep(rawevt, '.raw.evt', '.sac'); % Not necessarily reviewed!
+[~, idx] = setdiff(strippath(all_sac), strippath(matched_sac));
+s = all_sac(idx);
 
 % Loop over the unmatched SAC files.
 fail = [];
-s = allsac(idx);
 fprintf('Searching for unmatched SAC files...\n')
 for i = 1:length(s)
     if skip_french
