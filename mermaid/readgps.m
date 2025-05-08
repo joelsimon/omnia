@@ -34,7 +34,7 @@ function gps = readgps(processed, rm23, skippy)
 merpath = getenv('MERMAID');
 defval('processed', fullfile(merpath, 'processed'))
 defval('rm23', true)
-defval('skippy', true)
+defval('skippy', {''})
 
 % gps.csv format.
 fmt = ['%s' ...
@@ -63,7 +63,7 @@ for i = 1:length(d)
         file = fullfile(d(i).folder, d(i).name, 'gps.csv');
         fid = fopen(file, 'r');
         try
-        C = textscan(fid, fmt, 'HeaderLines', 3, 'Delimiter', ',');
+            C = textscan(fid, fmt, 'HeaderLines', 3, 'Delimiter', ',');
         catch
             keyboard
         end
