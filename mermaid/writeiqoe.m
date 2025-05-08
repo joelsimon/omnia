@@ -1,19 +1,14 @@
-function writeiqoe(sac, procdir)
-% WRITEIQOE(sac, procdir)
+function writeiqoe(sac)
+% WRITEIQOE(sac)
 %
 % Write MERMAID .xlsx file for International Quiet Ocean Experiment (IQOE) database.
 %
 % Input:
 % sac      Array of SAC filenames
-% procdir  Processed directory, where SAC files stored, to write mermaid_iqoe.xlsx
-%              (def: ~/mermaid/processed_automaid-v4)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 08-May-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
-
-% Default.
-defval('procdir', fullfile(getenv('MERMAID'), 'processed_automaid-v4'));
 
 % Constant attributes.
 public = 'Public';
@@ -23,15 +18,13 @@ freq_range = '0.1 - 10';
 duty_cycle = 'Null';
 hydrophone = 'High Tech HTI-96-Min Hex';
 purpose = 'Mobile Earthquake Recording in Marine Areas by Independent Divers (MERMAID)';
-acknowledge = '10.7914/SN/MH';
+acknowledge = 'doi: 10.7914/SN/MH';
 
-% Get deployment dates.
-deploy = deploydate;
-
-% Get all GPS fixes.
-gps = readgps(procdir);
+% Date format
+dfmt = 'uuuu-MM-dd HH:mm:ss.SS';
 
 for i = 1:length(sac);
+    % Get SAC header and determine station name and samp freq.
     h = sachdr(sac{i});
     kstnm = h.KSTNM;
     samp_freq(i) = efes(h, true);
@@ -40,21 +33,13 @@ for i = 1:length(sac);
     lat(i) = round(h.STLA, 3);
     lon(i) = round(h.STLO, 3);
 
-    % Get deployment date.
-    start_date{i} = datestr(deploy.(kstnm), 29);
+    % Get start/end times.
+    sd = seistime(h);
+    start_date{i} = string(sd.B, dfmt);
+    end_date{i} = string(sd.E, dfmt);
 
-    % Determine if float dead (hasn't reported location in 30 days)
-    last_gps = gps.(kstnm).date(end);
-    if days(datetime('now', 'TimeZone', 'UTC') - last_gps) > 30
-        end_date{i} = datestr(last_gps, 29);
-
-    else
-        end_date{i} = 'Null';
-
-    end
-
-    % Get water depth and deployment depth.
-    ocdp(i) = gebco(lon(i), lat(i));
+    % Get water depth (negative elevation) and deployment depth.
+    ocdp(i) = -gebco(lon(i), lat(i));
     stdp(i) = h.STDP;
 
 end
@@ -73,7 +58,7 @@ varnames = ["Public or Private", ...
             "Duty Cycle [min/hr]", ...
             "Hydrophone Type", ...
             "Water Depth", ...
-            "Deployment Depth," ...
+            "Deployment Depth", ...
             "Purpose", ...
             "Acknowledgement/Paper Citation"];
 
@@ -96,8 +81,8 @@ T = table(repmat(public, size(lat')), ...
           repmat(acknowledge, size(lat')), ...
           'VariableNames', varnames);
 
-xlsname = fullfile(procdir, 'iqoe_mermaid.xlsx');
-write(T, xlsname)
-fprintf('Wrote %i records to %s\n', length(sac), xlsname);
 
-
+% Write Excel sheet, overwritting any existing file.
+xlsname = fullfile(pwd, 'iqoe_mermaid.xlsx');
+writetable(T, xlsname, 'WriteMode', 'overwritesheet')
+fprintf('Wrote %i records to:\n%s\n', length(sac), xlsname);
