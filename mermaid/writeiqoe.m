@@ -1,30 +1,34 @@
-function writeiqoe(sac)
-% WRITEIQOE(sac)
+function writeiqoe(sac, procdir)
+% WRITEIQOE(sac, procdir)
 %
-% Write .xlsx file for Ed Urban's IQOE metadata database.
+% Write MERMAID .xlsx file for International Quiet Ocean Experiment (IQOE) database.
 %
 % Input:
-% sac    Array of SAC filenames
+% sac      Array of SAC filenames
+% procdir  Processed directory, where SAC files stored, to write mermaid_iqoe.xlsx
+%              (def: ~/mermaid/processed_automaid-v4)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 06-May-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 08-May-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
-% Constant attributes
+% Default.
+defval('procdir', fullfile(getenv('MERMAID'), 'processed_automaid-v4'));
+
+% Constant attributes.
 public = 'Public';
 contact = 'mermaid@princeton.edu';
 cabled = 'autonomous';
 freq_range = '0.1 - 10';
 duty_cycle = 'Null';
 hydrophone = 'High Tech HTI-96-Min Hex';
-purpose = 'Null';
-acknowledge = 'Null';
+purpose = 'Mobile Earthquake Recording in Marine Areas by Independent Divers (MERMAID)';
+acknowledge = '10.7914/SN/MH';
 
 % Get deployment dates.
 deploy = deploydate;
 
-% Get all GPS fixes -- maybe use ESO locations so this is directory agnostic?
-procdir = fullfile(getenv('MERMAID'), 'processed_automaid-v4');
+% Get all GPS fixes.
 gps = readgps(procdir);
 
 for i = 1:length(sac);
@@ -92,4 +96,8 @@ T = table(repmat(public, size(lat')), ...
           repmat(acknowledge, size(lat')), ...
           'VariableNames', varnames);
 
-write(T, fullfile(procdir, 'iqoe_mermaid.xlsx'))
+xlsname = fullfile(procdir, 'iqoe_mermaid.xlsx');
+write(T, xlsname)
+fprintf('Wrote %i records to %s\n', length(sac), xlsname);
+
+
