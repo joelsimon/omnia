@@ -1,0 +1,13 @@
+#!/bin/zsh
+#
+# Return total size (bytes) of all mSEED in directory.
+#
+# Usage: mseed_total $MERMAID/processed
+
+total=0
+for f in $1/**/*\.mseed; do
+    fsize=$( wc -c $f | awk '{print $1}' )
+    total=$(( total + fsize ))
+
+done
+echo $total
