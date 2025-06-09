@@ -1,16 +1,18 @@
-function countsac(procdir)
-% COUNTSAC(procdir)
+function countsac(procdir, excl)
+% COUNTSAC(procdir, excl)
 %
 % Print $MERMAID .sac file dates and counts.
 %
 % Input:
 % procdir      Processed directory (def: $MERMAID/processed/)
+% excl         Optional string to exclude match in output (e.g., 'IcCycle')
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 31-Jan-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 09-Jun-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
+defval('excl', [])
 
 D = skipdotdir(dir(fullfile(strip(procdir))));
 proc_dirs_regexp = regexp(fullfiledir(D), '.*[0-9]-[A-Z]-[0-9].*');
@@ -23,6 +25,12 @@ tot_req = 0;
 fprintf('                   ALL      DET      LAST_DET     REQ       LAST_REQ\n')
 for i = 1:length(sac_dirs);
     sac = globglob(sac_dirs{i}, '**/*.sac');
+    if ~isempty(excl)
+        rm_idx = cellstrfind(sac, excl);
+        sac(rm_idx) = [];
+
+    end
+
     [~, det_sac] = cellstrfind(sac, '.DET.');
     [~, req_sac] = cellstrfind(sac, '.REQ.');
 
