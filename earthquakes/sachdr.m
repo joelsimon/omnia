@@ -1,5 +1,5 @@
 function  HdrData = sachdr(filename, endianness)
-% HdrData = sachdr(filename, endianness)
+% HdrData = SACHDR(filename, endianness)
 %
 % Wrapper for readsac.m that only returns header.
 %
