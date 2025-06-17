@@ -1,6 +1,8 @@
 function matchall(writecp, procdir, evtdir, evtdir2)
 % MATCHALL(writecp, procdir, evtdir, evtdir2)
 %
+% !! Must be run in versioin R2022b or earlier !!
+%
 % Matches all unmatched $MERMAID SAC files to the IRIS database using
 % cpsac2evt.m and its defaults, assuming same system configuration as JDS.
 %
@@ -17,16 +19,25 @@ function matchall(writecp, procdir, evtdir, evtdir2)
 % empty if all successfully matched).
 %
 % *Ex:
-%    matchall(false, '~/mermaid/processed_automaid-v4/', ~/mermaid/events_automaid-v4/', '~/mermaid/events/')
+%    MATCHALL(false, '~/mermaid/processed_automaid-v4/', ...
+%                    '~/mermaid/events_automaid-v4/', ...
+%                    '~/mermaid/events/')
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 21-Apr-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 17-Jun-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 clc
 
+% irisFetch stopped working after version 22b
+if ~verLessThan('matlab', '9.14')
+    error('Must run in R2022b or earlier')
+
+end
+
 skip_french = true;
 skip_0100 = true;
+princeton_only = true;
 
 % Defauls.
 defval('writecp', false)
@@ -36,6 +47,10 @@ defval('evtdir2', [])
 
 % Find only those SAC files which have not been preliminary matched.
 all_sac = fullsac([], procdir);
+if isempty(all_sac)
+    error('No SAC files found %s\n', procdir)
+
+end
 if isempty(all_sac)
     error('No .sac files recursively found in %s\n', procdir)
 
@@ -47,6 +62,13 @@ if ~isempty(evtdir2)
 
 end
 matched_sac = strrep(rawevt, '.raw.evt', '.sac'); % Not necessarily reviewed!
+if isempty(matched_sac)
+    % This could be fine, e.g., first time you ever run it.
+    warning(sprintf(['No .evt files in found, check evt* paths\n' ...
+                     'Paused: `dbcont` to continue']))
+    keyboard
+
+end
 [~, idx] = setdiff(strippath(all_sac), strippath(matched_sac));
 s = all_sac(idx);
 
@@ -54,6 +76,14 @@ s = all_sac(idx);
 fail = [];
 fprintf('Searching for unmatched SAC files...\n')
 for i = 1:length(s)
+    [x, h] = readsac(s{i});
+    if princeton_only
+        if ~princeton_kstnm(h.KSTNM)
+            continue
+
+        end
+    end
+
     if skip_french
         if contains(s{i}, '452.020-P-06') || contains(s{i}, '452.020-P-07')
             continue
@@ -82,7 +112,6 @@ for i = 1:length(s)
 
     %% Temp patch to skip really long REQ files (need to update (i)wtspy.m
     %% routines to handle longer time series / shortcut those functions?).
-    x = readsac(s{i});
     if length(x) > 10000
         % Check if I have manually added a reviewed-only .evt file.
         if ~isreviewed(s{i})
