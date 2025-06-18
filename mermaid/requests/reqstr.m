@@ -17,9 +17,9 @@ function cmd = reqstr(sac_date, sac_duration, sac_scales)
 %    sac_scales = -1;
 %    cmd = REQSTR(sac_date, sac_duration, sac_scales)
 %
-% Author: Dr. Joel D. Simon
+% Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 07-Sep-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 18-Jun-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 % Sanity.
 if ~isa(sac_date, 'datetime')
@@ -42,7 +42,7 @@ if ~ismember(sac_scales, [-1:5])
     error('''sac_scales'' must be an integer between -1 and 5')
 
 end
-if sacduration > 1800
+if sac_duration > 1800
     error('''sac_duration'' cannot be greater than 1800 (must split to multline request')
 
 end
