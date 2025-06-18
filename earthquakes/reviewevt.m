@@ -3,6 +3,8 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 %
 % REVIEWEVT is the smart SAC file to event matching tool.
 %
+% Use, e.g., `eqdet(EQ, 2)` to see phase/times in EQ(2).
+%
 % After running cpsac2evt.m run REVIEWEVT to hand-review all potential matches
 % and save only the true event matches, or to re-review events and potentially
 % move their .evt files between identified and unidentified folders.  Further,
