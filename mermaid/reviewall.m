@@ -4,6 +4,8 @@ function reviewall(writecp, floatnum, procdir, evtdir)
 % Review all unreviewed $MERMAID events using reviewevt.m, assuming
 % same system configuration as JDS.
 %
+% Use, e.g., `eqdet(EQ, 2)` to see phase/times in EQ(2).
+%
 % Input:
 % writecp   true to run writechangepointall.m after review
 %           false to skip running writechangepointall.m (def: false)
@@ -18,7 +20,7 @@ function reviewall(writecp, floatnum, procdir, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Nov-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 17-Jun-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 % Defaults.
 defval('writecp', false)
@@ -48,21 +50,38 @@ fprintf('Searching for unreviewed SAC files...\n')
 revevt_dir = fullfile(evtdir, 'reviewed');
 d = recursivedir(dir(fullfile(revevt_dir, '**/*.evt')));
 if ~isempty(d)
-    evt = strrep(strippath(d), 'evt', 'sac');
+    revsac = strrep(strippath(d), 'evt', 'sac');
 
 else
-    evt = [];
+    revsac = [];
 
 end
 
-% Compile list of all SAC files and compare their differences.
-sac = fullsac([], procdir);
-if isempty(sac)
-    error('No .sac files recursively found in %s\n', procdir)
+%% >>
+%% Option 1 (better): compare list of reviewed and unreviewed events.
+unrevevt_dir = fullfile(evtdir, 'raw', 'evt');
+unrevevt = fullfiledir(skipdotdir(dir(unrevevt_dir)));
+if ~isempty(unrevevt)
+    unrevsac = strrep(strippath(unrevevt), 'raw.evt', 'sac');
+
+else
+    unrevsac = [];
 
 end
-[~, idx] = setdiff(strippath(sac), evt);
-sac = sac(idx);
+sac = setdiff(unrevsac, revsac);
+
+%% Option 2 (original/worse): compare lists unreviewed events and all
+%% processed SAC files (will fail if, e.g.,  you didn't make a raw.evt file for a
+%% non-Princeton float)
+% % Compile list of all SAC files and compare their differences.
+% sac = fullsac([], procdir);
+% if isempty(sac)
+%     error('No .sac files recursively found in %s\n', procdir)
+
+% end
+% [~, idx] = setdiff(strippath(sac), evt);
+% sac = sac(idx);
+%% <<
 
 % Skip French floats, maybe.
 if skip_french
