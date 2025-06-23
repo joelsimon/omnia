@@ -37,7 +37,7 @@ new = readtext('response/nolet.pz'); % good
 
 % % You can set old=dmc_fixed.pz and compare (no output) to nolet show my
 % % formatted fix is identical to how Nolet originally printed in PDF.
-old = readtext('response/dmc_fixed.pz'); % also good; formatted for DMC
+% old = readtext('response/dmc_fixed.pz'); % also good; formatted for DMC
 
 for i = 1:length(old)
     if startsWith(old{i}, {'Z', 'P', 'C'})
