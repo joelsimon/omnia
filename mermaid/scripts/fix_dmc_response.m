@@ -28,13 +28,16 @@ function fix_dmc_response
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 10-Jun-2025, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 23-Jun-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 clc
 
-dmc = readtext('response/dmc.pz');
-%dmc = readtext('response/dmc_fixed.pz');
-nolet = readtext('response/nolet.pz');
+dmc = readtext('response/dmc.pz'); % bad
+nolet = readtext('response/nolet.pz'); % good
+
+% % You can set dmc=dmc_fixed.pz and compare (no output) to nolet show my
+% % formatted fix is identical to how Nolet originally printed in PDF.
+% dmc = readtext('response/dmc_fixed.pz'); % also good; formatted for DMC
 
 for i = 1:length(dmc)
     if startsWith(dmc{i}, {'Z', 'P', 'C'})
