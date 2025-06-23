@@ -32,20 +32,20 @@ function fix_dmc_response
 
 clc
 
-dmc = readtext('response/dmc.pz'); % bad
-nolet = readtext('response/nolet.pz'); % good
+old = readtext('response/dmc_error.pz'); % bad
+new = readtext('response/nolet.pz'); % good
 
-% % You can set dmc=dmc_fixed.pz and compare (no output) to nolet show my
+% % You can set old=dmc_fixed.pz and compare (no output) to nolet show my
 % % formatted fix is identical to how Nolet originally printed in PDF.
-% dmc = readtext('response/dmc_fixed.pz'); % also good; formatted for DMC
+old = readtext('response/dmc_fixed.pz'); % also good; formatted for DMC
 
-for i = 1:length(dmc)
-    if startsWith(dmc{i}, {'Z', 'P', 'C'})
+for i = 1:length(old)
+    if startsWith(old{i}, {'Z', 'P', 'C'})
         continue
 
     end
-    ds = dmc{i};
-    ns = nolet{i};
+    ds = old{i};
+    ns = new{i};
 
     dd = str2num(ds);
     nd = str2num(ns);
