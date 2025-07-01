@@ -5,7 +5,13 @@ function kstnm = sackstnm(sac)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 21-Oct-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 30-Jun-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+
+% Sanity
+if isempty(sac)
+    error('Empty SAC list')
+
+end
 
 % Recursion
 if iscell(sac)
