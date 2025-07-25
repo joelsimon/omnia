@@ -5,7 +5,7 @@ function dive3d(geocsv)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 15-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 25-Jul-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 clc
 close all
@@ -15,6 +15,8 @@ G = readGeoCSV(geocsv);
 lon = longitude360(G.Longitude);
 lat = G.Latitude;
 depth = -G.WaterPressure/100;
+lon_lim = [floor(min(lon))-1 ceil(max(lon))+1];
+lat_lim = [floor(min(lat))-1 ceil(max(lat))+1];
 
 lon = interpo(lon);
 lat = interpo(lat);
@@ -24,15 +26,17 @@ ax = axes;
 latimes
 
 years_deployed = years(G.StartTime - G.StartTime(1));
-cmap = jet;
+years_lim = [0:floor(max(years_deployed))];
+
+cmap = turbo;
 colormap(ax, cmap)
 [col, cbticks, cbticklabels] = x2color(years_deployed, [], [], cmap, false);
 
 cb = colorbar;
-ticks2keep = nearestidx([cbticklabels{:}], [0:0.5:4.5]);
+ticks2keep = nearestidx([cbticklabels{:}], years_lim);
 
 cb.Ticks = cbticks(ticks2keep);
-cb.TickLabels = num2cell([0:0.5:4.5]);
+cb.TickLabels = num2cell(years_lim);
 cb.Label.Interpreter = 'latex';
 cb.Label.String = 'Years Deployed';
 cb.TickDirection = 'out';
@@ -44,17 +48,19 @@ xlabel('Longitude (degrees)')
 ylabel('Latitude (degrees)')
 zlabel('Depth (m)')
 
-xlim(ax, [172 183]);
-ylim(ax, [-17 -11]);
+xlim(ax, lon_lim);
+ylim(ax, lat_lim);
 zlim(ax, [-2000 0]);
 
 box on
 grid on
 
 fr = 10;
-vid = VideoWriter(strippath(geocsv), 'MPEG-4');
+fname = sprintf('%s_%s', mfilename('fullpath'), G.Station{1});
+vid = VideoWriter(fname, 'MPEG-4');
 vid.FrameRate = 10;
 open(vid)
+fprintf('Wrote: %s\n', fname)
 
 int = 100;
 for i=1+int:int:length(lon)
