@@ -18,14 +18,16 @@ function matchall(writecp, procdir, evtdir, evtdir2)
 % cpsac2evt.m are saved as 'matchall_fail.txt' $MERMAID/events (or
 % empty if all successfully matched).
 %
-% *Ex:
-%    MATCHALL(false, '~/mermaid/processed_automaid-v4/', ...
-%                    '~/mermaid/events_automaid-v4/', ...
-%                    '~/mermaid/events/')
+% % *Ex:
+%    writecp = false;
+%    procdir = '~/mermaid/processed_everyone';
+%    evtdir = '~/mermaid/events_everyone';
+%    evtdir2 = '~/mermaid/events/';
+%    MATCHALL(writecp, procdir, evtdir, evtdir2)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Jun-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 05-Aug-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 clc
 
