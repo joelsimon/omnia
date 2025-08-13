@@ -1,10 +1,13 @@
-function [req_str, start_date, req_sec, tt, end_date] = ...
+function [req_str, start_date, req_sec, tt, end_date, arr_date] = ...
              reqphasetime(evt_date, evt_dep, evt_latlon, sta_latlon, phases, buf_secs)
-% [req_str, start_date, req_sec, tt, end_date] = ...
+% [req_str, start_date, req_sec, tt, end_date, arr_date] = ...
 %    REQPHASETIME(evt_date, evt_dep, evt_latlon, sta_latlon, phases, buf_secs)
 %
 % Return start time and duration strings for "mermaid REQUEST" for .cmd file,
 % given source/receiver information and phase list of interest.
+%
+% If multiple phases given only the first- and last-arriving are retained in
+% outputs tt, arr_date.
 %
 % Inputs:
 % evt_date     Event origin time as datetime
@@ -22,6 +25,8 @@ function [req_str, start_date, req_sec, tt, end_date] = ...
 % req_sec      Length of request (in seconds) as double
 % tt           TaupTime structure of first(last) retained phase
 % end_date     Endtime of request, as datetime
+% arr_date     2x1 datetime array of first/last phase retained
+%                  (same date if phase-length 1)
 %
 % *Both times must be positive; buf_secs = [60 120] means "request from 60
 %  seconds BEFORE the first phase to 120 seconds AFTER the last phase"
@@ -37,7 +42,8 @@ function [req_str, start_date, req_sec, tt, end_date] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 25-Jan-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 12-Aug-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Default outputs
 req_str = {};
@@ -45,6 +51,7 @@ start_date = datetime('NaT', 'TimeZone', 'UTC');
 req_sec = [];
 tt = [];
 end_date = datetime('NaT', 'TimeZone', 'UTC');
+arr_date = repmat(datetime('NaT', 'TimeZone', 'UTC'), [2, 1]);
 
 % Verify UTC timezone.
 if ~strcmp(evt_date.TimeZone, 'UTC')
