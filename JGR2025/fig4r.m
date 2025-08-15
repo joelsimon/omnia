@@ -25,7 +25,7 @@ function fig4r(label)
 
 defval('label', [])
 
-travtimeadj = false;
+travtimeadj = true;
 
 clc
 close all

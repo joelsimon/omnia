@@ -17,7 +17,7 @@ clc
 close all
 
 %% Get epicentral distances
-[dist_sta, dist_val] = hunga_readgcarc;
+[dist_sta, dist_val] = hunga_read_gcarc;
 %% Get epicentral distance
 
 %% Get RMS values

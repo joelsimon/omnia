@@ -232,9 +232,9 @@ uistack([F.gc F.bathy], 'bottom')
 %% ___________________________________________________________________________ %%
 
 function F = annotate_stdp(F)
-error('Replace `hunga_readstdp` with h.STDP')
+error('Replace `hunga_read_stdp` with h.STDP')
 
-stdp = hunga_readstdp;
+stdp = hunga_read_stdp;
 hold(F.ha, 'on')
 for i = 1:length(F.pl)
     mer_ser = F.tx(i).String;

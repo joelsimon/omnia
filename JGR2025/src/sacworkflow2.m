@@ -3,8 +3,6 @@ function sacworkflow2(ser)
 %
 % Re-merge and re-fill .sac, e.g., after removal of overlap/unused/bad .sac
 %
-% This is just sacworkflow.m without the copy.
-%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 01-Feb-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64

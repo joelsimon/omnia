@@ -1,0 +1,14 @@
+#!/bin/zsh
+#
+# rsync_jgr
+
+codedir=$HUNGA/code/
+
+# cp top-level fig dir
+git rm fig* tbl*
+rsync -av $codedir/fig* $codedir/tbl* .
+
+# cp src dir
+git rm src/*
+mkdir src/
+rsync -av --exclude='.*' --exclude='fig*' --exclude='tbl*' --exclude='graveyard/' --exclude='static/' --exclude='test/' "$codedir" src/

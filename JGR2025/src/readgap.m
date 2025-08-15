@@ -1,14 +1,6 @@
 function gap = readgap(sac)
 % gap = READGAP(sac)
 %
-% Return gaps identified in merged SAC files.
-%
-% Input:
-% SAC    SAC filename
-%
-% Output:
-% gap    Cell of start/end identified in sac2mergedsac_*_gap.mat
-%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 08-Sep-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64

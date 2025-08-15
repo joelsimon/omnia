@@ -76,7 +76,7 @@ amp = C{1}; % Phi_m
 depth = C{2};
 
 % Return value at station depth (via interpolation).
-stdp = hunga_readstdp(kstnm);
+stdp = hunga_read_stdp(kstnm);
 stamp = interp1(depth, amp, stdp);
 
 % Return maximum amplitude and that depth.

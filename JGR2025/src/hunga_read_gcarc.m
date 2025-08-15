@@ -1,12 +1,12 @@
-function [kstnm, gcarc] = hunga_readgcarc()
-% [kstnm, gcarc] = HUNGA_READGCARC
+function [kstnm, gcarc] = hunga_read_gcarc
+% [kstnm, gcarc] = HUNGA_READ_GCARC
 %
 % Reads $HUNGA/sac/meta/gcarc.txt and returns cells of station names and their
 % epicentral distances.
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 07-Jun-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 15-Aug-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 hundir = getenv('HUNGA');
 sacdir = fullfile(hundir, 'sac');

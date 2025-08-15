@@ -59,11 +59,11 @@ end
 %%%%% after I've sorted all value lists.
 
 %% Get epicentral distances
-[dist_sta, dist_val] = hunga_readgcarc;
+[dist_sta, dist_val] = hunga_read_gcarc;
 %% Get epicentral distance
 
 %% Get station depths
-stdp = hunga_readstdp;
+stdp = hunga_read_stdp;
 stdp_sta = fieldnames(stdp);
 stdp_val = structfun(@(xx) xx, stdp);
 %% Get station depths

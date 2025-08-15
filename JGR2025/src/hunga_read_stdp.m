@@ -1,5 +1,5 @@
-function stdp = hunga_readstdp(kstnm, filename)
-% stdp = HUNGA_READSTDP(kstnm, filename)
+function stdp = hunga_read_stdp(kstnm, filename)
+% stdp = HUNGA_READ_STDP(kstnm, filename)
 %
 % Input:
 % kstnm    Station name; if supplied, only one depth returned [m]

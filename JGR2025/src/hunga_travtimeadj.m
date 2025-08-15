@@ -1,5 +1,5 @@
-function tt_adj = hunga_travtimeadj(kstnm, c, tz)
-% tt_adj = HUNGA_TRAVTIMEADJ(kstnm, c, tz)
+function [tt_adj, dist_m] = hunga_travtimeadj(kstnm, c, tz)
+% [tt_adj, dist_m] = HUNGA_TRAVTIMEADJ(kstnm, c, tz)
 %
 % Returns time adjusment to be ADDED to theoretical travel time from HTHH to
 % station at velocity `c` (for the entire path length) to arrive at "true"
@@ -23,27 +23,28 @@ function tt_adj = hunga_travtimeadj(kstnm, c, tz)
 % Output:
 % tt_adj  Travel-time adjustment to be ADDED to theoretical travel time
 %            at velocity c [s]
+% dist_m  Distance in meters to first occurence of elevation on slope
 %
 % See also: hunga_dist2slope and hunga_travtimeadj.pdf
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 06-Feb-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 07-Jul-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+
+defval('c', 1480);
+defval('tz', -1350)
 
 if tz > 0
     error('P-to-T conversion ELEVATION must be negatiave (not a depth)\n')
 
 end
 
-defval('c', 1480);
-defval('tz', -1350)
-
 % Conversion point (P-to-T; traveled this distance as a P wave).
-p2t_dist_m = hunga_dist2slope(kstnm, tz, false);
-p_time_s = p2t_dist_m / 5800; % ak135 uppper crust
+dist_m = hunga_dist2slope(kstnm, tz, false);
+p_time_s = dist_m / 5800; % ak135 uppper crust
 
 % Compared with (slower) T time.
-t_time_s = p2t_dist_m / c;
+t_time_s = dist_m / c;
 
 % Travel-time adjustment (adjusts travel time assuming T-wave for full path from
 % source to reciever, to one that starts as P wave from source to conversion

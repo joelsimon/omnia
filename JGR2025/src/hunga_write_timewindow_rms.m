@@ -1,14 +1,14 @@
 function hunga_write_timewindow_rms
 % HUNGA_WRITE_TIMEWINDOW_RMS
 %
-% Write signal ("30-minute T wave) and noise* (10 mins prior) RMS values.
+% Write signal ("30-minute T wave") and noise* (10 mins prior) RMS values.
 %
 % *as explained in paper, really, only Category C signals have noise in earlier
 % window (the eruption was bubblin' for a while).
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 21-Mar-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 23-Jun-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 travtimeadj = false;
 
@@ -45,9 +45,9 @@ pre_mins_noi = -15;
 post_mins_noi = -5;
 
 fmt = '%5s  |  %9.6f\n';
-fstr = sprintf('%s_pre-%imin_post-%imin_envlen-%is_envtype-%s_%.1f-%.1fHz', ...
-               mfilename, pre_mins_sig, post_mins_sig, env_len_secs, env_type, lohi(1), lohi(2));
-
+% fstr = sprintf('%s_pre-%imin_post-%imin_envlen-%is_envtype-%s_%.1f-%.1fHz', ...
+%                mfilename, pre_mins_sig, post_mins_sig, env_len_secs, env_type, lohi(1), lohi(2));
+fstr = 'rms';
 fname_sig = fullfile(staticdir, [fstr '_signal.txt']);
 fname_noi = fullfile(staticdir, [fstr '_noise.txt']);
 

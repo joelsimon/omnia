@@ -1,5 +1,5 @@
-function [x, h, gap] = hunga_transfer_bandpass(sac, lohi, popas)
-% [x, h, gap] = hunga_transfer_bandpass(sac, lohi, popas)
+function [x, h, gap] = hunga_transfer_bandpass(sac, lohi, popas, sacpz)
+% [x, h, gap] = hunga_transfer_bandpass(sac, lohi, popas, sacpz)
 %
 % Remove instrument response (counts -> PA) and maybe filter.
 %
@@ -7,13 +7,14 @@ function [x, h, gap] = hunga_transfer_bandpass(sac, lohi, popas)
 % sac        SAC filename
 % lohi       Bandpass corners, or NaN to not bandpaass (def: [2.5 10])
 % popas      Bandpass poles and passes (def: [4 1])
+% sacpz      SACPZ filename (def: $MERMAID/response/MH.pz)
 %
 % Output:
 % x          Filtered time series in Pa
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 21-Mar-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 23-Jun-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 if exist('gap', 'var') == 1
     error('`gap` option not yet coded')
@@ -23,6 +24,7 @@ end
 % Default bandpass corner frequencies.
 defval('lohi', [2.5 10])
 defval('popas', [4 1])
+defval('sacpz', fullfile(getenv('MERMAID'), 'response', 'MH.pz'))
 
 % Percentrage of total gap length consider before/after for interpolation.
 interpgap_perc = 25;
@@ -64,7 +66,7 @@ gap = readgap(sac);
 x = interpgap(x, gap, interpgap_perc);
 
 % Remove instrument response (now overwriting x).
-x = mermaidtransferx(x, h, trans_freq, [], [], R);
+x = mermaidtransferx(x, h, trans_freq, sacpz, [], R);
 
 % Bandpass, maybe (no need to re-taper or remove mean/trend; that's already been
 % done in `mermaidtransfer`).
