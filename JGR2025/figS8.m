@@ -1,16 +1,16 @@
-function fig8
-% FIG8
+function figS8
+% FIGS8
 %
-% Figure 8: Acoustic eigenfunctions (modes)
+% Figure S8: Acoustic eigenfunctions (modes)
 % 
 % Unfortunately `boxplot` is a trash function and expands the figure, leaving
 % a lot of whitespace on the lhs. Use trim, crop in LaTeX.
 %
-% Developed as: hunga_plot_modes
+% Developed as: hunga_plot_modes.m then fig8.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-Mar-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 15-Aug-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 clc
 close all

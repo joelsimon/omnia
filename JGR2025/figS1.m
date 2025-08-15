@@ -1,14 +1,15 @@
-function ax = figA1
-% ax = FIGA1
+function ax = figS1
+% ax = FIGS1
 %
-% Figure A1: Record section, normed as in Figure 2, but spaced/timed relative to
+% Figure S1: Record section, normed as in Figure 2, but spaced/timed relative to
 % HTHH.
 %
-% Developed as: hunga_recordsection3.m
+% Developed as: hunga_recordsection3.m, then figA1.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 02-Apr-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 15-Aug-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
 close all
@@ -184,4 +185,48 @@ xlabel('Time Relative To Eruption [min]')
 ylabel('Epicentral Distance')
 set(ax, 'YTickLabels', degrees2(ax.YTick));
 
+%% How to save labels; adjust manually, uncomment two lines below, save,
+%% comment, load...
+%%pos = gettxpos(tl);
+%%save('static/figA1_pos.mat', 'pos')
+load('static/figA1_pos.mat')
+for i = 1:length(pos)
+    tl(i).Position = pos(i,:);
+
+end
+
+% for i = 1:length(tl)
+%     if any(strcmp(tl(i).String, {'H03N2', 'H03S1', 'H03S2', 'H03S3'}))
+%         delete(tl(i))
+%         continue
+
+%     end
+%     if any(strcmp(tl(i).String, {'H11N2', 'H11N3'}))
+%         delete(tl(i))
+%        continue
+
+%     end
+%     if any(strcmp(tl(i).String, {'H11S2', 'H11S3'}))
+%         delete(tl(i))
+%         continue
+
+%     end
+%     if strcmp(tl(i).String, 'H03N1')
+%         tl(i).String = 'H03N1-H03N2, H03S1-H03S3';
+
+%     end
+%     if strcmp(tl(i).String, 'H11N1')
+%         tl(i).String = 'H11N1-H11N3';
+
+%     end
+%     if strcmp(tl(i).String, 'H11S1')
+%         tl(i).String = 'H11S1-H11S3';
+
+%     end
+% end
+
+ax.XLabel.FontSize = 13;
+ax.YLabel.FontSize = 13;
+ax.XAxis.FontSize = 13;
+ax.YAxis.FontSize = 13;
 savepdf(mfilename)

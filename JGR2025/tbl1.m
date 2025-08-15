@@ -1,80 +1,71 @@
 function tbl1
 % TBL1
 %
-% Table 1: Station locations
+% Write Table 1: Fresnel radii for different frequencies/distances.
 %
-% Developed as: hunga_write_station_table
+% Developed as: hunga_write_fresnel_radii_table.m tbl2.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Mar-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 15-Aug-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
 
-s = hunga_fullsac;
-s = rmbadsac(s);
-s = rmgapsac(s);
-s = ordersac_geo(s, 'gcarc');
+% T wave frequencies, Hz.
+freqs = [2.5:2.5:10];
 
-evtdir = fullfile(getenv('HUNGA'), 'evt');
-evt = fullfile(evtdir, '11516993.evt');
-evt = load(evt, '-mat');
-EQ = evt.EQ;
+% Representative stations for table.
+kstnm = {'P0054', ...
+         'P0021', ...
+         'H03N1'};
 
-sigcat = catsac;
+% T wave velocity in m/s.
+c = 1480;
 
+% Read great-ricle file
+gc = hunga_read_great_circle_gebco;
+
+% Open file.
 fname = fullfile(getenv('HUNGA'), 'code', 'static', [mfilename '.txt']);
 writeaccess('unlock', fname, false)
-fmt_std = '%2s & %5s & %7.3f & %8.3f & %4i & %5s & %4i & %3i & %1s\\\\\n';
-fmt_h03 = '%2s & %5s & %7.1f & %8.1f & %4i & %5s & %4i & %3i & %1s\\\\\n';
-
 fid = fopen(fname, 'w+');
 
-for i = 1:length(s)
-    [~, h] = readsac(s{i});
-    [dist_km, dist_deg] = grcdist([EQ.PreferredLongitude EQ.PreferredLatitude], [h.STLO h.STLA]);
-    dist_km = round(dist_km);
-    az = round(azimuth(EQ.PreferredLatitude, EQ.PreferredLongitude, h.STLA, h.STLO));
-    gebco_m = -round(gebco(h.STLO, h.STLA, '2014'));
-    depthstr_m = sprintf('%i', gebco_m);
+% Write commented frequency header line -- should be able to just strip this
+% out and put in .tex file; separating it in case I want, e.g., a line
+% between header and data.
+fprintf(fid, '%sReceiver', '%');
+for j = 1:length(freqs)
+    fprintf(fid, ' & $f=$%.1f~Hz', freqs(j));
 
-    % Add asterisk to IMS GEBCO depths because IMS says those are way wrong
-    % in some cases.
-    if isimssac(s{i});
-        depthstr_m = [depthstr_m '$^*$'];
+end
+fprintf(fid, '\n');
 
-    end
+for i = 1:length(kstnm)
+    station = kstnm{i};
+    R_km = gc.(station).tot_distkm;
+    R_m = R_km * 1e3;
 
-    switch sigcat.(h.KSTNM)
-      case 'A'
-        sig = '{\color{blue}A}';
+    fprintf(fid, station);
+    for j = 1:length(freqs)
+        f = freqs(j);
+        fr_max_m  = fresnelmax(c, f, R_m);
 
-      case 'B'
-        sig = '{\color{black}B}';
+        % Check code to ensure max radius at middle of path.
+        fr_mid_m = fresnelradius(R_m/2, R_m, c, f);
+        if abs(fr_max_m - fr_mid_m) > 1e-10
+            error('radius at midpoint does not equal max radius')
 
-      case 'C'
-        sig = '{\color{gray}C}';
+        end
 
-      otherwise
-        error('Unknown signal category')
-
-    end
-
-    % Mask H03 locations.
-    if contains(h.KSTNM, 'H03')
-        h.STLA = round(h.STLA, 1);
-        h.STLO = round(h.STLO, 1);
-        h.STDP = round(800, -2);
-        fmt = fmt_h03;
-
-    else
-        fmt = fmt_std;
+        % Write radii in km.
+        fr_max_km = fr_max_m / 1e3;
+        fprintf(fid, ' & %2i km', round(fr_max_km));
 
     end
-    fprintf(fid, fmt, h.KNETWK, h.KSTNM, h.STLA, h.STLO, h.STDP, depthstr_m, dist_km, az, sig);
+    fprintf(fid, '\\\\ \n');
 
 end
 fclose(fid);
-fprintf('Wrote: %s\n', fname);
-
-fprintf('Including %i stations in table\n', length(s))
+writeaccess('lock', fname)
+fprintf('Wrote: %s\n', fname)

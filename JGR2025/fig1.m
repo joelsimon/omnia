@@ -13,6 +13,7 @@ clc
 close all
 
 invert = false;
+colorsat = 0.5;
 
 hundir = getenv('HUNGA');
 sacdir = fullfile(hundir, 'sac');
@@ -47,7 +48,7 @@ h03_idx = cellstrfind(sac, 'H03');
 sac(h03_idx(2:end)) = [];
 
 % Draw main map.
-F = plotevtmer_local_all(sac, EQ, sigtype);
+F = plotevtmer_local_all(sac, EQ, sigtype, colorsat);
 
 %% ___________________________________________________________________________ %%
 %% Map 1: MERMAID and IMS
@@ -118,7 +119,7 @@ savepdf('map2')
 
 %% ___________________________________________________________________________ %%
 
-function F = plotevtmer_local_all(sac, EQ, sigtype)
+function F = plotevtmer_local_all(sac, EQ, sigtype, colorsat)
 % Plot event location and location of array at time of event.
 %
 % Author: Joel D. Simon
@@ -132,7 +133,7 @@ evt_date = irisstr2date(EQ.PreferredTime);
 
 % Plot basemap.
 cax = [-6000 2000];
-F = plotgebcopacific(cax);
+F = plotgebcopacific(cax, colorsat);
 F.cb.Label.String = 'GEBCO Elevation [m]';
 hold(F.ha, 'on')
 

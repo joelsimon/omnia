@@ -1,9 +1,9 @@
 function [kstnm, minvp, minvp_depth, maxamp, maxamp_depth, vp, vp_depth, amp, amp_depth] = ...
-    figA3(freq, sigcat, excl48, plt)
+    figS9(freq, sigcat, excl48, plt)
 % [kstnm, minvp, minvp_depth, maxamp, maxamp_depth, vp, vp_depth, amp, amp_depth] = ...
-%     FIGA3(freq, sigcat, excl48, plt)
+%     FIGS9(freq, sigcat, excl48, plt)
 %
-% Figure A3: Sound-speed profile and mode summary (if plt=true)
+% Figure S9: Sound-speed profile and mode summary (if plt=true)
 %
 % Input:
 % freq    Frequency of mode, one of 2.5, 5.0, 7.5, or 10 [Hz]
@@ -13,19 +13,19 @@ function [kstnm, minvp, minvp_depth, maxamp, maxamp_depth, vp, vp_depth, amp, am
 % excl48  Exclude P0048 and P0049 (def: false)
 % plt     Plot result (def: false)
 %
-% Developed as: hunga_summarize_modes.m
+% Developed as: hunga_summarize_modes.m then figA3.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-Mar-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 01-Aug-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 clc
 
 % Default mode frequency and signal cateogry.
-defval('freq', 2.5);
+defval('freq', 2.5)
 defval('sigcat', 1)
 defval('excl48', false)
-defval('plt', false);
+defval('plt', true)
 
 % Get station-name list for given signal category.
 kstnm = lskstnmcat(sigcat);
@@ -98,6 +98,7 @@ if plt
         % Put crosses on outliers where max amplitude at seafloor.
         if max(amp{i}) == amp{i}(end)
             pl_cross(i) = plot(amp{i}(end), amp_depth{i}(end), 'k+');
+            fprintf('Shallow, cross in (B): %s\n', kstnm{i})
 
         end
     end

@@ -1,9 +1,9 @@
-function tblA1
-% TBLA1
+function tblS2
+% TBLS2
 %
-% Table A1: Ocean depths as repoted by GEBCO vs IMS 
+% Table S2: Ocean depths as repoted by GEBCO vs IMS 
 %
-% Developed as: hunga_write_gebco_ims_elevation_table.m
+% Developed as: hunga_write_gebco_ims_elevation_table.m then tbl1A1.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com

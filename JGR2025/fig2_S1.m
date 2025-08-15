@@ -1,18 +1,24 @@
-function ax = fig2(travtimeadj)
-% ax = FIG2(travtimeadj)
+function ax = fig2_S1(travtimeadj)
+% ax = FIG2_S1(travtimeadj)
 %
-% Figure 2: Record section, equally spaced, individually normed, aligned on T wave.
+% Figures 2 and S1: Record section, equally spaced, individually normed, aligned on T wave.
+%
+% See internally for switches to flip between azimuth and gcarc sorting.
 %
 % Developed as: hunga_recordsection2.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Dec-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 15-Aug-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
 close all
 
 defval('travtimeadj', false)
+
+% Dummary var in case of Figure S1, where it's not orded by azimuth.
+az = [];
 
 c = 1480; % km/s
 ph = c2ph(c, 'm/s');
@@ -37,7 +43,11 @@ sac = [sac ; imssac];
 
 sac = rmbadsac(sac);
 sac = rmgapsac(sac);
-sac = ordersac_geo(sac, 'gcarc');
+[sac, az] = ordersac_geo(sac, 'azimuth', 'P0023'); % Figure 2
+% sac = ordersac_geo(sac, 'gcarc'); % Figure S1
+
+% Flip ordering so plots top to bottom.
+az = flipud(az');
 sac = flipud(sac);
 
 sigtype = catsac;
@@ -81,7 +91,7 @@ for i = 1:length(sac)
 
     end
     xlab = 'Time Relative To Predicted {\it{T}}-Wave Arrival [min]';
-    
+
     xw = xw ./ rms(noise(isfinite(noise)));
     xw = xw - nanmean(xw);
 
@@ -95,7 +105,8 @@ for i = 1:length(sac)
 
     pl(i) = plot(ax, xax, xw + y, 'Color', [0.6 0.6 0.6], 'LineWidth', 0.25);
     pl30(i) = plot(ax, xax30, xw30 + y, 'Color', Color, 'LineWidth', 0.25);
-    tl(i) = text(xax(end), xw(end) + y, h.KSTNM);
+    tl(i) = text(xax(end), nanmean(xw) + y, h.KSTNM);
+    azl(i) = text(0.99*xax(end), nanmean(xw) + y, sprintf('%i^{\\circ}', round(az(i))), 'HorizontalAlignment', 'Right'); % comment for Figure S1
 
     if xax(1) < mn
         mn = xax(1);
@@ -105,7 +116,8 @@ for i = 1:length(sac)
         mx = xax(end);
 
     end
-    y = y + 30; % 2.5-10 Hz
+    y = y + 37; % 2.5-10 Hz
+
 
 end
 vl = plot(ax, [0 0], ax.YLim, 'Color', 'k');
@@ -120,9 +132,10 @@ grid on
 ax.YTick = [];
 ax.XLim = [-prepost(1) prepost(2)];
 xticks([-30:5:60])
-ylim([-40 1060])
+ylim([-40 1300])
 latimes2
 
+%% Figure 2
 for i = 1:length(tl)
     % Name MERMAID stations at left, IMS at right
     if ~strcmp(tl(i).String(1), 'H')
@@ -136,4 +149,25 @@ for i = 1:length(tl)
     end
 end
 axesfs([], 8, 8)
+set(azl, 'FontSize', 7)
+movev(azl, 22)
+uistack(azl, 'top')
+%% Figure 2
+
+%% Figure S1
+% for i = 1:length(tl)
+%     % Name MERMAID stations at left, IMS at right
+%     if ~strcmp(tl(i).String(1), 'H')
+%         tl(i).Position(1) = -prepost(1)-0.005*(sum(prepost));
+%         tl(i).HorizontalAlignment = 'right';
+
+%     else
+%         tl(i).Position(1) = prepost(end)+0.005*(sum(prepost));
+%         tl(i).HorizontalAlignment = 'left';
+
+%     end
+% end
+% axesfs([], 8, 8)
+%% Figure S1
+
 savepdf(mfilename)

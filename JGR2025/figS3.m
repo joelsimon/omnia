@@ -1,16 +1,16 @@
-function fig3(ref_phase, lohi)
-% FIG3(ref_phase, lohi)
+function figS3(ref_phase, lohi)
+% FIGS3(ref_phase, lohi)
 %
 % Figure 3: Vespagram
 %
-% To generate fig3a: FIG3('1.48kmps', [2.5 10])
-% To generate fig3b: FIG3('P', [1 2.5])
+% To generate figS3a: FIGS3('1.48kmps', [2.5 10])
+% To generate figS3b: FIGS3('P', [1 2.5])
 %
 % Input:
 % ref_phase   MatTaup reference phase (def: '1.48kmps')
 % lohi        Bandpass corners (def: [2.5 10])
 %
-% Developed as: hunga_vespagram.m
+% Developed as: hunga_vespagram.m then fig3.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
@@ -354,7 +354,12 @@ cn = imagesc(xax_stack, delP, stack, 'AlphaData', ~isnan(stack));
 ax = gca;
 ax.YDir = 'Normal';
 
-colormap(turbo)
+%% Pull in Crameri's colormaps so that I can use crameri.m
+cpath = fullfile(getenv('PROGRAMS'), 'crameri');
+addpath(cpath);
+colormap(crameri('-devon'))
+rmpath(cpath);
+%% Pull in Crameri's colormaps so that I can use crameri.m
 
 xlim([xax_align(1) xax_align(end)])
 ylim([delP(1) delP(end)])
@@ -426,7 +431,7 @@ end
 
 ylabel('\delta Slowness [s/deg]')
 
-% E.g., fig3b.
+% E.g., figS3B.
 if strcmp(ref_phase, 'P')
     xlim([-5*60 15*60]);
     xticks([-5*60:5*60:15*60]);
@@ -437,6 +442,7 @@ if strcmp(ref_phase, 'P')
     movev(tlc(2:end), -1)
     ax.XLabel.String = 'Time Relative To Predicted {\itP}-Wave Arrival [min]';
     ax.YLabel.String = 'Slowness Relative To Predicted {\itP}-Wave [s/deg]';
+    ax.YLabel.Position(1) = -405;
     plot([0 0], [-10 -1.5], 'k')
     plot([0 0], [1.5 30], 'k')
     plot([-5*60 -2/3*60], [0 0], 'k')
@@ -454,7 +460,7 @@ if strcmp(ref_phase, 'P')
 
 end
 
-% E.g., fig3a
+% E.g., figS3A
 if strcmp(ref_phase, '1.48kmps')
     xlim([-60*15 60*45])
     xticks([-60*15:60*5:60*45])
@@ -469,11 +475,11 @@ if strcmp(ref_phase, '1.48kmps')
     plot([0 0], [5 100], 'k')
     plot([-15*60 -2*60], [0 0], 'k')
     plot([2*60 45*60], [0 0], 'k')
-    text(60, 12.5, '{\itT}', 'Color', 'k')
-    text(33*60, -90, sprintf('%.1f - %.1f Hz', lohi(1), lohi(2)), 'Color', 'white')
+    text(-200, 12.5, '{\itT}', 'Color', 'k')
+    text(33*60, -90, sprintf('%.1f - %.1f Hz', lohi(1), lohi(2)), 'Color', 'k')
     delete(ax.Title)
     clim([0.2 1])
-    lbl = text(-14*60, 90, 'A', 'FontName', 'Helvetica', 'FontWeight',  'Bold', 'Color', 'w');
+    lbl = text(-14*60, 90, 'A', 'FontName', 'Helvetica', 'FontWeight',  'Bold', 'Color', 'k');
 
 end
 axesfs([], 15, 15)
@@ -488,6 +494,15 @@ if exist('lbl')
 
 end
 
+% %% Pull in Crameri's colormaps so that I can use crameri.m
+% cpath = fullfile(getenv('PROGRAMS'), 'crameri');
+% addpath(cpath);
+% cycle_crameri(ax);
+% cmap2 = crameri(cmap2);
+% %% Pull in Crameri's colormaps so that I can use crameri.m
+
+keyboard
+%% End main.
 
 %% ___________________________________________________________________________ %%
 function [xb, h] = readsac_filter(s, lohi, popas)

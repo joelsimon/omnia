@@ -1,0 +1,1 @@
+No script to generate this table; did by hand with output of fig7_8_S45.m and adjusting the clearence ratio.

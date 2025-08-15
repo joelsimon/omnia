@@ -1,25 +1,32 @@
 function fig9ab
-% FIG9AB
+% FIG5AB
 %
-% Panel A and B of Figure 9: Bathymetric cross section and map for H11S3.
+% Panel A and B of Figure 5: Bathymetric cross section and map for H11S3.
 %
 % Part of three panel: bathymetric PROFile; BATHymetric map; occlusion-count
 % SCHEMatic.
 %
-% See fig9c.m (developed as hunga_schematic2.m) to finish.
+% See fig5c.m (developed as hunga_schematic2.m, then fig9c.m) to finish.
 %
-% Developed as: hunga_profbathschem.m
+% Developed as: hunga_profbathschem.m then fig9ab.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-Mar-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 15-Aug-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
 close all
 
 kstnm = 'H11S3';
 
-cmap = 'turbo';
+%% Pull in Crameri's colormaps so that I can use crameri.m
+cmap = 'oslo';
+cpath = fullfile(getenv('PROGRAMS'), 'crameri');
+addpath(cpath);
+cmap = crameri(cmap);
+%% Pull in Crameri's colormaps so that I can use crameri.m
+
 lw = 2;
 cn_lw = 1.5;
 
@@ -101,7 +108,6 @@ cax = [-6 0];
 caxis(cax);
 colormap(cmap)
 cb = colorbar;
-
 cb.Location = 'SouthOutside';
 cb.Label.String = 'GEBCO Elevation [km]';
 cb.Label.Interpreter = 'tex';
@@ -114,7 +120,7 @@ cb.TickDirection = 'out';
 % Get mesh from image, to overlay contour
 [cn_x, cn_y] = im2mesh(im);
 [~, cn] = contour(ax(2), cn_x, cn_y, bathy, [tz_m tz_m]);
-cn.EdgeColor = 'black';
+cn.EdgeColor = 'g';
 cn.LineWidth = cn_lw;
 
 %ax(2).YDir = 'normal';
@@ -124,17 +130,25 @@ ylabel(ax(2), 'Distance From GCP [km]')
 xlabel(ax(2), 'Distance From Source [km]')
 
 % Annotation/hightlight like schematic
+%plot(ax(2).XLim, [0 0], 'k', 'LineWidth', lw*1.4);
 plot(ax(2).XLim, [0 0], 'r', 'LineWidth', lw);
 
 kstnm_tx2 = text(ax(2), 50, -18, sprintf('%s', kstnm));
 map_tx = text(50, -24, 'Map View');
 
+% plfr061b = plot(ax(2), dist_km, +0.6*fg.radius_m/1e3, 'Color', 'k', 'LineWidth', lw*1.4);
+% plfr062b = plot(ax(2), dist_km, -0.6*fg.radius_m/1e3, 'Color', 'k', 'LineWidth', lw*1.4);
 
-plfr061 = plot(ax(2), dist_km, +0.6*fg.radius_m/1e3, 'Color', 'm', 'LineWidth', lw);
-plfr062 = plot(ax(2), dist_km, -0.6*fg.radius_m/1e3, 'Color', 'm', 'LineWidth', lw);
+plfr061 = plot(ax(2), dist_km, +0.6*fg.radius_m/1e3, 'Color', orange, 'LineWidth', lw);
+plfr062 = plot(ax(2), dist_km, -0.6*fg.radius_m/1e3, 'Color', orange, 'LineWidth', lw);
 
-plfr1 = plot(dist_km, +fg.radius_m/1e3, 'b', 'LineWidth', lw);
-plfr2 = plot(dist_km, -fg.radius_m/1e3, 'b', 'LineWidth', lw);
+% plfr1b = plot(dist_km, +fg.radius_m/1e3, 'k', 'LineWidth', lw*1.4);
+% plfr2b = plot(dist_km, -fg.radius_m/1e3, 'k', 'LineWidth', lw*1.4);
+
+uistack(cn, 'top')
+
+plfr1 = plot(dist_km, +fg.radius_m/1e3, 'm', 'LineWidth', lw);
+plfr2 = plot(dist_km, -fg.radius_m/1e3, 'm', 'LineWidth', lw);
 
 %% Final cosmetics.
 %% ___________________________________________________________________________ %%
@@ -154,4 +168,20 @@ axesfs(f, 12, 12)
 lbA = text(ax(1), 60, -0.1, 'A', 'FontName', 'Helvetica', 'FontWeight',  'Bold', 'FontSize', 12);
 lbB = text(ax(2), 60, 23, 'B', 'FontName', 'Helvetica', 'FontWeight',  'Bold', 'FontSize', 12);
 
-savepdf(mfilename)
+% S = load(fullfile(getenv('PROGRAMS'), 'crameri', 'CrameriColourMaps8.0.mat'));
+% cnames = fieldnames(S);
+% for i = 1:length(cnames)
+%     cmap = cnames{i};
+%     colormap(ax(2), crameri(cmap))
+%     title(cmap)
+%     savepdf(sprintf('%i_%s', i, cmap))
+
+%     cmap = ['-' cnames{i}];
+%     colormap(ax(2), crameri(cmap))
+%     title(cmap)
+%     savepdf(sprintf('%i_%s', i, cmap))
+
+% end
+% savepdf(mfilename)
+
+rmpath(cpath);

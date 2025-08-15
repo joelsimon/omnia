@@ -1,32 +1,33 @@
-function ax = fig11_13_14(tz, algo, crat, prev, los)
-% ax = FIG11_13_14(tz, algo, crat, prev, los)
+function ax = fig7_8_S45(tz, algo, crat, prev, los)
+% ax = fig7_8_S45(tz, algo, crat, prev, los)
 %
-% Figures 10, 11, 14: RMS vs occlusion rank
-%                     SPL vs distance
-%                     SPL* vs occlusion value
+% Figures 7, 8, S45: SPL vs distance
+%                    SPL* vs occlusion value
+%                    RMS vs occlusion rank
 % See internal comments for switches to generate various iterations of each.
 %
 % For inputs, see orderkstnm_occl.m
 %
-% Developed as: hunga_plot_timewindow_rms.m
+% Developed as: hunga_plot_timewindow_rms.m then fig11_13_14.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 10-Mar-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 15-Aug-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
 close all
 
-%% For Figure 11: all false
-%% >> fig11_13_14(-1350, 1, 1.0, false, false)
+%% For Figure 7: all false except `only_sig` (keep Figure 5 window)
+%% >> fig7_8_S45(-1350, 1, 1.0, false, false)
 %%
-%% For Figure 13: all false except `only_sig`
-%% >> fig11_13_14(-1350, 1, 1.0, false, false)
+%% For Figure 8: all false except `only_sig` (keep Figure 1 window)
+%% 8a >> fig7_8_S45(-1350, 1, 0.0, false, false)
+%% 8b >> fig7_8_S45(-1350, 1, 0.6, false, false)
+%% 8c >> fig7_8_S45(-1350, 1, 1.0, false, false)
 %%
-%% For Figure 14: all false except `only_sig`
-%% 14a >> fig11_13_14(-1350, 1, 0.0, false, false)
-%% 14b >> fig11_13_14(-1350, 1, 0.6, false, false)
-%% 14c >> fig11_13_14(-1350, 1, 1.0, false, false)
+%% For Figure S45: all false (keep Figure 4 window)
+%% >> fig7_8_S45(-1350, 1, 1.0, false, false)
 skip_occ0 = false;
 skip_ims = false;
 skip_H11 = false;
@@ -36,24 +37,23 @@ skip_35 = false;
 skip_48_49 = false;
 skip_48 = false;
 skip_49 = false;
-only_sig = true;
 only_peaky = false;
+only_sig = true;
 
 switch crat
   case 0
     lColor = 'r';
 
   case 0.6
-    lColor = 'm'
+    lColor = orange
 
   case 1.0
-    lColor = 'b';
+    lColor = 'm';
 
   otherwise
     lColor = 'k'
 
 end
-
 
 %%%%% Really should have one REFERENCE station list, not keep, e.g., occ_sta,
 %%%%% after I've sorted all value lists.
@@ -74,7 +74,8 @@ stdp_val = structfun(@(xx) xx, stdp);
 %% Get occlusion stats
 
 %% Get RMS stats
-rmsfile = 'hunga_write_timewindow_rms_pre--5min_post-25min_envlen-30s_envtype-rms_2.5-10.0Hz_signal.txt';
+%rmsfile = 'hunga_write_timewindow_rms_pre--5min_post-25min_envlen-30s_envtype-rms_2.5-10.0Hz_signal.txt';
+rmsfile = 'rms_signal.txt';
 [rms_sta, rms_val] = hunga_read_timewindow_rms(rmsfile);
 %% Get RMS stats
 
@@ -204,20 +205,28 @@ max_Lp_star_sta = Lp_star_sta{max_idx};
 x = log10(occ_val+1);
 y = Lp_star_val - max_Lp_star_val;
 
-ax(1) = plotxy(x, y, occ_sta, 0);
+[ax(1), F(1)] = plotxy(x, y, occ_sta, 0);
 
+xlabel('Log Occlusion Count')
 switch crat
-  case 0
-    xlabel('Log Occlusion Count, Great-Circle Path Only (\Lambda_{0.0})')
+  case 0.0
+    frestr = 'Great-Circle Path Only';
+    %frestr = 'Great-Circle Path Only [\Lambda_{0.0}]';
+    %xlabel('Log Occlusion Count, Great-Circle Path Only [\Lambda_{0.0}]')
 
   case 0.6
-    xlabel(sprintf('Log Occlusion Count, 60%s Fresnel Clearance (\\Lambda_{0.6})', '%'))
+    frestr = sprintf('60%s Fresnel Clearance', '%');
+    %frestr = sprintf('60%s Fresnel Clearance [\\Lambda_{0.6}]', '%');
+    %xlabel(sprintf('Log Occlusion Count, 60%s Fresnel Clearance [\\Lambda_{0.6}]', '%'))
 
-  case 1
-    xlabel(sprintf('Log Occlusion Count, Full Fresnel Zone (\\Lambda_{1.0})'))
+  case 1.0
+    frestr = 'Full Fresnel Zone';
+    %frestr = 'Full Fresnel Zone [\\Lambda_{1.0}]';
+    %xlabel('Log Occlusion Count, Full Fresnel Zone [\\Lambda_{1.0}]');
 
-  otherwise
-    xlabel('Log Occlusion Count');
+end
+if ismember(crat, [0.0 0.6 1.0])
+    frestx = text(0.5, -18.25, frestr, 'HorizontalAlignment', 'Center');
 
 end
 
@@ -225,7 +234,7 @@ end
 %ylabel('log$_{10}$(RMS$^2\cdot\|\Delta\|$)')
 
 % tex
-ylabel(sprintf('Adjusted Sound Pressure Level, {\\itL}_{\\itp}^* (dB from %s)', max_Lp_star_sta));
+ylabel(sprintf('Adjusted Sound Pressure Level, {\\itL}_{\\itp}^* [dB from %s]', max_Lp_star_sta));
 
 ax(1).XLim(1) = ax(1).XLim(1) - 0.025*range(ax(1).XLim);
 ax(1).XLim(2) = ax(1).XLim(2) + 0.025*range(ax(1).XLim);
@@ -251,6 +260,7 @@ if ~skip_occ0 && ~isempty(occ0_idx)
     pf_bot = plot(xyfit(:, 1), xyfit(:, 2) - 0.5*occ0_rng, 'k--', 'LineWidth', 1);
 
 end
+uistack([pf_top pf_bot], 'bottom')
 
 %% Compute bootstrapped statistics
 % https://www.mathworks.com/help/stats/linearmodel.predict.html#namevaluepairarguments
@@ -320,38 +330,87 @@ tx_d = text(0.93*ax(1).XLim(2), midy+0.40*rngy, dstr, 'Color', lColor, ...
 fr_x = linspace(0, 1, 100);
 fr_y = fresnelradius(fr_x, 1, 1, 1/25);
 
-if crat == 0
-    lb1 = text(0, 3.5, 'A', 'FontName', 'Helvetica', 'FontWeight',  'Bold', 'FontSize', 15);
-    plot(fr_x, fr_y-21.5, 'k:');
-    plot(fr_x, -fr_y-21.5, 'k:');
+for i = 1:length(F(1).rms_tx)
+    if any(strcmp(F(1).rms_tx(i).String, {'H11S3' 'H11S1' 'H11N2' 'H11N3' 'H03S3' 'H03S2'}))
+        F(1).rms_tx(i).String = '';
+        continue
 
-    plot(fr_x, 0.6*fr_y-21.5, 'k:');
-    plot(fr_x, -0.6*fr_y-21.5, 'k:');
+    end
+    if strcmp(F(1).rms_tx(i).String, 'H11S2')
+        F(1).rms_tx(i).String = 'H11S1-H11S3';
+        %F(1).rms_tx(i).String = ['H11S1'  char(8211) 'H11S3']
 
-    plot(fr_x, repmat(-21.5, size(fr_x)), 'r', 'LineWidth', 2);
+    end
+    if strcmp(F(1).rms_tx(i).String, 'H11N1')
+        F(1).rms_tx(i).String = 'H11N1-H11N3';
+        %F(1).rms_tx(i).String = ['H11N1'  char(8211) 'H11N3']
 
-elseif crat == 0.6
-    lb1 = text(0, 3.5, 'B', 'FontName', 'Helvetica', 'FontWeight',  'Bold', 'FontSize', 15);
-    plot(fr_x, fr_y-21.5, 'k:');
-    plot(fr_x, -fr_y-21.5, 'k:');
+    end
+    if strcmp(F(1).rms_tx(i).String, 'H03S1')
+        F(1).rms_tx(i).String = 'H03S1-H03S3';
+        %F(1).rms_tx(i).String = ['H03S1'  char(8211) 'H03S3']
 
-    plot(fr_x, 0.6*fr_y-21.5, 'm', 'LineWidth', 2);
-    plot(fr_x, -0.6*fr_y-21.5, 'm', 'LineWidth', 2);
+    end
+end
 
-    plot(fr_x, repmat(-21.5, size(fr_x)), 'k:');
+%% To set positions I manually adjusted (arrow above graph in MATLAB figure), then:
+%% pos = gettxpos(F(1).rms_tx);
+%% save('static/fig8[a-c]_pos.mat', 'pos');
 
+% These pos .mat files are only valid for Figs. 7 and 8 where we only keep
+% category A and B signals; I didn't adjust for null (Category C) labels, so we
+% want to skip this section when making, e.g., the rank figure of S45.
+if only_sig
+    if crat == 0
+        lb1 = text(0, 3.5, 'A', 'FontName', 'Helvetica', 'FontWeight',  'Bold', 'FontSize', 15);
+        plot(fr_x, fr_y-21.5, 'k:');
+        plot(fr_x, -fr_y-21.5, 'k:');
 
-elseif crat == 1.0
-    lb1 = text(0, 3.5, 'C', 'FontName', 'Helvetica', 'FontWeight',  'Bold', 'FontSize', 15);
+        plot(fr_x, 0.6*fr_y-21.5, 'k:');
+        plot(fr_x, -0.6*fr_y-21.5, 'k:');
 
-    plot(fr_x, fr_y-21.5, 'b', 'LineWidth', 2);
-    plot(fr_x, -fr_y-21.5, 'b', 'LineWidth', 2);
+        plot(fr_x, repmat(-21.5, size(fr_x)), 'Color', lColor, 'LineWidth', 2);
 
-    plot(fr_x, 0.6*fr_y-21.5, 'k:');
-    plot(fr_x, -0.6*fr_y-21.5, 'k:');
+        load('static/fig8a_pos.mat', 'pos');
+        for i = 1:length(F(1).rms_tx)
+            F(1).rms_tx(i).Position = pos(i,:);
+            F(1).rms_tx(i).Position(3) = 1;
 
-    plot(fr_x, repmat(-21.5, size(fr_x)), 'k:')
+        end
+    elseif crat == 0.6
+        lb1 = text(0, 3.5, 'B', 'FontName', 'Helvetica', 'FontWeight',  'Bold', 'FontSize', 15);
+        plot(fr_x, fr_y-21.5, 'k:');
+        plot(fr_x, -fr_y-21.5, 'k:');
 
+        plot(fr_x, repmat(-21.5, size(fr_x)), 'k:');
+
+        plot(fr_x, 0.6*fr_y-21.5, 'Color', lColor, 'LineWidth', 2);
+        plot(fr_x, -0.6*fr_y-21.5, 'Color', lColor, 'LineWidth', 2);
+
+        load('static/fig8b_pos.mat', 'pos');
+        for i = 1:length(F(1).rms_tx)
+            F(1).rms_tx(i).Position = pos(i,:);
+            F(1).rms_tx(i).Position(3) = 1;
+
+        end
+    elseif crat == 1.0
+        lb1 = text(0, 3.5, 'C', 'FontName', 'Helvetica', 'FontWeight',  'Bold', 'FontSize', 15);
+
+        plot(fr_x, 0.6*fr_y-21.5, 'k:');
+        plot(fr_x, -0.6*fr_y-21.5, 'k:');
+
+        plot(fr_x, repmat(-21.5, size(fr_x)), 'k:')
+
+        plot(fr_x, fr_y-21.5, 'Color', lColor, 'LineWidth', 2);
+        plot(fr_x, -fr_y-21.5, 'Color', lColor, 'LineWidth', 2);
+
+        load('static/fig8c_pos.mat', 'pos');
+        for i = 1:length(F(1).rms_tx)
+            F(1).rms_tx(i).Position = pos(i,:);
+            F(1).rms_tx(i).Position(3) = 1;
+
+        end
+    end
 end
 hold(ax(1), 'off')
 
@@ -415,14 +474,14 @@ ax(2).FontSize = 14;
 
 ax(3) = plotxy(rank_x, rank_y, rank_sta, 1);
 hold(ax(3), 'on')
-F.rank_line = plot(rank_x, rank_y, 'k');
-uistack(F.rank_line, 'bottom');
+rank_line = plot(rank_x, rank_y, 'k');
+uistack(rank_line, 'bottom');
 hold(ax(3), 'off')
 
 ax(3).YDir = 'reverse';
 ax(3).XAxisLocation = 'top';
-xlabel('Occlusion Rank (Least Occluded First)')
-ylabel('Signal RMS Rank (Largest RMS First)')
+xlabel('Occlusion Rank [Least Occluded First]')
+ylabel('Signal RMS Rank [Largest RMS First]')
 
 xticks(ax(3), unique(rank_x));
 yticks(ax(3), unique(rank_y));
@@ -459,9 +518,8 @@ ax(3).GridAlpha = .25;
 axesfs(gcf, 10, 10);
 
 %% ___________________________________________________________________________ %%
-%% Figure 11 with ALL 35 stations, occlfspl
+%% Plot raw sound pressure level vs distance
 %% ___________________________________________________________________________ %%
-% Plot raw sound pressure level vs distance
 
 if ~isequal(dist_sta, p_sta)
     error('')
@@ -471,7 +529,7 @@ end
 Lp_val = spl(p_val, 1);
 Lp_sta = p_sta;
 
-ax(4) = plotxy(deg2km(dist_val), Lp_val, dist_sta)
+[ax(4), F(4)] = plotxy(deg2km(dist_val), Lp_val, dist_sta)
 
 % Shift KSTNM labels up slightly.
 kstnm_tx = findobj(ax(4).Children, 'type', 'text');
@@ -508,8 +566,8 @@ hold(ax(4), 'off')
 
 xlim(ax(4), [0 10000]);
 ylim(ax(4), [90 130]);
-xlabel('Epicentral Distance, {\itr} (km)')
-ylabel('Sound Pressure Level, {\itL}_{\itp} (dB re 1 \muPa)')
+xlabel('Epicentral Distance, {\itr} [km]')
+ylabel('Sound Pressure Level, {\itL}_{\itp} [dB re 1 \muPa]')
 
 box on
 grid on
@@ -521,6 +579,39 @@ ax(4).FontSize = 14;
 % Make attenuation-curve labels (ONLY) LaTeX for proper sqrt.
 set(tx_spldist2, 'String',' \boldmath{$p \propto 1/\sqrt{r}$}', 'Interpreter', 'LaTeX', 'FontSize', 13);
 set(tx_spldist3, 'String',' \boldmath{$p \propto 1/r$}', 'Interpreter', 'LaTeX', 'FontSize', 13);
+
+for i = 1:length(F(4).rms_tx)
+    if any(strcmp(F(4).rms_tx(i).String, {'H11S3' 'H11S1' 'H11N2' 'H11N3' 'H03S3' 'H03S2'}))
+        F(4).rms_tx(i).String = '';
+        continue
+
+    end
+    if strcmp(F(4).rms_tx(i).String, 'H11S2')
+        F(4).rms_tx(i).String = 'H11S1-H11S3';
+        %F(4).rms_tx(i).String = ['H11S1'  char(8211) 'H11S3']
+
+    end
+    if strcmp(F(4).rms_tx(i).String, 'H11N1')
+        F(4).rms_tx(i).String = 'H11N1-H11N3';
+        %F(4).rms_tx(i).String = ['H11N1'  char(8211) 'H11N3']
+
+    end
+    if strcmp(F(4).rms_tx(i).String, 'H03S1')
+        F(4).rms_tx(i).String = 'H03S1-H03S3';
+        %F(4).rms_tx(i).String = ['H03S1'  char(8211) 'H03S3']
+
+    end
+end
+
+% Manually adjusted labels, got positions, saved in mat (two comment lines below)
+%pos = gettxpos(F(4).rms_tx);
+%save('static/fig7_pos.mat', 'pos');
+load('static/fig7_pos.mat', 'pos');
+for i = 1:length(F(4).rms_tx)
+    F(4).rms_tx(i).Position = pos(i,:);
+
+end
+keyboard
 
 % %% ___________________________________________________________________________ %%
 % % Plot corrected sound pressure level vs azimuth
@@ -537,6 +628,10 @@ set(tx_spldist3, 'String',' \boldmath{$p \propto 1/r$}', 'Interpreter', 'LaTeX',
 % latimes2
 
 
+%% END MAIN
+
+
+
 %% ___________________________________________________________________________ %%
 %% Subfuncs
 %% ___________________________________________________________________________ %%
@@ -550,7 +645,7 @@ val = val(idx);
 
 %% ___________________________________________________________________________ %%
 
-function ax = plotxy(x, y, kstnm, pos1)
+function [ax, F] = plotxy(x, y, kstnm, pos1)
 
 % pos1 = first index that you want labels shifted to right; 0 for occluion
 % and 1 for rank.

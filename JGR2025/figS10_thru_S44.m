@@ -1,5 +1,5 @@
-function figSI1_35
-% FIGSI1_35
+function figS10_thru_S44
+% FIGS10_THRU_S44
 %
 % Figures SI 1-35: Time domain, spectral domain, bathymetric cross section,
 % Fresnel-zone bathymetry map view.
@@ -8,11 +8,12 @@ function figSI1_35
 % There, no individual sac files should be called internally (comment all
 % lines starting with `sac = ...`), and timspec_only must be false.
 %
-% Developed as: hunga_timspecprofbath2_all
-
+% Developed as: hunga_timspecprofbath2_all then figSI1_35.m
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 12-Feb-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 15-Aug-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 hundir = getenv('HUNGA');
 sacdir = fullfile(hundir, 'sac');
@@ -36,8 +37,7 @@ sac = ordersac_geo(sac, 'gcarc');
 %sac = sac(idx);
 
 for i = 1:length(sac)
-    % NB: `fig4_5_A2` was originally `hunga_timspecprofbath2`
-    [ax, f] = fig4_5_A2(sac{i});
+    [ax, f] = fig3_4l_S4(sac{i}); % see this subfunc to properly set up preamble
     h = sachdr(sac{i});
     savepdf(sprintf('%02i_%s', i, h.KSTNM));
     close

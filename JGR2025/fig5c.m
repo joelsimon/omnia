@@ -1,18 +1,18 @@
-function fig9c
-% FIG9C
+function fig5c
+% FIG5C
 %
-% Panel C of Figure 9: Occlusion-counting schematic.
+% Panel C of Figure 5: Occlusion-counting schematic.
 %
 % Cause it's easier to program than draw, right?
 %
 % See also: hunga_profbathschem to finish.
 %
-% Developed as hunga_schematic2.m, itself hunga_schematic.m, but normalized
-% distances and radii.
+% Developed as: hunga_schematic2.m then fig9c.m
+% (itself hunga_schematic.m, but normalized distances and radii)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 26-Mar-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 07-Aug-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
 
 clc
 close all
@@ -31,20 +31,33 @@ figure
 ax = axes;
 hold(ax, 'on');
 ax.Box = 'on';
-plfr = plot(r/1e3, fr/1e3);
 ax.YDir = 'reverse';
-plfr.Color = 'blue';
+
+% plfrb = plot(r/1e3, fr/1e3);
+% plfrb.Color = 'k';
+% plfrb.LineStyle = '-';
+% plfrb.LineWidth = 1.5*1.4;
+
+plfr = plot(r/1e3, fr/1e3);
+plfr.Color = 'm';
 plfr.LineStyle = '-';
 plfr.LineWidth = 1.5;
 
-green = [6/256 100/256 43/256];
+% plfr06b = plot(r/1e3, 0.6*fr/1e3);
+% plfr06b.Color = 'k';
+% plfr06b.LineStyle = '-';
+% plfr06b.LineWidth = 1.5*1.4;
+
 plfr06 = plot(r/1e3, 0.6*fr/1e3);
-ax.YDir = 'reverse';
-plfr06.Color = 'm';
+plfr06.Color = orange;
 plfr06.LineStyle = '-';
 plfr06.LineWidth = 1.5;
 
 shrink(ax, 0.9, 3);
+
+% pllosb = plot(ax.XLim, [0 0], 'k');
+% pllosb.LineStyle = '-';
+% pllosb.LineWidth = 1.5*1.4;
 
 pllos = plot(ax.XLim, [0 0], 'r');
 pllos.LineStyle = '-';
@@ -80,8 +93,10 @@ pa500 = plot([500 500], [0 fr500-0.5], 'Color', 'black', 'LineWidth', 1.5);
 pl500 = plot(500, fr500-0.75, 'v', 'MarkerFaceColor', 'black', 'MarkerEdgeColor', 'black');
 phi500 = text(530, 5, '{\itF} = {\itF}{_1}', 'Color', 'black');
 
-lg = legend([pllos plfr06 plfr pl250 r250], 'Line of Sight', '0.6\cdotFresnel Radius', 'Fresnel Radius', 'Clearance', 'Occlusion', 'Location', ...
+lg = legend([pllos plfr06 plfr pl250 r250], 'Great-circle path', '0.6\cdotFresnel Radius', 'Fresnel Radius', 'Clearance', 'Occlusion', 'Location', ...
             'SouthEast', 'Box', 'on', 'AutoUpdate', 'off');
+% lg = legend([pllos plfr06 plfr pl250 r250], 'Great-circle path', '0.6\times Fresnel Radius', 'Fresnel Radius', 'Clearance', 'Occlusion', 'Location', ...
+%             'SouthEast', 'Box', 'on', 'AutoUpdate', 'off');
 
 posx = [0:250:1500];
 posx = posx(2:end-1);
@@ -101,8 +116,8 @@ l6 = text(posx, repmat(24, size(posx)), s6, 'HorizontalAlignment', 'Center', 'Ve
 sym_posx = repmat(90, 1, 4);
 div = text(90, 17.5, '{\itF} / {\itF}_{1}', 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top');
 lam00 = text(90, 20, '\Lambda_{\color{red}{0.0}}', 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top');
-lam06 = text(90, 22, '\Lambda_{\color{magenta}{0.6}}', 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top');
-lam10 = text(90, 24, '\Lambda_{\color{blue}{1.0}}', 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top');
+lam06 = text(90, 22, '\Lambda_{\color{orange}{0.6}}', 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top');
+lam10 = text(90, 24, '\Lambda_{\color{magenta}{1.0}}', 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top');
 
 eql1 = text(repmat(187.50, 1, 4), [17.5 20 22 24], {'=' '=' '=' '='}, 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top');
 eql2 = text(1500-[187.5 187.5 187.5], [20 22 24], {'=' '=' '='}, 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top');
@@ -113,13 +128,13 @@ plus3 = text(repmat(875, 1, 3), [20 22 24], {'+' '+' '+'}, 'HorizontalAlignment'
 plus4 = text(repmat(1125, 1, 3), [20 22 24], {'+' '+' '+'}, 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top');
 
 sum0 = text(1395, 20, '1' , 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top', 'Color', 'r');
-sum06 = text(1395, 22, '3' , 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top', 'Color', 'm');
-sum10 = text(1395, 24, '4' , 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top', 'Color', 'b');
+sum06 = text(1395, 22, '3' , 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top', 'Color', orange);
+sum10 = text(1395, 24, '4' , 'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Top', 'Color', 'm');
 
 ttxt = text(60, -2, '{\itT}-Wave \Rightarrow');
 
 % Line for division in ylabel
-div_lin = annotation('line', [0.025 0.025], [0.4 0.63]);
+div_lin = annotation('line', [0.022 0.022], [0.4 0.63]);
 latimes2
 
 uistack([pllos r250 r750 r1000 r1250 pa250 pa500 plfr plfr06], 'top')

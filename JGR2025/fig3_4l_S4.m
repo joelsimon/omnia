@@ -1,24 +1,27 @@
-function [ax, f] = fig4_5_A2(sac)
-% [ax, f] = FIG4_5_A2(sac)
+function [ax, f] = fig3_4l_S4(sac)
+% [ax, f] = FIG3_4l_S4(sac)
 %
-% Figures (or parts of): 4, 5, A2, SI 1-35
+% Figures (or parts of): 3, 4 (left column), S4, S10--S44.
+%
+% Pretty func name, huh?
 %
 % Generically plots 4 panels: time domain, spectral domain, bathymetric cross
 % section, Fresnel-zone bathymetry map view.
 %
 % See internal instructions to generate specific figures/parts.
 %
-% Developed as: hunga_timspecprofbath2.m
+% Developed as: hunga_timspecprofbath2.m then fig4_5_A2.m
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 01-Apr-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 15-Aug-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
-% Figures 4 and 5: set timspec_only to true
-% Figure 4, A2: uncomment "For small font P0045 --> ... <--- For small font P0045" block
-% Figure 4: additional annotation added in post
-% For Figures SI 1--35: comment all following SAC, set timspec_only to false
-%sac = '20220115T034444.0045_62AAD314.MER.REQ.merged.sac'
+% Figures 3 and 4: set timspec_only to true
+% Figure 3: additional annotation added in post
+% Figure 4, S4: uncomment "For small font P0045 --> ... <--- For small font P0045" block
+% For Figures S10--44: set timspec_only to false and comment these individual `sac` files
+sac = '20220115T034444.0045_62AAD314.MER.REQ.merged.sac'; 
 %sac = '20220115T040400.0053_630C0CF0.MER.REQ.merged.sac'; % color = [0 .33  1]
 %sac = 'H03S1.EDH.202201150400_4hr.sac.pa'; % color = [0 .67  1]
 %sac = 'H11S1.EDH.202201150300_5hr.sac.pa'; % color = [0 1 1]
@@ -26,7 +29,7 @@ function [ax, f] = fig4_5_A2(sac)
 %sac = '20220115T034444.0049_62AD8DA4.MER.REQ.merged.sac';
 
 clc
-timspec_only = false;
+timspec_only = true;
 
 % Defaults.
 prepost = [-15 45]; % minutes
@@ -39,7 +42,6 @@ plt_env = false;
 travtimeadj = false;
 c = 1480; % m/s
 ph = c2ph(c, 'm/s');
-freq = 2.5;
 lohi = [5 10];
 popas = [4 1];
 cn_lw = 0.5;
@@ -53,6 +55,14 @@ equaleyes = false;
 
 % Vertical exaggeration.
 ve = 300;
+
+%% Pull in Crameri's colormaps so that I can use crameri.m
+cmap1 = '-managua';
+cmap2 = 'acton';
+cpath = fullfile(getenv('PROGRAMS'), 'crameri');
+addpath(cpath);
+%cmap2 = crameri(cmap2);
+%% Pull in Crameri's colormaps so that I can use crameri.m
 
 [~, ax] = krijetem(subnum(3, 1));
 f = gcf;
@@ -229,7 +239,7 @@ xticklabels(ax(2), {'-15' '' '' '0' '' '' '15' '' '' '30'  '' '' '45'})
 
 ax(2).YLim = [spec_lowerlim spec_upperlim];
 ax(2).YTick = [spec_lowerlim:2.5:spec_upperlim];
-colormap(jet)
+colormap(crameri(cmap1));
 
 pos = axpos(ax(2));
 cbpos = [pos.lr(1)+0.0125 pos.lr(2) 0.025 pos.ur(2)-pos.lr(2)];
@@ -237,10 +247,10 @@ cb2 = colorbar('Position', cbpos);
 
 set(cb2, 'TickDirection', 'out', 'TickLength', 0.05);
 if timspec_only
-    set(cb2.Label, 'FontName', 'Times', 'String', 'Standard Deviation From Mean (dB Pa^2/Hz)', 'Interpreter', 'tex');
+    set(cb2.Label, 'FontName', 'Times', 'String', 'Standard Deviation From Mean [dB Pa^2/Hz]', 'Interpreter', 'tex');
 
 else
-    set(cb2.Label, 'FontName', 'Times', 'String', 'Std. From Mean (dB Pa^2/Hz)', 'Interpreter', 'tex');
+    set(cb2.Label, 'FontName', 'Times', 'String', 'Std. From Mean [dB Pa^2/Hz]', 'Interpreter', 'tex');
 
 end
 
@@ -333,7 +343,7 @@ bathy(:, end-10:end) = [];
 im = imagesc(ax(4), im_xl, im_yl, bathy/1e3, 'AlphaData', ~isnan(bathy));
 [cn_x, cn_y] = im2mesh(im);
 [~, cn] = contour(ax(4), cn_x, cn_y, bathy, [tz_m tz_m]);
-cn.EdgeColor = 'black';
+cn.EdgeColor = 'g';
 cn.LineWidth = cn_lw;
 
 ax(4).XLim = max_im_xlim;
@@ -354,6 +364,9 @@ cb4.Label.String = 'Elevation [km]';
 set(cb4, 'TickDirection', 'out', 'TickLength', 0.05);
 cb4.Label.Interpreter = 'tex';
 cb4.Label.FontName = 'times';
+
+colormap(ax(4), crameri(cmap2))
+%colormap(ax(4), crameri(cmap2, 'pivot', tz_km));
 
 %% ___________________________________________________________________________ %%
 %% COSMETICS
@@ -440,52 +453,60 @@ if timspec_only
     cb2.FontSize = 12;
 
 
-    % %% For small font P0045 -->
-    % % Thurin+2023 "best set of force paramters" (Table 4) subevent timing in
-    % % minutes relative to USGS 2022-01-15 04:14:45 UTC
-    % s1_4 = [50.85 256.09 293.51 321.1] ./ 60;
-    % hold(ax([1 2]), 'on')
-    % for i = 1:length(s1_4);
-    %     ps = plot(ax(1), [s1_4(i) s1_4(i)], ax(1).YLim, '-', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
+    %% For small font P0045 -->
+    % Thurin+2023 "best set of force paramters" (Table 4) subevent timing in
+    % minutes relative to USGS 2022-01-15 04:14:45 UTC (0 time here is T-wave
+    % arrival time, so it's the same as saying 0 is HTHH origin time)
+    s1_4 = [50.85 256.09 293.51 321.1] ./ 60;
+    hold(ax([1 2]), 'on')
+    for i = 1:length(s1_4);
+        ps = plot(ax(1), [s1_4(i) s1_4(i)], ax(1).YLim, '-', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
 
-    % end
-    % hold(ax([1 2]), 'off')
-    % ts1 = text(ax(1), s1_4(1)+0.25, -2.5, 'S1', 'Color', [0.6 0.6 0.6]);
-    % ts2_4 = text(ax(1), s1_4(4)+0.25, -2.5, 'S2 - S4 (Thurin & Tape, 2023)', 'Color', [0.6 0.6 0.6]);
-    % latimes2
+    end
+    hold(ax([1 2]), 'off')
+    ts1 = text(ax(1), s1_4(1)+0.25, -2.5, 'S1', 'Color', [0.6 0.6 0.6]);
+    ts2_4 = text(ax(1), s1_4(4)+0.25, -2.5, 'S2 - S4 (Thurin & Tape, 2023)', 'Color', [0.6 0.6 0.6]);
+    latimes2
 
-    % shrink(ax(1:2), 1,1.5)
-    % movev(ax(2), .05);
-    % movev(cb2, .09)
-    % axesfs([], 8, 8);
-    % % ts1.FontSize = 5;
-    % % ts2_4.FontSize = 5;
-    % cb2.FontSize = 8;
-    % ax(1).YLabel.Position(1) = ax(2).YLabel.Position(1);
-    % rec = rectangle(ax(2), 'Position', [-6 2.5 3 7.5], 'LineWidth', 1);
-    % savepdf('timspecP0045_smallfont.pdf');
+    shrink(ax(1:2), 1,1.5)
+    movev(ax(2), .05);
+    movev(cb2, .09)
+    axesfs([], 8, 8);
+    % ts1.FontSize = 5;
+    % ts2_4.FontSize = 5;
+    cb2.FontSize = 8;
+    ax(1).YLabel.Position(1) = ax(2).YLabel.Position(1);
+    %% For glide rectangle
+    %rec = rectangle(ax(2), 'Position', [-6 2 3 9], 'LineWidth', 1, 'EdgeColor', 'black');
+    %% For glide rectangle
+    savepdf('timspecP0045_smallfont.pdf');
 
-    % delete(ax(1))
-    % delete(rec)
+    delete(ax(1))
+    %% For glide rectangle
+    %delete(rec)
+    %% For glide rectangle
+    
+    xlim(ax(2), [-6 0]);
+    xticks(ax(2), [-6:0]);
+    xticklabels({'-6' '-5' '-4' '-3' '-2' '-1' '0'});
 
-    % xlim(ax(2), [-6 0]);
-    % xticks(ax(2), [-6:0]);
-    % xticklabels({'-6' '-5' '-4' '-3' '-2' '-1' '0'});
+    %% travtimeadj
+    % xlim(ax(2), [-5 0]);
+    % xticks(ax(2), [-5:0]);
+    % xticklabels({'-5' '-4' '-3' '-2' '-1' '0'});
+    %% travtimeadj
 
-    % %% travtimeadj
-    % % xlim(ax(2), [-5 0]);
-    % % xticks(ax(2), [-5:0]);
-    % % xticklabels({'-5' '-4' '-3' '-2' '-1' '0'});
-    % %% travtimeadj
+    axesfs([], 15, 15)
+    cb2.FontSize = 15
+    shrink(ax(2), 1, 1/2)
+    movev(cb2, -0.075);
+    savepdf('glide')
 
-    % delete(cb2)
-    % axesfs([], 15, 15)
-    % shrink(ax(2), 1, 1/2)
-    % savepdf('glide')
-
-    % %% <--- For small font P0045
-    % keyboard
+    %% <--- For small font P0045
 end
+
+% Remove external path to Crameri's colormaps
+rmpath(cpath);
 
 %% ___________________________________________________________________________ %%
 % Subfuncs
