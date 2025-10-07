@@ -92,7 +92,8 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 31-Mar-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 06-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 %% Recursive.
 
@@ -254,7 +255,7 @@ if ~isempty(EQ)
                                       EQ(1).TaupTimes.truearsecs) '\n\n']);
 
     % These list the magnitudes and distances of ALL earthquakes.
-    fprintf(['\n     EQ(#):     ' sprintf(repmat('  %5i', [1 ...
+    fprintf(['     EQ(#):     ' sprintf(repmat('  %5i', [1 ...
                         length([EQ.PreferredMagnitudeValue])]), ...
                                               1:length([EQ.PreferredMagnitude])) '\n'])
 
@@ -267,9 +268,10 @@ if ~isempty(EQ)
         dists(i)  = EQ(i).TaupTimes(1).distance;
 
     end
-
     fprintf([  '     Distance:  ' sprintf(repmat('  %5.1f', [1 length(dists)]), dists) '\n\n']);
-    fprintf(['\n     !! Paused execution -- type ''dbcont'' to continue !!\n\n'])
+
+    fprintf('     (use `eqdet(EQ, [2,...,N])` to inspect arrivals from secondary+ EQs)\n');
+    fprintf('     !! Paused execution -- type ''dbcont'' to continue !!\n\n');
     keyboard
 
     while ~ynflag
