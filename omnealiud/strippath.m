@@ -1,10 +1,11 @@
-function filename = strippath(filename)
-% filename = STRIPPATH(filename)
+function filename = strippath(filename, rm_suffix)
+% filename = STRIPPATH(filename, rm_suffix)
 %
 % Strips filename from path if separators ('/' or '\') present.
 %
 % Input:
 % filename       Filename(s), possibly with a full path (cells okay)
+% rm_suffix      true to also remove filename suffix (def: false)
 %
 % Output:
 % filename       Filename(s) with full path removed, output in char or cell
@@ -21,8 +22,11 @@ function filename = strippath(filename)
 %    filename = STRIPPATH(filename)
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Apr-2020, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 10-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
+
+defval('rm_suffix', false)
 
 %% Recursive.
 
@@ -31,10 +35,10 @@ if isa(filename, 'cell')
     %% Recursive.
 
     for i = 1:length(filename)
-        temp_filename{i} = strippath(filename{i});
+        Ba{i} = strippath(filename{i}, rm_suffix);
 
     end
-    filename = temp_filename(:);
+    filename = aa(:);
 
     return
 
@@ -42,14 +46,16 @@ end
 
 % Sanity
 if ~isa(filename,'char')
-    error('''filename'' must a character array')
+    error('`filename` must a be character array')
 
 end
 
 % If a file separator (e.g., '/') is present, remove it. Else, do
 % nothing because the path is already stripped.
 if contains(filename,filesep)
-    [~,file,ext] = fileparts(filename);
-    filename = [file ext];
+    [~, filename, suf] = fileparts(filename);
+    if ~rm_suffix
+        filename = [fname fsuf];
 
+    end
 end
