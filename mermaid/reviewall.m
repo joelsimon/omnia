@@ -20,7 +20,8 @@ function reviewall(writecp, floatnum, procdir, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 17-Jun-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Last modified: 09-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Defaults.
 defval('writecp', false)
@@ -85,7 +86,7 @@ sac = setdiff(unrevsac, revsac);
 
 % Skip French floats, maybe.
 if skip_french
-    rm_idx = find(contains(sac, {'452.020-P-06' '452.020-P-07'}));
+    rm_idx = cellstrfind(sac, {'.06_' '.07_'});
     sac(rm_idx) = [];
 
 end

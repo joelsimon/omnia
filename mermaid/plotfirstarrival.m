@@ -50,7 +50,8 @@ function [f, ax, tx, pl, FA] = ...
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 21-Jun-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 09-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Defaults -- those left empty are defaulted in firstarrival.m
 defval('s', '20180819T042909.08_5B7A4C26.MER.DET.WLT5.sac')
@@ -87,12 +88,13 @@ hold(ax, 'on')
                                                   bathy, wlen2, fs, popas, ...
                                                   pt0);
 if isnan(tres)
-    warning('No arrival identified')
     f = [];
     ax = [];
     tx = [];
     pl = [];
     FA = [];
+    warning(sprintf(['No travel-time residual calculated.\n' ...
+                     'Either AIC unable to pick changepoint, or no EQ phase arrivals theorized.']))
     return
 
 end

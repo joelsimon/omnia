@@ -92,7 +92,8 @@ function EQ = reviewevt(sac, redo, diro, viewr)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 06-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Last modified: 09-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 %% Recursive.
@@ -271,6 +272,7 @@ if ~isempty(EQ)
     fprintf([  '     Distance:  ' sprintf(repmat('  %5.1f', [1 length(dists)]), dists) '\n\n']);
 
     fprintf('     (use `eqdet(EQ, [2,...,N])` to inspect arrivals from secondary+ EQs)\n');
+    fprintf('     (use `ploteqdet(EQ, [2,...,N], ...)` to plot arrivals from secondary+ EQs)\n');
     fprintf('     !! Paused execution -- type ''dbcont'' to continue !!\n\n');
     keyboard
 
