@@ -27,15 +27,15 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'));
 [sac, evt] = revsac(1, sacdir, evtdir, 'ALL');
 
 % Open text file that tallies which .evt required EQ.TaupTimes update.
-fname1 = fullfile(evtdir, sprintf('%s_%s.txt', mfilename, datetime('now', 'Format', 'uuuu-MM-dd')));
+fname1 = fullfile(evtdir, sprintf('%s_%s.txt', datestr(datetime('now'), 29), mfilename));
 writeaccess('unlock', fname1, false)
 fid1 = fopen(fname1, 'w+');
 
-fname2 = fullfile(evtdir, sprintf('%s_%s_phaseName1_mismatch.txt', mfilename, datetime('now', 'Format', 'uuuu-MM-dd')));
+fname2 = fullfile(evtdir, sprintf('%s_%s_phaseName1_mismatch.txt', datestr(datetime('now'), 29), mfilename));
 writeaccess('unlock', fname2, false)
 fid2 = fopen(fname2, 'w+');
 
-fname3 = fullfile(evtdir, sprintf('%s_%s_tdiff_exceeds_1s.txt', mfilename, datetime('now', 'Format', 'uuuu-MM-dd')));
+fname3 = fullfile(evtdir, sprintf('%s_%s_tdiff_exceeds_1s.txt', datestr(datetime('now'), 29), mfilename));
 writeaccess('unlock', fname3, false)
 fid3 = fopen(fname3, 'w+');
 
