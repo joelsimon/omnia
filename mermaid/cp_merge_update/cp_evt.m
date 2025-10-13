@@ -50,7 +50,7 @@ evt2 = globglob(evt_dir2, 'reviewed', '**/*.evt');
 fname_sac2 = strippath(sac2, true);
 fname_evt2 = strippath(evt2, true);
 
-% These new .sac files have no associated .evt files. 
+% These new .sac files have no associated .evt files.
 fname_missing_evt2 = setdiff(fname_sac2, fname_evt2);
 
 % Some of those .evt files are found in the old .evt directory.
@@ -74,7 +74,7 @@ for i = 1:length(need2copy_evt1)
     %% Copy old .evt
     this_evt = need2copy_evt1{i};
     this_evt_fname = strippath(this_evt, true);
-    
+
     % Determine which reviewed subdir to send copy to.
     if contains(this_evt, 'unidentified')
         rev_status = 'unidentified';
@@ -98,7 +98,7 @@ for i = 1:length(need2copy_evt1)
     %% Write logfile
     % Same .sac file basenames (with potentially different data), just different
     % leading paths, so okay to pick either for basename printing.
-    [~, this_sac1] = cellstrfind(sac1, this_evt_fname); 
+    [~, this_sac1] = cellstrfind(sac1, this_evt_fname);
     this_sac1 = this_sac1{:};
     [~, this_sac2] = cellstrfind(sac2, this_evt_fname);
     this_sac2 = this_sac2{:};
@@ -120,7 +120,7 @@ for i = 1:length(need2copy_evt1)
     if tdiff > h(1).DELTA
         fprintf(fid, '%s time differs: %6.2f s\n', this_sac_fname, tdiff);
         needs_indent = true;
-        
+
     end
     if tdiff > max_time
         max_time = tdiff;
