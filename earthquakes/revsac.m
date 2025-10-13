@@ -42,8 +42,9 @@ function [sac, evt, xtra_evt] = revsac(iup, sacdir, evtdir, returntype)
 % See also: getevt.m, reviewevt.m, fullsac.m
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 30-Aug-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
+% Last modified: 13-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Defaults.
 defval('iup', 1)
@@ -125,8 +126,8 @@ if isempty(allsac)
 end
 
 % Find the intersection between all SAC filenames and those in the specified review class.
-allevt_nopath = cellfun(@(xx) strippath(xx), strrep(allevt(:), '.evt', ''), 'UniformOutput', false);
-allsac_nopath = cellfun(@(xx) strippath(xx), strrep(allsac(:), '.sac', ''), 'UniformOutput', false);
+allevt_nopath = strippath(allevt, true);
+allsac_nopath = strippath(allsac, true);
 
 [~, evt_idx, sac_idx] = intersect(allevt_nopath, allsac_nopath);
 evt = allevt(evt_idx);
