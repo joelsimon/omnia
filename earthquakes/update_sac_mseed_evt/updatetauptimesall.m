@@ -17,7 +17,8 @@ function fname = updatetauptimesall(sacdir, evtdir)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 01-Dec-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Last modified: 13-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Default paths.
 defval('sacdir', fullfile(getenv('MERMAID'), 'processed'));
@@ -70,4 +71,3 @@ fprintf('\nWrote: %s\n', fname1)
 
 writeaccess('lock', fname2)
 fprintf('\nWrote: %s\n', fname2)
-keyboard
