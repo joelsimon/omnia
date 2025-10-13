@@ -23,7 +23,7 @@ function filename = strippath(filename, rm_suffix)
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 10-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Last modified: 13-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 defval('rm_suffix', false)
@@ -35,7 +35,7 @@ if isa(filename, 'cell')
     %% Recursive.
 
     for i = 1:length(filename)
-        Ba{i} = strippath(filename{i}, rm_suffix);
+        aa{i} = strippath(filename{i}, rm_suffix);
 
     end
     filename = aa(:);
@@ -53,9 +53,12 @@ end
 % If a file separator (e.g., '/') is present, remove it. Else, do
 % nothing because the path is already stripped.
 if contains(filename,filesep)
-    [~, filename, suf] = fileparts(filename);
-    if ~rm_suffix
-        filename = [fname fsuf];
+    [~, name, ext] = fileparts(filename);
+    if rm_suffix
+        filename = name;
+
+    else
+        filename = [name ext];
 
     end
 end
