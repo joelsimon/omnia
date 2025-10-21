@@ -1,0 +1,44 @@
+#!/bin/zsh
+#
+# Sync individual $MERMAID/server*/ into $MERMAID/server_everyone/
+#
+# Usage: ./rsync_servers
+#
+# Author: Joel D. Simon
+# Contact: jdsimon@bathymetrix.com | joeldsimon@gmail.com
+# Last modified: 21-Oct-2025, Darwin Kernel Version 23.6.0
+
+# List of server directories to be synced
+servers=( $MERMAID/server/ $MERMAID/server_jamstec/ $MERMAID/server_sustech/ )
+
+# Generate (or clear) exists file logging commits
+log_file=$MERMAID/server_everyone/rsync_server_log.txt
+truncate -s 0 $log_file
+
+# Loop and sync all servers here
+for server in ${servers[@]}; do
+    # Sync new and modified files.
+    rsync -av --exclude='.git*' \
+	      --exclude='ZMODEM-eso.log' \
+	      --exclude='empty_files.txt' \
+	      --exclude='jdsimon_server_log.txt' \
+	      --exclude='nohup.out' \
+	      --exclude='ZMODEM-mermaid.log' \
+	      --exclude='README' \
+	      --exclude='1500m.cmd' \
+              $server $MERMAID/server_everyone/
+
+    # Print the current status (ensure nothing untracked/staged) and commit
+    # from sync source.
+    git_status=$( git -C $server status )
+    git_commit=$( git -C $server rev-parse HEAD )
+
+    printf "%s\n" $server >> $log_file
+    printf "Commit: %s\n" $git_commit >> $log_file
+    printf "Status:\n%s\n" $git_status >> $log_file
+
+    if [[ $server != ${servers[-1]} ]]; then
+	echo "_____________________________________\n" >> $log_file
+
+    fi
+done
