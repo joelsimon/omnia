@@ -12,7 +12,7 @@
 servers=( $MERMAID/server/ $MERMAID/server_jamstec/ $MERMAID/server_sustech/ )
 
 # Generate (or clear) exists file logging commits
-log_file=$MERMAID/server_everyone/rsync_server_log.txt
+log_file=$MERMAID/server_everyone/rsync_servers_log.txt
 truncate -s 0 $log_file
 
 # Loop and sync all servers here
@@ -26,6 +26,7 @@ for server in ${servers[@]}; do
 	      --exclude='ZMODEM-mermaid.log' \
 	      --exclude='README' \
 	      --exclude='1500m.cmd' \
+	      --exclude='4day.cmd' \
               $server $MERMAID/server_everyone/
 
     # Print the current status (ensure nothing untracked/staged) and commit
