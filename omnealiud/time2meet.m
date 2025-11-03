@@ -3,6 +3,8 @@ function time2meet(meeting_day, their_timezone)
 %
 % Print collaborators' local times w.r.t. Joel's timezone ('America/Los_Angeles').
 %
+% !! WARNING: Note flipped convention of 'Etc/GMT-*' == 'UTC+*' !!
+%
 % Input:
 % meeting_day      Date of proposed meeting, in Joel's timezone
 %                      (datetime; def: datetime('today'))
@@ -10,13 +12,14 @@ function time2meet(meeting_day, their_timezone)
 %
 % Ex:
 %    TIME2MEET(datetime('tomorrow'), 'Asia/Shanghai')
+%    TIME2MEET(datetime('tomorrow'), 'Etc/GMT-14') % == UTC+14
+%    TIME2MEET(datetime('tomorrow'), 'UTC+14') % == Etc/GMT-14
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 20-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 03-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 %
-% IANA timezones:
+% IANA timezones (note that 'UTC+/-*' is also valid but not listed):
 %
 %           NAME                            AREA          UTCOffset   DSTOffset
 %    {'Africa/Abidjan'                }    Africa              0           0
