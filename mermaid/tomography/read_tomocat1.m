@@ -1,5 +1,5 @@
 function MERMAID = read_tomocat1(filename)
-% MERMAID = READ_UPDATE_SIMON2021GJI_SUPPLEMENT_RESIDUALS(filename)
+% MERMAID = READ_TOMOCAT1(filename)
 %
 % Input:
 % filename   Filename to updated residual formatted text file
@@ -8,9 +8,9 @@ function MERMAID = read_tomocat1(filename)
 % Output:
 % MERMAID    Structure with fieldnames that which mirror the columns in the text file
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@princeton.edu | joeldsimon@gmail.com
-% Last modified: 20-Nov-2023, Version 9.3.0.713579 (R2017b) on GLNXA64
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 03-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified', 'txt', 'tomocat1.txt'))
 
