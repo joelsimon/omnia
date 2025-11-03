@@ -30,7 +30,7 @@ for i = 1:2
 
 end
 
-if x{1} == x{2};
+if isequal(x{1}, x{2});
     data = true;
 
 else
