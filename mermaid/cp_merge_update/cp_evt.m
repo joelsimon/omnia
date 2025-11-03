@@ -2,11 +2,16 @@ function cp_evt(sac_dir1, evt_dir1, sac_dir2, evt_dir2)
 % CP_EVT(sac_dir1, evt_dir1, sac_dir2, evt_dir2)
 %
 % Copy reviewed .evt files from dir1 (old) to dir2 (new), e.g.,:
-%     (1) $MERMAID/processed/ to (2) $MERMAID/processed_everyone.
+%     (1) $MERMAID/events/ to (2) $MERMAID/events_everyone.
 %
 % * Only reviewed files in (1) to (2); raw files NOT copied
 % * Does not update .evt files; only copies (update next)
 % * Does not overwrite; only copies (1) to (2) if .evt file in (2) DNE
+%
+% The idea is that Joel would just manaully rematch any .evt files that are not
+% copied here, either becauase their data, times, or locations differ (within
+% reason), because Joel has remade all the .sac files himself, and therefore
+% considers those the authoritative set.
 %
 % Script assumes processed and events directories organized like JDS.
 %
@@ -19,8 +24,11 @@ function cp_evt(sac_dir1, evt_dir1, sac_dir2, evt_dir2)
 % one-time script; work solely out of processed_everyone going forward.
 %
 % Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 10-Oct-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Contact: jdsimon@bathymetrix.com | joeldsimon@gmail.com
+% Last modified: 30-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
+
+clc
 
 % Defaults.
 defval('mer_dir', fullfile(getenv('MERMAID')))
@@ -29,6 +37,10 @@ defval('evt_dir1', fullfile(mer_dir, 'events'))
 defval('sac_dir2', fullfile(mer_dir, 'processed_everyone'))
 defval('evt_dir2', fullfile(mer_dir, 'events_everyone'))
 
+fprintf('Copying .evt FROM: %s\n', evt_dir1);
+fprintf('Copying .evt TO: %s\n', evt_dir2);
+
+% Define logfile name.
 logdir = fullfile(evt_dir2, 'cp_merge_update');
 if ~exist(logdir, 'dir')
     mkdir(logdir);
@@ -68,8 +80,8 @@ max_loc_sac = '';
 writeaccess('unlock', logfile, false)
 fid = fopen(logfile, 'w');
 for i = 1:length(need2copy_evt1)
-    needs_indent = false;
     fprintf('%i of %i\n', i, length(need2copy_evt1))
+    do_copy = true;
 
     %% Copy old .evt
     this_evt = need2copy_evt1{i};
@@ -88,13 +100,6 @@ for i = 1:length(need2copy_evt1)
     end
     destination = fullfile(evt_dir2, 'reviewed', rev_status, 'evt');
 
-    % Copy old reviewed .evt to new events/ directory.
-    success = copyfile(this_evt, destination);
-    if ~success
-        error('bad copy')
-
-    end
-
     %% Write logfile
     % Same .sac file basenames (with potentially different data), just different
     % leading paths, so okay to pick either for basename printing.
@@ -109,7 +114,8 @@ for i = 1:length(need2copy_evt1)
 
     % Data diffs
     if ~data
-        fprintf(fid, '%s data differ\n', sac)
+        do_copy = false;
+        fprintf(fid, '%44s data differ              !! .evt NOT COPIED !!\n', this_sac_fname);
         data_ct = data_ct + 1;
         data_differ{data_ct} = this_sac_fname;
 
@@ -118,8 +124,8 @@ for i = 1:length(need2copy_evt1)
     % Timing diffs
     tdiff = max(abs(time)); % seconds
     if tdiff > h(1).DELTA
-        fprintf(fid, '%s time differs: %6.2f s\n', this_sac_fname, tdiff);
-        needs_indent = true;
+        do_copy = false;
+        fprintf(fid, '%44s time differs: %6.2f s   !! .evt NOT COPIED !!\n', this_sac_fname, tdiff);
 
     end
     if tdiff > max_time
@@ -130,18 +136,31 @@ for i = 1:length(need2copy_evt1)
 
     % Location diffs
     if loc ~= 0 % meters
-        if ~needs_indent
-            fprintf(fid, '%44s location differs: %4i m\n', this_sac_fname, round(loc));
+        if loc > 100
+            do_cp = false;
+            mess = '%44s location differs: %4i m !! .evt NOT COPIED !!\n';
+
 
         else
-            fprintf(fid, '%44s location differs: %4i m\n', ' ', round(loc));
+            mess = '%44s location differs: %4i m\n';
 
         end
+        fprintf(fid, mess, this_sac_fname, round(loc));
+
     end
     if loc > max_loc
         max_loc = loc;
         max_loc_sac = this_sac_fname;
 
+    end
+
+    % Copy old reviewed .evt to new events/ directory.
+    if do_copy
+        success = copyfile(this_evt, destination);
+        if ~success
+            error('bad copy')
+
+        end
     end
 end
 fprintf(fid, '\nMax. time diff: %.6f s (%s)\n', max_time, max_time_sac);
