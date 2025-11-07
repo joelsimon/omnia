@@ -3,9 +3,14 @@ function cp_evt(sac_dir1, evt_dir1, sac_dir2, evt_dir2)
 %
 % Copy reviewed .evt files from dir1 (old) to dir2 (new), e.g.,:
 %     (1) $MERMAID/events/ to (2) $MERMAID/events_everyone.
+% if:
+% * sac1,2 data are identical
+% * sac1,2 start/end times differ by less than sampling interval
+% * sac1,2 locations differ by less than 100 m
 %
-% * Only reviewed files in (1) to (2); raw files NOT copied
-% * Does not update .evt files; only copies (update next)
+% Be aware:
+% * Only copies reviewed files in (1) to (2); raw files NOT copied
+% * Does not update .evt files; only copies them (update next)
 % * Does not overwrite; only copies (1) to (2) if .evt file in (2) DNE
 %
 % The idea is that Joel would just manaully rematch any .evt files that are not
@@ -23,9 +28,8 @@ function cp_evt(sac_dir1, evt_dir1, sac_dir2, evt_dir2)
 % REQ, mag<3, non-Princeton floats etc.  However, I do think this will be a
 % one-time script; work solely out of processed_everyone going forward.
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@bathymetrix.com | joeldsimon@gmail.com
-% Last modified: 30-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 07-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
