@@ -15,9 +15,8 @@ function fname = updatetauptimesall(sacdir, evtdir)
 % *Note: these are base paths to be searched recursively, e.g., use
 %  $MERMAID/events/, not $MERMAID/events/reviewed/identified/evt/, for `evtdir`
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 07-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Default paths.
@@ -28,15 +27,15 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'));
 [sac, evt] = revsac(1, sacdir, evtdir, 'ALL');
 
 % Open text file that tallies which .evt required EQ.TaupTimes update.
-fname1 = fullfile(evtdir, sprintf('%s_%s.txt', datestr(datetime('now'), 29), mfilename));
+fname1 = fullfile(evtdir, sprintf('%s_%s.txt', timenow, mfilename));
 writeaccess('unlock', fname1, false)
 fid1 = fopen(fname1, 'w+');
 
-fname2 = fullfile(evtdir, sprintf('%s_%s_phaseName1_mismatch.txt', datestr(datetime('now'), 29), mfilename));
+fname2 = fullfile(evtdir, sprintf('%s_%s_phaseName1_mismatch.txt', timenow, mfilename));
 writeaccess('unlock', fname2, false)
 fid2 = fopen(fname2, 'w+');
 
-fname3 = fullfile(evtdir, sprintf('%s_%s_tdiff_exceeds_1s.txt', datestr(datetime('now'), 29), mfilename));
+fname3 = fullfile(evtdir, sprintf('%s_%s_tdiff_exceeds_1s.txt', timenow, mfilename));
 writeaccess('unlock', fname3, false)
 fid3 = fopen(fname3, 'w+');
 
