@@ -50,7 +50,7 @@ if ~exist(logdir, 'dir')
     mkdir(logdir);
 
 end
-logfile = fullfile(logdir, sprintf('%s_%s.txt', datestr(datetime('now'), 29), mfilename));
+logfile = fullfile(logdir, sprintf('%s_%s.txt', timenow, mfilename));
 
 %% OLD DIR
 % E.g., $MERMAID/[processed, events]/.
@@ -81,8 +81,13 @@ max_time_sac = '';
 max_loc = 0;
 max_loc_sac = '';
 
+% Note copy FROM and TO directories at top of log file.
 writeaccess('unlock', logfile, false)
 fid = fopen(logfile, 'w');
+fprintf(fid, 'sac_dir1 = %s\n', sac_dir1);
+fprintf(fid, 'evt_dir1 = %s\n', evt_dir1);
+fprintf(fid, 'sac_dir2 = %s\n', sac_dir2);
+fprintf(fid, 'evt_dir2 = %s\n\n', evt_dir2);
 for i = 1:length(need2copy_evt1)
     fprintf('%i of %i\n', i, length(need2copy_evt1))
     do_copy = true;
