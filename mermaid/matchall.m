@@ -25,9 +25,9 @@ function matchall(writecp, procdir, evtdir, evtdir2)
 %    evtdir2 = '~/mermaid/events/';
 %    MATCHALL(writecp, procdir, evtdir, evtdir2)
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Aug-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 10-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
 
@@ -37,9 +37,9 @@ if ~verLessThan('matlab', '9.14')
 
 end
 
-skip_french = true;
-skip_0100 = true;
-princeton_only = true;
+skip_french = false;
+skip_0100 = false;
+princeton_only = false;
 
 % Defauls.
 defval('writecp', false)
@@ -57,13 +57,14 @@ if isempty(all_sac)
     error('No .sac files recursively found in %s\n', procdir)
 
 end
-rawevt = fullfiledir(skipdotdir(dir(fullfile(evtdir, 'raw', 'evt'))));
-if ~isempty(evtdir2)
-    rawevt2 = fullfiledir(skipdotdir(dir(fullfile(evtdir2, 'raw', 'evt'))));
-    rawevt = unique([rawevt ; rawevt2]);
 
-end
-matched_sac = strrep(rawevt, '.raw.evt', '.sac'); % Not necessarily reviewed!
+% It is insufficient to only compare .sac list with list of .raw.evt because in
+% many cases I did not copy .raw.evt from collaborators (e.g., when taking in
+% Yong's and Yuko's data I only copied over their reviewed .evt files).
+% Therefore, just glob all .evt files in the dir and keep the unique list.
+all_evt = globglob(evtdir, '**/*.evt');
+all_evt = unique(strippath(strrep(all_evt, '.raw', '')));
+matched_sac = strrep(all_evt, '.evt', '.sac'); % Not necessarily reviewed!
 if isempty(matched_sac)
     % This could be fine, e.g., first time you ever run it.
     warning(sprintf(['No .evt files in found, check evt* paths\n' ...
