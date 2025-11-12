@@ -27,9 +27,11 @@ function writelatlon(sacdir, evtdir, returntype, filename, precision)
 %              (6) EVLO (decimal degrees)
 %              (7) EVDP (kilometers)
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 20-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 12-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
+
+warning('Need to update formatspec for longer filenames')
 
 % Defaults.
 merpath = getenv('MERMAID');
