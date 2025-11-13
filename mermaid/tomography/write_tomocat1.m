@@ -3,9 +3,19 @@ function write_tomocat1(redo, procdir, evtdir, txtdir, revtxt)
 %
 % Tomography Catalog Iteration #1: GJI22 supplement + KSTNM, REVIEWER
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Mar-2024, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Input:
+% redo        true to delete and remake existing tomocat1.txt (def: true)
+% procdir     Processed directory (def: $MERMAID/processed_everyone/)
+% evtdir      Events directory (def: $MERMAID/events_everyone/)
+% txtdir      Textfile directory (def: $MERMAID/events_everyone/reviewed/identified/txt)
+% revtxt      Reviewer textfile (def: [])
+%
+% Output:
+% tomocat1.txt
+%
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 12-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
 close all
@@ -20,9 +30,9 @@ llnl_exists = false;
 % JDS and YK                     : 7
 
 defval('redo', true)
-defval('procdir', fullfile(getenv('MERMAID'), 'processed'));
-defval('evtdir',  fullfile(getenv('MERMAID'), 'events'));
-defval('txtdir', fullfile(getenv('MERMAID'), 'events', 'reviewed', 'identified', 'txt'));
+defval('procdir', fullfile(getenv('MERMAID'), 'processed_everyone'));
+defval('evtdir',  fullfile(getenv('MERMAID'), 'events_everyone'));
+defval('txtdir', fullfile(getenv('MERMAID'), 'events_everyone', 'reviewed', 'identified', 'txt'));
 defval('revtxt', [])
 
 %% Preliminaries
@@ -220,8 +230,8 @@ prev_file = exist(filename, 'file') == 2;
 
 if ~prev_file || redo
     fid = fopen(filename, 'w+');
-    hdrline1 = '#COLUMN:                                     1                             2                3               4          5            6             7                             8                9              10           11           12              13            14              15             16              17             18             19             20            21            22            23             24            25            26            27             28            29            30            31              32                     33          34                    35              36          37           38        39';
-    hdrline2 = '#DESCRIPTION:                         FILENAME                    EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP               SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP        1D_GCARC 1D*_GCARC_adj       1D*_GCARC   3D_GCARC_adj        3D_GCARC   OBS_TRAVTIME   OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES  1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES   3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR             SNR             MAX_COUNTS    MAX_TIME               NEIC_ID         IRIS_ID       KSTNM        PHASE  REVIEWER';
+    hdrline1 = '#COLUMN:                                     1                              2                3               4          5            6             7                              8                9              10           11           12              13            14              15             16              17             18             19             20            21            22            23             24            25            26            27             28            29            30            31              32                     33          34                    35              36          37           38        39';
+    hdrline2 = '#DESCRIPTION                          FILENAME                     EVENT_TIME             EVLO            EVLA    MAG_VAL     MAG_TYPE          EVDP                SEISMOGRAM_TIME             STLO            STLA         STDP         OCDP        1D_GCARC 1D*_GCARC_adj       1D*_GCARC   3D_GCARC_adj        3D_GCARC   OBS_TRAVTIME   OBS_ARVLTIME    1D_TRAVTIME   1D_ARVLTIME       1D_TRES  1D*_TIME_adj   1D*_TRAVTIME  1D*_ARVLTIME      1D*_TRES   3D_TIME_adj    3D_TRAVTIME   3D_ARVLTIME       3D_TRES      2STD_ERR             SNR             MAX_COUNTS    MAX_TIME               NEIC_ID         IRIS_ID       KSTNM        PHASE  REVIEWER';
     fprintf(fid, '%s\n', hdrline1);
     fprintf(fid, '%s\n', hdrline2);
     prev_mer = '';
@@ -243,30 +253,15 @@ for i = 1:length(s);
     end
 
     % Retrieve the SAC info.
-    [~, h] = readsac(fullsac(s{i}, procdir));
-    seisdate = seistime(h);
-    sttime = fdsndate2str(seisdate.B);
-    kstnm = h.KSTNM;
-
-    % Round seismogram time to 1/100 of s precision from millisecond-precision.
+    % Round seismogram time to centisecond precision from millisecond-precision.
     % Don't just cut off the last sig fig because all other numbers are rounded,
     % and I specifically say all times are ROUNDED (not truncated) in the
     % supplement (not just 'floor'ed in the output text file; e.g., the travel
     % time residuals and their estimated uncertainties are rounded to 1/100 s).
-    rounded_sttime_decimal = num2str(round(str2double(sttime(end-3:end)), 2));
-
-    %% ___________________________________________________________________________ %%
-    %%
-    error('next two lines are the poblem (same with evt timing below)')
-    %% I compute the rounded string for complete decimal, but instead of
-    %% replacing complete decimal (and adding a zero if I need to, I guess) I
-    %% replace the decimal hundreds with the whole decimal. Try
-    %% sttime = '2018-07-06T01:49:30.603' as an example
-
-    sttime(end) = []; % chop of 1/1000 s decimal place
-    sttime(end) = rounded_sttime_decimal(end); % replace 1/100 s decimal place with rounded value
-    %%
-    %% ___________________________________________________________________________ %%
+    [~, h] = readsac(fullsac(s{i}, procdir));
+    seisdate = seistime(h);
+    sttime = roundmsec(fdsndate2str(seisdate.B));
+    kstnm = h.KSTNM;
 
     % Parse station parameters.
     % Station depth is in meters, down is positive.
@@ -291,14 +286,9 @@ for i = 1:length(s);
     EQ = onlyPKP(EQ);
     phase_name = EQ.TaupTimes(1).phaseName;
 
-    % Parse event parameters.
+    % Parse event parameters and round times as above.
     evtime_date = irisstr2date(EQ.PreferredTime);
-    evtime = fdsndate2str(evtime_date);
-
-    % Round event time as in seismogram time.
-    rounded_evtime_decimal = num2str(round(str2double(evtime(end-3:end)), 2));
-    evtime(end) = [];
-    evtime(end) = rounded_evtime_decimal(end);
+    evtime = roundmsec(fdsndate2str(evtime_date));
 
     evla = EQ.PreferredLatitude;
     evlo = EQ.PreferredLongitude;
@@ -317,7 +307,6 @@ for i = 1:length(s);
     % maybe even 2nd, with rounding) decimal place.  Basically I take her 3D
     % distance as truth and disregard her 1D distance, preferring instead to use
     % my own higher-precision number to compute their difference.
-
     gcarc_1D = EQ.TaupTimes(1).distance;
     gcarc_1Dadj = gcarc_1D;
     gcarc_3D = gcarc_3D_vector(i);
@@ -346,8 +335,7 @@ for i = 1:length(s);
     % in both cases and cancels.
     exp_travtime_1Dadj_diff  = exp_arvltime_1Dadj_diff;
 
-    % Round the SNR; when its down in single digits is so low who cares if
-    % its rounded.
+    % Round the SNR; when its down in single digits is so low who cares if it's rounded.
     SNR = round(SNR);
 
     % The max. counts are non-integer due to filtering; round them because it's
