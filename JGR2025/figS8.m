@@ -53,8 +53,7 @@ ave_ocdp45 = mode_depth45(end);
 [nul_stdp, nul_ocdp] = hunga_average_depths(2);
 
 % Get average depths of mode maximums.
-% (figA3 was originally hunga_summarize_modes.m)
-[~, ~, ~, ~, maxamp_depth] = figA3(freq, sigcat, excl48, false);
+[~, ~, ~, ~, maxamp_depth] = hunga_summarize_modes(freq, sigcat, excl48, false);
 
 % Get mode value at stdp.
 mode_stdp45 = mode_amp45(nearestidx(mode_depth45, stdp45));

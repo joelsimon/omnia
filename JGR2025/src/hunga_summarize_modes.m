@@ -1,9 +1,9 @@
 function [kstnm, minvp, minvp_depth, maxamp, maxamp_depth, vp, vp_depth, amp, amp_depth] = ...
-    figS9(freq, sigcat, excl48, plt)
+    hunga_summarize_modes(freq, sigcat, excl48, plt)
 % [kstnm, minvp, minvp_depth, maxamp, maxamp_depth, vp, vp_depth, amp, amp_depth] = ...
-%     FIGS9(freq, sigcat, excl48, plt)
+%     HUNGA_SUMMARIZE_MODES(freq, sigcat, excl48, plt)
 %
-% Figure S9: Sound-speed profile and mode summary (if plt=true)
+% Sound-speed profile and mode summary (if plt=true)
 %
 % Input:
 % freq    Frequency of mode, one of 2.5, 5.0, 7.5, or 10 [Hz]
@@ -13,9 +13,9 @@ function [kstnm, minvp, minvp_depth, maxamp, maxamp_depth, vp, vp_depth, amp, am
 % excl48  Exclude P0048 and P0049 (def: false)
 % plt     Plot result (def: false)
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 01-Aug-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 17-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
 
