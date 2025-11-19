@@ -38,10 +38,10 @@ dates = unique(dates);
 gps = rmfield(gps, empties);
 mermaids = fieldnames(gps);
 
-f = figure;
+F = plotgebcopacific;
 ax = gca;
-plotcont
-hold on
+hold(ax, 'on')
+
 box on
 xlim([160 270])
 ylim([-40 10])
@@ -53,24 +53,27 @@ set(ax, 'YTickLabels', degrees2(ax.YTick))
 longticks([], 2)
 latimes2
 
+% ax2 = axes;
+% ax2.Position = ax.Position;
+% ax2.Visible = 'off';
+
 %% Pull in Crameri's colormaps so that I can use crameri.m
 cmap = '-acton';
 cpath = fullfile(getenv('PROGRAMS'), 'crameri');
 addpath(cpath);
 cmap = crameri(cmap);
-%% Pull in Crameri's colormaps so that I can use crameri.m
 
-colormap(cmap)
-cb = colorbar;
+% %% Pull in Crameri's colormaps so that I can use crameri.m
+% cb = colorbar('SouthOutside');
+% cb.Colormap = cmap;
 
 max_deploy_days = days(max_deploy_duration);
 sc = gobjects(size(mermaids));
 for i = 1:length(mermaids)
     d = gps.(mermaids{i}).date;
     col = x2color(days(d - d(1)), 0, max_deploy_days, cmap);
-    %col = x2color(days(d - d(1)), 0, max_deploy_days);
     np = length(d);
-    sc(i) = scatter(nan(1, np), nan(1, np), 25, col, 'Filled', 'MarkerEdgeColor', 'k');
+    sc(i) = scatter(nan(1, np), nan(1, np), 25, col, 'Filled', 'MarkerEdgeColor', 'None');
 
 end
 
@@ -83,7 +86,7 @@ cb.Ticks = tick_loc;
 cb.TickLabels = tick_lab;
 cb.Label.String = 'Years Deployed [Per Float]';
 cb.TickDirection = 'out';
-cb.TickLength = 0.02
+cb.TickLength = 0.02;
 
 vname = mfilename;
 vwriter = VideoWriter(vname, 'MPEG-4');
@@ -101,9 +104,9 @@ for j = 1:length(dates)
 
         end
     end
-    title(datestr(d));
+    title(datestr(d, 'mmmm YYYY'));
     drawnow
-    writeVideo(vwriter, getframe(f));
+    writeVideo(vwriter, getframe(gcf));
 
 end
 close(vwriter)
