@@ -23,13 +23,13 @@ for i = 1:length(mermaids)
 
     bad_dates = g.date < datetime('2018-06-10', 'TimeZone', 'UTC') | g.date > datetime('now', 'TimeZone', 'UTC');
     g = structfun(@(xx) xx(~bad_dates), g, 'UniformOutput', false);
-    
+
     deploy_duration = g.date(end) - g.date(1);
     if deploy_duration > max_deploy_duration
         max_deploy_duration = deploy_duration;
 
     end
-    
+
     dates = [dates; g.date];
     gps.(mermaids{i}) = g;
 
@@ -49,34 +49,30 @@ xlabel('Longitude')
 ylabel('Latitude')
 set(ax, 'XTickLabels', degrees2(ax.XTick))
 set(ax, 'YTickLabels', degrees2(ax.YTick))
+F.cb.TickLength = 0.02;
+F.cb.TickDirection = 'out';
 
 longticks([], 2)
 latimes2
 
-% ax2 = axes;
-% ax2.Position = ax.Position;
-% ax2.Visible = 'off';
 
 %% Pull in Crameri's colormaps so that I can use crameri.m
-cmap = '-acton';
+cmap = 'acton';
 cpath = fullfile(getenv('PROGRAMS'), 'crameri');
 addpath(cpath);
 cmap = crameri(cmap);
-
 % %% Pull in Crameri's colormaps so that I can use crameri.m
-% cb = colorbar('SouthOutside');
-% cb.Colormap = cmap;
+
+% Generate secondary invisible axis just to hold the drift-time colorbar.
+cbax = axes;
+colormap(cbax, cmap);
+cb = colorbar(cbax, 'SouthOutside')
+cb.Position(1) = ax.Position(1)
+cb.Position(2) = 0.16
+cb.Position(3) = ax.Position(3)
+cbax.Visible = 'off';
 
 max_deploy_days = days(max_deploy_duration);
-sc = gobjects(size(mermaids));
-for i = 1:length(mermaids)
-    d = gps.(mermaids{i}).date;
-    col = x2color(days(d - d(1)), 0, max_deploy_days, cmap);
-    np = length(d);
-    sc(i) = scatter(nan(1, np), nan(1, np), 25, col, 'Filled', 'MarkerEdgeColor', 'None');
-
-end
-
 max_deploy_years = max_deploy_days/365;
 last_tick_lab = floor(max_deploy_years);
 last_tick_loc = last_tick_lab / max_deploy_years;
@@ -86,7 +82,17 @@ cb.Ticks = tick_loc;
 cb.TickLabels = tick_lab;
 cb.Label.String = 'Years Deployed [Per Float]';
 cb.TickDirection = 'out';
-cb.TickLength = 0.02;
+cb.TickLength = 0.01;
+
+axes(ax)
+sc = gobjects(size(mermaids));
+for i = 1:length(mermaids)
+    d = gps.(mermaids{i}).date;
+    col = x2color(days(d - d(1)), 0, max_deploy_days, cmap);
+    np = length(d);
+    sc(i) = scatter(nan(1, np), nan(1, np), 5, col, 'Filled', 'MarkerEdgeColor', 'None');
+
+end
 
 vname = mfilename;
 vwriter = VideoWriter(vname, 'MPEG-4');
@@ -94,7 +100,7 @@ open(vwriter);
 
 for j = 1:length(dates)
     d = dates(j);
-    
+
     for i = 1:length(mermaids)
         g = gps.(mermaids{i});
         idx = g.date == d;
@@ -104,7 +110,7 @@ for j = 1:length(dates)
 
         end
     end
-    title(datestr(d, 'mmmm YYYY'));
+    title(datestr(d, 'mmmm YYYY'), 'FontWeight', 'Normal');
     drawnow
     writeVideo(vwriter, getframe(gcf));
 
