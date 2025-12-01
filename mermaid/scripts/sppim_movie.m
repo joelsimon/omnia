@@ -1,4 +1,7 @@
 function sppim_movie
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 19-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
 close all
@@ -66,10 +69,10 @@ cmap = crameri(cmap);
 % Generate secondary invisible axis just to hold the drift-time colorbar.
 cbax = axes;
 colormap(cbax, cmap);
-cb = colorbar(cbax, 'SouthOutside')
-cb.Position(1) = ax.Position(1)
-cb.Position(2) = 0.16
-cb.Position(3) = ax.Position(3)
+cb = colorbar(cbax, 'SouthOutside');
+cb.Position(1) = ax.Position(1);
+cb.Position(2) = 0.16;
+cb.Position(3) = ax.Position(3);
 cbax.Visible = 'off';
 
 max_deploy_days = days(max_deploy_duration);
