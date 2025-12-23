@@ -4,12 +4,15 @@
 #
 # Usage: ./rsync_servers
 #
-# Author: Joel D. Simon
-# Contact: jdsimon@bathymetrix.com | joeldsimon@gmail.com
-# Last modified: 21-Oct-2025, Darwin Kernel Version 23.6.0
+# Author: Joel D. Simon <jdsimon@bathymetrix.com>
+# Last modified: 04-Dec-2025, Darwin Kernel Version 23.6.0
 
 # List of server directories to be synced
-servers=( $MERMAID/server/ $MERMAID/server_jamstec/ $MERMAID/server_sustech/ )
+# (closing "\" or dir itself copied)
+servers=( $MERMAID/server/ \
+	  $MERMAID/server_jamstec/ \
+	  $MERMAID/server_sustech/ \
+	  $MERMAID/server_stanford/ )
 
 # Generate (or clear) exists file logging commits
 log_file=$MERMAID/server_everyone/rsync_servers_log.txt
