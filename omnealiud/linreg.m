@@ -11,15 +11,15 @@ function [r2, p, r2_adj, yfit] = linreg(x, y, n)
 % n                Order of polynomial fit (def: 1)
 %
 % Output:
-% r2               R-squared value
+% r2               Coefficient of determination (1 - SSres/SStot; "R-squared")
 % p                Best fit polynomial from polyfit
 % r2_adjust        Adjusted R-squared value
 %                      (penalizes higher order fits)
 % yfit             Fitted curve, evaluated at points in `x`
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 13-Jul-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 22-Dec-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Default.
 defval('n', 1)
