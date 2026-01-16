@@ -26,7 +26,7 @@ function matchall(writecp, procdir, evtdir, evtdir2)
 %    MATCHALL(writecp, procdir, evtdir, evtdir2)
 %
 % Author: Joel D. Simon <jdsimon@bathymetrix.com>
-% Last modified: 10-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Last modified: 16-Jan-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
@@ -63,17 +63,17 @@ end
 % Yong's and Yuko's data I only copied over their reviewed .evt files).
 % Therefore, just glob all .evt files in the dir and keep the unique list.
 all_evt = globglob(evtdir, '**/*.evt');
-all_evt = unique(strippath(strrep(all_evt, '.raw', '')));
-matched_sac = strrep(all_evt, '.evt', '.sac'); % Not necessarily reviewed!
-if isempty(matched_sac)
-    % This could be fine, e.g., first time you ever run it.
-    warning(sprintf(['No .evt files in found, check evt* paths\n' ...
-                     'Paused: `dbcont` to continue']))
-    keyboard
+if ~isempty(all_evt)
+    all_evt = unique(strippath(strrep(all_evt, '.raw', '')));
+    matched_sac = strrep(all_evt, '.evt', '.sac'); % Not necessarily reviewed!
+    [~, idx] = setdiff(strippath(all_sac), strippath(matched_sac));
+    s = all_sac(idx);
+
+else
+    % No .evt files found in evtdir (e.g., running fresh or in new diro)
+    s = all_sac;
 
 end
-[~, idx] = setdiff(strippath(all_sac), strippath(matched_sac));
-s = all_sac(idx);
 
 % Loop over the unmatched SAC files.
 fail = [];
