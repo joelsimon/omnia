@@ -69,92 +69,100 @@ else
 end
 sac = setdiff(unrevsac, revsac);
 
-%% Option 2 (original/worse): compare lists unreviewed events and all
-%% processed SAC files (will fail if, e.g.,  you didn't make a raw.evt file for a
-%% non-Princeton float)
-% % Compile list of all SAC files and compare their differences.
-% sac = fullsac([], procdir);
-% if isempty(sac)
-%     error('No .sac files recursively found in %s\n', procdir)
+if ~isempty(sac)
 
-% end
-% [~, idx] = setdiff(strippath(sac), evt);
-% sac = sac(idx);
-%% <<
+    %% Option 2 (original/worse): compare lists unreviewed events and all
+    %% processed SAC files (will fail if, e.g.,  you didn't make a raw.evt file for a
+    %% non-Princeton float)
+    % % Compile list of all SAC files and compare their differences.
+    % sac = fullsac([], procdir);
+    % if isempty(sac)
+    %     error('No .sac files recursively found in %s\n', procdir)
 
-skipped = {};
-% Skip French floats, maybe.
-if skip_french
-    rm_idx = cellstrfind(sac, {'452.020-P-06' '452.020-P-07'});
-    if ~isempty(rm_idx)
-        skipped = [skipped ; strippath(sac(rm_idx))];
-        sac(rm_idx) = [];
+    % end
+    % [~, idx] = setdiff(strippath(sac), evt);
+    % sac = sac(idx);
+    %% <<
+
+    skipped = {};
+    % Skip French floats, maybe.
+    if skip_french
+        rm_idx = cellstrfind(sac, {'452.020-P-06' '452.020-P-07'});
+        if ~isempty(rm_idx)
+            skipped = [skipped ; strippath(sac(rm_idx))];
+            sac(rm_idx) = [];
+
+        end
+    end
+
+    if skip_0100
+        rm_idx = find(contains(sac, '467.174-T-0100'));
+        if ~isempty(rm_idx)
+            skipped = [skipped ; strippath(sac(rm_idx))];
+            sac(rm_idx) = [];
+
+        end
+    end
+
+    % Loop backwards in time (most recent first).
+    keyboard
+    [~, sort_idx] = sort(strippath(sac));
+    sac = sac(sort_idx);
+    num_sac = length(sac);
+    num_rev = num_sac;
+    for i = num_sac:-1:1
+        fprintf('Remaining SAC to be reviewed: %3i\n', num_rev)
+        num_rev = num_rev - 1;
+
+        % Skip review of REQ
+        if contains(strippath(sac{i}), 'REQ')
+            skipped = [skipped ; strippath(sac{i})];
+            warning(sprintf('Skipping review (REQ): %s\n', strippath(sac{i})))
+            continue
+
+        end
+
+        if skip_mag3 && EQ_mag3(sac{i}, evtdir)
+            skipped = [skipped ; strippath(sac{i})];
+            warning('Skipping %s (< mag. 3, or empty)\n', strippath(sac{i}))
+            continue
+
+        end
+        try
+            reviewevt(sac{i}, false, evtdir, viewr);
+
+        catch
+            skipped = [skipped ; strippath(sac{i})];
+            fprintf('Skipping...%s\n', strippath(sac{i}))
+                
+        end
+    end
+    clc
+    fprintf('Manual review complete...\n')
+
+    if ~isempty(skipped)
+        warning(['These SAC files were not reviewed:\n' ...
+                 repmat('%s\n', 1, length(skipped))], skipped{:})
 
     end
+    fid = fopen(fullfile(revevt_dir, 'reviewall_skipped.txt'), 'w');
+    fprintf(fid, '%s\n', skipped{:});
+    fclose(fid);
+
+else
+    fprintf('All raw.evt files reviewed\n')
+
 end
-
-if skip_0100
-    rm_idx = find(contains(sac, '467.174-T-0100'));
-    if ~isempty(rm_idx)
-        skipped = [skipped ; strippath(sac(rm_idx))];
-        sac(rm_idx) = [];
-
-    end
-end
-
-% Loop backwards in time (most recent first).
-[~, sort_idx] = sort(strippath(sac));
-sac = sac(sort_idx);
-num_sac = length(sac);
-num_rev = num_sac;
-for i = num_sac:-1:1
-    fprintf('Remaining SAC to be reviewed: %3i\n', num_rev)
-    num_rev = num_rev - 1;
-
-    % Skip review of REQ
-    if contains(strippath(sac{i}), 'REQ')
-        skipped = [skipped ; strippath(sac{i})];
-        warning(sprintf('Skipping review (REQ): %s\n', strippath(sac{i})))
-        continue
-
-    end
-
-    if skip_mag3 && EQ_mag3(sac{i}, evtdir)
-        skipped = [skipped ; strippath(sac{i})];
-        warning('Skipping %s (< mag. 3, or empty)\n', strippath(sac{i}))
-        continue
-
-    end
-    try
-        reviewevt(sac{i}, false, evtdir, viewr);
-
-    catch
-        skipped = [skipped ; strippath(sac{i})];
-        fprintf('Skipping...%s\n', strippath(sac{i}))
-        
-    end
-end
-clc
-fprintf('Manual review complete...\n')
-
-if ~isempty(skipped)
-    warning(['These SAC files were not reviewed:\n' ...
-             repmat('%s\n', 1, length(skipped))], skipped{:})
-
-end
-fid = fopen(fullfile(revevt_dir, 'reviewall_skipped.txt'), 'w');
-fprintf(fid, '%s\n', skipped{:});
-fclose(fid);
-
 fprintf('Updating event text files...\n')
-evt2txt;
-writelatlon;
+evt2txt(procdir, evtdir);
+%writelatlon(procdir, evtdir);
 
 fprintf('Updating first arrival text files...\n')
-writefirstarrival;
-writefirstarrivalpressure;
+writefirstarrival([], [], [], [], [], procdir, evtdir);
+writefirstarrivalpressure([], [], [], [], [], procdir, evtdir);
 
 if writecp
+    error('Must update writechangepointall to accept paths')
     try
         fprintf('Writing .cp files with error estimates...\n')
         writechangepointall
