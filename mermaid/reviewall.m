@@ -18,9 +18,8 @@ function reviewall(writecp, floatnum, procdir, evtdir)
 % N/A       Writes reviewed .evt files, updates .txt files,
 %               writes .cp files with uncertainty estimation
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 09-Oct-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 16-Jan-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Defaults.
@@ -42,7 +41,6 @@ otherwise
   viewr = 2;
 
 end
-
 
 clc
 fprintf('Searching for unreviewed SAC files...\n')
@@ -84,21 +82,27 @@ sac = setdiff(unrevsac, revsac);
 % sac = sac(idx);
 %% <<
 
+skipped = {};
 % Skip French floats, maybe.
 if skip_french
     rm_idx = cellstrfind(sac, {'.06_' '.07_'});
-    sac(rm_idx) = [];
+    if ~isempty(rm_idx)
+        skipped = [skipped ; strippath(sac(rm_idx))];
+        sac(rm_idx) = [];
 
+    end
 end
 
 if skip_0100
     rm_idx = find(contains(sac, '467.174-T-0100'));
-    sac(rm_idx) = [];
+    if ~isempty(rm_idx)
+        skipped = [skipped ; strippath(sac(rm_idx))];
+        sac(rm_idx) = [];
 
+    end
 end
 
 % Loop backwards in time (most recent first).
-fail = [];
 [~, sort_idx] = sort(strippath(sac));
 sac = sac(sort_idx);
 num_sac = length(sac);
@@ -109,12 +113,14 @@ for i = num_sac:-1:1
 
     % Skip review of REQ
     if contains(strippath(sac{i}), 'REQ')
+        skipped = [skipped ; strippath(sac{i})];
         warning(sprintf('Skipping review (REQ): %s\n', strippath(sac{i})))
         continue
 
     end
 
     if skip_mag3 && EQ_mag3(sac{i}, evtdir)
+        skipped = [skipped ; strippath(sac{i})];
         warning('Skipping %s (< mag. 3, or empty)\n', strippath(sac{i}))
         continue
 
@@ -123,13 +129,22 @@ for i = num_sac:-1:1
         reviewevt(sac{i}, false, evtdir, viewr);
 
     catch
+        skipped = [skipped ; strippath(sac{i})];
         fprintf('Skipping...%s\n', strippath(sac{i}))
-            fail = [fail; i];
-
+        
     end
 end
 clc
 fprintf('Manual review complete...\n')
+
+if ~isempty(skipped)
+    warning(['These SAC files were not reviewed:\n' ...
+             repmat('%s\n', 1, length(skipped))], skipped{:})
+
+end
+fid = fopen(fullfile(revevt_dir, 'reviewall_skipped.txt'), 'w');
+fprintf(fid, '%s\n', skipped{:});
+fclose(fid);
 
 fprintf('Updating event text files...\n')
 evt2txt;
@@ -152,20 +167,6 @@ if writecp
     end
 end
 
-if ~isempty(fail)
-    failsac = strippath(sac(fail));
-    failsac = cellfun(@(xx) strippath(xx), failsac, 'UniformOutput', ...
-                      false);
-    warning(['These SAC files were not reviewed:\n' ...
-             repmat('%s\n', 1, length(failsac))], failsac{:})
-
-else
-    failsac = {};
-
-end
-fid = fopen(fullfile(revevt_dir, 'reviewall_fail.txt'), 'w');
-fprintf(fid, '%s\n', failsac{:});
-fclose(fid);
 fprintf('\nAll done.\n')
 
 %% ___________________________________________________________________________ %%
