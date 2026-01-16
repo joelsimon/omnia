@@ -30,7 +30,7 @@ defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 
 skip_french = true;
 skip_0100 = true;
-skip_mag3 = true;
+skip_mag3 = false;
 
 % Switch the .pdf viewer depending on the platform.
 switch computer
@@ -85,7 +85,7 @@ sac = setdiff(unrevsac, revsac);
 skipped = {};
 % Skip French floats, maybe.
 if skip_french
-    rm_idx = cellstrfind(sac, {'.06_' '.07_'});
+    rm_idx = cellstrfind(sac, {'452.020-P-06' '452.020-P-07'});
     if ~isempty(rm_idx)
         skipped = [skipped ; strippath(sac(rm_idx))];
         sac(rm_idx) = [];
