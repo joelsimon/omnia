@@ -12,16 +12,15 @@ function [ax, f] = fig3_4l_S4(sac)
 %
 % Developed as: hunga_timspecprofbath2.m then fig4_5_A2.m
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 15-Aug-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 27-Jan-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Figures 3 and 4: set timspec_only to true
 % Figure 3: additional annotation added in post
 % Figure 4, S4: uncomment "For small font P0045 --> ... <--- For small font P0045" block
 % For Figures S10--44: set timspec_only to false and comment these individual `sac` files
-sac = '20220115T034444.0045_62AAD314.MER.REQ.merged.sac'; 
+sac = '20220115T034444.0045_62AAD314.MER.REQ.merged.sac';
 %sac = '20220115T040400.0053_630C0CF0.MER.REQ.merged.sac'; % color = [0 .33  1]
 %sac = 'H03S1.EDH.202201150400_4hr.sac.pa'; % color = [0 .67  1]
 %sac = 'H11S1.EDH.202201150300_5hr.sac.pa'; % color = [0 1 1]
@@ -137,6 +136,13 @@ hold(ax(1), 'on')
 pl_full = plot(ax(1), xax_t0_mins, xw_filtered, 'Color', [0.6 0.6 0.6]);
 pl_30 = plot(ax(1), xax30_t0_mins, xw30, 'Color', Color);
 hold(ax(1), 'off')
+
+if strcmp(kstnm, 'P0045')
+    % Export an audio file for an animation -- set for 30 sec animation
+    audiowrite('P0045.wav', norm2max(xw_filtered), round(length(xw_filtered)/30))
+
+end
+
 
 if plt_env
     env_len_secs = 30;
@@ -452,20 +458,21 @@ if timspec_only
     cb2.TickLength = 0.01;
     cb2.FontSize = 12;
 
+    % %% For small font P0045 --> (comment block to kill gray annotation)
+    % % Thurin+2023 "best set of force paramters" (Table 4) subevent timing in
+    % % minutes relative to USGS 2022-01-15 04:14:45 UTC (0 time here is T-wave
+    % % arrival time, so it's the same as saying 0 is HTHH origin time)
+    % s1_4 = [50.85 256.09 293.51 321.1] ./ 60;
+    % hold(ax([1 2]), 'on')
+    % for i = 1:length(s1_4);
+    %     ps = plot(ax(1), [s1_4(i) s1_4(i)], ax(1).YLim, '-', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
 
-    %% For small font P0045 -->
-    % Thurin+2023 "best set of force paramters" (Table 4) subevent timing in
-    % minutes relative to USGS 2022-01-15 04:14:45 UTC (0 time here is T-wave
-    % arrival time, so it's the same as saying 0 is HTHH origin time)
-    s1_4 = [50.85 256.09 293.51 321.1] ./ 60;
-    hold(ax([1 2]), 'on')
-    for i = 1:length(s1_4);
-        ps = plot(ax(1), [s1_4(i) s1_4(i)], ax(1).YLim, '-', 'Color', [0.6 0.6 0.6], 'LineWidth', 1);
+    % end
+    % hold(ax([1 2]), 'off')
+    % ts1 = text(ax(1), s1_4(1)+0.25, -2.5, 'S1', 'Color', [0.6 0.6 0.6]);
+    % ts2_4 = text(ax(1), s1_4(4)+0.25, -2.5, 'S2 - S4 (Thurin & Tape, 2023)', 'Color', [0.6 0.6 0.6]);
+    % %% <<-- For small font P0045 (comment block to kill gray annotation)
 
-    end
-    hold(ax([1 2]), 'off')
-    ts1 = text(ax(1), s1_4(1)+0.25, -2.5, 'S1', 'Color', [0.6 0.6 0.6]);
-    ts2_4 = text(ax(1), s1_4(4)+0.25, -2.5, 'S2 - S4 (Thurin & Tape, 2023)', 'Color', [0.6 0.6 0.6]);
     latimes2
 
     shrink(ax(1:2), 1,1.5)
@@ -485,7 +492,7 @@ if timspec_only
     %% For glide rectangle
     %delete(rec)
     %% For glide rectangle
-    
+
     xlim(ax(2), [-6 0]);
     xticks(ax(2), [-6:0]);
     xticklabels({'-6' '-5' '-4' '-3' '-2' '-1' '0'});
