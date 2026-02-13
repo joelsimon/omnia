@@ -1,0 +1,9 @@
+#!/bin/zsh
+#
+# Author: Joel D. Simon <jdsimon@bathymetrix.com>
+# Last modified: 13-Feb-2026, Darwin Kernel Version 23.6.0
+
+standir=$MERMAID/server_stanford/
+printf "rsycning to %s\n" $standir
+rsync -av psdmaid@mermaid.princeton.edu:\*.\* $standir
+
