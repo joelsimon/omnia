@@ -6,19 +6,35 @@ function time2meet(meeting_day, their_timezone)
 % !! WARNING: Note flipped convention of 'Etc/GMT-*' == 'UTC+*' !!
 %
 % Input:
-% meeting_day      Date of proposed meeting, in Joel's timezone
-%                      (datetime; def: datetime('today'))
+% meeting_day      Date of proposed meeting (datetime; def: datetime('today'))
 % their_timezone   Collaborator's IANA timezone, listed below (char/string)
 %
 % Ex:
 %    TIME2MEET(datetime('tomorrow'), 'Asia/Shanghai')
-%    TIME2MEET(datetime('tomorrow'), 'Etc/GMT-14') % == UTC+14
 %    TIME2MEET(datetime('tomorrow'), 'UTC+14') % == Etc/GMT-14
+%    TIME2MEET(datetime('tomorrow'), 'Etc/GMT-14') % == UTC+14
+%
+% To see timezones: type(time2meet)
 %
 % Author: Joel D. Simon <jdsimon@bathymetrix.com>
-% Last modified: 03-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Last modified: 13-Feb-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
-%
+
+defval('meeting_day', datetime('today'))
+
+meeting_day.Hour = 0;
+meeting_day.TimeZone = '';
+base_day = datetime(meeting_day + hours(0:24));
+
+my_day = base_day;
+my_day.TimeZone = 'America/Los_Angeles';
+
+their_day = my_day;
+their_day.TimeZone = their_timezone;
+
+fprintf('\n')
+disp(table(my_day', their_day', 'VariableNames', {'My Time', 'Their Time'}))
+
 % IANA timezones (note that 'UTC+/-*' is also valid but not listed):
 %
 %           NAME                            AREA          UTCOffset   DSTOffset
@@ -478,18 +494,3 @@ function time2meet(meeting_day, their_timezone)
 %    {'Pacific/Truk'                  }    Pacific            10           0
 %    {'Pacific/Wake'                  }    Pacific            12           0
 %    {'Pacific/Wallis'                }    Pacific            12           0
-
-defval('meeting_day', datetime('today'))
-
-meeting_day.Hour = 0;
-meeting_day.TimeZone = '';
-base_day = datetime(meeting_day + hours(0:24));
-
-my_day = base_day;
-my_day.TimeZone = 'America/Los_Angeles';
-
-their_day = my_day;
-their_day.TimeZone = their_timezone;
-
-fprintf('\n')
-disp(table(my_day', their_day', 'VariableNames', {'My Time', 'Their Time'}))
