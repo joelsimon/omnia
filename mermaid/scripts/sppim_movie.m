@@ -1,6 +1,6 @@
 function sppim_movie
 % Author: Joel D. Simon <jdsimon@bathymetrix.com>
-% Last modified: 19-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Last modified: 12-Jan-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
@@ -58,13 +58,13 @@ F.cb.TickDirection = 'out';
 longticks([], 2)
 latimes2
 
-
 %% Pull in Crameri's colormaps so that I can use crameri.m
 cmap = 'acton';
 cpath = fullfile(getenv('PROGRAMS'), 'crameri');
 addpath(cpath);
 cmap = crameri(cmap);
-% %% Pull in Crameri's colormaps so that I can use crameri.m
+rmpath(cpath)
+%% Pull in Crameri's colormaps so that I can use crameri.m
 
 % Generate secondary invisible axis just to hold the drift-time colorbar.
 cbax = axes;
