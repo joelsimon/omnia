@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# Author: Joel D. Simon <jdsimon@bathymetrix.com>
+# Last modified: 13-Feb-2026, Darwin Kernel Version 23.6.0
+
+users=(s_m0101 s_m0102 s_m0056s s_m0057)
+server=$MERMAID/server_jamstec/
+for u in "${users[@]}"; do
+    printf "Syncing %s:\n" "$u"
+    passvar="${u}_PASS"
+    passwrd="${!passvar}"
+    lftp -u $u,$passwrd sftp://iridium-rudics.cls.fr \
+	 -e "set sftp:auto-confirm yes; mirror --verbose --continue --only-newer --parallel=4 --exclude-glob '.*' . $server; bye"
+
+done
+printf "\nDone: Synced to %s\n" "$server"
+
