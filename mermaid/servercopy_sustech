@@ -1,0 +1,12 @@
+#!/bin/zsh
+#
+# Author: Joel D. Simon <jdsimon@bathymetrix.com>
+# Last modified: 04-Mar-2026, Darwin Kernel Version 23.6.0
+
+standir=$MERMAID/server_sustech/
+printf "rsycning to %s\n" $standir
+# will probably want to clean this dir up at some point (ignore history.txt, etc.).
+rsync -av mermaid@134.175.126.179:\*.\* $standir
+
+    
+
