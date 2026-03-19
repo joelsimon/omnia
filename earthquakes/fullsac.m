@@ -19,7 +19,7 @@ function s = fullsac(singl, diro, returntype, ofuse)
 %                  Leave empty to return all SAC files in diro (def: [])
 %                  (really, it can be any filename...doesn't have to be SAC)
 % diro         Directory which contains (or whose subdirectories contain)
-%                  the SAC files of interest (def: $MERMAID/processed/)
+%                  the SAC files of interest (def: $MERMAID/processed_everyone/)
 % returntype   For third-generation+ MERMAID only:
 %              'ALL': both triggered and user-requested SAC files (def)
 %              'DET': triggered SAC files as determined by onboard algorithm
@@ -56,13 +56,13 @@ function s = fullsac(singl, diro, returntype, ofuse)
 %
 % See also: mermaid_sacf.m
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 08-Sep-2021, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 19-Mar-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Default is to return all SAC filenames in $MERMAID/processed.
 defval('singl', [])
-defval('diro', fullfile(getenv('MERMAID'), 'processed'))
+defval('diro', fullfile(getenv('MERMAID'), 'processed_everyone'))
 defval('returntype', 'ALL')
 defval('ofuse', [])
 
