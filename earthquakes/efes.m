@@ -1,7 +1,7 @@
 function fs = efes(h, rd)
 % fs = EFES(h, rd)
 %
-% Returns the nominal sampling frequency of a SAC waveform in Hz.
+% Returns the <nominal> sampling frequency of a SAC waveform in Hz.
 %
 % Input:
 % h           Header structure returned by readsac.m
@@ -15,29 +15,29 @@ function fs = efes(h, rd)
 %    fs1 = EFES(h)
 %    fs2 = EFES(h, false)
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 28-Mar-2022, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 19-Mar-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Find nominal sampling frequency.
 defval('rd', true)
 
 % Pull SAC-derived sampling interval ("DELTA) exists; otherwise compute
 if isfield(h, 'NPTS')
-    if any([h.NPTS h.E h.B] == -12345)
+    if isfield(h, 'DELTA')
         fs = 1 / h.DELTA;
 
     else
-        fs = h.NPTS / (h.E - h.B);
+        fs = (h.NPTS - 1) / (h.E - h.B);
 
     end
 elseif isfield(h, 'npts')
     % Yuck (but this this faster than, e.g., a `structfun` rename...)
-    if any([h.npts h.e h.b] == -12345)
+    if isfield(h, 'delta')
         fs = 1 / h.delta;
 
     else
-        fs = h.npts / (h.e - h.b);
+        fs = (h.npts - 1) / (h.e - h.b);
 
     end
     warning(sprintf(['Why are you using nonstandard (lowercase) SAC header fields?\n' ...
