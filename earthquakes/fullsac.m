@@ -57,7 +57,7 @@ function s = fullsac(singl, diro, returntype, ofuse)
 % See also: mermaid_sacf.m
 %
 % Author: Joel D. Simon <jdsimon@bathymetrix.com>
-% Last modified: 19-Mar-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Last modified: 24-Apr-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Default is to return all SAC filenames in $MERMAID/processed.
@@ -104,7 +104,7 @@ else
                 s{i} = fullfile(d(i).folder, d(i).name);
             end
 
-            if length(s) > 1 && ~isempty('ofuse')
+            if length(s) > 1 && ~isempty(ofuse)
                 idx = find(contains(s, ofuse));
                 if length(idx) == 1
                     s = s{idx};
