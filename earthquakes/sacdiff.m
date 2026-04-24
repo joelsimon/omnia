@@ -31,7 +31,7 @@ function [h1, h2] = sacdiff(s1, s2, dmate, lohi, flipstack)
 %    SACDIFF('20180728T225619.06_5B773AE6.MER.REQ.WLT5.sac', ...
 %            '20180728T225619.06_5B773AE6.MER1.REQ.WLT5.sac');
 %
-% See also: alignxcorr.m
+% See also: sacequality, comparesac, alignxcorr
 %
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com

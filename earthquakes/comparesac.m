@@ -19,6 +19,8 @@ function [data, time, loc, x, h, sd] = comparesac(sac1, sac2)
 %    sac2 = '20180728T225619.06_5B773AE6.MER1.REQ.WLT5.sac';
 %    [data, time, loc] = COMPARESAC(sac1, sac2)
 %
+% See also: sacequality, sacdiff
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 14-May-2025, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)

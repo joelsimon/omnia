@@ -25,6 +25,8 @@ function [iseq, cf, h1, h2, x1, x2] = sacequality(sac1, sac2, names, mess, excl)
 %    [iseq_same, cf_same] = SACEQUALITY(sac1, sac1)
 %    [iseq_diff, cf_diff] = SACEQUALITY(sac1, sac2)
 %
+% See also: comparesac, sacdiff
+%
 % Author: Joel D. Simon
 % Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
 % Last modified: 25-Sep-2024, 24.1.0.2568132 (R2024a) Update 1 on MACA64 (geo_mac)
