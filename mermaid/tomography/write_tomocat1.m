@@ -1,5 +1,5 @@
-function write_tomocat1(redo, procdir, evtdir, txtdir, revtxt)
-% WRITE_TOMOCAT1(redo, procdir, evtdir, txtdir, revtxt)
+function write_tomocat1(redo, procdir, evtdir, txtdir, revtxt, outdir)
+% WRITE_TOMOCAT1(redo, procdir, evtdir, txtdir, revtxt, outdir)
 %
 % Tomography Catalog Iteration #1: GJI22 supplement + KSTNM, REVIEWER
 %
@@ -9,12 +9,13 @@ function write_tomocat1(redo, procdir, evtdir, txtdir, revtxt)
 % evtdir      Events directory (def: $MERMAID/events_everyone/)
 % txtdir      Textfile directory (def: $MERMAID/events_everyone/reviewed/identified/txt)
 % revtxt      Reviewer textfile (def: [])
+% outdir      Dir to send output tomocat1.txt (def: txtdir)
 %
 % Output:
-% tomocat1.txt
+% {outdir}/tomocat1.txt
 %
 % Author: Joel D. Simon <jdsimon@bathymetrix.com>
-% Last modified: 12-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Last modified: 23-Apr-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
@@ -34,6 +35,7 @@ defval('procdir', fullfile(getenv('MERMAID'), 'processed_everyone'));
 defval('evtdir',  fullfile(getenv('MERMAID'), 'events_everyone'));
 defval('txtdir', fullfile(getenv('MERMAID'), 'events_everyone', 'reviewed', 'identified', 'txt'));
 defval('revtxt', [])
+defval('outdir', txtdir);
 
 %% Preliminaries
 
@@ -223,7 +225,7 @@ fmt = [sac_fmt ...                        %  1
 
 %%______________________________________________________________________________________%%
 
-filename = fullfile(txtdir, 'tomocat1.txt');
+filename = fullfile(outdir, 'tomocat1.txt');
 
 writeaccess('unlock', filename, false);
 prev_file = exist(filename, 'file') == 2;
