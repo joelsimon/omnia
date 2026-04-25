@@ -1,5 +1,5 @@
-function write_tomocat1(redo, procdir, evtdir, txtdir, revtxt, outdir)
-% WRITE_TOMOCAT1(redo, procdir, evtdir, txtdir, revtxt, outdir)
+function [s, badidx] = write_tomocat1(redo, procdir, evtdir, txtdir, revtxt, outdir)
+% [s, badidx] = WRITE_TOMOCAT1(redo, procdir, evtdir, txtdir, revtxt, outdir)
 %
 % Tomography Catalog Iteration #1: GJI22 supplement + KSTNM, REVIEWER
 %
@@ -244,9 +244,12 @@ else
 
 end
 
+badidx = [];
+badsac = [];
 max_tdiff = 0;
 max_tdiff_sac = '';
 for i = 1:length(s);
+    try
     fprintf('Working on # %i of %i\n', i, length(s))
     sac = s{i};
     if ~redo && any(contains(prev_mer.filename, sac));
@@ -466,10 +469,20 @@ for i = 1:length(s);
            };
 
     fprintf(fid, fmt, data{:});
+    catch
+        % Dont also log sac here because fails can be duplicates.
+        badidx = [badidx; i];
 
+    end
 end
 fclose(fid);
 fprintf('Max. tdiff: %.48f s (%s)\n', max_tdiff, strippath(max_tdiff_sac))
+
+for i = 1:length(badidx)
+    % Don't do sac here because it fails on duplicates
+    fprintf('Bad index: %i\n', badidx(i));
+
+end
 
 % Use a system call to sort the new entries.
 status = system(sprintf('sort -k1 -n -o %s %s', filename, filename));
