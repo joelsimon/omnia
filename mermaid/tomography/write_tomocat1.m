@@ -1,5 +1,5 @@
-function [s, badidx] = write_tomocat1(redo, procdir, evtdir, txtdir, revtxt, outdir)
-% [s, badidx] = WRITE_TOMOCAT1(redo, procdir, evtdir, txtdir, revtxt, outdir)
+function [sacfiles, badidx, duplicates, absentees] = write_tomocat1(redo, procdir, evtdir, txtdir, revtxt, outdir)
+% [sacfiles, badidx, duplicates, absentees] = WRITE_TOMOCAT1(redo, procdir, evtdir, txtdir, revtxt, outdir)
 %
 % Tomography Catalog Iteration #1: GJI22 supplement + KSTNM, REVIEWER
 %
@@ -12,7 +12,13 @@ function [s, badidx] = write_tomocat1(redo, procdir, evtdir, txtdir, revtxt, out
 % outdir      Dir to send output tomocat1.txt (def: txtdir)
 %
 % Output:
-% {outdir}/tomocat1.txt
+% <file>      {outdir}/tomocat1.txt
+% sacfiles    List of sac files attempted to be processed
+% badidx      Indices of sac files unable to be processed in `s`
+% duplicates  Table of sac files whose basename in preflight txtiles (see code),
+%                 but which are duplicated in `procdir`
+% absentees   Sac files whose basename in preflight txtiles (see code) not found in `procdir`
+
 %
 % Author: Joel D. Simon <jdsimon@bathymetrix.com>
 % Last modified: 23-Apr-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
@@ -248,10 +254,17 @@ badidx = [];
 badsac = [];
 max_tdiff = 0;
 max_tdiff_sac = '';
+
+% Get time-consuming recursive full path search out of the way.
+[s, duplicates, absentees] = fullfiles(s, procdir);
+
+sacfiles = {};
 for i = 1:length(s);
+    sac = s{i};
+    sacfiles = [sacfiles ; sac];
+
     try
     fprintf('Working on # %i of %i\n', i, length(s))
-    sac = s{i};
     if ~redo && any(contains(prev_mer.filename, sac));
         continue
 
@@ -263,7 +276,7 @@ for i = 1:length(s);
     % and I specifically say all times are ROUNDED (not truncated) in the
     % supplement (not just 'floor'ed in the output text file; e.g., the travel
     % time residuals and their estimated uncertainties are rounded to 1/100 s).
-    [~, h] = readsac(fullsac(s{i}, procdir));
+    [~, h] = readsac(sac);
     seisdate = seistime(h);
     sttime = roundmsec(fdsndate2str(seisdate.B));
     kstnm = h.KSTNM;
