@@ -14,8 +14,9 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     exit 1
 fi
 
-# Set time zone local to JDS.
-export TZ="America/Los_Angeles"
+# Set time zone.
+#export TZ="America/Los_Angeles" # JDS local
+export TZ="UTC"
 
 # Get current Unix Epoch time (-u is redundant, but left here).
 current_epoch=$(date -u +%s)
