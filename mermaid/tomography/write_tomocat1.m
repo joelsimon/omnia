@@ -18,10 +18,9 @@ function [sacfiles, badidx, duplicates, absentees] = write_tomocat1(redo, procdi
 % duplicates  Table of sac files whose basename in preflight txtiles (see code),
 %                 but which are duplicated in `procdir`
 % absentees   Sac files whose basename in preflight txtiles (see code) not found in `procdir`
-
 %
 % Author: Joel D. Simon <jdsimon@bathymetrix.com>
-% Last modified: 23-Apr-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Last modified: 01-May-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
@@ -259,13 +258,15 @@ max_tdiff_sac = '';
 [s, duplicates, absentees] = fullfiles(s, procdir);
 
 sacfiles = {};
-for i = 1:length(s);
+for i = 1:length(s)
     sac = s{i};
     sacfiles = [sacfiles ; sac];
 
     try
     fprintf('Working on # %i of %i\n', i, length(s))
-    if ~redo && any(contains(prev_mer.filename, sac));
+
+    has_prev = ~isempty(prev_mer) && isfield(prev_mer,'filename');
+    if ~redo && has_prev && ~isempty(prev_mer.filename) && any(contains({prev_mer.filename}, sac))
         continue
 
     end
@@ -482,7 +483,7 @@ for i = 1:length(s);
            };
 
     fprintf(fid, fmt, data{:});
-    catch
+    catch ME
         % Dont also log sac here because fails can be duplicates.
         badidx = [badidx; i];
 
