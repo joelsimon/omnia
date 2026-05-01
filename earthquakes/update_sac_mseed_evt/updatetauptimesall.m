@@ -1,5 +1,5 @@
-function fname = updatetauptimesall(sacdir, evtdir)
-% fname = UPDATETAUPTIMESALL(sacdir, evtdir)
+function updatetauptimesall(sacdir, evtdir)
+% UPDATETAUPTIMESALL(sacdir, evtdir)
 %
 % Run `updatetauptimes` on entire reviewed .evt directory.
 %
@@ -9,14 +9,13 @@ function fname = updatetauptimesall(sacdir, evtdir)
 % evtdir    Path to events directory (modified by omnia) containing .evt
 %              (def: $MERMAID/events)
 % Output:
-% fname     Text file detailing which .evt files had their EQ.TaupTimes updated
 % *n/a*     Overwrites any .evt file with required EQ.TaupTimes corrections
 %
 % *Note: these are base paths to be searched recursively, e.g., use
 %  $MERMAID/events/, not $MERMAID/events/reviewed/identified/evt/, for `evtdir`
 %
 % Author: Joel D. Simon <jdsimon@bathymetrix.com>
-% Last modified: 07-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Last modified: 01-May-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Default paths.
@@ -70,3 +69,6 @@ fprintf('\nWrote: %s\n', fname1)
 
 writeaccess('lock', fname2)
 fprintf('\nWrote: %s\n', fname2)
+
+writeaccess('lock', fname3)
+fprintf('\nWrote: %s\n', fname3)
