@@ -15,7 +15,7 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 % redo     true: delete and remake the text file
 %          false: add new lines to the existing text file unless
 %              that SAC file name already exists in the text file (def)
-% filename Output text file name (def: $MERMAID/.../firstarrival.txt)
+% filename Output text file name (def: <evtdir>/reviewed/identified/txt/firstarrival.txt)
 % wlen     Window length [s]
 % lohi     1x2 array of corner frequencies, or NaN to skip bandpass
 % sacdir   Directory containing (possibly subdirectories) of .sac files
@@ -56,17 +56,17 @@ function writefirstarrival(s, redo, filename, wlen, lohi, sacdir, ...
 %
 % See also: firstarrival.m, readfirstarrival.m
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 16-Aug-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 04-May-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Defaults.
 defval('sacdir', [])
 defval('evtdir', [])
 defval('s', revsac(1, sacdir, evtdir, 'ALL'))
 defval('redo', false)
-defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
-                            'identified', 'txt', 'firstarrival.txt'))
+defval('filename', fullfile(evtdir, 'reviewed', 'identified', 'txt', 'firstarrival.txt'))
+
 % Default the rest as empties to be filled in firstarrival.m
 defval('wlen', [])
 defval('lohi', [])

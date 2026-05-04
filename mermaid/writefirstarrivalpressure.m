@@ -17,7 +17,7 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 % redo     true: delete and remake the text file
 %          false: add new lines to the existing tex file unless
 %              that SAC file name already exists in the text file (def)
-% filename Output text file name (def: $MERMAID/.../firstarrivalpressure.txt)
+% filename Output text file name (def: <evtdir>/reviewed/identified/txt/firstarrivalpressure.txt)
 % wlen     Window length [s] (def: 30)
 % lohi     1x2 array of corner frequencies, or NaN to skip bandpass (def: [1 5]])
 % sacdir   Directory containing (possibly subdirectories)
@@ -68,8 +68,8 @@ defval('sacdir', [])
 defval('evtdir', [])
 defval('s', revsac(1, sacdir, evtdir, 'ALL'))
 defval('redo', false)
-defval('filename', fullfile(getenv('MERMAID'), 'events', 'reviewed', ...
-                            'identified', 'txt', 'firstarrivalpressure.txt'))
+defval('filename', fullfile(evtdir, 'reviewed', 'identified', 'txt', 'firstarrivalpressure.txt'))
+
 defval('wlen', 30)
 defval('lohi', [1 5])
 defval('EQ', [])
