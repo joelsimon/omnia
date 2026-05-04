@@ -6,14 +6,14 @@ function writelatlon(sacdir, evtdir, returntype, filename, precision)
 %
 % Input:
 % sacdir       Directory where .sac files are kept
-%                  def($MERMAID/processed)
+%                  def($MERMAID/processed_everyone/)
 % evtdir       Path to directory containing 'raw/' and 'reviewed'
-%                  subdirectories (def: $MERMAID/events/)
+%                  subdirectories (def: $MERMAID/events_everyone/)
 % returntype   For third-generation+ MERMAID only:
 %              'ALL': both triggered and user-requested SAC files (def)
 %              'DET': triggered SAC files as determined by onboard algorithm
 %              'REQ': user-requested SAC files
-% filename     Fullpath output filename (def: $MERMAID/events/.../mermaid_latlon.txt)
+% filename     Output text file name (def: <evtdir>/reviewed/identified/txt/latlon.txt)
 % singl        true to write same file in single-precision (def: true)
 % precision    Number of decimal places in latitude, longitude (def: 4)
 %
@@ -28,17 +28,15 @@ function writelatlon(sacdir, evtdir, returntype, filename, precision)
 %              (7) EVDP (kilometers)
 %
 % Author: Joel D. Simon <jdsimon@bathymetrix.com>
-% Last modified: 12-Nov-2025, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Last modified: 04-May-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
-
-warning('Need to update formatspec for longer filenames')
 
 % Defaults.
 merpath = getenv('MERMAID');
-defval('sacdir', fullfile(merpath, 'processed'))
-defval('evtdir', fullfile(merpath, 'events'))
+defval('sacdir', fullfile(merpath, 'processed_everyone'))
+defval('evtdir', fullfile(merpath, 'events_everyone'))
 defval('returntype', 'ALL')
-defval('filename',  fullfile(merpath, 'events', 'reviewed', 'identified', 'txt', 'mermaid_latlon.txt'))
+defval('filename', fullfile(evtdir, 'reviewed', 'identified', 'txt', 'latlon.txt'))
 defval('singl', true)
 defval('precision', 4)
 
@@ -49,7 +47,7 @@ s = revsac(1, sacdir, evtdir, returntype);
 % lon: -180.(precision) --> max. 5 leading chars incl. decimal
 
 % Text file format.
-fmt = ['%44s    ', ...
+fmt = ['%47s    ', ...
       ['%' sprintf('%i.%if    ', precision+4, precision)], ...  % STLA
       ['%' sprintf('%i.%if    ', precision+5, precision)], ...  % STLO
       '%4i    ', ...
@@ -63,7 +61,13 @@ writeaccess('unlock', filename, false);
 fid =fopen(filename, 'w');
 
 if singl
-    filename_single = [filename '_single'];
+    if strcmp(suf(filename), 'txt')
+        filename_single = strrep(filename, '.txt', '_single.txt');
+
+    else
+        filename_single = [filename '_single'];
+
+    end
     writeaccess('unlock', filename_single, false);
     fid_single = fopen(filename_single, 'w');
 

@@ -155,7 +155,7 @@ else
 end
 fprintf('Updating event text files...\n')
 evt2txt(procdir, evtdir);
-%writelatlon(procdir, evtdir);
+writelatlon(procdir, evtdir);
 
 fprintf('Updating first arrival text files...\n')
 writefirstarrival([], [], [], [], [], procdir, evtdir);

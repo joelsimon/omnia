@@ -15,9 +15,9 @@ function [sac, evt, xtra_evt] = revsac(iup, sacdir, evtdir, returntype)
 %             -1: unidentified
 %              0: purgatory
 % sacdir       Directory where .sac files are kept
-%                  def($MERMAID/processed)
+%                  def($MERMAID/processed_everyone/)
 % evtdir       Path to directory containing 'raw/' and 'reviewed'
-%                  subdirectories (def: $MERMAID/events/)
+%                  subdirectories (def: $MERMAID/events_everyone/)
 % returntype   For third-generation+ MERMAID only:
 %              'ALL': both triggered and user-requested SAC files (def)
 %              'DET': triggered SAC files as determined by onboard algorithm
@@ -48,8 +48,8 @@ function [sac, evt, xtra_evt] = revsac(iup, sacdir, evtdir, returntype)
 
 % Defaults.
 defval('iup', 1)
-defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
-defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
+defval('sacdir', fullfile(getenv('MERMAID'), 'processed_everyone'))
+defval('evtdir', fullfile(getenv('MERMAID'), 'events_everyone'))
 defval('returntype', 'ALL')
 
 sacdir = strtrim(sacdir);

@@ -13,9 +13,9 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 %
 % Inputs:
 % sacdir    Path to directory containing subdirectories with SAC files
-%               (def: $MERMAID/processed)
+%               (def: $MERMAID/processed_everyone/)
 % revdir    Path to directory containing 'reviewed' subdirectory
-%               (def: $MERMAID/events)
+%               (def: $MERMAID/events_everyone/)
 % geoazur   logical true to assume GeoAzur's naming scheme
 %               (def: false)
 %
@@ -57,13 +57,13 @@ function txt = evt2txt(sacdir, revdir, geoazur)
 %
 % See also: cpsac2evt.m, reviewevt.m, revsac.m, getevt.m
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 05-Oct-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 04-May-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Defaults.
-defval('sacdir', fullfile(getenv('MERMAID'), 'processed'))
-defval('revdir', fullfile(getenv('MERMAID'), 'events'))
+defval('sacdir', fullfile(getenv('MERMAID'), 'processed_everyone'))
+defval('revdir', fullfile(getenv('MERMAID'), 'events_everyone'))
 defval('geoazur', false)
 
 % Initialize empty struct to hold text lines, and specify format.

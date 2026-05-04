@@ -20,10 +20,8 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 % filename Output text file name (def: <evtdir>/reviewed/identified/txt/firstarrivalpressure.txt)
 % wlen     Window length [s] (def: 30)
 % lohi     1x2 array of corner frequencies, or NaN to skip bandpass (def: [1 5]])
-% sacdir   Directory containing (possibly subdirectories)
-%              of .sac files (def: $MERMAID/processed)
-% evtdir   Directory containing (possibly subdirectories)
-%              of .evt files (def: $MERMAID/events)
+% sacdir   Directory containing (possibly subdirectories) of .sac files
+% evtdir   Directory containing (possibly subdirectories) of .evt files
 % EQ      Cell array (same size as 's') of corresponding EQ structs
 %             (def: []; retrieve via `getrevevt(s, evtdir)` in firstarrival.m)
 % bathy    logical true apply bathymetric travel time correction,
@@ -59,9 +57,9 @@ function writefirstarrivalpressure(s, redo, filename, wlen, lohi, sacdir, ...
 %
 % See also: firstarrivalpressure.m, readfirstarrivalpressure.m
 %
-% Author: Joel D. Simon
-% Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-% Last modified: 16-Aug-2023, Version 9.3.0.948333 (R2017b) Update 9 on MACI64
+% Author: Joel D. Simon <jdsimon@bathymetrix.com>
+% Last modified: 04-May-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Defaults.
 defval('sacdir', [])
@@ -80,7 +78,7 @@ defval('popas', [4 1])
 defval('pt0', 0)
 
 % Textfile format.
-fmt = ['%-47s    ' , ...
+fmt = ['%47s    ' , ...
        '%11s    ' ,  ...
        '%18.12E    ' , ...
        '%6.2f   ' ,  ...
