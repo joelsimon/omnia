@@ -1,88 +1,90 @@
 #! /bin/zsh
-# Usage: lastsurface
+# Usage: lastsurface [server_dir]
 #
 # Print dates of MERMAIDs' last transmissions as recorded in their *.out files.
-#
-# Author: Joel D. Simon
-# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 04-Oct-2021, Darwin Kernel Version 18.7.0
 
-# Print help doc.
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     sed -ne '/^#/!q;s/^#$/# /;/^# /s/^# //p' < "$0" |
-	awk -v f="${1#-h}" '!f && /^Usage:/ || u { u=!/^\s*$/; if (!u) exit } u || f'
+        awk -v f="${1#-h}" '!f && /^Usage:/ || u { u=!/^\s*$/; if (!u) exit } u || f'
     exit 1
 fi
 
+osean2kstnm() {
+    local osean=$1
+    local split_name len_kstnm len_zeropad zeros kstnm
+
+    split_name=("${(@s/-/)osean}")
+    len_kstnm=$(echo -n "$split_name[2]$split_name[3]" | wc -m | tr -d ' ')
+
+    if [[ $len_kstnm -gt 5 ]]; then
+        echo "Unexpected input: kstnm greater than five characters: $osean" >&2
+        return 1
+    elif [[ $len_kstnm -eq 5 ]]; then
+        kstnm="$split_name[2]$split_name[3]"
+    else
+        len_zeropad=$(( 5 - len_kstnm ))
+        zeros=$(printf '0%.0s' {1..$len_zeropad})
+        kstnm="$split_name[2]$zeros$split_name[3]"
+    fi
+
+    printf '%s\n' "$kstnm"
+}
+
 # Set time zone.
-#export TZ="America/Los_Angeles" # JDS local
 export TZ="UTC"
 
-# Get current Unix Epoch time (-u is redundant, but left here).
 current_epoch=$(date -u +%s)
-
-# Specify output format.
 output_fmt="%d-%b-%Y (%a @ %H:%M:%S %Z)"
 computer=$(uname -s)
 
-# Loop over all .out files in the server.
-for out_file in $MERMAID/server/452*.out; do
-    # Parse the serial_number from the out file name.
-    base_name=$(basename $out_file)
-    serial_number=${base_name/.out}  # string substitution; = sed 's/.out//'
+MERMAID_ROOT="${MERMAID:-$HOME/mermaid}"
+SERVER_DIR="${1:-$MERMAID_ROOT/server}"
 
-    # Find the last occurrence of "sending cmd from ...", signaling the last
-    # transmission.
-    line=$(grep "sending cmd from ${serial_number}.cmd" $out_file  | tail -1)
+if [[ ! -d "$SERVER_DIR" ]]; then
+    echo "Error: server directory not found: $SERVER_DIR" >&2
+    exit 1
+fi
 
-    # Parse its UTC time.
-    cmd_time=$(cut -c4-21 <<< $line)
+for out_file in "$SERVER_DIR"/*.out(N); do
+    base_name=$(basename "$out_file")
+    serial_number=${base_name/.out}
 
-    # Parse date specifiers (year, month, day etc.) from UTC time.
-    Y=$(cut -c1-4 <<< $cmd_time)
-    m=$(cut -c5-6 <<< $cmd_time)
-    d=$(cut -c7-8 <<< $cmd_time)
-    H=$(cut -c10-11 <<< $cmd_time)
-    M=$(cut -c13-14 <<< $cmd_time)
-    S=$(cut -c17-18 <<< $cmd_time)
+    line=$(grep "sending cmd from ${serial_number}.cmd" "$out_file" | tail -1)
 
-    # Convert UTC time into ISO 8601 format date string.
+    if [[ -z "$line" ]]; then
+        echo "Warning: no last-surface line found in $out_file" >&2
+        continue
+    fi
+
+    cmd_time=$(cut -c4-21 <<< "$line")
+
+    Y=$(cut -c1-4 <<< "$cmd_time")
+    m=$(cut -c5-6 <<< "$cmd_time")
+    d=$(cut -c7-8 <<< "$cmd_time")
+    H=$(cut -c10-11 <<< "$cmd_time")
+    M=$(cut -c13-14 <<< "$cmd_time")
+    S=$(cut -c17-18 <<< "$cmd_time")
+
     input_fmt="%Y-%m-%dT%H:%M:%SZ"
     date_string="$Y-$m-${d}T$H:$M:${S}Z"
 
-    # Log the Unix Epoch time of the UTC time.
-    if [ $computer = Darwin ]; then
-	last_surface_epoch=$(date -ujf $input_fmt $date_string +%s) # UTC
-
-    elif [ $computer = Linux ]; then
-	last_surface_epoch=$(date -ud $date_string +%s) # UTC
-
+    if [ "$computer" = Darwin ]; then
+        last_surface_epoch=$(date -ujf "$input_fmt" "$date_string" +%s) || continue
+    elif [ "$computer" = Linux ]; then
+        last_surface_epoch=$(date -ud "$date_string" +%s) || continue
     else
-	echo "Error: $0 only tested on Linux and Mac computers"
-	exit 1
-
+        echo "Error: $0 only tested on Linux and Mac computers" >&2
+        exit 1
     fi
 
-    # Parse the float name from the serial number.
-    float_name=$(cut -c9-12 <<< $serial_number | sed 's/-/00/')
+    float_name=$(osean2kstnm "$serial_number") || continue
 
-    # Compute the number of days elapsed since the last transmission.
-    # WARNING: ignores leap seconds.
     day_diff=$(bc <<< "scale=2; ($current_epoch - $last_surface_epoch) / (60*60*24)")
-    day_diff=$(printf '%6.1f\n' $day_diff) # left pad with spaces
+    day_diff=$(printf '%6.1f\n' "$day_diff")
 
-    # Print the output.
-    if [ $computer = Darwin ]; then
-	# In the OSX "date" command you may specify both an input and output
-	# date format.  Use %z in the input format and append +0000 to the date
-	# string to properly handle the timezone conversion from UTC.
-	date -jf $input_fmt%z $date_string+0000 +"$float_name: $output_fmt --> $day_diff days ago"
-
-    elif [ $computer = Linux ]; then
-	# Cannot(?) specify and input format in POSIX "date" command.  However,
-	# by default it does recognize the ISO 8601 format and properly handles
-	# the timezone conversion from UTC under the hood.
-	date -d $date_string +"$float_name: $output_fmt --> $day_diff days ago"
-
+    if [ "$computer" = Darwin ]; then
+        date -jf "$input_fmt%z" "$date_string+0000" +"$float_name: $output_fmt --> $day_diff days ago"
+    elif [ "$computer" = Linux ]; then
+        date -d "$date_string" +"$float_name: $output_fmt --> $day_diff days ago"
     fi
 done
