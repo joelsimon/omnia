@@ -24,7 +24,7 @@ function cmdparkdepth(park_depth, dive_duration, descent_speed, ascent_speed, ..
 % descent_speed     Approximate descent speed in [mbar/s (~0.01 m/s)] (def: 2.5)*
 %                       (NB, 2.5 mbar/s ~ 0.025 m/s ~ 90. m/hr ;
 %                        or, ~ 40.0 s/m, ~ 1.1 hr/100 m)
-% ascent_speed      Approximate descent speed in [mbar/s (~0.01 m/s)] (def: 8)
+% ascent_speed      Approximate ascent speed in [mbar/s (~0.01 m/s)] (def: 8)
 %                       (NB, 8.0 mbar/s ~ 0.080 m/s ~ 288 m/hr ;
 %                        or, ~ 12.5 s/m ~ 0.3 hr/100 m)
 % depth_tolerance   Depth tolerance (+-) at parking depth [dbar (~m)] (def: 50)
