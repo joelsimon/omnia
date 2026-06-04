@@ -1,10 +1,11 @@
 #! /bin/zsh
-# Usage: lastsurface [-p|--serial] [server_dir]
+# Usage: lastsurface [-s|--serial] [SERVER_DIR]
 #
 # Print dates of MERMAIDs' last transmissions as recorded in their *.out files.
 #
 # Options:
-#   -s, --serial   Print the full float serial name instead of kstnm.
+#    -s, --serial   Print the full float serial name instead of kstnm.
+#    SERVER_DIR    Server directory to scan (default: $MERMAID/servers/s_mermaid)
 #
 # Author: Joel D. Simon <jdsimon@bathymetrix.com>
 # Last modified: 11-May-2026, Darwin Kernel Version 23.6.0
@@ -50,7 +51,7 @@ input_fmt="%Y-%m-%dT%H:%M:%SZ"
 computer=$(uname -s)
 
 MERMAID_ROOT="${MERMAID:-$HOME/mermaid}"
-SERVER_DIR="${1:-$MERMAID_ROOT/server}"
+SERVER_DIR="${1:-$MERMAID_ROOT/servers/s_mermaid}"
 
 if [[ ! -d "$SERVER_DIR" ]]; then
     echo "Error: server directory not found: $SERVER_DIR" >&2
@@ -117,17 +118,17 @@ for out_file in "$SERVER_DIR"/*.out(N) "$SERVER_DIR"/*/*.out(N); do
     fi
 done
 
+
 for i in {1..${#labels}}; do
-    marker=""
     if (( ${day_diffs[$i]%.*} < 30 )); then
-        marker=" x"
+	marker=""
+    else
+	marker=" !"
     fi
 
     printf "%${label_width}s: %s --> %s days ago%s\n" \
-        "$labels[$i]" \
-        "$surface_dates[$i]" \
-        "$day_diffs[$i]" \
-        "$marker"
+	   "$labels[$i]" \
+	   "$surface_dates[$i]" \
+	   "$day_diffs[$i]" \
+	   "$marker"
 done
-
-
