@@ -5,7 +5,10 @@
 # Usage: ./rsync_servers
 #
 # Author: Joel D. Simon <jdsimon@bathymetrix.com>
-# Last modified: 04-Dec-2025, Darwin Kernel Version 23.6.0
+# Last modified: 17-Jun-2026, Darwin Kernel Version 23.6.0
+
+echo "Error: user 'reconcile_server.py'" >&2
+exit 1
 
 # List of server directories to be synced
 # (closing "\" or dir itself copied)
