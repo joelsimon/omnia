@@ -2,18 +2,17 @@
 #
 # Pull all "????_all.txt" MERMAID-location text files from EarthScopeOceans.org
 #
-# Requires: `wget` and output directory $MERMAID/eso_locations/
-#
-# Author: Joel D. Simon
-# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 26-Sep-2022, Darwin Kernel Version 18.7.0
+# Author: Joel D. Simon <jdsimon@bathymetrix.com>
+# Last modified: 30-Jun-2026, Darwin Kernel Version 23.6.0
+
+OUTDIR=$MERMAID/esoloc/
 
 wget --recursive \
      --no-parent \
      --no-host-directories \
      --cut-dirs=3 \
-     --directory-prefix=$MERMAID/eso_locations/ \
+     --directory-prefix=$OUTDIR \
      --accept '?????_all.txt' \
      http://geoweb.princeton.edu/people/simons/SOM/
 
-rm -rf $MERMAID/eso_locations/inprogress
+rm -rf $OUTDIR/inprogress

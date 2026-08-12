@@ -1,6 +1,8 @@
 #!/usr/bin/env zsh
 
-print -u2 "error: servercopy_jamstec has moved."
-print -u2 "Use: https://github.com/Bathymetrix/mermaid-ops/blob/main/servercopy_jamstec.zsh"
+print -u2 "Error: use 'FileZilla' to copy kobeuni/ at taal.unice.fr"
+
+# `serveropy_rudics` doesn't include full set of users mirrored at taal.unice.fr
+#print -u2 "Error: 'servercopy_jamstec' has moved to https://github.com/Bathymetrix/mermaid-ops/blob/main/servercopy_rudics.zsh"
 
 exit 1
