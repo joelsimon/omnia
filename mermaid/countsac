@@ -8,6 +8,10 @@
 # Last modified by JDS: 08-Sep-2021, Darwin Kernel Version 18.7.0
 # (previously modified by fjsimons-at-alum.mit.edu, 02/12/2019)
 
+echo "ERROR: This script has been retired."
+echo "Use https://github.com/Bathymetrix/mermaid-scripts/blob/main/scripts/countsac.py instead."
+exit 1
+
 set MERMAID = $MERMAID
 find $MERMAID/processed/ -maxdepth 3 -type f -name '*sac' > $MERMAID/all_sac
 
