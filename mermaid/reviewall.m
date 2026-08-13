@@ -19,7 +19,7 @@ function reviewall(writecp, floatnum, procdir, evtdir)
 %               writes .cp files with uncertainty estimation
 %
 % Author: Joel D. Simon <jdsimon@bathymetrix.com>
-% Last modified: 16-Jan-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Last modified: 13-Aug-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 % Defaults.
@@ -28,8 +28,9 @@ defval('floatnum', [])
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
 
-skip_french = true;
-skip_0100 = true;
+princeton_only = true;
+skip_french = false;
+skip_0100 = false;
 skip_mag3 = false;
 
 % Switch the .pdf viewer depending on the platform.
@@ -105,7 +106,6 @@ if ~isempty(sac)
     end
 
     % Loop backwards in time (most recent first).
-    keyboard
     [~, sort_idx] = sort(strippath(sac));
     sac = sac(sort_idx);
     num_sac = length(sac);
@@ -113,6 +113,12 @@ if ~isempty(sac)
     for i = num_sac:-1:1
         fprintf('Remaining SAC to be reviewed: %3i\n', num_rev)
         num_rev = num_rev - 1;
+
+        % Yeesh...this is ugly with the stripped and then repatched path
+        if princeton_only && ~princeton_sac(fullsac(sac{i}, procdir))
+            continue
+
+        end
 
         % Skip review of REQ
         if contains(strippath(sac{i}), 'REQ')
