@@ -1,6 +1,7 @@
 function reviewall(writecp, floatnum, procdir, evtdir)
 % REVIEWALL(writecp, floatnum, procdir, evtdir)
 %
+% ! THIS NEEDS A REWRITE FOR COMPILED EVENTS DIR !
 % Review all unreviewed $MERMAID events using reviewevt.m, assuming
 % same system configuration as JDS.
 %
@@ -71,21 +72,27 @@ end
 sac = setdiff(unrevsac, revsac);
 
 if ~isempty(sac)
-
-    %% Option 2 (original/worse): compare lists unreviewed events and all
-    %% processed SAC files (will fail if, e.g.,  you didn't make a raw.evt file for a
-    %% non-Princeton float)
-    % % Compile list of all SAC files and compare their differences.
-    % sac = fullsac([], procdir);
-    % if isempty(sac)
-    %     error('No .sac files recursively found in %s\n', procdir)
-
-    % end
-    % [~, idx] = setdiff(strippath(sac), evt);
-    % sac = sac(idx);
-    %% <<
-
+    % Let's collect all the fullpaths of the sac files (heavy op once).
+    [sac, excl] = fullsacs(sac, procdir);
+    
+    % Gotta figure all skips before main(ish) loop if you want local
+    % countdown to be correct
     skipped = {};
+
+    % Skip non-Princeton floats, maybe.
+    if princeton_only
+        rm_idx = [];
+        for i = 1:length(sac)
+            if ~princeton_sac(sac{i})
+                rm_idx = [rm_idx; i];
+
+            end
+        end
+        skipped = [skipped ; strippath(sac(rm_idx))];
+        sac(rm_idx) = [];
+
+    end
+    
     % Skip French floats, maybe.
     if skip_french
         rm_idx = cellstrfind(sac, {'452.020-P-06' '452.020-P-07'});
@@ -113,12 +120,6 @@ if ~isempty(sac)
     for i = num_sac:-1:1
         fprintf('Remaining SAC to be reviewed: %3i\n', num_rev)
         num_rev = num_rev - 1;
-
-        % Yeesh...this is ugly with the stripped and then repatched path
-        if princeton_only && ~princeton_sac(fullsac(sac{i}, procdir))
-            continue
-
-        end
 
         % Skip review of REQ
         if contains(strippath(sac{i}), 'REQ')
@@ -181,6 +182,11 @@ if writecp
     end
 end
 
+if ~isempty(excl)
+    warning('These excluded')
+    fprintf('%s\n', excl{:})
+
+end
 fprintf('\nAll done.\n')
 
 %% ___________________________________________________________________________ %%
