@@ -1,4 +1,4 @@
-function  out = princeton_kstnm(kstnm)
+function out = princeton_kstnm(kstnm)
 % PRINCETON_KSTNM(knstm)
 %
 % Returns true if KSTNM (station name) is one of Princeton's, P0008-P0025.
