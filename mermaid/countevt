@@ -2,9 +2,12 @@
 #
 # Counts MERMAID .evt files.
 #
-# Author: Joel D. Simon
-# Contact: jdsimon@alumni.princeton.edu | joeldsimon@gmail.com
-# Last modified: 05-Mar-2021, Darwin Kernel Version 18.7.0
+# Author: Joel D. Simon <jdsimon@bathymetrix.com>
+# Last modified: 14-Aug-2026, Darwin Kernel Version 23.6.0
+
+echo "WARNING: This script has been retired."
+echo "Use https://github.com/Bathymetrix/mermaid-scripts/blob/main/scripts/countevt.py instead."
+
 
 set MERMAID = $MERMAID
 
@@ -12,9 +15,9 @@ set MERMAID = $MERMAID
 set floatnum = (06 07 08 09 10 11 12 13 16 17 18 19 20 21 22 23 24 25 0100)
 set evt_count = 0
 
-find $MERMAID/events/reviewed -not -iname '*prelim*' -iname '*.evt' > $MERMAID/all_evt
-find $MERMAID/events/reviewed/identified -not -iname '*prelim*' -iname '*.evt' > $MERMAID/id_evt
-find $MERMAID/events/reviewed/unidentified -not -iname '*prelim*' -iname '*.evt' > $MERMAID/null_evt
+find $MERMAID/events_everyone/reviewed -not -iname '*prelim*' -iname '*.evt' > $MERMAID/all_evt
+find $MERMAID/events_everyone/reviewed/identified -not -iname '*prelim*' -iname '*.evt' > $MERMAID/id_evt
+find $MERMAID/events_everyone/reviewed/unidentified -not -iname '*prelim*' -iname '*.evt' > $MERMAID/null_evt
 
 printf "\n                         ...Tallying the .evt files...                          \n"
 printf "\n               All          ID    DET_ID    REQ_ID      NULL  DET_NULL  REQ_NULL\n"
