@@ -1,6 +1,10 @@
 function sppim_movie
+% SPPIM_MOVIE
+%
+% Use, e.g., `fmpeg -i sppim_movie.mp4 -vf "crop=1120:680:0:140" -c:a copy cropped.mp4`
+%
 % Author: Joel D. Simon <jdsimon@bathymetrix.com>
-% Last modified: 12-Jan-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Last modified: 19-Aug-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
@@ -8,7 +12,7 @@ close all
 
 procdir = fullfile(getenv('MERMAID'), 'processed_everyone');
 
-gps = readgps(procdir, false);
+gps = readgps(procdir, true);
 mermaids = fieldnames(gps);
 
 empties = {};
@@ -97,7 +101,7 @@ for i = 1:length(mermaids)
 
 end
 
-vname = mfilename;
+vname = fullfile(pwd, mfilename);
 vwriter = VideoWriter(vname, 'MPEG-4');
 open(vwriter);
 
@@ -113,8 +117,8 @@ for j = 1:length(dates)
 
         end
     end
-    title(datestr(d, 'mmmm YYYY'), 'FontWeight', 'Normal');
-    drawnow
+    tl = title(datestr(d, 'mmm. YYYY'), 'FontWeight', 'Normal', 'FontSize', 13);
+    tl.Position(2) = 11.5;
     writeVideo(vwriter, getframe(gcf));
 
 end
