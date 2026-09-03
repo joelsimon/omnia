@@ -51,7 +51,7 @@ input_fmt="%Y-%m-%dT%H:%M:%SZ"
 computer=$(uname -s)
 
 MERMAID_ROOT="${MERMAID:-$HOME/mermaid}"
-SERVER_DIR="${1:-$MERMAID_ROOT/servers/s_mermaid}"
+SERVER_DIR="${1:-$MERMAID_ROOT/server_everyone}"
 
 if [[ ! -d "$SERVER_DIR" ]]; then
     echo "Error: server directory not found: $SERVER_DIR" >&2
