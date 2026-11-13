@@ -7,7 +7,7 @@
 
 echo "WARNING: This script has been retired."
 echo "Use https://github.com/Bathymetrix/mermaid-scripts/blob/main/scripts/countevt.py instead."
-
+exit 1
 
 set MERMAID = $MERMAID
 
