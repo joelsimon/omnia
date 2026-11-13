@@ -20,13 +20,13 @@ function matchall(writecp, procdir, evtdir, evtdir2)
 %
 % % *Ex:
 %    writecp = false;
-%    procdir = '~/mermaid/processed_everyone';
-%    evtdir = '~/mermaid/events_everyone';
+%    procdir = '~/mermaid/processed';
+%    evtdir = '~/mermaid/events;
 %    evtdir2 = '~/mermaid/events/';
 %    MATCHALL(writecp, procdir, evtdir, evtdir2)
 %
 % Author: Joel D. Simon <jdsimon@bathymetrix.com>
-% Last modified: 16-Jan-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
+% Last modified: 08-Oct-2026, 9.13.0.2553342 (R2022b) Update 9 on MACI64 (geo_mac)
 % (in reality: Intel MATLAB in Rosetta 2 running on an Apple silicon Mac)
 
 clc
@@ -45,10 +45,12 @@ princeton_only = false;
 defval('writecp', false)
 defval('procdir', fullfile(getenv('MERMAID'), 'processed'))
 defval('evtdir', fullfile(getenv('MERMAID'), 'events'))
-defval('evtdir2', [])
+defval('evtdir2', fullfile(getenv('MERMAID'), 'events'))
 
-% Find only those SAC files which have not been preliminary matched.
+% Find only those SAC files which have not been preliminary matched and
+% aren't incomplete dives
 all_sac = fullsac([], procdir);
+all_sac(find(contains(all_sac, 'IcCycle'))) = [];
 if isempty(all_sac)
     error('No SAC files found %s\n', procdir)
 
